@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
@@ -55,19 +56,21 @@ export default async function LocaleLayout({
   return (
     <html lang={validLocale} dir={dir} suppressHydrationWarning>
       <body className="min-h-screen bg-white font-sans antialiased dark:bg-gray-950 dark:text-gray-100">
-        <ThemeProvider>
-          <CurrencyProvider>
-            <CartProvider>
-              <JsonLd data={generateOrganizationJsonLd()} />
-              <div className="flex min-h-screen flex-col">
-                <Header locale={validLocale} dictionary={dictionary} />
-                <main className="flex-1">{children}</main>
-                <Footer locale={validLocale} dictionary={dictionary} />
-              </div>
-              <ThemeToggle />
-            </CartProvider>
-          </CurrencyProvider>
-        </ThemeProvider>
+                <ThemeProvider>
+                  <AuthProvider>
+                    <CurrencyProvider>
+                      <CartProvider>
+                        <JsonLd data={generateOrganizationJsonLd()} />
+                        <div className="flex min-h-screen flex-col">
+                          <Header locale={validLocale} dictionary={dictionary} />
+                          <main className="flex-1">{children}</main>
+                          <Footer locale={validLocale} dictionary={dictionary} />
+                        </div>
+                        <ThemeToggle />
+                      </CartProvider>
+                    </CurrencyProvider>
+                  </AuthProvider>
+                </ThemeProvider>
       </body>
     </html>
   );
