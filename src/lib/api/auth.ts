@@ -15,6 +15,8 @@ export interface RegisterData {
 
 export interface AuthUser {
   token: string;
+  refresh_token?: string;
+  user_id: number;
   user_email: string;
   user_nicename: string;
   user_display_name: string;
@@ -41,9 +43,15 @@ export interface RegisterResponse {
   error?: AuthError;
 }
 
+export interface RefreshTokenResponse {
+  success: boolean;
+  token?: string;
+  error?: AuthError;
+}
+
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
   try {
-    const response = await fetch(`${API_BASE}/wp-json/jwt-auth/v1/token`, {
+    const response = await fetch(`${API_BASE}/wp-json/cocart/v2/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,10 +75,12 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     return {
       success: true,
       user: {
-        token: data.token,
-        user_email: data.user_email,
-        user_nicename: data.user_nicename,
-        user_display_name: data.user_display_name,
+        token: data.jwt_token || data.token,
+        refresh_token: data.jwt_refresh_token || data.refresh_token,
+        user_id: data.user_id || data.id || 0,
+        user_email: data.user_email || data.email || "",
+        user_nicename: data.user_nicename || data.nicename || data.username || "",
+        user_display_name: data.user_display_name || data.display_name || data.username || "",
       },
     };
   } catch (error) {
@@ -129,7 +139,7 @@ export async function register(data: RegisterData): Promise<RegisterResponse> {
 
 export async function validateToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE}/wp-json/jwt-auth/v1/token/validate`, {
+    const response = await fetch(`${API_BASE}/wp-json/cocart/jwt/validate-token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -141,4 +151,54 @@ export async function validateToken(token: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export async function refreshToken(refreshTokenValue: string): Promise<RefreshTokenResponse> {
+  try {
+    const response = await fetch(`${API_BASE}/wp-json/cocart/jwt/refresh-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refresh_token: refreshTokenValue }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: {
+          code: data.code || "refresh_failed",
+          message: data.message || "Token refresh failed.",
+          data: { status: response.status },
+        },
+      };
+    }
+
+    return {
+      success: true,
+      token: data.jwt_token || data.token,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "network_error",
+        message: error instanceof Error ? error.message : "Network error occurred",
+      },
+    };
+  }
+}
+
+export function getAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  const cookies = document.cookie.split(";");
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split("=");
+    if (name === "asl_auth_token") {
+      return decodeURIComponent(value);
+    }
+  }
+  return null;
 }

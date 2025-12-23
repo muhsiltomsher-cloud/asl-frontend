@@ -114,9 +114,27 @@
     "register": "Register",
     "forgotPassword": "Forgot Password?",
     "orders": "Orders",
+    "ordersDesc": "View and track your orders",
     "addresses": "Addresses",
+    "addressesDesc": "Manage your delivery addresses",
     "accountDetails": "Account Details",
-    "wishlist": "Wishlist"
+    "wishlist": "Wishlist",
+    "wishlistDesc": "View your saved items",
+    "settings": "Account Settings",
+    "settingsDesc": "Update your profile and preferences",
+    "logoutDesc": "Sign out of your account",
+    "welcome": "Welcome back",
+    "notLoggedIn": "Please login to access your account",
+    "memberSince": "Member since"
+  },
+  "miniCart": {
+    "cart": "Shopping Cart",
+    "emptyCart": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "subtotal": "Subtotal",
+    "viewCart": "View Cart",
+    "checkout": "Checkout",
+    "remove": "Remove"
   },
   "auth": {
     "loginTitle": "Welcome Back",
