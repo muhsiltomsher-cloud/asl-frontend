@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { siteConfig, type Locale } from "@/config/site";
 
+interface AlternateUrls {
+  en?: string;
+  ar?: string;
+}
+
 interface GenerateMetadataParams {
   title?: string;
   description?: string;
@@ -8,6 +13,7 @@ interface GenerateMetadataParams {
   locale: Locale;
   pathname: string;
   noIndex?: boolean;
+  alternatePathnames?: AlternateUrls;
 }
 
 export function generateMetadata({
@@ -17,14 +23,15 @@ export function generateMetadata({
   locale,
   pathname,
   noIndex = false,
+  alternatePathnames,
 }: GenerateMetadataParams): Metadata {
   const fullTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
   const fullDescription = description || siteConfig.description;
   const ogImage = image || siteConfig.ogImage;
   const url = `${siteConfig.url}/${locale}${pathname}`;
 
-  // alternateLocale used for hreflang tags
-  const _alternateLocale = locale === "en" ? "ar" : "en";
+  const enPathname = alternatePathnames?.en || pathname;
+  const arPathname = alternatePathnames?.ar || pathname;
 
   return {
     title: fullTitle,
@@ -33,9 +40,9 @@ export function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        en: `${siteConfig.url}/en${pathname}`,
-        ar: `${siteConfig.url}/ar${pathname}`,
-        "x-default": `${siteConfig.url}/en${pathname}`,
+        en: `${siteConfig.url}/en${enPathname}`,
+        ar: `${siteConfig.url}/ar${arPathname}`,
+        "x-default": `${siteConfig.url}/en${enPathname}`,
       },
     },
     openGraph: {

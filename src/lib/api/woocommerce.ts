@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config/site";
+import { siteConfig, type Locale } from "@/config/site";
 import type {
   WCProduct,
   WCCategory,
@@ -10,15 +10,23 @@ const API_BASE = `${siteConfig.apiUrl}/wp-json/wc/store/v1`;
 interface FetchOptions {
   revalidate?: number;
   tags?: string[];
+  locale?: Locale;
 }
 
 async function fetchAPI<T>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const { revalidate = 60, tags } = options;
+  const { revalidate = 60, tags, locale } = options;
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  let url = `${API_BASE}${endpoint}`;
+  
+  if (locale) {
+    const separator = endpoint.includes("?") ? "&" : "?";
+    url = `${url}${separator}lang=${locale}`;
+  }
+
+  const response = await fetch(url, {
     next: {
       revalidate,
       tags,
@@ -40,6 +48,7 @@ export async function getProducts(params?: {
   search?: string;
   orderby?: string;
   order?: "asc" | "desc";
+  locale?: Locale;
 }): Promise<WCProductsResponse> {
   const searchParams = new URLSearchParams();
 
@@ -65,11 +74,13 @@ export async function getProducts(params?: {
 }
 
 export async function getProductBySlug(
-  slug: string
+  slug: string,
+  locale?: Locale
 ): Promise<WCProduct | null> {
   try {
     const products = await fetchAPI<WCProduct[]>(`/products?slug=${slug}`, {
       tags: ["products", `product-${slug}`],
+      locale,
     });
 
     return products.length > 0 ? products[0] : null;
@@ -78,10 +89,14 @@ export async function getProductBySlug(
   }
 }
 
-export async function getProductById(id: number): Promise<WCProduct | null> {
+export async function getProductById(
+  id: number,
+  locale?: Locale
+): Promise<WCProduct | null> {
   try {
     const product = await fetchAPI<WCProduct>(`/products/${id}`, {
       tags: ["products", `product-${id}`],
+      locale,
     });
 
     return product;
@@ -91,19 +106,21 @@ export async function getProductById(id: number): Promise<WCProduct | null> {
 }
 
 // Categories API
-export async function getCategories(): Promise<WCCategory[]> {
+export async function getCategories(locale?: Locale): Promise<WCCategory[]> {
   const categories = await fetchAPI<WCCategory[]>("/products/categories", {
     tags: ["categories"],
+    locale,
   });
 
   return categories;
 }
 
 export async function getCategoryBySlug(
-  slug: string
+  slug: string,
+  locale?: Locale
 ): Promise<WCCategory | null> {
   try {
-    const categories = await getCategories();
+    const categories = await getCategories(locale);
     return categories.find((cat) => cat.slug === slug) || null;
   } catch {
     return null;
@@ -115,9 +132,10 @@ export async function getProductsByCategory(
   params?: {
     page?: number;
     per_page?: number;
+    locale?: Locale;
   }
 ): Promise<WCProductsResponse> {
-  const category = await getCategoryBySlug(categorySlug);
+  const category = await getCategoryBySlug(categorySlug, params?.locale);
 
   if (!category) {
     return { products: [], total: 0, totalPages: 0 };
