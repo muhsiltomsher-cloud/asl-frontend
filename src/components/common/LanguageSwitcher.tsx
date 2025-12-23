@@ -10,14 +10,15 @@ import { cn } from "@/lib/utils";
 interface LanguageSwitcherProps {
   locale: Locale;
   className?: string;
+  alternateUrl?: string;
 }
 
-export function LanguageSwitcher({ locale, className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ locale, className, alternateUrl }: LanguageSwitcherProps) {
   const pathname = usePathname();
   const pathWithoutLocale = getPathWithoutLocale(pathname);
 
   const alternateLocale: Locale = locale === "en" ? "ar" : "en";
-  const alternateHref = `/${alternateLocale}${pathWithoutLocale}`;
+  const alternateHref = alternateUrl || `/${alternateLocale}${pathWithoutLocale}`;
 
   return (
     <Link
