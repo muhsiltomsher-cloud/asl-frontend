@@ -1,21 +1,54 @@
+/**
+ * Site Configuration
+ * 
+ * Main configuration file for the Aromatic Scents Lab frontend.
+ * Update these values when deploying to different environments.
+ */
 export const siteConfig = {
+  // Site name - displayed in browser title, meta tags, etc.
   name: "Aromatic Scents Lab",
+  
+  // Site description - used for SEO meta description
   description: "Premium fragrances and aromatic products",
+  
+  // Frontend URL - update this when deploying to production
+  // Local: http://localhost:3000
+  // Production: https://aromaticscentslab.com
   url: "https://aromaticscentslab.com",
+  
+  // Open Graph image URL - used for social media sharing
   ogImage: "https://aromaticscentslab.com/og.jpg",
+  
+  // WordPress/WooCommerce Backend API URL
+  // Staging: https://adminasl.stagingndemo.com
+  // Production: https://aromaticscentslab.com (or your production backend)
   apiUrl: "https://adminasl.stagingndemo.com",
+  
+  // Social media links
   links: {
     instagram: "https://instagram.com/aromaticscentslab",
     facebook: "https://facebook.com/aromaticscentslab",
   },
+  
+  // Default locale for the site (en = English, ar = Arabic)
   defaultLocale: "en" as const,
+  
+  // Supported locales - add more locales here if needed
   locales: ["en", "ar"] as const,
+  
+  // Default currency code
   defaultCurrency: "AED" as const,
 };
 
 export type Locale = (typeof siteConfig.locales)[number];
 export type Currency = (typeof currencies)[number]["code"];
 
+/**
+ * Supported Currencies
+ * 
+ * List of currencies supported by the store.
+ * Each currency has: code, label, symbol, and decimal places.
+ */
 export const currencies = [
   { code: "AED", label: "UAE (AED)", symbol: "د.إ", decimals: 2 },
   { code: "BHD", label: "Bahrain (BHD)", symbol: "BD", decimals: 3 },
@@ -26,6 +59,14 @@ export const currencies = [
   { code: "USD", label: "United States (USD)", symbol: "$", decimals: 2 },
 ] as const;
 
+/**
+ * Locale Configuration
+ * 
+ * Configuration for each supported locale.
+ * - name: Display name of the language
+ * - dir: Text direction (ltr = left-to-right, rtl = right-to-left)
+ * - hrefLang: HTML lang attribute value
+ */
 export const localeConfig = {
   en: {
     name: "English",
