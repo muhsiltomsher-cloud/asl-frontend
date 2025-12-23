@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, ShoppingBag, Search, User } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, User, LogOut } from "lucide-react";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { CurrencySwitcher } from "@/components/common/CurrencySwitcher";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
@@ -18,6 +19,7 @@ interface HeaderProps {
 export function Header({ locale, dictionary }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartItemsCount, setIsCartOpen } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navigation = [
     { name: dictionary.common.home, href: `/${locale}` },
@@ -88,13 +90,41 @@ export function Header({ locale, dictionary }: HeaderProps) {
             >
               <Search className="h-5 w-5" />
             </button>
-            <Link
-              href={`/${locale}/account`}
-              className="p-2 text-gray-700 hover:text-gray-900"
-              aria-label={dictionary.account.myAccount}
-            >
-              <User className="h-5 w-5" />
-            </Link>
+                        {isAuthenticated ? (
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/${locale}/account`}
+                              className="hidden items-center gap-1 p-2 text-sm text-gray-700 hover:text-gray-900 md:flex"
+                              aria-label={dictionary.account.myAccount}
+                            >
+                              <User className="h-5 w-5" />
+                              <span className="max-w-[100px] truncate">{user?.user_display_name}</span>
+                            </Link>
+                            <Link
+                              href={`/${locale}/account`}
+                              className="p-2 text-gray-700 hover:text-gray-900 md:hidden"
+                              aria-label={dictionary.account.myAccount}
+                            >
+                              <User className="h-5 w-5" />
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={logout}
+                              className="p-2 text-gray-700 hover:text-gray-900"
+                              aria-label={dictionary.account.logout}
+                            >
+                              <LogOut className="h-5 w-5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <Link
+                            href={`/${locale}/login`}
+                            className="p-2 text-gray-700 hover:text-gray-900"
+                            aria-label={dictionary.account.login}
+                          >
+                            <User className="h-5 w-5" />
+                          </Link>
+                        )}
             <button
               type="button"
               className="relative p-2 text-gray-700 hover:text-gray-900"
