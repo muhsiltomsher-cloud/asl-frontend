@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
@@ -13,6 +14,16 @@ import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import "@/app/globals.css";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -56,7 +67,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={validLocale} dir={dir} suppressHydrationWarning>
-      <body className="min-h-screen bg-white font-sans antialiased dark:bg-gray-950 dark:text-gray-100">
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-white font-sans antialiased dark:bg-gray-950 dark:text-gray-100`}>
                 <ThemeProvider>
                   <AuthProvider>
                     <CurrencyProvider>
