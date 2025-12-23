@@ -114,9 +114,27 @@
     "register": "إنشاء حساب",
     "forgotPassword": "نسيت كلمة المرور؟",
     "orders": "الطلبات",
+    "ordersDesc": "عرض وتتبع طلباتك",
     "addresses": "العناوين",
+    "addressesDesc": "إدارة عناوين التوصيل",
     "accountDetails": "تفاصيل الحساب",
-    "wishlist": "قائمة الأمنيات"
+    "wishlist": "قائمة الأمنيات",
+    "wishlistDesc": "عرض المنتجات المحفوظة",
+    "settings": "إعدادات الحساب",
+    "settingsDesc": "تحديث ملفك الشخصي والتفضيلات",
+    "logoutDesc": "الخروج من حسابك",
+    "welcome": "مرحباً بعودتك",
+    "notLoggedIn": "يرجى تسجيل الدخول للوصول إلى حسابك",
+    "memberSince": "عضو منذ"
+  },
+  "miniCart": {
+    "cart": "سلة التسوق",
+    "emptyCart": "سلة التسوق فارغة",
+    "continueShopping": "متابعة التسوق",
+    "subtotal": "المجموع الفرعي",
+    "viewCart": "عرض السلة",
+    "checkout": "إتمام الشراء",
+    "remove": "إزالة"
   },
   "auth": {
     "loginTitle": "مرحباً بعودتك",
