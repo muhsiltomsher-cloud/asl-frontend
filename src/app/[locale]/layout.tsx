@@ -4,6 +4,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
@@ -51,18 +53,21 @@ export default async function LocaleLayout({
   const { dir } = localeConfig[validLocale];
 
   return (
-    <html lang={validLocale} dir={dir}>
-      <body className="min-h-screen bg-white font-sans antialiased">
-        <CurrencyProvider>
-          <CartProvider>
-            <JsonLd data={generateOrganizationJsonLd()} />
-            <div className="flex min-h-screen flex-col">
-              <Header locale={validLocale} dictionary={dictionary} />
-              <main className="flex-1">{children}</main>
-              <Footer locale={validLocale} dictionary={dictionary} />
-            </div>
-          </CartProvider>
-        </CurrencyProvider>
+    <html lang={validLocale} dir={dir} suppressHydrationWarning>
+      <body className="min-h-screen bg-white font-sans antialiased dark:bg-gray-950 dark:text-gray-100">
+        <ThemeProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <JsonLd data={generateOrganizationJsonLd()} />
+              <div className="flex min-h-screen flex-col">
+                <Header locale={validLocale} dictionary={dictionary} />
+                <main className="flex-1">{children}</main>
+                <Footer locale={validLocale} dictionary={dictionary} />
+              </div>
+              <ThemeToggle />
+            </CartProvider>
+          </CurrencyProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
