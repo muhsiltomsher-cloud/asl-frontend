@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/common/Button";
+import { WCProductGrid } from "@/components/shop/WCProductGrid";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getProducts, getCategories } from "@/lib/api/woocommerce";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -29,6 +31,15 @@ export default async function HomePage({ params }: HomePageProps) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
   const isRTL = locale === "ar";
+
+  // Fetch products and categories from WooCommerce API
+  const [{ products }, categories] = await Promise.all([
+    getProducts({ per_page: 8 }),
+    getCategories(),
+  ]);
+
+  // Filter parent categories (those with parent = 0)
+  const parentCategories = categories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized").slice(0, 3);
 
   return (
     <div className="flex flex-col">
@@ -77,23 +88,7 @@ export default async function HomePage({ params }: HomePageProps) {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                name: isRTL ? "عطور" : "Perfumes",
-                slug: "perfumes",
-                image: "/categories/perfumes.jpg",
-              },
-              {
-                name: isRTL ? "بخور" : "Incense",
-                slug: "incense",
-                image: "/categories/incense.jpg",
-              },
-              {
-                name: isRTL ? "زيوت عطرية" : "Essential Oils",
-                slug: "essential-oils",
-                image: "/categories/oils.jpg",
-              },
-            ].map((category) => (
+            {parentCategories.map((category) => (
               <Link
                 key={category.slug}
                 href={`/${locale}/category/${category.slug}`}
@@ -105,6 +100,9 @@ export default async function HomePage({ params }: HomePageProps) {
                   <h3 className="text-xl font-semibold text-white">
                     {category.name}
                   </h3>
+                  <p className="text-sm text-white/80">
+                    {category.count} {isRTL ? "منتج" : "products"}
+                  </p>
                 </div>
               </Link>
             ))}
@@ -132,18 +130,11 @@ export default async function HomePage({ params }: HomePageProps) {
               <ArrowRight className={`ml-1 h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 md:gap-6">
-            {/* Placeholder product cards */}
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <div className="aspect-square rounded-lg bg-gray-200" />
-                <div className="space-y-1">
-                  <div className="h-4 w-3/4 rounded bg-gray-200" />
-                  <div className="h-4 w-1/2 rounded bg-gray-200" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <WCProductGrid
+            products={products.slice(0, 4)}
+            locale={locale as Locale}
+            columns={4}
+          />
           <div className="mt-8 text-center md:hidden">
             <Button variant="outline" asChild>
               <Link href={`/${locale}/shop`}>{dictionary.common.viewAll}</Link>

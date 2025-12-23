@@ -1,0 +1,117 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { ShoppingBag, Heart } from "lucide-react";
+import { Badge } from "@/components/common/Badge";
+import { Button } from "@/components/common/Button";
+import { cn } from "@/lib/utils";
+import { formatWCPrice } from "@/lib/api/woocommerce";
+import type { WCProduct } from "@/types/woocommerce";
+import type { Locale } from "@/config/site";
+
+interface WCProductCardProps {
+  product: WCProduct;
+  locale: Locale;
+  className?: string;
+}
+
+export function WCProductCard({
+  product,
+  locale,
+  className,
+}: WCProductCardProps) {
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // TODO: Implement add to cart with WooCommerce Store API
+    console.log("Add to cart:", product.id);
+  };
+
+  const isOutOfStock = !product.is_in_stock;
+  const mainImage = product.images[0];
+
+  return (
+    <article className={cn("group relative", className)}>
+      <Link href={`/${locale}/product/${product.slug}`} className="block">
+        {/* Image container */}
+        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+          {mainImage ? (
+            <Image
+              src={mainImage.src}
+              alt={mainImage.alt || product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <span className="text-gray-400">No image</span>
+            </div>
+          )}
+
+          {/* Badges */}
+          <div className="absolute left-2 top-2 flex flex-col gap-1">
+            {product.on_sale && <Badge variant="error">Sale</Badge>}
+            {isOutOfStock && <Badge variant="default">Out of Stock</Badge>}
+          </div>
+
+          {/* Quick actions */}
+          <div className="absolute right-2 top-2 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+            <button
+              type="button"
+              className="rounded-full bg-white p-2 shadow-md transition-colors hover:bg-gray-100"
+              aria-label="Add to wishlist"
+            >
+              <Heart className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Add to cart button */}
+          {!isOutOfStock && product.is_purchasable && (
+            <div className="absolute bottom-2 left-2 right-2 opacity-0 transition-opacity group-hover:opacity-100">
+              <Button onClick={handleAddToCart} className="w-full" size="sm">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                Add to Cart
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Product info */}
+        <div className="mt-3 space-y-1">
+          {/* Category */}
+          {product.categories?.[0] && (
+            <p className="text-xs text-gray-500">{product.categories[0].name}</p>
+          )}
+
+          {/* Name */}
+          <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
+            {product.name}
+          </h3>
+
+          {/* Price */}
+          <div className="flex items-center gap-2">
+            {product.on_sale ? (
+              <>
+                <span className="text-sm font-semibold text-gray-900">
+                  {formatWCPrice(product.prices)}
+                </span>
+                <span className="text-sm text-gray-500 line-through">
+                  {formatWCPrice({
+                    ...product.prices,
+                    price: product.prices.regular_price,
+                  })}
+                </span>
+              </>
+            ) : (
+              <span className="text-sm font-semibold text-gray-900">
+                {formatWCPrice(product.prices)}
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
+    </article>
+  );
+}

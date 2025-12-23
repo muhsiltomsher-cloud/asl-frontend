@@ -3,19 +3,21 @@ export const siteConfig = {
   description: "Premium fragrances and aromatic products",
   url: "https://aromaticscentslab.com",
   ogImage: "https://aromaticscentslab.com/og.jpg",
+  apiUrl: "https://adminasl.stagingndemo.com",
   links: {
     instagram: "https://instagram.com/aromaticscentslab",
     facebook: "https://facebook.com/aromaticscentslab",
   },
   defaultLocale: "en" as const,
   locales: ["en", "ar"] as const,
-  defaultCurrency: "SAR" as const,
+  defaultCurrency: "AED" as const,
 };
 
 export type Locale = (typeof siteConfig.locales)[number];
 export type Currency = (typeof currencies)[number]["code"];
 
 export const currencies = [
+  { code: "AED", label: "UAE (AED)", symbol: "د.إ", decimals: 2 },
   { code: "BHD", label: "Bahrain (BHD)", symbol: "BD", decimals: 3 },
   { code: "KWD", label: "Kuwait (KWD)", symbol: "KD", decimals: 3 },
   { code: "OMR", label: "Oman (OMR)", symbol: "OMR", decimals: 3 },

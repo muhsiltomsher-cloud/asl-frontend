@@ -4,3 +4,5 @@ export * from "./CategoryCard";
 export * from "./ProductGallery";
 export * from "./QuantitySelector";
 export * from "./ProductFilters";
+export * from "./WCProductCard";
+export * from "./WCProductGrid";
