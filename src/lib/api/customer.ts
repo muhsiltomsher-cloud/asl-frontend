@@ -1,10 +1,3 @@
-import { siteConfig } from "@/config/site";
-import { getAuthToken } from "./auth";
-
-const API_BASE = `${siteConfig.apiUrl}/wp-json/wc/v3`;
-const CONSUMER_KEY = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || "";
-const CONSUMER_SECRET = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "";
-
 export interface CustomerAddress {
   first_name: string;
   last_name: string;
@@ -142,51 +135,32 @@ export interface CustomerOperationResponse<T> {
   error?: CustomerError;
 }
 
-function getAuthHeaders(): HeadersInit {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
-
-  const token = getAuthToken();
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  return headers;
-}
-
-function getBasicAuthParams(): string {
-  return `consumer_key=${CONSUMER_KEY}&consumer_secret=${CONSUMER_SECRET}`;
-}
-
 export async function getCustomer(
   customerId: number
 ): Promise<CustomerOperationResponse<Customer>> {
   try {
-    const response = await fetch(
-      `${API_BASE}/customers/${customerId}?${getBasicAuthParams()}`,
-      {
-        method: "GET",
-        headers: getAuthHeaders(),
-      }
-    );
+    const response = await fetch(`/api/customer?customerId=${customerId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       return {
         success: false,
-        error: {
-          code: data.code || "customer_error",
-          message: data.message || "Failed to get customer.",
-          data: { status: response.status },
+        error: result.error || {
+          code: "customer_error",
+          message: "Failed to get customer.",
         },
       };
     }
 
     return {
       success: true,
-      data,
+      data: result.data,
     };
   } catch (error) {
     return {
@@ -205,31 +179,29 @@ export async function updateCustomer(
   customerData: Partial<Customer>
 ): Promise<CustomerOperationResponse<Customer>> {
   try {
-    const response = await fetch(
-      `${API_BASE}/customers/${customerId}?${getBasicAuthParams()}`,
-      {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(customerData),
-      }
-    );
+    const response = await fetch(`/api/customer?customerId=${customerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(customerData),
+    });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       return {
         success: false,
-        error: {
-          code: data.code || "customer_update_error",
-          message: data.message || "Failed to update customer.",
-          data: { status: response.status },
+        error: result.error || {
+          code: "customer_update_error",
+          message: "Failed to update customer.",
         },
       };
     }
 
     return {
       success: true,
-      data,
+      data: result.data,
     };
   } catch (error) {
     return {
@@ -253,37 +225,35 @@ export async function getCustomerOrders(
 ): Promise<CustomerOperationResponse<Order[]>> {
   try {
     const searchParams = new URLSearchParams();
-    searchParams.set("customer", customerId.toString());
+    searchParams.set("customerId", customerId.toString());
 
     if (params?.page) searchParams.set("page", params.page.toString());
     if (params?.per_page)
       searchParams.set("per_page", params.per_page.toString());
     if (params?.status) searchParams.set("status", params.status);
 
-    const response = await fetch(
-      `${API_BASE}/orders?${searchParams.toString()}&${getBasicAuthParams()}`,
-      {
-        method: "GET",
-        headers: getAuthHeaders(),
-      }
-    );
+    const response = await fetch(`/api/orders?${searchParams.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       return {
         success: false,
-        error: {
-          code: data.code || "orders_error",
-          message: data.message || "Failed to get orders.",
-          data: { status: response.status },
+        error: result.error || {
+          code: "orders_error",
+          message: "Failed to get orders.",
         },
       };
     }
 
     return {
       success: true,
-      data,
+      data: result.data,
     };
   } catch (error) {
     return {
@@ -301,30 +271,28 @@ export async function getOrder(
   orderId: number
 ): Promise<CustomerOperationResponse<Order>> {
   try {
-    const response = await fetch(
-      `${API_BASE}/orders/${orderId}?${getBasicAuthParams()}`,
-      {
-        method: "GET",
-        headers: getAuthHeaders(),
-      }
-    );
+    const response = await fetch(`/api/orders?orderId=${orderId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       return {
         success: false,
-        error: {
-          code: data.code || "order_error",
-          message: data.message || "Failed to get order.",
-          data: { status: response.status },
+        error: result.error || {
+          code: "order_error",
+          message: "Failed to get order.",
         },
       };
     }
 
     return {
       success: true,
-      data,
+      data: result.data,
     };
   } catch (error) {
     return {
@@ -344,31 +312,29 @@ export async function updateCustomerAddress(
   address: CustomerAddress
 ): Promise<CustomerOperationResponse<Customer>> {
   try {
-    const response = await fetch(
-      `${API_BASE}/customers/${customerId}?${getBasicAuthParams()}`,
-      {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ [addressType]: address }),
-      }
-    );
+    const response = await fetch(`/api/customer?customerId=${customerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ [addressType]: address }),
+    });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       return {
         success: false,
-        error: {
-          code: data.code || "address_update_error",
-          message: data.message || "Failed to update address.",
-          data: { status: response.status },
+        error: result.error || {
+          code: "address_update_error",
+          message: "Failed to update address.",
         },
       };
     }
 
     return {
       success: true,
-      data,
+      data: result.data,
     };
   } catch (error) {
     return {

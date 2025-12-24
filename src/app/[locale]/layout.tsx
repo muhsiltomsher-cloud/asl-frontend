@@ -8,6 +8,7 @@ import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
@@ -56,45 +57,47 @@ export default async function LocaleLayout({
   return (
     <AuthProvider>
       <CurrencyProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <JsonLd data={generateOrganizationJsonLd()} />
-            <div dir={dir} lang={validLocale} className="flex min-h-screen flex-col bg-white">
-              <Header locale={validLocale} dictionary={dictionary} />
-              <main className="flex-1">{children}</main>
-              <Footer locale={validLocale} dictionary={dictionary} />
-            </div>
-            <MiniCartDrawer
-              locale={validLocale}
-              dictionary={{
-                cart: dictionary.common.cart,
-                emptyCart: dictionary.cart.emptyCart,
-                continueShopping: dictionary.cart.continueShopping,
-                subtotal: dictionary.cart.subtotal,
-                viewCart: dictionary.cart.viewCart,
-                checkout: dictionary.cart.checkout,
-                remove: dictionary.common.remove,
-              }}
-            />
-            <AccountDrawer
-              locale={validLocale}
-              dictionary={{
-                myAccount: dictionary.account.myAccount,
-                orders: dictionary.account.orders,
-                addresses: dictionary.account.addresses,
-                wishlist: dictionary.account.wishlist,
-                settings: dictionary.account.settings,
-                logout: dictionary.account.logout,
-                welcome: dictionary.account.welcome,
-                login: dictionary.account.login,
-                register: dictionary.account.register,
-                notLoggedIn: dictionary.account.notLoggedIn,
-                profile: dictionary.account.profile,
-                more: dictionary.common.more,
-              }}
-            />
-          </WishlistProvider>
-        </CartProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <JsonLd data={generateOrganizationJsonLd()} />
+              <div dir={dir} lang={validLocale} className="flex min-h-screen flex-col bg-white">
+                <Header locale={validLocale} dictionary={dictionary} />
+                <main className="flex-1">{children}</main>
+                <Footer locale={validLocale} dictionary={dictionary} />
+              </div>
+              <MiniCartDrawer
+                locale={validLocale}
+                dictionary={{
+                  cart: dictionary.common.cart,
+                  emptyCart: dictionary.cart.emptyCart,
+                  continueShopping: dictionary.cart.continueShopping,
+                  subtotal: dictionary.cart.subtotal,
+                  viewCart: dictionary.cart.viewCart,
+                  checkout: dictionary.cart.checkout,
+                  remove: dictionary.common.remove,
+                }}
+              />
+              <AccountDrawer
+                locale={validLocale}
+                dictionary={{
+                  myAccount: dictionary.account.myAccount,
+                  orders: dictionary.account.orders,
+                  addresses: dictionary.account.addresses,
+                  wishlist: dictionary.account.wishlist,
+                  settings: dictionary.account.settings,
+                  logout: dictionary.account.logout,
+                  welcome: dictionary.account.welcome,
+                  login: dictionary.account.login,
+                  register: dictionary.account.register,
+                  notLoggedIn: dictionary.account.notLoggedIn,
+                  profile: dictionary.account.profile,
+                  more: dictionary.common.more,
+                }}
+              />
+            </WishlistProvider>
+          </CartProvider>
+        </NotificationProvider>
       </CurrencyProvider>
     </AuthProvider>
   );
