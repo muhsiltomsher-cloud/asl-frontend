@@ -1,16 +1,48 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Skeleton } from "@/components/common/Skeleton";
 import type { BannersSettings } from "@/types/wordpress";
 
 interface BannersSectionProps {
   settings: BannersSettings;
   className?: string;
+  isLoading?: boolean;
+}
+
+function BannerSkeleton() {
+  return <Skeleton className="aspect-[2/1] w-full rounded-xl md:aspect-[3/1]" />;
+}
+
+export function BannersSectionSkeleton({ count = 2 }: { count?: number }) {
+  const getGridClass = () => {
+    if (count === 1) return "grid-cols-1";
+    if (count === 2) return "grid-cols-1 md:grid-cols-2";
+    if (count === 3) return "grid-cols-1 md:grid-cols-3";
+    return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
+  };
+
+  return (
+    <section className="bg-white py-8 md:py-12">
+      <div className="container mx-auto px-4">
+        <div className={`grid gap-4 md:gap-6 ${getGridClass()}`}>
+          {Array.from({ length: count }).map((_, i) => (
+            <BannerSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function BannersSection({
   settings,
   className = "",
+  isLoading = false,
 }: BannersSectionProps) {
+  if (isLoading) {
+    return <BannersSectionSkeleton count={2} />;
+  }
+
   if (!settings.enabled || settings.banners.length === 0) {
     return null;
   }
@@ -25,12 +57,12 @@ export function BannersSection({
   };
 
   return (
-    <section className={`py-8 md:py-12 ${className}`}>
+    <section className={`bg-white py-8 md:py-12 ${className}`}>
       <div className="container mx-auto px-4">
         <div className={`grid gap-4 md:gap-6 ${getGridClass()}`}>
           {settings.banners.map((banner, index) => {
             const BannerContent = (
-              <div className="group relative aspect-[2/1] overflow-hidden rounded-lg md:aspect-[3/1]">
+              <div className="group relative aspect-[2/1] overflow-hidden rounded-xl md:aspect-[3/1]">
                 {banner.image?.url ? (
                   <>
                     <Image
@@ -49,7 +81,7 @@ export function BannersSection({
                     />
                   </>
                 ) : (
-                  <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700" />
+                  <div className="absolute inset-0 bg-stone-200" />
                 )}
                 {(banner.title || banner.subtitle) && (
                   <>

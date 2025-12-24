@@ -155,7 +155,6 @@ export default async function HomePage({ params }: HomePageProps) {
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
         productsText={sectionTexts.products}
-        className="bg-gray-50 dark:bg-gray-900"
       />
 
       {/* Featured Products Slider */}
@@ -165,7 +164,6 @@ export default async function HomePage({ params }: HomePageProps) {
         locale={locale as Locale}
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
-        className="bg-white dark:bg-gray-950"
       />
 
       {/* Bestseller Products Section */}
@@ -175,32 +173,32 @@ export default async function HomePage({ params }: HomePageProps) {
         locale={locale as Locale}
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
-        className="bg-gray-50 dark:bg-gray-900"
+        className="bg-stone-50"
       />
 
       {/* Our Collections */}
       <CollectionsSection settings={collectionsSettings} />
 
       {/* About Section */}
-      <section className="py-12 md:py-16">
+      <section className="bg-white py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-800 lg:aspect-[4/3]" />
+            <div className="relative aspect-square overflow-hidden rounded-xl bg-stone-200 lg:aspect-[4/3]" />
             <div>
-              <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+              <h2 className="mb-4 text-2xl font-bold text-amber-900 md:text-3xl">
                 {isRTL ? "قصتنا" : "Our Story"}
               </h2>
-              <p className="mb-4 text-gray-600 dark:text-gray-400 md:mb-6">
+              <p className="mb-4 text-amber-800/70 md:mb-6">
                 {isRTL
                   ? "في أروماتيك سينتس لاب، نؤمن بأن العطر هو فن. نصنع كل منتج بعناية فائقة باستخدام أجود المكونات من جميع أنحاء العالم."
                   : "At Aromatic Scents Lab, we believe that fragrance is an art. We craft each product with meticulous care using the finest ingredients from around the world."}
               </p>
-              <p className="mb-6 text-gray-600 dark:text-gray-400 md:mb-8">
+              <p className="mb-6 text-amber-800/70 md:mb-8">
                 {isRTL
                   ? "مهمتنا هي تقديم تجربة عطرية فريدة تدوم طويلاً وتترك انطباعاً لا يُنسى."
                   : "Our mission is to deliver a unique aromatic experience that lasts long and leaves an unforgettable impression."}
               </p>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="border-amber-900 text-amber-900 hover:bg-amber-900 hover:text-white" asChild>
                 <Link href={`/${locale}/about`}>{dictionary.common.learnMore}</Link>
               </Button>
             </div>
@@ -209,21 +207,21 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-gray-900 py-12 text-white md:py-16">
+      <section className="bg-amber-900 py-12 text-white md:py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="mb-3 text-2xl font-bold md:text-3xl">
             {isRTL ? "اشترك في نشرتنا الإخبارية" : "Subscribe to Our Newsletter"}
           </h2>
-          <p className="mx-auto mb-6 max-w-md text-gray-300 md:mb-8">
+          <p className="mx-auto mb-6 max-w-md text-amber-100/80 md:mb-8">
             {dictionary.footer.subscribeText}
           </p>
           <form className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
             <input
               type="email"
               placeholder={dictionary.footer.emailPlaceholder}
-              className="flex-1 rounded-md border-0 bg-white/10 px-4 py-3 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="flex-1 rounded-md border-0 bg-white/10 px-4 py-3 text-white placeholder:text-amber-200/60 focus:outline-none focus:ring-2 focus:ring-white/50"
             />
-            <Button className="bg-white text-gray-900 hover:bg-gray-100">
+            <Button className="bg-white text-amber-900 hover:bg-amber-50">
               {dictionary.footer.subscribe}
             </Button>
           </form>

@@ -6,6 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import { WCProductCard } from "@/components/shop/WCProductCard";
 import { Button } from "@/components/common/Button";
+import { Skeleton } from "@/components/common/Skeleton";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { FeaturedProductsSettings } from "@/types/wordpress";
@@ -20,6 +21,37 @@ interface FeaturedProductsSliderProps {
   isRTL?: boolean;
   viewAllText?: string;
   className?: string;
+  isLoading?: boolean;
+}
+
+function FeaturedProductCardSkeleton() {
+  return (
+    <div className="flex flex-col">
+      <Skeleton className="aspect-square w-full rounded-lg" />
+      <div className="mt-3 space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    </div>
+  );
+}
+
+export function FeaturedProductsSliderSkeleton() {
+  return (
+    <section className="bg-stone-50 py-12 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="mb-8 md:mb-10">
+          <Skeleton className="h-8 w-48 md:h-9" />
+          <Skeleton className="mt-2 h-5 w-64" />
+        </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <FeaturedProductCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function FeaturedProductsSlider({
@@ -29,7 +61,12 @@ export function FeaturedProductsSlider({
   isRTL = false,
   viewAllText = "View All",
   className = "",
+  isLoading = false,
 }: FeaturedProductsSliderProps) {
+  if (isLoading) {
+    return <FeaturedProductsSliderSkeleton />;
+  }
+
   if (!settings.enabled || products.length === 0) {
     return null;
   }
@@ -37,22 +74,22 @@ export function FeaturedProductsSlider({
   const displayProducts = products.slice(0, settings.products_count);
 
   return (
-    <section className={`bg-gray-50 py-12 dark:bg-gray-900 md:py-16 ${className}`}>
+    <section className={`bg-stone-50 py-12 md:py-16 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center justify-between md:mb-10">
           <div>
-            <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+            <h2 className="mb-2 text-2xl font-bold text-amber-900 md:text-3xl">
               {settings.section_title}
             </h2>
             {settings.section_subtitle && (
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-amber-700/70">
                 {settings.section_subtitle}
               </p>
             )}
           </div>
           <Link
             href={`/${locale}/shop`}
-            className="hidden items-center text-sm font-medium text-gray-900 hover:underline dark:text-white md:flex"
+            className="hidden items-center text-sm font-medium text-amber-900 hover:text-amber-700 hover:underline md:flex"
           >
             {viewAllText}
             <ArrowRight className={`ml-1 h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
@@ -104,19 +141,19 @@ export function FeaturedProductsSlider({
             <>
               <button
                 type="button"
-                className="featured-slider-prev absolute -left-4 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 lg:block"
+                className="featured-slider-prev absolute -left-4 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-stone-100 lg:block"
                 aria-label="Previous products"
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-amber-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
                 type="button"
-                className="featured-slider-next absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 lg:block"
+                className="featured-slider-next absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-stone-100 lg:block"
                 aria-label="Next products"
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-amber-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -125,7 +162,7 @@ export function FeaturedProductsSlider({
         </div>
 
         <div className="mt-8 text-center md:hidden">
-          <Button variant="outline" asChild>
+          <Button variant="outline" className="border-amber-900 text-amber-900 hover:bg-amber-900 hover:text-white" asChild>
             <Link href={`/${locale}/shop`}>{viewAllText}</Link>
           </Button>
         </div>
