@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingBag, Heart } from "lucide-react";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { formatWCPrice } from "@/lib/api/woocommerce";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useAuth } from "@/contexts/AuthContext";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 
@@ -28,6 +30,8 @@ export function WCProductCard({
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -45,6 +49,12 @@ export function WCProductCard({
   const handleAddToWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      router.push(`/${locale}/login`);
+      return;
+    }
+    
     setIsAddingToWishlist(true);
     try {
       await addToWishlist(product.id);
