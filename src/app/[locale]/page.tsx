@@ -1,10 +1,17 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/common/Button";
-import { WCProductGrid } from "@/components/shop/WCProductGrid";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
 import { getProducts, getCategories } from "@/lib/api/woocommerce";
+import { getHomePageSettings } from "@/lib/api/wordpress";
+import {
+  HeroSlider,
+  ProductSection,
+  CategorySection,
+  FeaturedProductsSlider,
+  CollectionsSection,
+  BannersSection,
+} from "@/components/sections";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -32,132 +39,163 @@ export default async function HomePage({ params }: HomePageProps) {
   const dictionary = await getDictionary(locale as Locale);
   const isRTL = locale === "ar";
 
-  // Fetch products and categories from WooCommerce API
-  const [{ products }, categories] = await Promise.all([
-    getProducts({ per_page: 8 }),
+  // Fetch all data in parallel
+  const [{ products }, categories, homeSettings] = await Promise.all([
+    getProducts({ per_page: 20 }),
     getCategories(),
+    getHomePageSettings(locale as Locale),
   ]);
 
-  // Filter parent categories (those with parent = 0)
-  const parentCategories = categories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized").slice(0, 3);
+  // Translations for sections
+  const sectionTexts = {
+    viewAll: dictionary.common.viewAll,
+    products: isRTL ? "منتج" : "products",
+    newProducts: {
+      title: isRTL ? "منتجات جديدة" : "New Products",
+      subtitle: isRTL ? "اكتشف أحدث منتجاتنا" : "Discover our latest arrivals",
+    },
+    bestsellers: {
+      title: isRTL ? "الأكثر مبيعاً" : "Bestsellers",
+      subtitle: isRTL ? "منتجاتنا الأكثر شعبية" : "Our most popular products",
+    },
+    shopByCategory: {
+      title: isRTL ? "تسوق حسب الفئة" : "Shop by Category",
+      subtitle: isRTL ? "استكشف مجموعاتنا المتنوعة" : "Explore our diverse collections",
+    },
+    featuredProducts: {
+      title: isRTL ? "منتجات مميزة" : "Featured Products",
+      subtitle: isRTL ? "اكتشف أفضل منتجاتنا" : "Discover our best sellers",
+    },
+    collections: {
+      title: isRTL ? "مجموعاتنا" : "Our Collections",
+      subtitle: isRTL ? "استكشف مجموعاتنا المنسقة" : "Explore our curated collections",
+    },
+  };
+
+  // Apply translations to settings if not set from WordPress
+  const newProductsSettings = {
+    ...homeSettings.new_products,
+    section_title: homeSettings.new_products.section_title || sectionTexts.newProducts.title,
+    section_subtitle: homeSettings.new_products.section_subtitle || sectionTexts.newProducts.subtitle,
+  };
+
+  const bestsellerSettings = {
+    ...homeSettings.bestseller_products,
+    section_title: homeSettings.bestseller_products.section_title || sectionTexts.bestsellers.title,
+    section_subtitle: homeSettings.bestseller_products.section_subtitle || sectionTexts.bestsellers.subtitle,
+  };
+
+  const categorySettings = {
+    ...homeSettings.shop_by_category,
+    section_title: homeSettings.shop_by_category.section_title || sectionTexts.shopByCategory.title,
+    section_subtitle: homeSettings.shop_by_category.section_subtitle || sectionTexts.shopByCategory.subtitle,
+  };
+
+  const featuredSettings = {
+    ...homeSettings.featured_products,
+    section_title: homeSettings.featured_products.section_title || sectionTexts.featuredProducts.title,
+    section_subtitle: homeSettings.featured_products.section_subtitle || sectionTexts.featuredProducts.subtitle,
+  };
+
+  const collectionsSettings = {
+    ...homeSettings.collections,
+    section_title: homeSettings.collections.section_title || sectionTexts.collections.title,
+    section_subtitle: homeSettings.collections.section_subtitle || sectionTexts.collections.subtitle,
+  };
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px] w-full">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-        <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center" />
-        <div className="container relative mx-auto flex h-full items-center px-4">
-          <div className="max-w-xl text-white">
-            <h1 className="mb-4 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
-              {isRTL
-                ? "اكتشف عالم العطور الفاخرة"
-                : "Discover the World of Premium Fragrances"}
-            </h1>
-            <p className="mb-8 text-lg text-white/90 md:text-xl">
-              {isRTL
-                ? "مجموعة حصرية من العطور المصنوعة بعناية فائقة"
-                : "An exclusive collection of carefully crafted aromatic scents"}
-            </p>
-            <div className="flex flex-wrap gap-4">
+      {/* Hero Slider */}
+      <HeroSlider settings={homeSettings.hero_slider} />
+
+      {/* Fallback Hero if no slider images */}
+      {(!homeSettings.hero_slider.enabled || homeSettings.hero_slider.slides.length === 0) && (
+        <section className="relative h-[50vh] min-h-[400px] w-full md:h-[70vh] md:min-h-[500px]">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
+          <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center" />
+          <div className="container relative mx-auto flex h-full items-center px-4">
+            <div className="max-w-xl text-white">
+              <h1 className="mb-4 text-3xl font-bold leading-tight md:text-4xl lg:text-5xl">
+                {isRTL
+                  ? "اكتشف عالم العطور الفاخرة"
+                  : "Discover the World of Premium Fragrances"}
+              </h1>
+              <p className="mb-6 text-base text-white/90 md:mb-8 md:text-lg">
+                {isRTL
+                  ? "مجموعة حصرية من العطور المصنوعة بعناية فائقة"
+                  : "An exclusive collection of carefully crafted aromatic scents"}
+              </p>
               <Button size="lg" asChild>
                 <Link href={`/${locale}/shop`}>
                   {dictionary.common.shop}
-                  <ArrowRight className={`ml-2 h-5 w-5 ${isRTL ? "rotate-180" : ""}`} />
                 </Link>
               </Button>
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10" asChild>
-                <Link href={`/${locale}/about`}>{dictionary.common.about}</Link>
-              </Button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Featured Categories */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-10 text-center">
-            <h2 className="mb-3 text-3xl font-bold text-gray-900">
-              {isRTL ? "تسوق حسب الفئة" : "Shop by Category"}
-            </h2>
-            <p className="text-gray-600">
-              {isRTL
-                ? "استكشف مجموعاتنا المتنوعة"
-                : "Explore our diverse collections"}
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {parentCategories.map((category) => (
-              <Link
-                key={category.slug}
-                href={`/${locale}/category/${category.slug}`}
-                className="group relative aspect-[4/3] overflow-hidden rounded-lg"
-              >
-                <div className="absolute inset-0 bg-gray-200" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="text-xl font-semibold text-white">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-white/80">
-                    {category.count} {isRTL ? "منتج" : "products"}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Banners - Top Position */}
+      <BannersSection settings={homeSettings.banners} />
 
-      {/* Featured Products */}
-      <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <h2 className="mb-2 text-3xl font-bold text-gray-900">
-                {isRTL ? "منتجات مميزة" : "Featured Products"}
-              </h2>
-              <p className="text-gray-600">
-                {isRTL ? "اكتشف أفضل منتجاتنا" : "Discover our best sellers"}
-              </p>
-            </div>
-            <Link
-              href={`/${locale}/shop`}
-              className="hidden items-center text-sm font-medium text-gray-900 hover:underline md:flex"
-            >
-              {dictionary.common.viewAll}
-              <ArrowRight className={`ml-1 h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
-            </Link>
-          </div>
-          <WCProductGrid
-            products={products.slice(0, 4)}
-            locale={locale as Locale}
-            columns={4}
-          />
-          <div className="mt-8 text-center md:hidden">
-            <Button variant="outline" asChild>
-              <Link href={`/${locale}/shop`}>{dictionary.common.viewAll}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* New Products Section */}
+      <ProductSection
+        settings={newProductsSettings}
+        products={products}
+        locale={locale as Locale}
+        isRTL={isRTL}
+        viewAllText={sectionTexts.viewAll}
+      />
+
+      {/* Shop by Category */}
+      <CategorySection
+        settings={categorySettings}
+        categories={categories}
+        locale={locale as Locale}
+        isRTL={isRTL}
+        viewAllText={sectionTexts.viewAll}
+        productsText={sectionTexts.products}
+        className="bg-gray-50 dark:bg-gray-900"
+      />
+
+      {/* Featured Products Slider */}
+      <FeaturedProductsSlider
+        settings={featuredSettings}
+        products={products}
+        locale={locale as Locale}
+        isRTL={isRTL}
+        viewAllText={sectionTexts.viewAll}
+        className="bg-white dark:bg-gray-950"
+      />
+
+      {/* Bestseller Products Section */}
+      <ProductSection
+        settings={bestsellerSettings}
+        products={products}
+        locale={locale as Locale}
+        isRTL={isRTL}
+        viewAllText={sectionTexts.viewAll}
+        className="bg-gray-50 dark:bg-gray-900"
+      />
+
+      {/* Our Collections */}
+      <CollectionsSection settings={collectionsSettings} />
 
       {/* About Section */}
-      <section className="py-16">
+      <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-200 lg:aspect-[4/3]" />
+          <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+            <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-800 lg:aspect-[4/3]" />
             <div>
-              <h2 className="mb-4 text-3xl font-bold text-gray-900">
+              <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
                 {isRTL ? "قصتنا" : "Our Story"}
               </h2>
-              <p className="mb-6 text-gray-600">
+              <p className="mb-4 text-gray-600 dark:text-gray-400 md:mb-6">
                 {isRTL
                   ? "في أروماتيك سينتس لاب، نؤمن بأن العطر هو فن. نصنع كل منتج بعناية فائقة باستخدام أجود المكونات من جميع أنحاء العالم."
                   : "At Aromatic Scents Lab, we believe that fragrance is an art. We craft each product with meticulous care using the finest ingredients from around the world."}
               </p>
-              <p className="mb-8 text-gray-600">
+              <p className="mb-6 text-gray-600 dark:text-gray-400 md:mb-8">
                 {isRTL
                   ? "مهمتنا هي تقديم تجربة عطرية فريدة تدوم طويلاً وتترك انطباعاً لا يُنسى."
                   : "Our mission is to deliver a unique aromatic experience that lasts long and leaves an unforgettable impression."}
@@ -171,15 +209,15 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-gray-900 py-16 text-white">
+      <section className="bg-gray-900 py-12 text-white md:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-3 text-3xl font-bold">
+          <h2 className="mb-3 text-2xl font-bold md:text-3xl">
             {isRTL ? "اشترك في نشرتنا الإخبارية" : "Subscribe to Our Newsletter"}
           </h2>
-          <p className="mx-auto mb-8 max-w-md text-gray-300">
+          <p className="mx-auto mb-6 max-w-md text-gray-300 md:mb-8">
             {dictionary.footer.subscribeText}
           </p>
-          <form className="mx-auto flex max-w-md gap-2">
+          <form className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row">
             <input
               type="email"
               placeholder={dictionary.footer.emailPlaceholder}

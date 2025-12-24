@@ -156,6 +156,41 @@
       "removeFromWishlist": "Remove from Wishlist",
       "added": "Added"
     },
+  "sections": {
+    "newProducts": {
+      "title": "New Products",
+      "subtitle": "Discover our latest arrivals"
+    },
+    "bestsellers": {
+      "title": "Bestsellers",
+      "subtitle": "Our most popular products"
+    },
+    "shopByCategory": {
+      "title": "Shop by Category",
+      "subtitle": "Explore our diverse collections"
+    },
+    "featuredProducts": {
+      "title": "Featured Products",
+      "subtitle": "Discover our best sellers"
+    },
+    "collections": {
+      "title": "Our Collections",
+      "subtitle": "Explore our curated collections"
+    },
+    "ourStory": {
+      "title": "Our Story",
+      "description1": "At Aromatic Scents Lab, we believe that fragrance is an art. We craft each product with meticulous care using the finest ingredients from around the world.",
+      "description2": "Our mission is to deliver a unique aromatic experience that lasts long and leaves an unforgettable impression."
+    },
+    "newsletter": {
+      "title": "Subscribe to Our Newsletter"
+    },
+    "hero": {
+      "title": "Discover the World of Premium Fragrances",
+      "subtitle": "An exclusive collection of carefully crafted aromatic scents"
+    },
+    "products": "products"
+  },
   "auth": {
     "loginTitle": "Welcome Back",
     "loginSubtitle": "Sign in to your account to continue",
