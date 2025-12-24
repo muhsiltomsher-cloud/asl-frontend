@@ -75,7 +75,6 @@ export default function CheckoutPage() {
       const lineItems = cartItems.map((item) => ({
         product_id: item.id,
         quantity: item.quantity.value,
-        variation_id: item.variation_id || undefined,
       }));
 
       const orderPayload = {
