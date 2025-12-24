@@ -1,10 +1,13 @@
 "use client";
 
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/contexts/CartContext";
-import { Drawer } from "@/components/common/Drawer";
+import MuiDrawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import { Button } from "@/components/common/Button";
 
 interface MiniCartDrawerProps {
@@ -23,7 +26,6 @@ interface MiniCartDrawerProps {
 export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
   const {
     cartItems,
-    cartItemsCount,
     cartSubtotal,
     isCartOpen,
     setIsCartOpen,
@@ -176,19 +178,61 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
   );
 
   return (
-    <Drawer
-      isOpen={isCartOpen}
+    <MuiDrawer
+      anchor={isRTL ? "left" : "right"}
+      open={isCartOpen}
       onClose={() => setIsCartOpen(false)}
-      position="right"
-      size="md"
-      title={dictionary.cart}
-      titleIcon={<ShoppingBag className="h-5 w-5" />}
-      dir={isRTL ? "rtl" : "ltr"}
-      showCloseButton={true}
-      footer={cartFooter}
-      bodyClassName="p-0"
+      PaperProps={{
+        sx: {
+          width: { xs: "100%", sm: 400 },
+          maxWidth: "100%",
+        },
+      }}
     >
-      {cartItems.length === 0 ? renderEmptyCart() : renderCartItems()}
-    </Drawer>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        }}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            px: 2,
+            py: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <ShoppingBag className="h-5 w-5" />
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {dictionary.cart}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setIsCartOpen(false)}
+            aria-label="Close drawer"
+            sx={{ color: "text.secondary" }}
+          >
+            <X className="h-5 w-5" />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ flex: 1, overflow: "auto" }}>
+          {cartItems.length === 0 ? renderEmptyCart() : renderCartItems()}
+        </Box>
+
+        {cartFooter && (
+          <Box sx={{ borderTop: "1px solid", borderColor: "divider", p: 2 }}>
+            {cartFooter}
+          </Box>
+        )}
+      </Box>
+    </MuiDrawer>
   );
 }
