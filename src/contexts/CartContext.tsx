@@ -12,6 +12,7 @@ import {
   type CoCartResponse,
   type CoCartItem,
 } from "@/lib/api/cocart";
+import { useNotification } from "./NotificationContext";
 
 interface CartContextType {
   cart: CoCartResponse | null;
@@ -37,6 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CoCartResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { notify } = useNotification();
 
   const refreshCart = useCallback(async () => {
     setIsLoading(true);
@@ -56,69 +58,75 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     refreshCart();
   }, [refreshCart]);
 
-  const addToCart = useCallback(
-    async (productId: number, quantity = 1, variationId?: number, variation?: Record<string, string>) => {
-      setIsLoading(true);
-      try {
-        const response = await apiAddToCart(productId, quantity, variationId, variation);
-        if (response.success && response.cart) {
-          setCart(response.cart);
-          setIsCartOpen(true);
-        } else if (response.error) {
-          console.error("Error adding to cart:", response.error.message);
-          throw new Error(response.error.message);
+    const addToCart = useCallback(
+      async (productId: number, quantity = 1, variationId?: number, variation?: Record<string, string>) => {
+        setIsLoading(true);
+        try {
+          const response = await apiAddToCart(productId, quantity, variationId, variation);
+          if (response.success && response.cart) {
+            setCart(response.cart);
+            setIsCartOpen(true);
+            notify("cart", "Item added to cart");
+          } else if (response.error) {
+            console.error("Error adding to cart:", response.error.message);
+            notify("error", response.error.message);
+            throw new Error(response.error.message);
+          }
+        } catch (error) {
+          console.error("Error adding to cart:", error);
+          throw error;
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error adding to cart:", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
+      },
+      [notify]
+    );
 
-  const updateCartItem = useCallback(
-    async (key: string, quantity: number) => {
-      setIsLoading(true);
-      try {
-        const response = await apiUpdateCartItem(key, quantity);
-        if (response.success && response.cart) {
-          setCart(response.cart);
-        } else if (response.error) {
-          console.error("Error updating cart:", response.error.message);
-          throw new Error(response.error.message);
+    const updateCartItem = useCallback(
+      async (key: string, quantity: number) => {
+        setIsLoading(true);
+        try {
+          const response = await apiUpdateCartItem(key, quantity);
+          if (response.success && response.cart) {
+            setCart(response.cart);
+            notify("cart", "Cart updated");
+          } else if (response.error) {
+            console.error("Error updating cart:", response.error.message);
+            notify("error", response.error.message);
+            throw new Error(response.error.message);
+          }
+        } catch (error) {
+          console.error("Error updating cart:", error);
+          throw error;
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error updating cart:", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
+      },
+      [notify]
+    );
 
-  const removeCartItem = useCallback(
-    async (key: string) => {
-      setIsLoading(true);
-      try {
-        const response = await apiRemoveCartItem(key);
-        if (response.success && response.cart) {
-          setCart(response.cart);
-        } else if (response.error) {
-          console.error("Error removing from cart:", response.error.message);
-          throw new Error(response.error.message);
+    const removeCartItem = useCallback(
+      async (key: string) => {
+        setIsLoading(true);
+        try {
+          const response = await apiRemoveCartItem(key);
+          if (response.success && response.cart) {
+            setCart(response.cart);
+            notify("cart", "Item removed from cart");
+          } else if (response.error) {
+            console.error("Error removing from cart:", response.error.message);
+            notify("error", response.error.message);
+            throw new Error(response.error.message);
+          }
+        } catch (error) {
+          console.error("Error removing from cart:", error);
+          throw error;
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error removing from cart:", error);
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
+      },
+      [notify]
+    );
 
   const clearCart = useCallback(async () => {
     setIsLoading(true);
@@ -138,45 +146,49 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const applyCoupon = useCallback(async (code: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const response = await apiApplyCoupon(code);
-      if (response.success && response.cart) {
-        setCart(response.cart);
-        return true;
-      } else if (response.error) {
-        console.error("Error applying coupon:", response.error.message);
+    const applyCoupon = useCallback(async (code: string): Promise<boolean> => {
+      setIsLoading(true);
+      try {
+        const response = await apiApplyCoupon(code);
+        if (response.success && response.cart) {
+          setCart(response.cart);
+          notify("success", "Coupon applied successfully");
+          return true;
+        } else if (response.error) {
+          console.error("Error applying coupon:", response.error.message);
+          notify("error", response.error.message);
+          return false;
+        }
         return false;
+      } catch (error) {
+        console.error("Error applying coupon:", error);
+        return false;
+      } finally {
+        setIsLoading(false);
       }
-      return false;
-    } catch (error) {
-      console.error("Error applying coupon:", error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    }, [notify]);
 
-  const removeCoupon = useCallback(async (code: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const response = await apiRemoveCoupon(code);
-      if (response.success && response.cart) {
-        setCart(response.cart);
-        return true;
-      } else if (response.error) {
-        console.error("Error removing coupon:", response.error.message);
+    const removeCoupon = useCallback(async (code: string): Promise<boolean> => {
+      setIsLoading(true);
+      try {
+        const response = await apiRemoveCoupon(code);
+        if (response.success && response.cart) {
+          setCart(response.cart);
+          notify("success", "Coupon removed");
+          return true;
+        } else if (response.error) {
+          console.error("Error removing coupon:", response.error.message);
+          notify("error", response.error.message);
+          return false;
+        }
         return false;
+      } catch (error) {
+        console.error("Error removing coupon:", error);
+        return false;
+      } finally {
+        setIsLoading(false);
       }
-      return false;
-    } catch (error) {
-      console.error("Error removing coupon:", error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    }, [notify]);
 
   const cartItems = cart?.items || [];
   const cartItemsCount = cart?.item_count || 0;

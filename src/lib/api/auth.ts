@@ -96,7 +96,7 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
 
 export async function register(data: RegisterData): Promise<RegisterResponse> {
   try {
-    const response = await fetch(`${API_BASE}/wp-json/wp/v2/users/register`, {
+    const response = await fetch("/api/customer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,18 +105,18 @@ export async function register(data: RegisterData): Promise<RegisterResponse> {
         username: data.username,
         email: data.email,
         password: data.password,
+        first_name: data.username,
       }),
     });
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (!result.success) {
       return {
         success: false,
         error: {
-          code: result.code || "registration_failed",
-          message: result.message || "Registration failed. Please try again.",
-          data: { status: response.status },
+          code: result.error?.code || "registration_failed",
+          message: result.error?.message || "Registration failed. Please try again.",
         },
       };
     }
@@ -124,7 +124,7 @@ export async function register(data: RegisterData): Promise<RegisterResponse> {
     return {
       success: true,
       message: "Registration successful! Please login with your credentials.",
-      user_id: result.id,
+      user_id: result.data?.id,
     };
   } catch (error) {
     return {
