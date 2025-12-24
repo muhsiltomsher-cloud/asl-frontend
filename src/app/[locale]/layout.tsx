@@ -5,9 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
@@ -54,22 +52,19 @@ export default async function LocaleLayout({
   const { dir } = localeConfig[validLocale];
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <CurrencyProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <JsonLd data={generateOrganizationJsonLd()} />
-              <div dir={dir} lang={validLocale} className="flex min-h-screen flex-col bg-white dark:bg-gray-950 dark:text-gray-100">
-                <Header locale={validLocale} dictionary={dictionary} />
-                <main className="flex-1">{children}</main>
-                <Footer locale={validLocale} dictionary={dictionary} />
-              </div>
-              <ThemeToggle />
-            </WishlistProvider>
-          </CartProvider>
-        </CurrencyProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <CurrencyProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <JsonLd data={generateOrganizationJsonLd()} />
+            <div dir={dir} lang={validLocale} className="flex min-h-screen flex-col bg-white">
+              <Header locale={validLocale} dictionary={dictionary} />
+              <main className="flex-1">{children}</main>
+              <Footer locale={validLocale} dictionary={dictionary} />
+            </div>
+          </WishlistProvider>
+        </CartProvider>
+      </CurrencyProvider>
+    </AuthProvider>
   );
 }
