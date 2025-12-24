@@ -10,6 +10,7 @@ import {
   type WishlistResponse,
   type WishlistItem,
 } from "@/lib/api/wishlist";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface WishlistContextType {
   wishlist: WishlistResponse | null;
@@ -31,8 +32,13 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<WishlistResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   const refreshWishlist = useCallback(async () => {
+    if (!isAuthenticated) {
+      setWishlist(null);
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await apiGetWishlist();
@@ -44,11 +50,13 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    refreshWishlist();
-  }, [refreshWishlist]);
+    if (!isAuthLoading) {
+      refreshWishlist();
+    }
+  }, [refreshWishlist, isAuthLoading]);
 
   const addToWishlist = useCallback(
     async (productId: number, variationId?: number): Promise<boolean> => {
