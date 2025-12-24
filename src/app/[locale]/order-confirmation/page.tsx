@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/common/Button";
@@ -30,7 +30,18 @@ interface OrderData {
   payment_method_title: string;
 }
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationLoading() {
+  return (
+    <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-8">
+      <div className="text-center">
+        <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+function OrderConfirmationContent() {
   const { locale } = useParams<{ locale: string }>();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
@@ -190,5 +201,13 @@ export default function OrderConfirmationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={<OrderConfirmationLoading />}>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }
