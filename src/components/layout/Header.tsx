@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Menu, X, ShoppingBag, Search, User, LogOut } from "lucide-react";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
@@ -10,24 +11,34 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
+import type { SiteSettings, WPMenuItem } from "@/types/wordpress";
 
 interface HeaderProps {
   locale: Locale;
   dictionary: Dictionary;
+  siteSettings?: SiteSettings | null;
+  menuItems?: WPMenuItem[] | null;
 }
 
-export function Header({ locale, dictionary }: HeaderProps) {
+export function Header({ locale, dictionary, siteSettings, menuItems }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartItemsCount, setIsCartOpen } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
 
-  const navigation = [
+  const defaultNavigation = [
     { name: dictionary.common.home, href: `/${locale}` },
     { name: dictionary.common.shop, href: `/${locale}/shop` },
     { name: dictionary.common.about, href: `/${locale}/about` },
     { name: dictionary.common.contact, href: `/${locale}/contact` },
     { name: dictionary.common.faq, href: `/${locale}/faq` },
   ];
+
+  const navigation = menuItems && menuItems.length > 0
+    ? menuItems.map((item) => ({
+        name: item.title,
+        href: item.url.startsWith("http") ? item.url : `/${locale}${item.url}`,
+      }))
+    : defaultNavigation;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -63,9 +74,20 @@ export function Header({ locale, dictionary }: HeaderProps) {
 
           {/* Logo */}
           <Link href={`/${locale}`} className="flex items-center">
-            <span className="text-xl font-bold tracking-tight text-gray-900">
-              Aromatic Scents Lab
-            </span>
+            {siteSettings?.logo?.url ? (
+              <Image
+                src={siteSettings.logo.url}
+                alt={siteSettings.logo.alt || siteSettings.site_name || "Logo"}
+                width={150}
+                height={40}
+                className="h-8 w-auto md:h-10"
+                priority
+              />
+            ) : (
+              <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                {siteSettings?.site_name || "Aromatic Scents Lab"}
+              </span>
+            )}
           </Link>
 
           {/* Desktop navigation */}
