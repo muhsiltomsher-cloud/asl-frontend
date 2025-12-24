@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { MiniCartDrawer } from "@/components/cart/MiniCartDrawer";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
@@ -62,6 +63,18 @@ export default async function LocaleLayout({
               <main className="flex-1">{children}</main>
               <Footer locale={validLocale} dictionary={dictionary} />
             </div>
+            <MiniCartDrawer
+              locale={validLocale}
+              dictionary={{
+                cart: dictionary.common.cart,
+                emptyCart: dictionary.cart.emptyCart,
+                continueShopping: dictionary.cart.continueShopping,
+                subtotal: dictionary.cart.subtotal,
+                viewCart: dictionary.cart.viewCart,
+                checkout: dictionary.cart.checkout,
+                remove: dictionary.common.remove,
+              }}
+            />
           </WishlistProvider>
         </CartProvider>
       </CurrencyProvider>
