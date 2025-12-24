@@ -3,6 +3,8 @@
  * 
  * Main configuration file for the Aromatic Scents Lab frontend.
  * Update these values when deploying to different environments.
+ * 
+ * Test change for verification - can be removed.
  */
 export const siteConfig = {
   // Site name - displayed in browser title, meta tags, etc.
