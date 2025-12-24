@@ -1,9 +1,12 @@
 "use client";
 
-import { User, Package, MapPin, Heart, Settings, LogOut } from "lucide-react";
+import { User, Package, MapPin, Heart, Settings, LogOut, X, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { Drawer } from "@/components/common/Drawer";
+import MuiDrawer from "@mui/material/Drawer";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import { Button } from "@/components/common/Button";
 
 interface AccountDrawerProps {
@@ -22,6 +25,7 @@ interface AccountDrawerProps {
     register: string;
     notLoggedIn: string;
     profile?: string;
+    more?: string;
   };
 }
 
@@ -92,7 +96,7 @@ export function AccountDrawer({
 
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
-          {menuItems.map((item) => (
+          {menuItems.slice(0, 3).map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}
@@ -107,7 +111,15 @@ export function AccountDrawer({
         </ul>
       </nav>
 
-      <div className="border-t p-4">
+      <div className="border-t p-4 space-y-2">
+        <Link
+          href={`/${locale}/account`}
+          onClick={onClose}
+          className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 active:scale-[0.98]"
+        >
+          <span className="font-medium">{dictionary.more || "More"}</span>
+          <ChevronRight className={`h-5 w-5 flex-shrink-0 ${isRTL ? "rotate-180" : ""}`} />
+        </Link>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-red-600 transition-all hover:bg-red-50 active:scale-[0.98]"
@@ -144,22 +156,59 @@ export function AccountDrawer({
   );
 
   return (
-    <Drawer
-      isOpen={isOpen}
+    <MuiDrawer
+      anchor={isRTL ? "left" : "right"}
+      open={isOpen}
       onClose={onClose}
-      position="right"
-      size="sm"
-      title={dictionary.myAccount}
-      titleIcon={<User className="h-5 w-5" />}
-      dir={isRTL ? "rtl" : "ltr"}
-      showCloseButton={true}
-      bodyClassName="p-0"
+      PaperProps={{
+        sx: {
+          width: { xs: "100%", sm: 320 },
+          maxWidth: "100%",
+        },
+      }}
     >
-      <div className="flex h-full flex-col">
-        {isAuthenticated && user
-          ? renderAuthenticatedContent()
-          : renderGuestContent()}
-      </div>
-    </Drawer>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        }}
+        dir={isRTL ? "rtl" : "ltr"}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            px: 2,
+            py: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <User className="h-5 w-5" />
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {dictionary.myAccount}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={onClose}
+            aria-label="Close drawer"
+            sx={{ color: "text.secondary" }}
+          >
+            <X className="h-5 w-5" />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ flex: 1, overflow: "auto" }}>
+          <div className="flex h-full flex-col">
+            {isAuthenticated && user
+              ? renderAuthenticatedContent()
+              : renderGuestContent()}
+          </div>
+        </Box>
+      </Box>
+    </MuiDrawer>
   );
 }

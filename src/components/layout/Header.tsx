@@ -3,11 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, ShoppingBag, Search, User, LogOut } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, User, LogOut, Heart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { CurrencySwitcher } from "@/components/common/CurrencySwitcher";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
@@ -24,6 +25,7 @@ export function Header({ locale, dictionary, siteSettings, menuItems }: HeaderPr
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartItemsCount, setIsCartOpen } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
+  const { wishlistItemsCount } = useWishlist();
 
   const defaultNavigation = [
     { name: dictionary.common.home, href: `/${locale}` },
@@ -147,6 +149,18 @@ export function Header({ locale, dictionary, siteSettings, menuItems }: HeaderPr
                             <User className="h-5 w-5" />
                           </Link>
                         )}
+            <Link
+              href={`/${locale}/wishlist`}
+              className="relative p-2 text-gray-700 hover:text-gray-900"
+              aria-label={dictionary.account.wishlist}
+            >
+              <Heart className="h-5 w-5" />
+              {wishlistItemsCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-xs font-medium text-white">
+                  {wishlistItemsCount}
+                </span>
+              )}
+            </Link>
             <button
               type="button"
               className="relative p-2 text-gray-700 hover:text-gray-900"
