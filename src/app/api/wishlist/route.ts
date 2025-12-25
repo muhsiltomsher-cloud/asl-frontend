@@ -3,16 +3,30 @@ import { siteConfig } from "@/config/site";
 import { cookies } from "next/headers";
 
 const API_BASE = siteConfig.apiUrl;
-// TI WooCommerce Wishlist REST API v3
-const WISHLIST_BASE = `${API_BASE}/wp-json/wishlist/v3`;
+// TI WooCommerce Wishlist REST API - uses WooCommerce REST API namespace
+const WISHLIST_BASE = `${API_BASE}/wp-json/wc/v3/wishlist`;
 const WP_AUTH_TOKEN_COOKIE = "asl_wp_auth_token";
 const AUTH_TOKEN_COOKIE = "asl_auth_token";
+const USER_COOKIE = "asl_auth_user";
 
-async function getAuthToken(): Promise<{ wpToken: string | null; cocartToken: string | null }> {
+async function getAuthToken(): Promise<{ wpToken: string | null; cocartToken: string | null; userId: number | null }> {
   const cookieStore = await cookies();
+  const userCookie = cookieStore.get(USER_COOKIE)?.value;
+  let userId: number | null = null;
+  
+  if (userCookie) {
+    try {
+      const userData = JSON.parse(decodeURIComponent(userCookie));
+      userId = userData.user_id || null;
+    } catch {
+      // Ignore parse errors
+    }
+  }
+  
   return {
     wpToken: cookieStore.get(WP_AUTH_TOKEN_COOKIE)?.value || null,
     cocartToken: cookieStore.get(AUTH_TOKEN_COOKIE)?.value || null,
+    userId,
   };
 }
 
@@ -33,12 +47,12 @@ function getAuthHeaders(request: NextRequest, authToken: string | null): Headers
 
 export async function GET(request: NextRequest) {
   try {
-    const { wpToken, cocartToken } = await getAuthToken();
+    const { wpToken, cocartToken, userId } = await getAuthToken();
     
     // Prefer WordPress JWT token for TI Wishlist endpoints, fall back to CoCart token
     const authToken = wpToken || cocartToken;
     
-    if (!authToken) {
+    if (!authToken || !userId) {
       return NextResponse.json(
         {
           success: false,
@@ -51,59 +65,70 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TI WooCommerce Wishlist: Get user's wishlists
-    const response = await fetch(`${WISHLIST_BASE}/wishlists`, {
+    // TI WooCommerce Wishlist: Get user's wishlist by user ID
+    const response = await fetch(`${WISHLIST_BASE}/get_by_user/${userId}`, {
       method: "GET",
       headers: getAuthHeaders(request, authToken),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
+      const errorText = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { message: errorText };
+      }
+      
+      // If no wishlist found, return empty
+      if (response.status === 404) {
+        return NextResponse.json({ success: true, wishlist: null, items: [] });
+      }
+      
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: data.code || "wishlist_error",
-            message: data.message || "Failed to get wishlist.",
+            code: errorData.code || "wishlist_error",
+            message: errorData.message || "Failed to get wishlist.",
           },
         },
         { status: response.status }
       );
     }
 
-    // TI Wishlist returns array of wishlists
+    const data = await response.json();
+    
+    // TI Wishlist returns wishlist data with share_key
     let wishlist = null;
     let items: unknown[] = [];
-    let wishlistsArray: Array<{ share_key?: string; is_default?: boolean; products?: unknown[] }> = [];
     
-    if (Array.isArray(data)) {
-      wishlistsArray = data;
-    } else if (data.wishlists && Array.isArray(data.wishlists)) {
-      wishlistsArray = data.wishlists;
-    } else if (data.share_key) {
-      // Single wishlist object
+    if (data && data.share_key) {
       wishlist = data;
-      items = data.products || [];
-      return NextResponse.json({ success: true, wishlist, items });
-    }
-    
-    if (wishlistsArray.length > 0) {
-      // Find default wishlist or use first one
-      wishlist = wishlistsArray.find((w) => w.is_default) || wishlistsArray[0];
       
-      // If we have a wishlist, fetch its products
+      // Fetch products for this wishlist
+      const productsResponse = await fetch(`${WISHLIST_BASE}/${data.share_key}/get_products`, {
+        method: "GET",
+        headers: getAuthHeaders(request, authToken),
+      });
+      
+      if (productsResponse.ok) {
+        const productsData = await productsResponse.json();
+        items = Array.isArray(productsData) ? productsData : productsData.products || productsData.items || [];
+      }
+    } else if (Array.isArray(data) && data.length > 0) {
+      // If array of wishlists, use first one
+      wishlist = data[0];
       if (wishlist && wishlist.share_key) {
-        const productsResponse = await fetch(`${WISHLIST_BASE}/wishlists/${wishlist.share_key}/products`, {
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${wishlist.share_key}/get_products`, {
           method: "GET",
           headers: getAuthHeaders(request, authToken),
         });
+        
         if (productsResponse.ok) {
           const productsData = await productsResponse.json();
-          items = Array.isArray(productsData) ? productsData : productsData.products || [];
+          items = Array.isArray(productsData) ? productsData : productsData.products || productsData.items || [];
         }
-      } else {
-        items = wishlist?.products || [];
       }
     }
 
@@ -127,12 +152,12 @@ export async function POST(request: NextRequest) {
   const action = searchParams.get("action");
 
   try {
-    const { wpToken, cocartToken } = await getAuthToken();
+    const { wpToken, cocartToken, userId } = await getAuthToken();
     
     // Prefer WordPress JWT token for TI Wishlist endpoints, fall back to CoCart token
     const authToken = wpToken || cocartToken;
     
-    if (!authToken) {
+    if (!authToken || !userId) {
       return NextResponse.json(
         {
           success: false,
@@ -147,34 +172,21 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
 
-    // Helper function to get or create default wishlist
-    async function getOrCreateDefaultWishlist(): Promise<{ share_key: string } | null> {
-      // First, try to get existing wishlists
-      const listResponse = await fetch(`${WISHLIST_BASE}/wishlists`, {
+    // Helper function to get user's wishlist share_key
+    async function getUserWishlistShareKey(): Promise<string | null> {
+      const response = await fetch(`${WISHLIST_BASE}/get_by_user/${userId}`, {
         method: "GET",
         headers: getAuthHeaders(request, authToken),
       });
       
-      if (listResponse.ok) {
-        const listData = await listResponse.json();
-        const wishlists = Array.isArray(listData) ? listData : listData.wishlists || [];
-        if (wishlists.length > 0) {
-          return wishlists.find((w: { is_default?: boolean }) => w.is_default) || wishlists[0];
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.share_key) {
+          return data.share_key;
         }
-      }
-      
-      // No wishlist exists, create one
-      const createResponse = await fetch(`${WISHLIST_BASE}/wishlists`, {
-        method: "POST",
-        headers: getAuthHeaders(request, authToken),
-        body: JSON.stringify({
-          title: "Default wishlist",
-          is_default: true,
-        }),
-      });
-      
-      if (createResponse.ok) {
-        return await createResponse.json();
+        if (Array.isArray(data) && data.length > 0 && data[0].share_key) {
+          return data[0].share_key;
+        }
       }
       
       return null;
@@ -182,24 +194,24 @@ export async function POST(request: NextRequest) {
 
     switch (action) {
       case "add": {
-        // TI Wishlist: First get or create a wishlist, then add product to it
-        const wishlist = await getOrCreateDefaultWishlist();
+        // Get user's wishlist share_key
+        const shareKey = await getUserWishlistShareKey();
         
-        if (!wishlist || !wishlist.share_key) {
+        if (!shareKey) {
           return NextResponse.json(
             {
               success: false,
               error: {
-                code: "wishlist_error",
-                message: "Could not get or create wishlist.",
+                code: "no_wishlist",
+                message: "No wishlist found. Please try again.",
               },
             },
-            { status: 500 }
+            { status: 404 }
           );
         }
         
-        // Add product to wishlist
-        const response = await fetch(`${WISHLIST_BASE}/wishlists/${wishlist.share_key}/products`, {
+        // TI Wishlist: POST /{share_key}/add_product
+        const response = await fetch(`${WISHLIST_BASE}/${shareKey}/add_product`, {
           method: "POST",
           headers: getAuthHeaders(request, authToken),
           body: JSON.stringify({
@@ -208,7 +220,14 @@ export async function POST(request: NextRequest) {
             quantity: body.quantity || 1,
           }),
         });
-        const data = await response.json();
+        
+        const responseText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch {
+          data = { message: responseText };
+        }
 
         if (!response.ok) {
           return NextResponse.json(
@@ -223,67 +242,60 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // Fetch updated products
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products`, {
+          method: "GET",
+          headers: getAuthHeaders(request, authToken),
+        });
+        let items: unknown[] = [];
+        if (productsResponse.ok) {
+          const productsData = await productsResponse.json();
+          items = Array.isArray(productsData) ? productsData : productsData.products || productsData.items || [];
+        }
+
         return NextResponse.json({
           success: true,
-          wishlist: wishlist,
-          items: data.products || data.items || [],
-          added_to: wishlist.share_key,
+          wishlist: { share_key: shareKey },
+          items,
+          added_to: shareKey,
         });
       }
 
       case "remove": {
         const productId = body.product_id;
-        const shareKey = body.share_key || body.wishlist_id;
+        const itemId = body.item_id || productId; // TI uses item_id for removal
+        let shareKey = body.share_key || body.wishlist_id;
         
         if (!shareKey) {
-          // Try to get the default wishlist's share_key
-          const wishlist = await getOrCreateDefaultWishlist();
-          if (!wishlist || !wishlist.share_key) {
-            return NextResponse.json(
-              {
-                success: false,
-                error: {
-                  code: "wishlist_error",
-                  message: "Could not find wishlist.",
-                },
-              },
-              { status: 404 }
-            );
-          }
-          
-          // TI Wishlist: DELETE /wishlists/{share_key}/products/{product_id}
-          const response = await fetch(`${WISHLIST_BASE}/wishlists/${wishlist.share_key}/products/${productId}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(request, authToken),
-          });
-          const data = await response.json();
-
-          if (!response.ok) {
-            return NextResponse.json(
-              {
-                success: false,
-                error: {
-                  code: data.code || "remove_from_wishlist_error",
-                  message: data.message || "Failed to remove item from wishlist.",
-                },
-              },
-              { status: response.status }
-            );
-          }
-
-          return NextResponse.json({
-            success: true,
-            wishlist: wishlist,
-            items: data.products || data.items || [],
-          });
+          shareKey = await getUserWishlistShareKey();
         }
         
-        // TI Wishlist: DELETE /wishlists/{share_key}/products/{product_id}
-        const response = await fetch(`${WISHLIST_BASE}/wishlists/${shareKey}/products/${productId}`, {
+        if (!shareKey) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: "wishlist_error",
+                message: "Could not find wishlist.",
+              },
+            },
+            { status: 404 }
+          );
+        }
+        
+        // TI Wishlist: DELETE /{share_key}/remove_product/{item_id}
+        const response = await fetch(`${WISHLIST_BASE}/${shareKey}/remove_product/${itemId}`, {
           method: "DELETE",
           headers: getAuthHeaders(request, authToken),
         });
-        const data = await response.json();
+        
+        const responseText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch {
+          data = { message: responseText };
+        }
 
         if (!response.ok) {
           return NextResponse.json(
@@ -298,10 +310,21 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // Fetch updated products
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products`, {
+          method: "GET",
+          headers: getAuthHeaders(request, authToken),
+        });
+        let items: unknown[] = [];
+        if (productsResponse.ok) {
+          const productsData = await productsResponse.json();
+          items = Array.isArray(productsData) ? productsData : productsData.products || productsData.items || [];
+        }
+
         return NextResponse.json({
           success: true,
-          wishlist: data.wishlist || data,
-          items: data.products || data.items || [],
+          wishlist: { share_key: shareKey },
+          items,
         });
       }
 
@@ -310,16 +333,16 @@ export async function POST(request: NextRequest) {
         const guestItems = body.items || [];
         const results: Array<{ product_id: number; success: boolean }> = [];
         
-        // Get or create default wishlist
-        const wishlist = await getOrCreateDefaultWishlist();
+        // Get user's wishlist share_key
+        const shareKey = await getUserWishlistShareKey();
         
-        if (!wishlist || !wishlist.share_key) {
+        if (!shareKey) {
           return NextResponse.json(
             {
               success: false,
               error: {
                 code: "wishlist_error",
-                message: "Could not get or create wishlist for sync.",
+                message: "Could not get wishlist for sync.",
               },
             },
             { status: 500 }
@@ -329,7 +352,7 @@ export async function POST(request: NextRequest) {
         // Add each item to the wishlist
         for (const item of guestItems) {
           try {
-            const response = await fetch(`${WISHLIST_BASE}/wishlists/${wishlist.share_key}/products`, {
+            const response = await fetch(`${WISHLIST_BASE}/${shareKey}/add_product`, {
               method: "POST",
               headers: getAuthHeaders(request, authToken),
               body: JSON.stringify({
@@ -338,10 +361,16 @@ export async function POST(request: NextRequest) {
                 quantity: item.quantity || 1,
               }),
             });
-            const data = await response.json();
+            const responseOk = response.ok;
+            let data;
+            try {
+              data = await response.json();
+            } catch {
+              data = {};
+            }
             results.push({
               product_id: item.product_id,
-              success: response.ok || data.code === "product_already_in_wishlist",
+              success: responseOk || data.code === "product_already_in_wishlist",
             });
           } catch {
             results.push({ product_id: item.product_id, success: false });
@@ -349,19 +378,19 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch the updated wishlist products
-        const productsResponse = await fetch(`${WISHLIST_BASE}/wishlists/${wishlist.share_key}/products`, {
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products`, {
           method: "GET",
           headers: getAuthHeaders(request, authToken),
         });
         let items: unknown[] = [];
         if (productsResponse.ok) {
           const productsData = await productsResponse.json();
-          items = Array.isArray(productsData) ? productsData : productsData.products || [];
+          items = Array.isArray(productsData) ? productsData : productsData.products || productsData.items || [];
         }
 
         return NextResponse.json({
           success: true,
-          wishlist,
+          wishlist: { share_key: shareKey },
           items,
           syncResults: results,
         });
