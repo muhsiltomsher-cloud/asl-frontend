@@ -4,11 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Truck, Shield, RotateCcw, Minus, Plus, Tag } from "lucide-react";
-import { Button } from "@/components/common/Button";
+import { Heart, Minus, Plus, ChevronDown, ShoppingBag } from "lucide-react";
 import { Badge } from "@/components/common/Badge";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { ProductTabs } from "@/components/shop/ProductTabs";
 import { RelatedProducts } from "@/components/shop/RelatedProducts";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { useCart } from "@/contexts/CartContext";
@@ -16,6 +14,41 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
+
+interface AccordionSectionProps {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+function AccordionSection({ title, isOpen, onToggle, children }: AccordionSectionProps) {
+  return (
+    <div className="border-b border-gray-200">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between py-4 text-left"
+      >
+        <span className="text-sm font-medium uppercase tracking-wide text-gray-900">
+          {title}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-200 ${
+          isOpen ? "max-h-[500px] pb-4" : "max-h-0"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 interface ProductDetailProps {
   product: WCProduct;
@@ -28,11 +61,16 @@ export function ProductDetail({ product, locale, relatedProducts = [] }: Product
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState<string | null>("characteristics");
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const isRTL = locale === "ar";
+
+  const toggleAccordion = (section: string) => {
+    setOpenAccordion(openAccordion === section ? null : section);
+  };
 
   const primaryCategory = product.categories?.[0];
   const breadcrumbItems = [
@@ -125,18 +163,18 @@ export function ProductDetail({ product, locale, relatedProducts = [] }: Product
 
         {/* Product Info */}
         <div className="space-y-6">
-          {/* Category - Clickable for SEO */}
+          {/* Category - Small uppercase label */}
           {primaryCategory && (
             <Link 
               href={`/${locale}/category/${primaryCategory.slug}`}
-              className="inline-block text-sm text-amber-700 hover:text-amber-900 hover:underline transition-colors"
+              className="inline-block text-xs font-medium uppercase tracking-wider text-gray-500 hover:text-gray-700 transition-colors"
             >
               {primaryCategory.name}
             </Link>
           )}
 
           {/* Title */}
-          <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+          <h1 className="text-2xl font-medium text-gray-900 md:text-3xl">{product.name}</h1>
 
           {/* Price */}
           <div className="flex items-center gap-3">
@@ -144,13 +182,13 @@ export function ProductDetail({ product, locale, relatedProducts = [] }: Product
               <>
                 <FormattedPrice
                   price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                  className="text-2xl font-bold text-amber-900"
-                  iconSize="lg"
+                  className="text-lg font-medium text-gray-900"
+                  iconSize="md"
                 />
                 <FormattedPrice
                   price={parseInt(product.prices.regular_price) / Math.pow(10, product.prices.currency_minor_unit)}
-                  className="text-lg text-gray-400"
-                  iconSize="md"
+                  className="text-base text-gray-400"
+                  iconSize="sm"
                   strikethrough
                 />
                 <Badge variant="error">{isRTL ? "تخفيض" : "Sale"}</Badge>
@@ -158,166 +196,203 @@ export function ProductDetail({ product, locale, relatedProducts = [] }: Product
             ) : (
               <FormattedPrice
                 price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                className="text-2xl font-bold text-amber-900"
-                iconSize="lg"
+                className="text-lg font-medium text-gray-900"
+                iconSize="md"
               />
-            )}
-          </div>
-
-          {/* Stock status */}
-          <div className="flex items-center gap-2">
-            {isOutOfStock ? (
-              <Badge variant="error">
-                {isRTL ? "غير متوفر" : "Out of Stock"}
-              </Badge>
-            ) : (
-              <Badge variant="success">{isRTL ? "متوفر" : "In Stock"}</Badge>
-            )}
-            {product.low_stock_remaining && product.low_stock_remaining < 10 && (
-              <span className="text-sm text-orange-600">
-                {isRTL
-                  ? `${product.low_stock_remaining} قطع متبقية فقط`
-                  : `Only ${product.low_stock_remaining} left`}
-              </span>
             )}
           </div>
 
           {/* Short description */}
           {product.short_description && (
             <div
-              className="prose prose-sm prose-amber max-w-none prose-p:text-gray-600 prose-p:leading-relaxed prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline"
+              className="text-sm leading-relaxed text-gray-600"
               dangerouslySetInnerHTML={{ __html: product.short_description }}
             />
           )}
 
-          {/* Quantity and Add to Cart - Unified Design */}
-          <div className="flex flex-wrap items-stretch gap-3">
-            {/* Quantity Selector - Custom inline design */}
-            <div className="flex items-center rounded-lg border border-gray-200 bg-white">
+          {/* Stock status - inline with low stock warning */}
+          {isOutOfStock && (
+            <div className="flex items-center gap-2">
+              <Badge variant="error">
+                {isRTL ? "غير متوفر" : "Out of Stock"}
+              </Badge>
+            </div>
+          )}
+          {!isOutOfStock && product.low_stock_remaining && product.low_stock_remaining < 10 && (
+            <span className="text-sm text-orange-600">
+              {isRTL
+                ? `${product.low_stock_remaining} قطع متبقية فقط`
+                : `Only ${product.low_stock_remaining} left`}
+            </span>
+          )}
+
+          {/* Add to Cart Button - Full width, black style */}
+          <div className="space-y-3">
+            {/* Quantity Selector */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500">{isRTL ? "الكمية" : "Quantity"}</span>
+              <div className="flex items-center border border-gray-300">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={isOutOfStock || quantity <= 1}
+                  className="flex h-10 w-10 items-center justify-center text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={isRTL ? "تقليل الكمية" : "Decrease quantity"}
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 1;
+                    const max = product.add_to_cart.maximum || 99;
+                    setQuantity(Math.min(Math.max(1, val), max));
+                  }}
+                  disabled={isOutOfStock}
+                  className="h-10 w-12 border-x border-gray-300 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                  min={1}
+                  max={product.add_to_cart.maximum || 99}
+                />
+                <button
+                  type="button"
+                  onClick={() => setQuantity(Math.min(quantity + 1, product.add_to_cart.maximum || 99))}
+                  disabled={isOutOfStock || quantity >= (product.add_to_cart.maximum || 99)}
+                  className="flex h-10 w-10 items-center justify-center text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={isRTL ? "زيادة الكمية" : "Increase quantity"}
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+              {/* Wishlist Button */}
               <button
                 type="button"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={isOutOfStock || quantity <= 1}
-                className="flex h-12 w-12 items-center justify-center text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label={isRTL ? "تقليل الكمية" : "Decrease quantity"}
+                onClick={handleAddToWishlist}
+                disabled={isAddingToWishlist}
+                className={`flex h-10 w-10 items-center justify-center border transition-all ${
+                  isInWishlist(product.id)
+                    ? "border-red-300 bg-red-50 text-red-500 hover:bg-red-100"
+                    : "border-gray-300 bg-white text-gray-500 hover:border-gray-400 hover:text-gray-700"
+                } ${isAddingToWishlist ? "cursor-not-allowed opacity-50" : ""}`}
+                aria-label={isRTL ? "أضف إلى المفضلة" : "Add to wishlist"}
               >
-                <Minus className="h-4 w-4" />
-              </button>
-              <input
-                type="number"
-                value={quantity}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value) || 1;
-                  const max = product.add_to_cart.maximum || 99;
-                  setQuantity(Math.min(Math.max(1, val), max));
-                }}
-                disabled={isOutOfStock}
-                className="h-12 w-14 border-x border-gray-200 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                min={1}
-                max={product.add_to_cart.maximum || 99}
-              />
-              <button
-                type="button"
-                onClick={() => setQuantity(Math.min(quantity + 1, product.add_to_cart.maximum || 99))}
-                disabled={isOutOfStock || quantity >= (product.add_to_cart.maximum || 99)}
-                className="flex h-12 w-12 items-center justify-center text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label={isRTL ? "زيادة الكمية" : "Increase quantity"}
-              >
-                <Plus className="h-4 w-4" />
+                <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
               </button>
             </div>
 
-            {/* Add to Cart Button */}
-            <Button
-              onClick={handleAddToCart}
-              isLoading={isAddingToCart}
-              disabled={isOutOfStock || !product.is_purchasable}
-              size="lg"
-              className="h-12 flex-1 px-8 md:flex-none"
-            >
-              {isRTL ? "أضف إلى السلة" : "Add to Cart"}
-            </Button>
-
-            {/* Wishlist Button - Matching height */}
+            {/* Add to Cart Button - Black, full width */}
             <button
               type="button"
-              onClick={handleAddToWishlist}
-              disabled={isAddingToWishlist}
-              className={`flex h-12 w-12 items-center justify-center rounded-lg border transition-all ${
-                isInWishlist(product.id)
-                  ? "border-red-300 bg-red-50 text-red-500 hover:bg-red-100"
-                  : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
-              } ${isAddingToWishlist ? "cursor-not-allowed opacity-50" : ""}`}
-              aria-label={isRTL ? "أضف إلى المفضلة" : "Add to wishlist"}
+              onClick={handleAddToCart}
+              disabled={isOutOfStock || !product.is_purchasable || isAddingToCart}
+              className="flex w-full items-center justify-center gap-2 bg-gray-900 px-6 py-3 text-sm font-medium uppercase tracking-wide text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
             >
-              <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-current" : ""}`} />
+              <ShoppingBag className="h-4 w-4" />
+              {isAddingToCart 
+                ? (isRTL ? "جاري الإضافة..." : "Adding...") 
+                : (isRTL ? "أضف إلى السلة" : "Add to Bag")}
             </button>
           </div>
 
-          {/* SKU & Tags */}
-          <div className="space-y-3">
-            {product.sku && (
-              <p className="text-sm text-gray-500">
-                {isRTL ? "رمز المنتج" : "SKU"}: {product.sku}
-              </p>
-            )}
-            
-            {/* Tags */}
-            {product.tags && product.tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="flex items-center gap-1 text-sm text-gray-500">
-                  <Tag className="h-4 w-4" />
-                  {isRTL ? "الوسوم:" : "Tags:"}
-                </span>
-                {product.tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-600/20 transition-colors hover:bg-amber-100"
-                  >
-                    {tag.name}
-                  </span>
-                ))}
+          {/* Accordion Sections */}
+          <div className="border-t border-gray-200 pt-2">
+            {/* Characteristics */}
+            <AccordionSection
+              title={isRTL ? "الخصائص" : "Characteristics"}
+              isOpen={openAccordion === "characteristics"}
+              onToggle={() => toggleAccordion("characteristics")}
+            >
+              <div className="space-y-2 text-sm">
+                {primaryCategory && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">{isRTL ? "الفئة" : "Category"}</span>
+                    <span className="text-gray-900">{primaryCategory.name}</span>
+                  </div>
+                )}
+                {product.sku && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">{isRTL ? "رمز المنتج" : "SKU"}</span>
+                    <span className="text-gray-900">{product.sku}</span>
+                  </div>
+                )}
+                {product.attributes && product.attributes.length > 0 && (
+                  product.attributes.map((attr) => (
+                    <div key={attr.id} className="flex justify-between">
+                      <span className="text-gray-500">{attr.name}</span>
+                      <span className="text-gray-900">{attr.terms?.map(t => t.name).join(", ") || attr.value}</span>
+                    </div>
+                  ))
+                )}
+                {product.tags && product.tags.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">{isRTL ? "الوسوم" : "Tags"}</span>
+                    <span className="text-gray-900">{product.tags.map(t => t.name).join(", ")}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </AccordionSection>
 
-          {/* Features */}
-          <div className="grid gap-4 border-t border-amber-100 pt-6 sm:grid-cols-3">
-            <div className="flex items-center gap-3 rounded-lg bg-amber-50 p-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-                <Truck className="h-5 w-5 text-amber-700" />
+            {/* Description */}
+            <AccordionSection
+              title={isRTL ? "الوصف" : "Description"}
+              isOpen={openAccordion === "description"}
+              onToggle={() => toggleAccordion("description")}
+            >
+              {product.description ? (
+                <div
+                  className="prose prose-sm max-w-none text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+              ) : (
+                <p className="text-sm text-gray-500">
+                  {isRTL ? "لا يوجد وصف متاح" : "No description available"}
+                </p>
+              )}
+            </AccordionSection>
+
+            {/* Payment & Delivery */}
+            <AccordionSection
+              title={isRTL ? "الدفع والتوصيل" : "Payment & Delivery"}
+              isOpen={openAccordion === "payment"}
+              onToggle={() => toggleAccordion("payment")}
+            >
+              <div className="space-y-3 text-sm text-gray-600">
+                <p>
+                  {isRTL 
+                    ? "نقبل جميع بطاقات الائتمان الرئيسية والدفع عند الاستلام."
+                    : "We accept all major credit cards and cash on delivery."}
+                </p>
+                <p>
+                  {isRTL
+                    ? "شحن مجاني للطلبات التي تزيد عن 300 درهم. التوصيل خلال 2-5 أيام عمل."
+                    : "Free shipping on orders over 300 AED. Delivery within 2-5 business days."}
+                </p>
               </div>
-              <span className="text-sm font-medium text-amber-900">
-                {isRTL ? "شحن مجاني" : "Free Shipping"}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg bg-amber-50 p-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-                <Shield className="h-5 w-5 text-amber-700" />
+            </AccordionSection>
+
+            {/* Returns */}
+            <AccordionSection
+              title={isRTL ? "الإرجاع" : "Returns"}
+              isOpen={openAccordion === "returns"}
+              onToggle={() => toggleAccordion("returns")}
+            >
+              <div className="space-y-3 text-sm text-gray-600">
+                <p>
+                  {isRTL
+                    ? "نقبل الإرجاع خلال 14 يومًا من تاريخ الشراء. يجب أن تكون المنتجات غير مستخدمة وفي عبوتها الأصلية."
+                    : "We accept returns within 14 days of purchase. Products must be unused and in original packaging."}
+                </p>
+                <p>
+                  {isRTL
+                    ? "للمزيد من المعلومات، يرجى الاطلاع على سياسة الإرجاع الخاصة بنا."
+                    : "For more information, please see our return policy."}
+                </p>
               </div>
-              <span className="text-sm font-medium text-amber-900">
-                {isRTL ? "منتج أصلي" : "Authentic Product"}
-              </span>
-            </div>
-            <div className="flex items-center gap-3 rounded-lg bg-amber-50 p-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-                <RotateCcw className="h-5 w-5 text-amber-700" />
-              </div>
-              <span className="text-sm font-medium text-amber-900">
-                {isRTL ? "إرجاع سهل" : "Easy Returns"}
-              </span>
-            </div>
+            </AccordionSection>
           </div>
 
         </div>
       </div>
-
-      {/* Product Tabs - Description & Additional Information */}
-      <ProductTabs
-        description={product.description}
-        attributes={product.attributes}
-        isRTL={isRTL}
-      />
 
       {/* Related Products */}
       <RelatedProducts
