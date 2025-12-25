@@ -52,7 +52,7 @@ export default function CheckoutPage() {
   const { locale } = useParams<{ locale: string }>();
   const router = useRouter();
   const { cart, cartItems, cartSubtotal, cartTotal, clearCart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const isRTL = locale === "ar";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,44 +70,47 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const fetchCustomerData = async () => {
-      if (isAuthenticated) {
+      if (isAuthenticated && user?.user_id) {
         setIsLoadingCustomer(true);
         try {
-          const customer = await getCustomer();
-          setCustomerData(customer);
-          if (customer.shipping) {
-            setFormData(prev => ({
-              ...prev,
-              shipping: {
-                firstName: customer.shipping.first_name || "",
-                lastName: customer.shipping.last_name || "",
-                address: customer.shipping.address_1 || "",
-                address2: customer.shipping.address_2 || "",
-                city: customer.shipping.city || "",
-                state: customer.shipping.state || "",
-                postalCode: customer.shipping.postcode || "",
-                country: customer.shipping.country || "AE",
-                phone: customer.shipping.phone || customer.billing?.phone || "",
-                email: customer.billing?.email || customer.email || "",
-              },
-            }));
-          }
-          if (customer.billing) {
-            setFormData(prev => ({
-              ...prev,
-              billing: {
-                firstName: customer.billing.first_name || "",
-                lastName: customer.billing.last_name || "",
-                address: customer.billing.address_1 || "",
-                address2: customer.billing.address_2 || "",
-                city: customer.billing.city || "",
-                state: customer.billing.state || "",
-                postalCode: customer.billing.postcode || "",
-                country: customer.billing.country || "AE",
-                phone: customer.billing.phone || "",
-                email: customer.billing.email || customer.email || "",
-              },
-            }));
+          const response = await getCustomer(user.user_id);
+          if (response.success && response.data) {
+            const customer = response.data;
+            setCustomerData(customer);
+            if (customer.shipping) {
+              setFormData(prev => ({
+                ...prev,
+                shipping: {
+                  firstName: customer.shipping.first_name || "",
+                  lastName: customer.shipping.last_name || "",
+                  address: customer.shipping.address_1 || "",
+                  address2: customer.shipping.address_2 || "",
+                  city: customer.shipping.city || "",
+                  state: customer.shipping.state || "",
+                  postalCode: customer.shipping.postcode || "",
+                  country: customer.shipping.country || "AE",
+                  phone: customer.shipping.phone || customer.billing?.phone || "",
+                  email: customer.billing?.email || customer.email || "",
+                },
+              }));
+            }
+            if (customer.billing) {
+              setFormData(prev => ({
+                ...prev,
+                billing: {
+                  firstName: customer.billing.first_name || "",
+                  lastName: customer.billing.last_name || "",
+                  address: customer.billing.address_1 || "",
+                  address2: customer.billing.address_2 || "",
+                  city: customer.billing.city || "",
+                  state: customer.billing.state || "",
+                  postalCode: customer.billing.postcode || "",
+                  country: customer.billing.country || "AE",
+                  phone: customer.billing.phone || "",
+                  email: customer.billing.email || customer.email || "",
+                },
+              }));
+            }
           }
         } catch (err) {
           console.error("Failed to fetch customer data:", err);
@@ -117,7 +120,7 @@ export default function CheckoutPage() {
       }
     };
     fetchCustomerData();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.user_id]);
 
   const breadcrumbItems = [
     { name: isRTL ? "السلة" : "Cart", href: `/${locale}/cart` },
