@@ -147,9 +147,9 @@ export function ProductViewToggle({
           </button>
         </div>
 
-        {/* Grid Columns Toggle (only show when in grid mode) */}
+        {/* Grid Columns Toggle (only show when in grid mode, hidden on mobile) */}
         {viewMode === "grid" && (
-          <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1">
+          <div className="hidden items-center rounded-lg border border-gray-200 bg-gray-50 p-1 md:flex">
             {gridOptions.map((option) => (
               <button
                 key={option.columns}
