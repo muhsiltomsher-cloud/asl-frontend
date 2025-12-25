@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore, useCallback } from "react";
+import { useState, useCallback, useReducer } from "react";
 import { WCProductGrid } from "./WCProductGrid";
 import { WCProductListCard } from "./WCProductListCard";
 import { ProductViewToggle, type ViewMode, type GridColumns } from "./ProductViewToggle";
@@ -25,31 +25,14 @@ interface ProductListingProps {
   toolbarClassName?: string;
 }
 
-function getDefaultPreference(): ViewPreference {
-  return {
-    viewMode: "grid",
-    gridColumns: 5,
-  };
-}
+const DEFAULT_PREFERENCE: ViewPreference = {
+  viewMode: "grid",
+  gridColumns: 5,
+};
 
-function savePreference(preference: ViewPreference): void {
-  if (typeof window === "undefined") return;
-  
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(preference));
-  } catch {
-    // Ignore localStorage errors
-  }
-}
-
-function subscribeToStorage(callback: () => void) {
-  window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
-}
-
-function getStoredPreference(): ViewPreference {
+function getInitialPreference(): ViewPreference {
   if (typeof window === "undefined") {
-    return getDefaultPreference();
+    return DEFAULT_PREFERENCE;
   }
   
   try {
@@ -67,15 +50,17 @@ function getStoredPreference(): ViewPreference {
     // Ignore localStorage errors
   }
   
-  return getDefaultPreference();
+  return DEFAULT_PREFERENCE;
 }
 
-function useIsHydrated() {
-  return useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
+function savePreference(preference: ViewPreference): void {
+  if (typeof window === "undefined") return;
+  
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(preference));
+  } catch {
+    // Ignore localStorage errors
+  }
 }
 
 export function ProductListing({
@@ -86,30 +71,25 @@ export function ProductListing({
   showToolbar = true,
   toolbarClassName,
 }: ProductListingProps) {
-  const isHydrated = useIsHydrated();
-  
-  const storedPreference = useSyncExternalStore(
-    subscribeToStorage,
-    getStoredPreference,
-    getDefaultPreference
-  );
-  
-  const [localPreference, setLocalPreference] = useState<ViewPreference | null>(null);
-  
-  const preference = localPreference ?? storedPreference;
+  const [preference, setPreference] = useState<ViewPreference>(() => getInitialPreference());
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const isHydrated = typeof window !== "undefined";
+
   const viewMode = preference.viewMode;
   const gridColumns = preference.gridColumns;
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     const newPreference = { viewMode: mode, gridColumns };
-    setLocalPreference(newPreference);
+    setPreference(newPreference);
     savePreference(newPreference);
+    forceUpdate();
   }, [gridColumns]);
 
   const handleGridColumnsChange = useCallback((columns: GridColumns) => {
     const newPreference = { viewMode, gridColumns: columns };
-    setLocalPreference(newPreference);
+    setPreference(newPreference);
     savePreference(newPreference);
+    forceUpdate();
   }, [viewMode]);
 
   if (isLoading) {
