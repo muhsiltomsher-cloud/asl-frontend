@@ -319,7 +319,7 @@ export function ProductDetail({ product, locale, relatedProducts = [] }: Product
                   product.attributes.map((attr) => (
                     <div key={attr.id} className="flex justify-between">
                       <span className="text-gray-500">{attr.name}</span>
-                      <span className="text-gray-900">{attr.terms?.map(t => t.name).join(", ") || attr.value}</span>
+                      <span className="text-gray-900">{attr.terms?.map(t => t.name).join(", ")}</span>
                     </div>
                   ))
                 )}
