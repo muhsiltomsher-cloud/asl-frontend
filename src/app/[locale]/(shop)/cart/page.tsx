@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, User, UserCheck } from "lucide-react";
 import { Button } from "@/components/common/Button";
-import { Input } from "@/components/common/Input";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { useCart } from "@/contexts/CartContext";
@@ -24,14 +22,8 @@ export default function CartPage() {
     isLoading,
     updateCartItem,
     removeCartItem,
-    applyCoupon,
-    removeCoupon,
   } = useCart();
   const { isAuthenticated, user } = useAuth();
-
-  const [couponCode, setCouponCode] = useState("");
-  const [couponError, setCouponError] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
 
   const isRTL = locale === "ar";
   const isEmpty = cartItems.length === 0;
@@ -60,10 +52,6 @@ export default function CartPage() {
       discount: "Discount",
       orderTotal: "Total",
       checkout: "Proceed to Checkout",
-      couponCode: "Coupon Code",
-      applyCoupon: "Apply",
-      couponError: "Invalid coupon code",
-      removeCoupon: "Remove",
       calculatedAtCheckout: "Calculated at checkout",
       backToShop: "Continue Shopping",
       loggedInAs: "Logged in as",
@@ -86,10 +74,6 @@ export default function CartPage() {
       discount: "الخصم",
       orderTotal: "الإجمالي",
       checkout: "المتابعة للدفع",
-      couponCode: "كود الخصم",
-      applyCoupon: "تطبيق",
-      couponError: "كود الخصم غير صالح",
-      removeCoupon: "إزالة",
       calculatedAtCheckout: "يحسب عند الدفع",
       backToShop: "متابعة التسوق",
       loggedInAs: "تم تسجيل الدخول كـ",
@@ -114,32 +98,6 @@ export default function CartPage() {
       await removeCartItem(itemKey);
     } catch (error) {
       console.error("Failed to remove item:", error);
-    }
-  };
-
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return;
-    setCouponLoading(true);
-    setCouponError("");
-    try {
-      const success = await applyCoupon(couponCode);
-      if (!success) {
-        setCouponError(texts.couponError);
-      } else {
-        setCouponCode("");
-      }
-    } catch {
-      setCouponError(texts.couponError);
-    } finally {
-      setCouponLoading(false);
-    }
-  };
-
-  const handleRemoveCoupon = async (code: string) => {
-    try {
-      await removeCoupon(code);
-    } catch (error) {
-      console.error("Failed to remove coupon:", error);
     }
   };
 
@@ -326,51 +284,6 @@ export default function CartPage() {
               <h2 className="mb-4 text-lg font-semibold text-gray-900">
                 {texts.orderSummary}
               </h2>
-
-              <div className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  {texts.couponCode}
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    placeholder={texts.couponCode}
-                    className="flex-1"
-                    error={couponError}
-                  />
-                  <Button
-                    onClick={handleApplyCoupon}
-                    isLoading={couponLoading}
-                    disabled={couponLoading || !couponCode.trim()}
-                    size="sm"
-                  >
-                    {texts.applyCoupon}
-                  </Button>
-                </div>
-              </div>
-
-              {cart?.coupons && cart.coupons.length > 0 && (
-                <div className="mb-6 space-y-2">
-                  {cart.coupons.map((coupon) => (
-                    <div
-                      key={coupon.coupon}
-                      className="flex items-center justify-between rounded-lg border border-black/10 bg-gray-50 px-3 py-2"
-                    >
-                      <span className="text-sm font-medium text-gray-700">
-                        {coupon.coupon}
-                      </span>
-                      <button
-                        onClick={() => handleRemoveCoupon(coupon.coupon)}
-                        className="text-sm text-red-600 hover:text-red-700"
-                      >
-                        {texts.removeCoupon}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               <div className="space-y-3 border-b border-black/10 pb-4">
                 <div className="flex justify-between text-gray-600">
