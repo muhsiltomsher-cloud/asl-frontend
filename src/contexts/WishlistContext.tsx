@@ -11,6 +11,9 @@ import {
   type WishlistItem,
 } from "@/lib/api/wishlist";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNotification } from "@/contexts/NotificationContext";
+
+const WISHLIST_COUNT_CACHE_KEY = "asl_wishlist_count";
 
 interface WishlistContextType {
   wishlist: WishlistResponse | null;
@@ -29,15 +32,58 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
+// Helper functions for localStorage caching (outside component to avoid SSR issues)
+function getCachedWishlistCount(): number {
+  if (typeof window === "undefined") return 0;
+  try {
+    const cached = localStorage.getItem(WISHLIST_COUNT_CACHE_KEY);
+    return cached ? parseInt(cached, 10) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function setCachedWishlistCount(count: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(WISHLIST_COUNT_CACHE_KEY, count.toString());
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
+function clearCachedWishlistCount(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(WISHLIST_COUNT_CACHE_KEY);
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<WishlistResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const [cachedCount, setCachedCount] = useState<number>(0);
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
+  const { notify } = useNotification();
+
+  // Initialize cached count from localStorage on mount
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setCachedCount(getCachedWishlistCount());
+    } else {
+      setCachedCount(0);
+      clearCachedWishlistCount();
+    }
+  }, [isAuthenticated, user]);
 
   const refreshWishlist = useCallback(async () => {
     if (!isAuthenticated) {
       setWishlist(null);
+      clearCachedWishlistCount();
+      setCachedCount(0);
       return;
     }
     setIsLoading(true);
@@ -45,6 +91,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       const response = await apiGetWishlist();
       if (response.success && response.wishlist) {
         setWishlist(response.wishlist);
+        // Update cache with fresh count
+        const newCount = response.wishlist.items_count || response.wishlist.items?.length || 0;
+        setCachedWishlistCount(newCount);
+        setCachedCount(newCount);
       }
     } catch (error) {
       console.error("Error fetching wishlist:", error);
@@ -66,20 +116,28 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         const response = await apiAddToWishlist(productId, variationId);
         if (response.success) {
           await refreshWishlist();
+          notify("success", "Added to wishlist");
           return true;
         } else if (response.error) {
+          // Check if item is already in wishlist
+          if (response.error.code === "product_already_in_wishlist") {
+            notify("info", "Already in your wishlist");
+            return true;
+          }
           console.error("Error adding to wishlist:", response.error.message);
+          notify("error", response.error.message || "Failed to add to wishlist");
           return false;
         }
         return false;
       } catch (error) {
         console.error("Error adding to wishlist:", error);
+        notify("error", "Failed to add to wishlist");
         return false;
       } finally {
         setIsLoading(false);
       }
     },
-    [refreshWishlist]
+    [refreshWishlist, notify]
   );
 
   const removeFromWishlist = useCallback(
@@ -95,20 +153,23 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         const response = await apiRemoveFromWishlist(productId, resolvedItemId);
         if (response.success) {
           await refreshWishlist();
+          notify("success", "Removed from wishlist");
           return true;
         } else if (response.error) {
           console.error("Error removing from wishlist:", response.error.message);
+          notify("error", response.error.message || "Failed to remove from wishlist");
           return false;
         }
         return false;
       } catch (error) {
         console.error("Error removing from wishlist:", error);
+        notify("error", "Failed to remove from wishlist");
         return false;
       } finally {
         setIsLoading(false);
       }
     },
-    [refreshWishlist, wishlist]
+    [refreshWishlist, wishlist, notify]
   );
 
   const syncWishlist = useCallback(
@@ -146,7 +207,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   );
 
   const wishlistItems = wishlist?.items || [];
-  const wishlistItemsCount = wishlist?.items_count || wishlistItems.length;
+  // Use cached count immediately while loading, then use actual count once loaded
+  const wishlistItemsCount = wishlist?.items_count || wishlistItems.length || cachedCount;
 
   return (
     <WishlistContext.Provider
