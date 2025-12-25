@@ -7,6 +7,7 @@ import { login as apiLogin, validateToken, refreshToken as apiRefreshToken, type
 const AUTH_TOKEN_KEY = "asl_auth_token";
 const AUTH_USER_KEY = "asl_auth_user";
 const AUTH_REFRESH_TOKEN_KEY = "asl_refresh_token";
+const AUTH_WP_TOKEN_KEY = "asl_wp_auth_token";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -105,6 +106,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             sameSite: "lax",
           });
         }
+        // Store WordPress JWT token for YITH wishlist and other WP endpoints
+        if (response.user.wp_token) {
+          setCookie(AUTH_WP_TOKEN_KEY, response.user.wp_token, {
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+            path: "/",
+            sameSite: "lax",
+          });
+        }
         setUser(response.user);
       }
 
@@ -118,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     deleteCookie(AUTH_TOKEN_KEY);
     deleteCookie(AUTH_USER_KEY);
     deleteCookie(AUTH_REFRESH_TOKEN_KEY);
+    deleteCookie(AUTH_WP_TOKEN_KEY);
     setUser(null);
   }, []);
 

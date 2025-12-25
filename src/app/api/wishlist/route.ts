@@ -4,11 +4,15 @@ import { cookies } from "next/headers";
 
 const API_BASE = siteConfig.apiUrl;
 const WISHLIST_BASE = `${API_BASE}/wp-json/yith/wishlist/v1`;
+const WP_AUTH_TOKEN_COOKIE = "asl_wp_auth_token";
 const AUTH_TOKEN_COOKIE = "asl_auth_token";
 
-async function getAuthToken(): Promise<string | null> {
+async function getAuthToken(): Promise<{ wpToken: string | null; cocartToken: string | null }> {
   const cookieStore = await cookies();
-  return cookieStore.get(AUTH_TOKEN_COOKIE)?.value || null;
+  return {
+    wpToken: cookieStore.get(WP_AUTH_TOKEN_COOKIE)?.value || null,
+    cocartToken: cookieStore.get(AUTH_TOKEN_COOKIE)?.value || null,
+  };
 }
 
 function getAuthHeaders(request: NextRequest, authToken: string | null): HeadersInit {
@@ -28,7 +32,10 @@ function getAuthHeaders(request: NextRequest, authToken: string | null): Headers
 
 export async function GET(request: NextRequest) {
   try {
-    const authToken = await getAuthToken();
+    const { wpToken, cocartToken } = await getAuthToken();
+    
+    // Prefer WordPress JWT token for YITH endpoints, fall back to CoCart token
+    const authToken = wpToken || cocartToken;
     
     if (!authToken) {
       return NextResponse.json(
@@ -43,7 +50,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const response = await fetch(`${WISHLIST_BASE}/lists`, {
+    // Use /wishlists endpoint with WordPress JWT for authenticated users
+    const response = await fetch(`${WISHLIST_BASE}/wishlists`, {
       method: "GET",
       headers: getAuthHeaders(request, authToken),
     });
@@ -107,7 +115,10 @@ export async function POST(request: NextRequest) {
   const action = searchParams.get("action");
 
   try {
-    const authToken = await getAuthToken();
+    const { wpToken, cocartToken } = await getAuthToken();
+    
+    // Prefer WordPress JWT token for YITH endpoints, fall back to CoCart token
+    const authToken = wpToken || cocartToken;
     
     if (!authToken) {
       return NextResponse.json(
@@ -216,8 +227,8 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Fetch the updated wishlist after sync
-        const listResponse = await fetch(`${WISHLIST_BASE}/lists`, {
+        // Fetch the updated wishlist after sync using /wishlists endpoint
+        const listResponse = await fetch(`${WISHLIST_BASE}/wishlists`, {
           method: "GET",
           headers: getAuthHeaders(request, authToken),
         });
