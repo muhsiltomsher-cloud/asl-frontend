@@ -1,15 +1,51 @@
 "use client";
 
-import { useState, useCallback, useReducer } from "react";
+import { useState, useCallback, useReducer, useMemo } from "react";
 import { WCProductGrid } from "./WCProductGrid";
 import { WCProductListCard } from "./WCProductListCard";
-import { ProductViewToggle, type ViewMode, type GridColumns } from "./ProductViewToggle";
+import { ProductViewToggle, type ViewMode, type GridColumns, type SortOption } from "./ProductViewToggle";
 import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { cn } from "@/lib/utils";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 
 const STORAGE_KEY = "asl_product_view_preference";
+
+function getProductPrice(product: WCProduct): number {
+  const priceStr = product.prices?.price || "0";
+  const price = parseFloat(priceStr);
+  return isNaN(price) ? 0 : price;
+}
+
+function sortProducts(products: WCProduct[], sortBy: SortOption): WCProduct[] {
+  if (sortBy === "default") {
+    return products;
+  }
+
+  const sorted = [...products];
+
+  switch (sortBy) {
+    case "price-asc":
+      sorted.sort((a, b) => getProductPrice(a) - getProductPrice(b));
+      break;
+    case "price-desc":
+      sorted.sort((a, b) => getProductPrice(b) - getProductPrice(a));
+      break;
+    case "name-asc":
+      sorted.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      break;
+    case "name-desc":
+      sorted.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+      break;
+    case "date-desc":
+      sorted.sort((a, b) => b.id - a.id);
+      break;
+    default:
+      break;
+  }
+
+  return sorted;
+}
 
 interface ViewPreference {
   viewMode: ViewMode;
@@ -72,11 +108,14 @@ export function ProductListing({
   toolbarClassName,
 }: ProductListingProps) {
   const [preference, setPreference] = useState<ViewPreference>(() => getInitialPreference());
+  const [sortBy, setSortBy] = useState<SortOption>("default");
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const isHydrated = typeof window !== "undefined";
 
   const viewMode = preference.viewMode;
   const gridColumns = preference.gridColumns;
+
+  const sortedProducts = useMemo(() => sortProducts(products, sortBy), [products, sortBy]);
 
   const handleViewModeChange = useCallback((mode: ViewMode) => {
     const newPreference = { viewMode: mode, gridColumns };
@@ -91,6 +130,10 @@ export function ProductListing({
     savePreference(newPreference);
     forceUpdate();
   }, [viewMode]);
+
+  const handleSortChange = useCallback((sort: SortOption) => {
+    setSortBy(sort);
+  }, []);
 
   if (isLoading) {
     return <ProductGridSkeleton count={10} />;
@@ -116,7 +159,9 @@ export function ProductListing({
             onViewModeChange={handleViewModeChange}
             onGridColumnsChange={handleGridColumnsChange}
             locale={locale}
-            productCount={products.length}
+            productCount={sortedProducts.length}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
           />
         </div>
       )}
@@ -125,13 +170,13 @@ export function ProductListing({
         <ProductGridSkeleton count={10} />
       ) : viewMode === "grid" ? (
         <WCProductGrid
-          products={products}
+          products={sortedProducts}
           locale={locale}
           columns={gridColumns}
         />
       ) : (
         <div className="space-y-4">
-          {products.map((product) => (
+          {sortedProducts.map((product) => (
             <WCProductListCard
               key={product.id}
               product={product}
