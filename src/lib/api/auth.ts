@@ -15,6 +15,7 @@ export interface RegisterData {
 
 export interface AuthUser {
   token: string;
+  wp_token?: string;
   refresh_token?: string;
   user_id: number;
   user_email: string;
@@ -51,6 +52,7 @@ export interface RefreshTokenResponse {
 
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
   try {
+    // Get CoCart JWT token (for cart operations)
     const response = await fetch(`${API_BASE}/wp-json/cocart/v2/login`, {
       method: "POST",
       headers: {
@@ -72,10 +74,29 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
       };
     }
 
+    // Also get WordPress JWT token (for YITH wishlist and other WP endpoints)
+    let wpToken: string | undefined;
+    try {
+      const wpResponse = await fetch(`${API_BASE}/wp-json/jwt-auth/v1/token`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+      if (wpResponse.ok) {
+        const wpData = await wpResponse.json();
+        wpToken = wpData.token;
+      }
+    } catch {
+      // WordPress JWT is optional, continue without it
+    }
+
     return {
       success: true,
       user: {
         token: data.extras?.jwt_token || data.jwt_token || data.token,
+        wp_token: wpToken,
         refresh_token: data.extras?.jwt_refresh || data.jwt_refresh_token || data.refresh_token,
         user_id: parseInt(data.user_id) || data.id || 0,
         user_email: data.email || data.user_email || "",
