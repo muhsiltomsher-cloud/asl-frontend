@@ -5,54 +5,41 @@ import { cookies } from "next/headers";
 const API_BASE = siteConfig.apiUrl;
 // TI WooCommerce Wishlist REST API - uses WooCommerce REST API namespace
 const WISHLIST_BASE = `${API_BASE}/wp-json/wc/v3/wishlist`;
-const WP_AUTH_TOKEN_COOKIE = "asl_wp_auth_token";
-const AUTH_TOKEN_COOKIE = "asl_auth_token";
 const USER_COOKIE = "asl_auth_user";
 
-async function getAuthToken(): Promise<{ wpToken: string | null; cocartToken: string | null; userId: number | null }> {
+// WooCommerce REST API authentication (required for /wc/v3/ endpoints)
+function getWooCommerceCredentials() {
+  const consumerKey = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || "";
+  const consumerSecret = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "";
+  return { consumerKey, consumerSecret };
+}
+
+function getBasicAuthParams(): string {
+  const { consumerKey, consumerSecret } = getWooCommerceCredentials();
+  return `consumer_key=${consumerKey}&consumer_secret=${consumerSecret}`;
+}
+
+async function getUserId(): Promise<number | null> {
   const cookieStore = await cookies();
   const userCookie = cookieStore.get(USER_COOKIE)?.value;
-  let userId: number | null = null;
   
   if (userCookie) {
     try {
       const userData = JSON.parse(decodeURIComponent(userCookie));
-      userId = userData.user_id || null;
+      return userData.user_id || null;
     } catch {
       // Ignore parse errors
     }
   }
   
-  return {
-    wpToken: cookieStore.get(WP_AUTH_TOKEN_COOKIE)?.value || null,
-    cocartToken: cookieStore.get(AUTH_TOKEN_COOKIE)?.value || null,
-    userId,
-  };
+  return null;
 }
 
-function getAuthHeaders(request: NextRequest, authToken: string | null): HeadersInit {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
-
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader) {
-    headers["Authorization"] = authHeader;
-  } else if (authToken) {
-    headers["Authorization"] = `Bearer ${authToken}`;
-  }
-
-  return headers;
-}
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { wpToken, cocartToken, userId } = await getAuthToken();
+    const userId = await getUserId();
     
-    // Prefer WordPress JWT token for TI Wishlist endpoints, fall back to CoCart token
-    const authToken = wpToken || cocartToken;
-    
-    if (!authToken || !userId) {
+    if (!userId) {
       return NextResponse.json(
         {
           success: false,
@@ -66,9 +53,12 @@ export async function GET(request: NextRequest) {
     }
 
     // TI WooCommerce Wishlist: Get user's wishlist by user ID
-    const response = await fetch(`${WISHLIST_BASE}/get_by_user/${userId}`, {
+    // Uses WooCommerce REST API authentication (consumer key/secret)
+    const response = await fetch(`${WISHLIST_BASE}/get_by_user/${userId}?${getBasicAuthParams()}`, {
       method: "GET",
-      headers: getAuthHeaders(request, authToken),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) {
@@ -107,9 +97,11 @@ export async function GET(request: NextRequest) {
       wishlist = data;
       
       // Fetch products for this wishlist
-      const productsResponse = await fetch(`${WISHLIST_BASE}/${data.share_key}/get_products`, {
+      const productsResponse = await fetch(`${WISHLIST_BASE}/${data.share_key}/get_products?${getBasicAuthParams()}`, {
         method: "GET",
-        headers: getAuthHeaders(request, authToken),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       
       if (productsResponse.ok) {
@@ -120,9 +112,11 @@ export async function GET(request: NextRequest) {
       // If array of wishlists, use first one
       wishlist = data[0];
       if (wishlist && wishlist.share_key) {
-        const productsResponse = await fetch(`${WISHLIST_BASE}/${wishlist.share_key}/get_products`, {
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${wishlist.share_key}/get_products?${getBasicAuthParams()}`, {
           method: "GET",
-          headers: getAuthHeaders(request, authToken),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         
         if (productsResponse.ok) {
@@ -152,12 +146,9 @@ export async function POST(request: NextRequest) {
   const action = searchParams.get("action");
 
   try {
-    const { wpToken, cocartToken, userId } = await getAuthToken();
+    const userId = await getUserId();
     
-    // Prefer WordPress JWT token for TI Wishlist endpoints, fall back to CoCart token
-    const authToken = wpToken || cocartToken;
-    
-    if (!authToken || !userId) {
+    if (!userId) {
       return NextResponse.json(
         {
           success: false,
@@ -174,9 +165,11 @@ export async function POST(request: NextRequest) {
 
     // Helper function to get user's wishlist share_key
     async function getUserWishlistShareKey(): Promise<string | null> {
-      const response = await fetch(`${WISHLIST_BASE}/get_by_user/${userId}`, {
+      const response = await fetch(`${WISHLIST_BASE}/get_by_user/${userId}?${getBasicAuthParams()}`, {
         method: "GET",
-        headers: getAuthHeaders(request, authToken),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       
       if (response.ok) {
@@ -211,9 +204,11 @@ export async function POST(request: NextRequest) {
         }
         
         // TI Wishlist: POST /{share_key}/add_product
-        const response = await fetch(`${WISHLIST_BASE}/${shareKey}/add_product`, {
+        const response = await fetch(`${WISHLIST_BASE}/${shareKey}/add_product?${getBasicAuthParams()}`, {
           method: "POST",
-          headers: getAuthHeaders(request, authToken),
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             product_id: body.product_id,
             variation_id: body.variation_id || 0,
@@ -243,9 +238,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch updated products
-        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products`, {
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products?${getBasicAuthParams()}`, {
           method: "GET",
-          headers: getAuthHeaders(request, authToken),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         let items: unknown[] = [];
         if (productsResponse.ok) {
@@ -284,9 +281,11 @@ export async function POST(request: NextRequest) {
         }
         
         // TI Wishlist: DELETE /{share_key}/remove_product/{item_id}
-        const response = await fetch(`${WISHLIST_BASE}/${shareKey}/remove_product/${itemId}`, {
+        const response = await fetch(`${WISHLIST_BASE}/${shareKey}/remove_product/${itemId}?${getBasicAuthParams()}`, {
           method: "DELETE",
-          headers: getAuthHeaders(request, authToken),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         
         const responseText = await response.text();
@@ -311,9 +310,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch updated products
-        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products`, {
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products?${getBasicAuthParams()}`, {
           method: "GET",
-          headers: getAuthHeaders(request, authToken),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         let items: unknown[] = [];
         if (productsResponse.ok) {
@@ -352,9 +353,11 @@ export async function POST(request: NextRequest) {
         // Add each item to the wishlist
         for (const item of guestItems) {
           try {
-            const response = await fetch(`${WISHLIST_BASE}/${shareKey}/add_product`, {
+            const response = await fetch(`${WISHLIST_BASE}/${shareKey}/add_product?${getBasicAuthParams()}`, {
               method: "POST",
-              headers: getAuthHeaders(request, authToken),
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify({
                 product_id: item.product_id,
                 variation_id: item.variation_id || 0,
@@ -378,9 +381,11 @@ export async function POST(request: NextRequest) {
         }
 
         // Fetch the updated wishlist products
-        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products`, {
+        const productsResponse = await fetch(`${WISHLIST_BASE}/${shareKey}/get_products?${getBasicAuthParams()}`, {
           method: "GET",
-          headers: getAuthHeaders(request, authToken),
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         let items: unknown[] = [];
         if (productsResponse.ok) {
