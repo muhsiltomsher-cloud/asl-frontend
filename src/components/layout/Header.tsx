@@ -81,12 +81,12 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
               <LanguageSwitcher locale={locale} />
               {/* Desktop only: Currency next to language */}
               <div className="hidden md:block">
-                <CurrencySwitcher />
+                <CurrencySwitcher locale={locale} />
               </div>
             </div>
             {/* Mobile: Currency on right | Desktop: Promotional text */}
             <div className="md:hidden">
-              <CurrencySwitcher />
+              <CurrencySwitcher locale={locale} />
             </div>
             {topbarText && (
               <div className="hidden text-sm text-gray-600 md:block">
