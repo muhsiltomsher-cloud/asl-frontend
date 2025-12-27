@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Grid3X3, ArrowRight } from "lucide-react";
+import { Grid3X3 } from "lucide-react";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
 import type { WCCategory } from "@/types/woocommerce";
@@ -145,6 +145,23 @@ export function MegaMenu({
 
   const hierarchicalCategories = organizeCategoriesByHierarchy(categories);
 
+  const featuredProducts = [
+    {
+      id: 1,
+      title: isRTL ? "مجموعة الهدايا" : "Gift Sets",
+      subtitle: isRTL ? "خصم 30%" : "30% off",
+      image: "/images/featured-1.jpg",
+      href: `/${locale}/shop?category=gifts-set`,
+    },
+    {
+      id: 2,
+      title: isRTL ? "العطور الجديدة" : "New Fragrances",
+      subtitle: isRTL ? "وصل حديثاً" : "Just Arrived",
+      image: "/images/featured-2.jpg",
+      href: `/${locale}/shop?orderby=date`,
+    },
+  ];
+
   return (
     <>
       <div 
@@ -164,38 +181,11 @@ export function MegaMenu({
         dir={isRTL ? "rtl" : "ltr"}
         onMouseLeave={onClose}
       >
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <Grid3X3 className="h-5 w-5 text-amber-700" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">
-                  {dictionary.common.categories || "Shop by Category"}
-                </h3>
-                <p className="text-sm text-gray-500">
-                  {dictionary.sections?.shopByCategory?.subtitle || "Explore our diverse collections"}
-                </p>
-              </div>
-            </div>
-            <Link
-              href={`/${locale}/shop`}
-              onClick={onClose}
-              className="group flex items-center gap-2 text-sm font-semibold text-amber-700 hover:text-amber-800 transition-colors"
-            >
-              {dictionary.common.viewAll || "View All Products"}
-              <ArrowRight className={cn(
-                "h-4 w-4 transition-transform group-hover:translate-x-1",
-                isRTL && "rotate-180 group-hover:-translate-x-1"
-              )} />
-            </Link>
-          </div>
-
+        <div className="container mx-auto px-6 py-8">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-100 border-t-amber-600" />
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#7a3205]/20 border-t-[#7a3205]" />
                 <span className="text-sm text-gray-500">{dictionary.common.loading || "Loading..."}</span>
               </div>
             </div>
@@ -205,93 +195,87 @@ export function MegaMenu({
               <p className="text-gray-400">No categories found</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-5">
-              {hierarchicalCategories.map((category) => (
-                <div key={category.id} className="flex flex-col">
-                  <Link
-                    href={`/${locale}/shop?category=${category.slug}`}
-                    onClick={onClose}
-                    className="group block"
-                  >
-                    <div className="relative overflow-hidden rounded-xl bg-gradient-to-b from-[#e8e4dc] to-[#d4cfc5]">
-                      <div className="aspect-[4/3] relative flex items-center justify-center p-4">
-                        {category.image ? (
-                          <Image
-                            src={category.image.src}
-                            alt={decodeHtmlEntities(category.name)}
-                            fill
-                            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-                          />
-                        ) : (
-                          <Grid3X3 className="h-16 w-16 text-[#8b7355]" />
+            <div className="flex gap-8">
+              {/* Left Side - Categories */}
+              <div className={cn("flex-1", isRTL ? "order-2" : "order-1")}>
+                <div className="grid grid-cols-4 gap-8">
+                  {hierarchicalCategories.slice(0, 4).map((category) => (
+                    <div key={category.id} className="flex flex-col">
+                      {/* Category Header */}
+                      <Link
+                        href={`/${locale}/shop?category=${category.slug}`}
+                        onClick={onClose}
+                        className="text-sm font-bold text-gray-900 uppercase tracking-wide hover:text-[#7a3205] transition-colors mb-3"
+                      >
+                        {decodeHtmlEntities(category.name)}
+                      </Link>
+                      
+                      {/* Subcategories */}
+                      <div className="space-y-2">
+                        {category.children.slice(0, 8).map((child) => (
+                          <Link
+                            key={child.id}
+                            href={`/${locale}/shop?category=${child.slug}`}
+                            onClick={onClose}
+                            className="block text-sm text-gray-600 hover:text-[#7a3205] transition-colors"
+                          >
+                            {decodeHtmlEntities(child.name)}
+                          </Link>
+                        ))}
+                        {category.children.length > 8 && (
+                          <Link
+                            href={`/${locale}/shop?category=${category.slug}`}
+                            onClick={onClose}
+                            className="block text-sm font-medium text-[#7a3205] hover:text-[#5a2504] transition-colors"
+                          >
+                            {isRTL ? "عرض الكل..." : "View all..."}
+                          </Link>
                         )}
                       </div>
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#6b5b4a]/90 to-[#6b5b4a]/70 px-3 py-2.5">
-                        <h4 className="font-semibold text-sm text-white">
-                          {decodeHtmlEntities(category.name)}
-                        </h4>
-                      </div>
                     </div>
-                  </Link>
-
-                  {category.children.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {category.children.slice(0, 4).map((child) => (
-                        <Link
-                          key={child.id}
-                          href={`/${locale}/shop?category=${child.slug}`}
-                          onClick={onClose}
-                          className={cn(
-                            "flex items-center gap-2 py-1 group/child",
-                            "text-sm text-gray-600 hover:text-amber-700 transition-colors"
-                          )}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
-                          <span className="truncate">{decodeHtmlEntities(child.name)}</span>
-                        </Link>
-                      ))}
-                      {category.children.length > 4 && (
-                        <Link
-                          href={`/${locale}/shop?category=${category.slug}`}
-                          onClick={onClose}
-                          className="flex items-center gap-2 py-1 text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
-                          <span>{isRTL ? "عرض الكل" : "View all"}</span>
-                        </Link>
-                      )}
-                    </div>
-                  )}
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Right Side - Featured Products */}
+              <div className={cn("w-[340px] flex-shrink-0", isRTL ? "order-1" : "order-2")}>
+                <div className="grid grid-cols-2 gap-4">
+                  {featuredProducts.map((product) => (
+                    <Link
+                      key={product.id}
+                      href={product.href}
+                      onClick={onClose}
+                      className="group block"
+                    >
+                      <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gradient-to-b from-[#e8e4dc] to-[#d4cfc5]">
+                        {hierarchicalCategories[product.id - 1]?.image ? (
+                          <Image
+                            src={hierarchicalCategories[product.id - 1].image.src}
+                            alt={product.title}
+                            fill
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Grid3X3 className="h-12 w-12 text-[#8b7355]" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      </div>
+                      <div className="mt-2">
+                        <h4 className="text-sm font-semibold text-gray-900 group-hover:text-[#7a3205] transition-colors">
+                          {product.title}
+                        </h4>
+                        <p className="text-xs text-[#7a3205] font-medium">
+                          {product.subtitle}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
-
-          <div className="mt-8 pt-6 border-t border-gray-100">
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href={`/${locale}/shop?orderby=date`}
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-full transition-colors"
-              >
-                {dictionary.filters?.newest || "New Arrivals"}
-              </Link>
-              <Link
-                href={`/${locale}/shop?orderby=popularity`}
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-amber-700 hover:bg-amber-50 rounded-full transition-colors"
-              >
-                {dictionary.filters?.bestSelling || "Best Sellers"}
-              </Link>
-              <Link
-                href={`/${locale}/shop?on_sale=true`}
-                onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 rounded-full transition-colors shadow-md"
-              >
-                Sale Items
-              </Link>
-            </div>
-          </div>
         </div>
       </div>
     </>
