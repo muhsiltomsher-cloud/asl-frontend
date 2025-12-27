@@ -1,13 +1,17 @@
 "use client";
 
-import { User, Package, MapPin, Heart, Settings, LogOut, X, ChevronRight } from "lucide-react";
+import { User, Package, MapPin, Heart, Settings, LogOut, X, ChevronRight, Globe } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { Button } from "@/components/common/Button";
+import { localeConfig, currencies, type Locale, type Currency } from "@/config/site";
+import { getPathWithoutLocale } from "@/lib/utils";
 
 interface AccountDrawerProps {
   locale: string;
@@ -38,6 +42,8 @@ export function AccountDrawer({
   dictionary,
 }: AccountDrawerProps) {
   const { user, isAuthenticated, logout, isAccountDrawerOpen, setIsAccountDrawerOpen } = useAuth();
+  const { currency, setCurrency } = useCurrency();
+  const pathname = usePathname();
   const isRTL = locale === "ar";
 
   const onClose = () => setIsAccountDrawerOpen(false);
@@ -46,6 +52,14 @@ export function AccountDrawer({
     logout();
     onClose();
   };
+
+  const handleCurrencyChange = (code: Currency) => {
+    setCurrency(code);
+  };
+
+  const alternateLocale: Locale = locale === "en" ? "ar" : "en";
+  const pathWithoutLocale = getPathWithoutLocale(pathname);
+  const alternateHref = `/${alternateLocale}${pathWithoutLocale}`;
 
   const menuItems: MenuItem[] = [
     {
@@ -153,6 +167,51 @@ export function AccountDrawer({
     </div>
   );
 
+  const renderSettingsSection = () => (
+    <div className="border-t bg-gray-50 p-4">
+      <div className="space-y-3">
+        {/* Language Switcher */}
+        <div className="flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <Globe className="h-5 w-5 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">
+              {locale === "en" ? "Language" : "اللغة"}
+            </span>
+          </div>
+          <Link
+            href={alternateHref}
+            onClick={onClose}
+            className="flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200"
+            hrefLang={localeConfig[alternateLocale].hrefLang}
+          >
+            {localeConfig[alternateLocale].name}
+          </Link>
+        </div>
+
+        {/* Currency Switcher */}
+        <div className="flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <span className="flex h-5 w-5 items-center justify-center text-sm font-bold text-gray-500">$</span>
+            <span className="text-sm font-medium text-gray-700">
+              {locale === "en" ? "Currency" : "العملة"}
+            </span>
+          </div>
+          <select
+            value={currency}
+            onChange={(e) => handleCurrencyChange(e.target.value as Currency)}
+            className="rounded-md border-0 bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          >
+            {currencies.map((curr) => (
+              <option key={curr.code} value={curr.code}>
+                {curr.code} - {curr.symbol}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+
     return (
       <MuiDrawer
         anchor={isRTL ? "left" : "right"}
@@ -199,12 +258,13 @@ export function AccountDrawer({
           </IconButton>
         </Box>
 
-        <Box sx={{ flex: 1, overflow: "auto" }}>
-          <div className="flex h-full flex-col">
+        <Box sx={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "column" }}>
+          <div className="flex flex-1 flex-col">
             {isAuthenticated && user
               ? renderAuthenticatedContent()
               : renderGuestContent()}
           </div>
+          {renderSettingsSection()}
         </Box>
       </Box>
     </MuiDrawer>
