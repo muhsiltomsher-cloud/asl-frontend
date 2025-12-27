@@ -665,13 +665,13 @@ export default function CheckoutPage() {
                                   <Tag className="h-4 w-4" />
                                   {isRTL ? "كود الخصم" : "Coupon Code"}
                                 </label>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col gap-2 sm:flex-row">
                                   <Input
                                     type="text"
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value)}
                                     placeholder={isRTL ? "أدخل كود الخصم" : "Enter coupon code"}
-                                    className="flex-1"
+                                    className="flex-1 min-w-0"
                                     error={couponError}
                                   />
                                   <Button
@@ -680,6 +680,7 @@ export default function CheckoutPage() {
                                     isLoading={couponLoading}
                                     disabled={couponLoading || !couponCode.trim()}
                                     size="sm"
+                                    className="w-full sm:w-auto flex-shrink-0"
                                   >
                                     {isRTL ? "تطبيق" : "Apply"}
                                   </Button>
@@ -692,21 +693,21 @@ export default function CheckoutPage() {
                                   {selectedCoupons.map((coupon) => (
                                     <div
                                       key={coupon.code}
-                                      className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-3 py-2"
+                                      className="flex items-center justify-between gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2"
                                     >
-                                      <div className="flex items-center gap-2">
-                                        <Tag className="h-4 w-4 text-green-600" />
-                                        <span className="text-sm font-medium text-green-700">
+                                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        <Tag className="h-4 w-4 text-green-600 flex-shrink-0" />
+                                        <span className="text-sm font-medium text-green-700 truncate">
                                           {coupon.code}
                                         </span>
-                                        <span className="text-xs text-green-600">
+                                        <span className="text-xs text-green-600 flex-shrink-0">
                                           ({coupon.discount_type === "percent" ? `${coupon.amount}%` : `${coupon.amount} AED`})
                                         </span>
                                       </div>
                                       <button
                                         type="button"
                                         onClick={() => handleRemoveCoupon(coupon.code)}
-                                        className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+                                        className="flex items-center gap-1 text-sm text-red-600 hover:text-red-700 flex-shrink-0"
                                       >
                                         <X className="h-4 w-4" />
                                       </button>
