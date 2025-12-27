@@ -291,17 +291,17 @@ export function BuildYourOwnSetClient({
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="truncate font-medium text-gray-900">
+                        <p className="truncate font-medium text-gray-900 text-sm sm:text-base">
                           {selections[index]!.name}
                         </p>
-                        <p className="text-sm text-amber-700">
+                        <p className="text-xs sm:text-sm text-amber-700">
                           <FormattedPrice price={selections[index]!.price} iconSize="sm" />
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         <button
                           onClick={() => handleSlotClick(index)}
-                          className="text-xs text-amber-600 hover:text-amber-800 hover:underline"
+                          className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
                         >
                           {t.change}
                         </button>
@@ -359,17 +359,17 @@ export function BuildYourOwnSetClient({
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="truncate font-medium text-gray-900">
+                        <p className="truncate font-medium text-gray-900 text-sm sm:text-base">
                           {selections[index]!.name}
                         </p>
-                        <p className="text-sm text-amber-700">
+                        <p className="text-xs sm:text-sm text-amber-700">
                           <FormattedPrice price={selections[index]!.price} iconSize="sm" />
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         <button
                           onClick={() => handleSlotClick(index)}
-                          className="text-xs text-amber-600 hover:text-amber-800 hover:underline"
+                          className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
                         >
                           {t.change}
                         </button>
@@ -535,11 +535,11 @@ export function BuildYourOwnSetClient({
                           </div>
                         )}
                       </div>
-                      <div className="p-3">
-                        <p className="line-clamp-2 text-sm font-medium text-gray-900">
+                      <div className="p-2 sm:p-3">
+                        <p className="line-clamp-2 text-xs sm:text-sm font-medium text-gray-900">
                           {product.name}
                         </p>
-                        <p className="mt-1 text-sm font-semibold text-amber-700">
+                        <p className="mt-1 text-xs sm:text-sm font-semibold text-amber-700">
                           <FormattedPrice price={product.price} iconSize="sm" />
                         </p>
                       </div>
