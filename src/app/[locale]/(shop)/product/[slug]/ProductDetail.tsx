@@ -24,6 +24,22 @@ import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 
+function sanitizeProductDescription(html: string): string {
+  if (!html) return "";
+  
+  let sanitized = html;
+  
+  sanitized = sanitized.replace(/<div[^>]*class="[^"]*tinv[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+  sanitized = sanitized.replace(/<div[^>]*class="[^"]*yith[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+  sanitized = sanitized.replace(/<a[^>]*class="[^"]*tinvwl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, "");
+  sanitized = sanitized.replace(/<a[^>]*aria-label="Add to Wishlist"[^>]*>[\s\S]*?<\/a>/gi, "");
+  sanitized = sanitized.replace(/<p>\s*<\/p>/gi, "");
+  sanitized = sanitized.replace(/Add to Wishlist/gi, "");
+  sanitized = sanitized.trim();
+  
+  return sanitized;
+}
+
 interface AccordionSectionProps {
   title: string;
   isOpen: boolean;
@@ -716,10 +732,10 @@ export function ProductDetail({ product, locale, relatedProducts = [] }: Product
               isOpen={openAccordion === "description"}
               onToggle={() => toggleAccordion("description")}
             >
-              {product.description ? (
+              {product.description && sanitizeProductDescription(product.description) ? (
                 <div
                   className="prose prose-sm max-w-none text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: product.description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description) }}
                 />
               ) : (
                 <p className="text-sm text-gray-500">
