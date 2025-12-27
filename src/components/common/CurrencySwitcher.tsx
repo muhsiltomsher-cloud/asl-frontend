@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, Check, X, Coins } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { currencies, type Currency } from "@/config/site";
@@ -81,8 +82,8 @@ export function CurrencySwitcher({ className, locale = "en" }: CurrencySwitcherP
         <ChevronDown className="h-3 w-3 text-gray-400" />
       </button>
 
-      {/* Small Centered Popup Modal - Same design for all screens */}
-      {isOpen && (
+      {/* Small Centered Popup Modal - Rendered via portal to ensure proper centering */}
+      {isOpen && typeof window !== "undefined" && createPortal(
         <>
           {/* Overlay */}
           <div
@@ -156,7 +157,8 @@ export function CurrencySwitcher({ className, locale = "en" }: CurrencySwitcherP
               </div>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </>
   );
