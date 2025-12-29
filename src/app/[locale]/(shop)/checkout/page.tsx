@@ -354,7 +354,7 @@ export default function CheckoutPage() {
         )}
 
       <form id="checkout-form" onSubmit={handleSubmit}>
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
           <div className="space-y-6 lg:col-span-2">
             {/* Contact Information */}
             <div className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
@@ -610,7 +610,7 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-32 rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+            <div className="lg:sticky lg:top-32 lg:self-start rounded-lg border border-black/10 bg-white p-6 shadow-sm">
                             <h2 className="mb-4 text-lg font-semibold text-gray-900 font-sans">
                               {isRTL ? "ملخص الطلب" : "Order Summary"}
                             </h2>

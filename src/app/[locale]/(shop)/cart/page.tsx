@@ -243,7 +243,7 @@ export default function CartPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
           <div className="lg:col-span-2">
             <div className="rounded-lg bg-white shadow-sm">
               <div className="hidden border-b p-4 md:grid md:grid-cols-12 md:gap-4">
@@ -381,7 +381,7 @@ export default function CartPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-black/10 bg-white p-6 shadow-sm lg:sticky lg:top-32 lg:self-start">
               <h2 className="mb-4 text-lg font-semibold text-gray-900">
                 {texts.orderSummary}
               </h2>
