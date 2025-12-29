@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getPageBySlug, stripHtmlTags } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { Truck, Clock, MapPin, Package } from "lucide-react";
@@ -13,6 +14,21 @@ export async function generateMetadata({
   params,
 }: ShippingPageProps): Promise<Metadata> {
   const { locale } = await params;
+  const wpPage = await getPageBySlug("shipping-information", locale as Locale);
+
+  if (wpPage) {
+    return generateSeoMetadata({
+      title: stripHtmlTags(wpPage.title.rendered),
+      description: wpPage.excerpt.rendered
+        ? stripHtmlTags(wpPage.excerpt.rendered).slice(0, 160)
+        : locale === "ar"
+          ? "تعرف على سياسة الشحن والتوصيل لدى أروماتيك سينتس لاب"
+          : "Learn about Aromatic Scents Lab's shipping and delivery policy",
+      locale: locale as Locale,
+      pathname: "/shipping",
+    });
+  }
+
   return generateSeoMetadata({
     title: locale === "ar" ? "معلومات الشحن" : "Shipping Information",
     description:
@@ -29,9 +45,62 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
   const dictionary = await getDictionary(locale as Locale);
   const isRTL = locale === "ar";
 
+  const wpPage = await getPageBySlug("shipping-information", locale as Locale);
+
   const breadcrumbItems = [
     { name: dictionary.footer.shippingInfo, href: `/${locale}/shipping` },
   ];
+
+  if (wpPage && wpPage.content.rendered) {
+    const pageTitle = stripHtmlTags(wpPage.title.rendered);
+
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
+
+        <div className="mb-12 text-center">
+          <h1 className="mb-4 text-4xl font-bold text-gray-900">{pageTitle}</h1>
+          {wpPage.excerpt.rendered && (
+            <p className="mx-auto max-w-2xl text-lg text-gray-600">
+              {stripHtmlTags(wpPage.excerpt.rendered)}
+            </p>
+          )}
+          <p className="mt-2 text-sm text-gray-500">
+            {isRTL ? "آخر تحديث: " : "Last Updated: "}
+            {new Date(wpPage.modified).toLocaleDateString(
+              isRTL ? "ar-SA" : "en-US",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            )}
+          </p>
+        </div>
+
+        <div className="mx-auto max-w-4xl">
+          <div
+            className="prose prose-amber max-w-none prose-headings:text-amber-900 prose-p:text-gray-700 prose-strong:text-amber-800 prose-li:text-gray-700 prose-a:text-amber-700 prose-a:underline hover:prose-a:text-amber-900"
+            dangerouslySetInnerHTML={{ __html: wpPage.content.rendered }}
+          />
+
+          <div className="mt-12 rounded-lg bg-gray-50 p-6 text-center">
+            <p className="text-gray-600">
+              {isRTL
+                ? "هل لديك أسئلة حول الشحن؟ تواصل معنا"
+                : "Have questions about shipping? Contact us"}
+            </p>
+            <a
+              href={`/${locale}/contact`}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            >
+              {isRTL ? "اتصل بنا" : "Contact Us"}
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const shippingFeatures = [
     {
