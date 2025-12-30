@@ -45,13 +45,19 @@ export interface SelectedCoupon {
   free_shipping: boolean;
 }
 
+interface CartItemData {
+  wcpa_data?: Record<string, unknown>;
+  bundle_items?: Array<{ product_id: number; quantity?: number }>;
+  [key: string]: unknown;
+}
+
 interface CartContextType {
   cart: CoCartResponse | null;
   cartItems: CoCartItem[];
   isLoading: boolean;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
-  addToCart: (productId: number, quantity?: number, variationId?: number, variation?: Record<string, string>) => Promise<void>;
+  addToCart: (productId: number, quantity?: number, variationId?: number, variation?: Record<string, string>, itemData?: CartItemData) => Promise<void>;
   updateCartItem: (key: string, quantity: number) => Promise<void>;
   removeCartItem: (key: string) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -95,7 +101,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addToCart = useCallback(
-    async (productId: number, quantity = 1, variationId?: number, variation?: Record<string, string>) => {
+    async (productId: number, quantity = 1, variationId?: number, variation?: Record<string, string>, itemData?: CartItemData) => {
       setIsOperationLoading(true);
       
       // Optimistic update - add a placeholder item immediately
@@ -110,7 +116,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         slug: "",
         meta: { product_type: "simple", sku: "", dimensions: { length: "", width: "", height: "", unit: "" }, weight: 0, variation: {} },
         backorders: "no",
-        cart_item_data: {},
+        cart_item_data: itemData || {},
         featured_image: "",
       };
 
@@ -132,6 +138,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const body: Record<string, unknown> = { id: String(productId), quantity: String(quantity) };
         if (variationId) body.variation_id = String(variationId);
         if (variation) body.variation = variation;
+        if (itemData) body.cart_item_data = itemData;
 
         const response = await fetch("/api/cart?action=add", {
           method: "POST",

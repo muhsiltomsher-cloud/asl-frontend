@@ -187,7 +187,15 @@ export function ProductDetail({ product, locale, relatedProducts = [], addonForm
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
     try {
-      await addToCart(product.id, quantity);
+      // If there are addon forms and values, pass them as cart item data
+      const hasAddonValues = Object.keys(addonValues).length > 0;
+      if (hasAddonValues && addonForms && addonForms.length > 0) {
+        await addToCart(product.id, quantity, undefined, undefined, {
+          wcpa_data: addonValues,
+        });
+      } else {
+        await addToCart(product.id, quantity);
+      }
     } catch (error) {
       console.error("Failed to add to cart:", error);
     } finally {
