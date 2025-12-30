@@ -43,13 +43,16 @@ export function BuildYourOwnSetClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
-  const [selections, setSelections] = useState<(ProductOption | null)[]>([
-    null,
-    null,
-    null,
-    null,
-    null,
-  ]);
+  // Get slot configuration from bundle config or use defaults
+  const totalSlots = bundleConfig?.total_slots || 5;
+  const requiredSlots = bundleConfig?.required_slots || 3;
+  const requiredLabelTemplate = bundleConfig?.required_label || "Choose item {n}";
+  const optionalLabelTemplate = bundleConfig?.optional_label || "Add extra";
+
+  // Initialize selections array based on total slots
+  const [selections, setSelections] = useState<(ProductOption | null)[]>(
+    () => Array(totalSlots).fill(null)
+  );
 
   // Get eligible product IDs from bundle config (if configured)
   const eligibleProductIds = useMemo(() => {
@@ -113,8 +116,8 @@ export function BuildYourOwnSetClient({
     }, 0);
   }, [selections]);
 
-  const requiredCount = selections.slice(0, 3).filter((s) => s !== null).length;
-  const isValid = requiredCount === 3;
+  const requiredCount = selections.slice(0, requiredSlots).filter((s) => s !== null).length;
+  const isValid = requiredCount === requiredSlots;
 
   const handleSlotClick = (index: number) => {
     setActiveSlot(index);
@@ -280,13 +283,13 @@ export function BuildYourOwnSetClient({
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">{t.yourBox}</h2>
               <span className="text-sm text-gray-500">
-                {requiredCount}/3 {t.requiredItems}
+                {requiredCount}/{requiredSlots} {t.requiredItems}
               </span>
             </div>
 
-            {/* Required Slots (3) */}
+            {/* Required Slots */}
             <div className="space-y-3">
-              {[0, 1, 2].map((index) => (
+              {Array.from({ length: requiredSlots }, (_, index) => (
                 <div
                   key={`slot-${index}`}
                   className={`relative flex items-center gap-4 rounded-xl border-2 p-3 transition-all ${
@@ -338,7 +341,7 @@ export function BuildYourOwnSetClient({
                       </div>
                       <div>
                         <p className="font-medium text-gray-600">
-                          {t.chooseItem} {index + 1}
+                          {requiredLabelTemplate.replace("{n}", String(index + 1))}
                         </p>
                         <p className="text-xs text-red-500">{t.required}</p>
                       </div>
@@ -351,10 +354,11 @@ export function BuildYourOwnSetClient({
               ))}
             </div>
 
-            {/* Optional Slots (2) */}
+            {/* Optional Slots */}
+            {totalSlots > requiredSlots && (
             <div className="space-y-3 pt-2">
               <p className="text-sm font-medium text-gray-500">{t.optional}</p>
-              {[3, 4].map((index) => (
+              {Array.from({ length: totalSlots - requiredSlots }, (_, i) => requiredSlots + i).map((index) => (
                 <div
                   key={`slot-${index}`}
                   className={`relative flex items-center gap-4 rounded-xl border-2 p-3 transition-all ${
@@ -405,7 +409,9 @@ export function BuildYourOwnSetClient({
                         <Plus className="h-6 w-6 text-gray-300" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-400">{t.addExtra}</p>
+                        <p className="font-medium text-gray-400">
+                          {optionalLabelTemplate.replace("{n}", String(index - requiredSlots + 1))}
+                        </p>
                         <p className="text-xs text-gray-400">{t.optional}</p>
                       </div>
                     </button>
@@ -413,6 +419,7 @@ export function BuildYourOwnSetClient({
                 </div>
               ))}
             </div>
+            )}
           </div>
 
           {/* Total */}

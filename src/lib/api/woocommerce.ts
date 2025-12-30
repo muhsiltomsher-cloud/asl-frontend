@@ -274,6 +274,8 @@ export interface BundleConfig {
   unique_products: number[];
   total_slots: number;
   required_slots: number;
+  required_label: string;
+  optional_label: string;
 }
 
 export async function getBundleConfig(
