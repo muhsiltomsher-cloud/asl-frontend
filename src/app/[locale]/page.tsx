@@ -44,8 +44,8 @@ export default async function HomePage({ params }: HomePageProps) {
 
   // Fetch all data in parallel
   const [{ products }, categories, homeSettings] = await Promise.all([
-    getProducts({ per_page: 20 }),
-    getCategories(),
+    getProducts({ per_page: 20, locale: locale as Locale }),
+    getCategories(locale as Locale),
     getHomePageSettings(locale as Locale),
   ]);
 
