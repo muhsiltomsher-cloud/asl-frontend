@@ -16,15 +16,17 @@ export const revalidate = 300;
 // Pre-render all categories at build time for better performance
 export async function generateStaticParams() {
   try {
-    const categories = await getCategories();
+    // Fetch categories for each locale to handle translated slugs
+    const allParams: { locale: string; slug: string }[] = [];
     
-    // Generate params for each locale and category combination
-    return categories.flatMap((category) =>
-      siteConfig.locales.map((locale) => ({
-        locale,
-        slug: category.slug,
-      }))
-    );
+    for (const locale of siteConfig.locales) {
+      const categories = await getCategories(locale as Locale);
+      for (const category of categories) {
+        allParams.push({ locale, slug: category.slug });
+      }
+    }
+    
+    return allParams;
   } catch {
     // Return empty array if fetch fails - pages will be generated on-demand
     return [];
@@ -39,7 +41,7 @@ export async function generateMetadata({
   params,
 }: CategoryPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug, locale as Locale);
   const categoryName = decodeHtmlEntities(category?.name || slug.charAt(0).toUpperCase() + slug.slice(1));
   
   return generateSeoMetadata({
@@ -58,13 +60,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const dictionary = await getDictionary(locale as Locale);
 
   // Fetch category and products from WooCommerce API
-  const category = await getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug, locale as Locale);
   
   if (!category) {
     notFound();
   }
 
-  const { products } = await getProductsByCategory(slug, { per_page: 24 });
+  const { products } = await getProductsByCategory(slug, { per_page: 24, locale: locale as Locale });
 
     const breadcrumbItems = [
       { name: dictionary.common.shop, href: `/${locale}/shop` },

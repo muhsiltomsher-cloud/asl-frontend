@@ -41,7 +41,7 @@ export default async function ShopPage({ params }: ShopPageProps) {
   ];
 
   // Fetch products from WooCommerce API
-  const { products, total, totalPages } = await getProducts({ per_page: 24 });
+  const { products, total, totalPages } = await getProducts({ per_page: 24, locale: locale as Locale });
 
   return (
     <div className="container mx-auto px-4 py-8">

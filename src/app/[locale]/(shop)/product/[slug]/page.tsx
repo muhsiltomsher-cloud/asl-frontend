@@ -13,16 +13,17 @@ export const revalidate = 300;
 // Pre-render top products at build time for better performance
 export async function generateStaticParams() {
   try {
-    // Fetch top 50 products to pre-render
-    const { products } = await getProducts({ per_page: 50 });
+    // Fetch products for each locale to handle translated slugs
+    const allParams: { locale: string; slug: string }[] = [];
     
-    // Generate params for each locale and product combination
-    return products.flatMap((product) =>
-      siteConfig.locales.map((locale) => ({
-        locale,
-        slug: product.slug,
-      }))
-    );
+    for (const locale of siteConfig.locales) {
+      const { products } = await getProducts({ per_page: 50, locale: locale as Locale });
+      for (const product of products) {
+        allParams.push({ locale, slug: product.slug });
+      }
+    }
+    
+    return allParams;
   } catch {
     // Return empty array if fetch fails - pages will be generated on-demand
     return [];
