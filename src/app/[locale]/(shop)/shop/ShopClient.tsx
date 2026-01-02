@@ -10,16 +10,16 @@ import type { Locale } from "@/config/site";
 // const CACHE_TTL_MS = 5 * 60 * 1000;
 const PER_PAGE = 24;
 
-// DEV MODE: Cache functions disabled for faster development
-// interface CachedProducts {
-//   products: WCProduct[];
-//   total: number;
-//   totalPages: number;
-//   timestamp: number;
-//   locale: string;
-// }
+// Interface kept for type safety even when cache is disabled
+interface CachedProducts {
+  products: WCProduct[];
+  total: number;
+  totalPages: number;
+  timestamp: number;
+  locale: string;
+}
 
-function getCachedProducts(_locale: string): null {
+function getCachedProducts(_locale: string): CachedProducts | null {
   // DEV MODE: Cache disabled for faster development
   return null;
 }
