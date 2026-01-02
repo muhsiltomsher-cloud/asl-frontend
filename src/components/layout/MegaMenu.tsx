@@ -8,7 +8,7 @@ import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
 import type { WCCategory, WCProduct } from "@/types/woocommerce";
 import { getCategories, getProducts } from "@/lib/api/woocommerce";
-import { decodeHtmlEntities, cn } from "@/lib/utils";
+import { decodeHtmlEntities, cn, getProductSlugFromPermalink } from "@/lib/utils";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 
 const categoriesCache: Record<string, { data: WCCategory[]; timestamp: number }> = {};
@@ -316,10 +316,12 @@ export function MegaMenu({
                   </div>
                 ) : featuredProducts.length > 0 ? (
                   <div className="grid grid-cols-2 gap-4">
-                    {featuredProducts.slice(0, 4).map((product) => (
+                    {featuredProducts.slice(0, 4).map((product) => {
+                      const productSlug = getProductSlugFromPermalink(product.permalink, product.slug);
+                      return (
                       <Link
                         key={product.id}
-                        href={`/${locale}/product/${product.slug}`}
+                        href={`/${locale}/product/${productSlug}`}
                         onClick={onClose}
                         className="group block"
                       >
@@ -349,7 +351,8 @@ export function MegaMenu({
                           </p>
                         </div>
                       </Link>
-                    ))}
+                    );
+                    })}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8 text-center">

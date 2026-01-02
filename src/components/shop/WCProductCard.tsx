@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { ShoppingBag, Heart } from "lucide-react";
 import { Badge } from "@/components/common/Badge";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { cn, decodeHtmlEntities } from "@/lib/utils";
+import { cn, decodeHtmlEntities, getProductSlugFromPermalink } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -74,10 +74,13 @@ export function WCProductCard({
 
   const isOutOfStock = !product.is_in_stock;
   const mainImage = product.images[0];
+  
+  // Use English slug from permalink to ensure consistent URLs across locales
+  const productSlug = getProductSlugFromPermalink(product.permalink, product.slug);
 
   return (
     <article className={cn("group relative", className)}>
-      <Link href={`/${locale}/product/${product.slug}`} className="block">
+      <Link href={`/${locale}/product/${productSlug}`} className="block">
         <div className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 shadow-sm transition-all duration-500 ease-out group-hover:shadow-[0_20px_50px_rgba(180,83,9,0.15)] group-hover:-translate-y-1">
           {mainImage ? (
             <Image

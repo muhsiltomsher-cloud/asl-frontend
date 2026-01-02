@@ -14,6 +14,7 @@ import type { Locale } from "@/config/site";
 import type { WCProduct } from "@/types/woocommerce";
 import { getProducts } from "@/lib/api/woocommerce";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
+import { getProductSlugFromPermalink } from "@/lib/utils";
 
 interface SearchDrawerProps {
   isOpen: boolean;
@@ -162,39 +163,42 @@ export function SearchDrawer({
             </div>
           ) : results.length > 0 ? (
             <div className="space-y-2">
-              {results.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/${locale}/product/${product.slug}`}
-                  onClick={handleClose}
-                  className="flex items-center gap-3 rounded-lg p-3 transition-all hover:bg-gray-100 active:scale-[0.98]"
-                >
-                  {product.images[0] ? (
-                    <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                      <Image
-                        src={product.images[0].src}
-                        alt={product.name}
-                        fill
-                        sizes="64px"
-                        className="object-cover"
-                        loading="lazy"
+              {results.map((product) => {
+                const productSlug = getProductSlugFromPermalink(product.permalink, product.slug);
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/${locale}/product/${productSlug}`}
+                    onClick={handleClose}
+                    className="flex items-center gap-3 rounded-lg p-3 transition-all hover:bg-gray-100 active:scale-[0.98]"
+                  >
+                    {product.images[0] ? (
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                        <Image
+                          src={product.images[0].src}
+                          alt={product.name}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                        <Search className="h-6 w-6 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate uppercase">{product.name}</h3>
+                      <FormattedPrice
+                        price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
+                        className="text-sm font-semibold text-gray-700"
+                        iconSize="xs"
                       />
                     </div>
-                  ) : (
-                    <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-                      <Search className="h-6 w-6 text-gray-400" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 truncate uppercase">{product.name}</h3>
-                    <FormattedPrice
-                      price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                      className="text-sm font-semibold text-gray-700"
-                      iconSize="xs"
-                    />
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
               
               {query.trim() && (
                 <button

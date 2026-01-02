@@ -10,7 +10,7 @@ import type { Locale } from "@/config/site";
 import type { WCProduct } from "@/types/woocommerce";
 import { getProducts } from "@/lib/api/woocommerce";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { cn } from "@/lib/utils";
+import { cn, getProductSlugFromPermalink } from "@/lib/utils";
 
 interface DesktopSearchDropdownProps {
   locale: Locale;
@@ -115,7 +115,9 @@ export function DesktopSearchDropdown({
       case "Enter":
         if (highlightedIndex >= 0 && results[highlightedIndex]) {
           e.preventDefault();
-          router.push(`/${locale}/product/${results[highlightedIndex].slug}`);
+          const selectedProduct = results[highlightedIndex];
+          const productSlug = getProductSlugFromPermalink(selectedProduct.permalink, selectedProduct.slug);
+          router.push(`/${locale}/product/${productSlug}`);
           setIsOpen(false);
           setQuery("");
         }
@@ -230,44 +232,47 @@ export function DesktopSearchDropdown({
                 </p>
               </div>
               <div className="max-h-80 overflow-y-auto">
-                {results.map((product, index) => (
-                  <Link
-                    key={product.id}
-                    href={`/${locale}/product/${product.slug}`}
-                    onClick={handleProductClick}
-                    className={cn(
-                      "flex items-center gap-4 px-4 py-3 transition-all hover:bg-gray-50",
-                      highlightedIndex === index && "bg-amber-50"
-                    )}
-                  >
-                    {product.images[0] ? (
-                      <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                        <Image
-                          src={product.images[0].src}
-                          alt={product.name}
-                          fill
-                          sizes="56px"
-                          className="object-cover"
-                          loading="lazy"
+                {results.map((product, index) => {
+                  const productSlug = getProductSlugFromPermalink(product.permalink, product.slug);
+                  return (
+                    <Link
+                      key={product.id}
+                      href={`/${locale}/product/${productSlug}`}
+                      onClick={handleProductClick}
+                      className={cn(
+                        "flex items-center gap-4 px-4 py-3 transition-all hover:bg-gray-50",
+                        highlightedIndex === index && "bg-amber-50"
+                      )}
+                    >
+                      {product.images[0] ? (
+                        <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                          <Image
+                            src={product.images[0].src}
+                            alt={product.name}
+                            fill
+                            sizes="56px"
+                            className="object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                          <Search className="h-5 w-5 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate text-sm uppercase">
+                          {product.name}
+                        </h3>
+                        <FormattedPrice
+                          price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
+                          className="text-sm font-semibold text-amber-800"
+                          iconSize="xs"
                         />
                       </div>
-                    ) : (
-                      <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-                        <Search className="h-5 w-5 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate text-sm uppercase">
-                        {product.name}
-                      </h3>
-                      <FormattedPrice
-                        price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                        className="text-sm font-semibold text-amber-800"
-                        iconSize="xs"
-                      />
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
               
               <div className="border-t border-gray-100 bg-gray-50 p-3">
