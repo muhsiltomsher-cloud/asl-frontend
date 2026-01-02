@@ -32,7 +32,18 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-  await params;
+  const { locale } = await params;
+  const validLocale = locale as Locale;
+  
+  // Fetch site settings to get favicon from backend
+  const siteSettings = await getSiteSettings(validLocale);
+  
+  // Build favicon URL with cache-busting parameter
+  const faviconUrl = siteSettings.favicon?.url;
+  const faviconWithCacheBust = faviconUrl 
+    ? `${faviconUrl}${faviconUrl.includes('?') ? '&' : '?'}v=${siteSettings.favicon?.id || Date.now()}`
+    : undefined;
+  
   return {
     title: {
       default: siteConfig.name,
@@ -40,6 +51,11 @@ export async function generateMetadata({
     },
     description: siteConfig.description,
     metadataBase: new URL(siteConfig.url),
+    icons: faviconWithCacheBust ? {
+      icon: faviconWithCacheBust,
+      shortcut: faviconWithCacheBust,
+      apple: faviconWithCacheBust,
+    } : undefined,
   };
 }
 
