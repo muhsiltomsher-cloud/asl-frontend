@@ -8,7 +8,7 @@ import { ShoppingBag, Heart } from "lucide-react";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { cn, decodeHtmlEntities } from "@/lib/utils";
+import { cn, decodeHtmlEntities, getProductSlugFromPermalink } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -80,10 +80,13 @@ export function WCProductListCard({
     ? product.short_description.replace(/<[^>]*>/g, "").slice(0, 150)
     : "";
 
+  // Use English slug from permalink to ensure consistent URLs across locales
+  const productSlug = getProductSlugFromPermalink(product.permalink, product.slug);
+
   return (
     <article className={cn("group relative", className)}>
       <Link 
-        href={`/${locale}/product/${product.slug}`} 
+        href={`/${locale}/product/${productSlug}`} 
         className="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-amber-200 hover:shadow-md md:gap-6"
       >
         {/* Product Image */}
