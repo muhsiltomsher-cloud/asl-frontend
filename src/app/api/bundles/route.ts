@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
-import type { BundleConfiguration } from "@/types/bundle";
+import type { BundleConfiguration, BundlePricing } from "@/types/bundle";
+import { createDefaultBundlePricing } from "@/types/bundle";
 
 const API_BASE = `${siteConfig.apiUrl}/wp-json/asl-bundles/v1`;
 
@@ -60,6 +61,13 @@ export async function POST(request: NextRequest) {
         title: config.title,
         bundle_type: config.bundleType,
         shipping_fee: config.shippingFee,
+        pricing: {
+          mode: config.pricing.mode,
+          box_price: config.pricing.boxPrice,
+          included_items_count: config.pricing.includedItemsCount,
+          extra_item_charging_method: config.pricing.extraItemChargingMethod,
+          show_product_prices: config.pricing.showProductPrices,
+        },
         is_enabled: config.isEnabled,
         items: config.items.map((item) => ({
           id: item.id,
@@ -127,6 +135,13 @@ export async function PUT(request: NextRequest) {
         title: config.title,
         bundle_type: config.bundleType,
         shipping_fee: config.shippingFee,
+        pricing: {
+          mode: config.pricing.mode,
+          box_price: config.pricing.boxPrice,
+          included_items_count: config.pricing.includedItemsCount,
+          extra_item_charging_method: config.pricing.extraItemChargingMethod,
+          show_product_prices: config.pricing.showProductPrices,
+        },
         is_enabled: config.isEnabled,
         items: config.items.map((item) => ({
           id: item.id,
@@ -238,12 +253,21 @@ interface ApiItem {
   };
 }
 
+interface ApiPricing {
+  mode: string;
+  box_price: number;
+  included_items_count: number;
+  extra_item_charging_method: string;
+  show_product_prices: boolean;
+}
+
 interface ApiResponse {
   id: string;
   product_id: number | null;
   title: string;
   bundle_type: string;
   shipping_fee: string;
+  pricing?: ApiPricing;
   is_enabled: boolean;
   items: ApiItem[];
   created_at: string;
@@ -251,12 +275,21 @@ interface ApiResponse {
 }
 
 function transformApiResponse(apiResponse: ApiResponse): BundleConfiguration {
+  const defaultPricing = createDefaultBundlePricing();
+  
   return {
     id: apiResponse.id,
     productId: apiResponse.product_id,
     title: apiResponse.title,
     bundleType: apiResponse.bundle_type as BundleConfiguration["bundleType"],
     shippingFee: apiResponse.shipping_fee as BundleConfiguration["shippingFee"],
+    pricing: apiResponse.pricing ? {
+      mode: apiResponse.pricing.mode as BundlePricing["mode"],
+      boxPrice: apiResponse.pricing.box_price,
+      includedItemsCount: apiResponse.pricing.included_items_count,
+      extraItemChargingMethod: apiResponse.pricing.extra_item_charging_method as BundlePricing["extraItemChargingMethod"],
+      showProductPrices: apiResponse.pricing.show_product_prices,
+    } : defaultPricing,
     isEnabled: apiResponse.is_enabled,
     items: apiResponse.items.map((item) => ({
       id: item.id,
