@@ -111,29 +111,6 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Hero Slider */}
       <HeroSlider settings={homeSettings.hero_slider} />
 
-      {/* Fallback Hero if no slider images */}
-      {(!homeSettings.hero_slider.enabled || homeSettings.hero_slider.slides.length === 0) && (
-        <section className="relative h-[50vh] min-h-[400px] w-full md:h-[70vh] md:min-h-[500px]">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
-          <div className="absolute inset-0 bg-[url('/hero-bg.jpg')] bg-cover bg-center" />
-          <div className="container relative mx-auto flex h-full items-center px-4">
-            <div className="max-w-xl text-white">
-              <h1 className="mb-4 text-3xl font-bold leading-tight md:text-4xl lg:text-5xl">
-                {dictionary.sections.hero.title}
-              </h1>
-              <p className="mb-6 text-base text-white/90 md:mb-8 md:text-lg">
-                {dictionary.sections.hero.subtitle}
-              </p>
-              <Button size="lg" asChild>
-                <Link href={`/${locale}/shop`}>
-                  {dictionary.common.shop}
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Banners - Top Position */}
       <BannersSection settings={homeSettings.banners} />
 
