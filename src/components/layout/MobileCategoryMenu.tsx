@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Grid3X3, ChevronDown } from "lucide-react";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
-import type { WCCategory } from "@/types/woocommerce";
-import { getCategories } from "@/lib/api/woocommerce";
-import { decodeHtmlEntities, cn } from "@/lib/utils";
-import { organizeCategoriesByHierarchy } from "./MegaMenu";
-
-// DEV MODE: Cache disabled for faster development - uncomment when done
-// const categoriesCache: Record<string, { data: WCCategory[]; timestamp: number }> = {};
-// const CACHE_TTL = 5 * 60 * 1000;
-const fetchPromise: Record<string, Promise<WCCategory[]> | null> = {};
+import { cn } from "@/lib/utils";
+import { getMegaMenuCategories } from "@/config/menu";
 
 interface MobileCategoryMenuProps {
   locale: Locale;
@@ -27,57 +20,10 @@ export function MobileCategoryMenu({
   dictionary,
   onNavigate,
 }: MobileCategoryMenuProps) {
-  // DEV MODE: Cache disabled for faster development
-  const [categories, setCategories] = useState<WCCategory[]>([]);
-  const [loading, setLoading] = useState(false);
+  // Static categories from config
+  const staticCategories = getMegaMenuCategories(locale);
   const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
-  const hasFetchedRef = useRef(false);
   const isRTL = locale === "ar";
-
-  const fetchCategoriesData = useCallback(async () => {
-    // DEV MODE: Cache disabled for faster development
-    if (fetchPromise[locale]) {
-      try {
-        const cats = await fetchPromise[locale];
-        if (cats) {
-          setCategories(cats);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-      return;
-    }
-
-    setLoading(true);
-    try {
-      fetchPromise[locale] = getCategories(locale).then((cats) => {
-        const filtered = cats.filter((cat) => cat.count > 0);
-        return filtered;
-      });
-
-      const cats = await fetchPromise[locale];
-      if (cats) {
-        setCategories(cats);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-      fetchPromise[locale] = null;
-    }
-  }, [locale]);
-
-  useEffect(() => {
-    // DEV MODE: Cache disabled for faster development - always fetch fresh data
-    if (!hasFetchedRef.current) {
-      hasFetchedRef.current = true;
-      fetchCategoriesData();
-    }
-  }, [locale, fetchCategoriesData]);
-
-  useEffect(() => {
-    hasFetchedRef.current = false;
-  }, [locale]);
 
   const toggleCategory = (categoryId: number, e: React.MouseEvent) => {
     e.preventDefault();
@@ -93,17 +39,7 @@ export function MobileCategoryMenu({
     });
   };
 
-  const hierarchicalCategories = organizeCategoriesByHierarchy(categories);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-4">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-200 border-t-amber-600" />
-      </div>
-    );
-  }
-
-  if (hierarchicalCategories.length === 0) {
+  if (staticCategories.length === 0) {
     return null;
   }
 
@@ -113,7 +49,7 @@ export function MobileCategoryMenu({
         {dictionary.common.categories || "Categories"}
       </div>
       <div className="space-y-1">
-        {hierarchicalCategories.map((category) => (
+        {staticCategories.map((category) => (
           <div key={category.id}>
             <div className="flex items-center">
               <Link
@@ -126,11 +62,11 @@ export function MobileCategoryMenu({
                   "transition-colors"
                 )}
               >
-                {category.image ? (
+                {category.image?.src ? (
                   <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
                     <Image
                       src={category.image.src}
-                      alt={decodeHtmlEntities(category.name)}
+                      alt={category.name}
                       fill
                       className="object-cover"
                     />
@@ -140,9 +76,9 @@ export function MobileCategoryMenu({
                     <Grid3X3 className="h-4 w-4 text-amber-400" />
                   </div>
                 )}
-                <span className="flex-1">{decodeHtmlEntities(category.name)}</span>
+                <span className="flex-1">{category.name}</span>
                 <span className="text-xs text-gray-400 font-normal">
-                  {category.count}
+                  {category.children.length}
                 </span>
               </Link>
               {category.children.length > 0 && (
@@ -183,10 +119,7 @@ export function MobileCategoryMenu({
                     )}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
-                    <span className="flex-1">{decodeHtmlEntities(child.name)}</span>
-                    <span className="text-xs text-gray-400">
-                      {child.count}
-                    </span>
+                    <span className="flex-1">{child.name}</span>
                   </Link>
                 ))}
               </div>
