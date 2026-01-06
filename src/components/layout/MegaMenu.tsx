@@ -7,13 +7,15 @@ import { Grid3X3 } from "lucide-react";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
 import type { WCProduct } from "@/types/woocommerce";
-import { getProducts } from "@/lib/api/woocommerce";
+import { getProducts, getProductById } from "@/lib/api/woocommerce";
 import { cn, getProductSlugFromPermalink } from "@/lib/utils";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { MiniProductGridSkeleton } from "@/components/common/Skeleton";
+import { MiniProductGridSkeleton, CategoriesGridSkeleton } from "@/components/common/Skeleton";
 import { getMegaMenuCategories } from "@/config/menu";
+import { getMegaMenuData, type MegaMenuColumn, type MegaMenuData } from "@/lib/api/wordpress";
 
 const productsFetchPromise: Record<string, Promise<WCProduct[]> | null> = {};
+const menuDataFetchPromise: Record<string, Promise<MegaMenuData | null> | null> = {};
 
 /**
  * Static menu category type with children
@@ -59,17 +61,48 @@ export function MegaMenu({
 }: MegaMenuProps) {
   void dictionary; // Reserved for future use
   
-  // Static categories from config
+  // Static categories from config (fallback)
   const staticCategories = getMegaMenuCategories(locale);
   
-  // Featured products state (still fetched dynamically)
+  // Dynamic menu data state
+  const [menuData, setMenuData] = useState<MegaMenuData | null>(null);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const hasMenuFetchedRef = useRef(false);
+  
+  // Featured products state
   const [featuredProducts, setFeaturedProducts] = useState<WCProduct[]>([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const hasProductsFetchedRef = useRef(false);
   const isRTL = locale === "ar";
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const fetchFeaturedProducts = useCallback(async () => {
+  // Fetch dynamic menu data from WordPress
+  const fetchMenuData = useCallback(async () => {
+    if (menuDataFetchPromise[locale]) {
+      try {
+        const data = await menuDataFetchPromise[locale];
+        setMenuData(data);
+      } catch (error) {
+        console.error("Error fetching menu data:", error);
+      }
+      return;
+    }
+
+    setMenuLoading(true);
+    try {
+      menuDataFetchPromise[locale] = getMegaMenuData(locale);
+      const data = await menuDataFetchPromise[locale];
+      setMenuData(data);
+    } catch (error) {
+      console.error("Error fetching menu data:", error);
+    } finally {
+      setMenuLoading(false);
+      menuDataFetchPromise[locale] = null;
+    }
+  }, [locale]);
+
+  // Fetch featured products - either by specific IDs from menu or latest products
+  const fetchFeaturedProducts = useCallback(async (productIds?: number[]) => {
     if (productsFetchPromise[locale]) {
       try {
         const prods = await productsFetchPromise[locale];
@@ -84,15 +117,20 @@ export function MegaMenu({
 
     setProductsLoading(true);
     try {
-      productsFetchPromise[locale] = getProducts({
-        per_page: 4,
-        orderby: "date",
-        order: "desc",
-        locale,
-      }).then((response) => {
-        const products = response.products;
-        return products;
-      });
+      // If we have specific product IDs from the menu, fetch those
+      if (productIds && productIds.length > 0) {
+        productsFetchPromise[locale] = Promise.all(
+          productIds.slice(0, 4).map((id) => getProductById(id, locale))
+        ).then((products) => products.filter((p): p is WCProduct => p !== null));
+      } else {
+        // Fallback to latest products
+        productsFetchPromise[locale] = getProducts({
+          per_page: 4,
+          orderby: "date",
+          order: "desc",
+          locale,
+        }).then((response) => response.products);
+      }
 
       const prods = await productsFetchPromise[locale];
       if (prods) {
@@ -106,16 +144,51 @@ export function MegaMenu({
     }
   }, [locale]);
 
+  // Fetch menu data when menu opens
+  useEffect(() => {
+    if (isOpen && !hasMenuFetchedRef.current) {
+      hasMenuFetchedRef.current = true;
+      fetchMenuData();
+    }
+  }, [isOpen, fetchMenuData]);
+
+  // Fetch products after menu data is loaded (or immediately if no menu data)
   useEffect(() => {
     if (isOpen && !hasProductsFetchedRef.current) {
       hasProductsFetchedRef.current = true;
-      fetchFeaturedProducts();
+      // If we have menu data with product IDs, use those
+      if (menuData?.featuredProductIds && menuData.featuredProductIds.length > 0) {
+        fetchFeaturedProducts(menuData.featuredProductIds);
+      } else {
+        fetchFeaturedProducts();
+      }
     }
-  }, [isOpen, locale, fetchFeaturedProducts]);
+  }, [isOpen, menuData, fetchFeaturedProducts]);
 
+  // Reset fetch flags when locale changes
   useEffect(() => {
+    hasMenuFetchedRef.current = false;
     hasProductsFetchedRef.current = false;
+    setMenuData(null);
+    setFeaturedProducts([]);
   }, [locale]);
+
+  // Use dynamic columns if available, otherwise fall back to static categories
+  const displayColumns: MegaMenuColumn[] = menuData?.columns && menuData.columns.length > 0
+    ? menuData.columns
+    : staticCategories.map((cat) => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        url: `/${locale}/shop?category=${cat.slug}`,
+        image: cat.image,
+        children: cat.children.map((child) => ({
+          id: child.id,
+          name: child.name,
+          slug: child.slug,
+          url: `/${locale}/shop?category=${child.slug}`,
+        })),
+      }));
 
   if (!isOpen) return null;
 
@@ -139,7 +212,16 @@ export function MegaMenu({
         onMouseLeave={onClose}
       >
         <div className="container mx-auto px-6 py-8">
-          {staticCategories.length === 0 ? (
+          {menuLoading ? (
+            <div className="flex gap-8">
+              <div className={cn("flex-1", isRTL ? "order-2" : "order-1")}>
+                <CategoriesGridSkeleton count={4} />
+              </div>
+              <div className={cn("w-[340px] flex-shrink-0", isRTL ? "order-1" : "order-2")}>
+                <MiniProductGridSkeleton count={4} />
+              </div>
+            </div>
+          ) : displayColumns.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Grid3X3 className="mb-4 h-16 w-16 text-gray-200" />
               <p className="text-gray-400">No categories found</p>
@@ -148,20 +230,20 @@ export function MegaMenu({
             <div className="flex gap-8">
               {/* Left Side - Categories with Images */}
               <div className={cn("flex-1", isRTL ? "order-2" : "order-1")}>
-                <div className="grid grid-cols-4 gap-8">
-                  {staticCategories.slice(0, 4).map((category) => (
-                    <div key={category.id} className="flex flex-col">
+                <div className="grid grid-cols-3 gap-8">
+                  {displayColumns.slice(0, 3).map((column) => (
+                    <div key={column.id} className="flex flex-col">
                       {/* Category Header with Image */}
                       <Link
-                        href={`/${locale}/shop?category=${category.slug}`}
+                        href={column.url || `/${locale}/shop?category=${column.slug}`}
                         onClick={onClose}
                         className="flex items-center gap-2 mb-3 group"
                       >
-                        {category.image?.src ? (
+                        {column.image?.src ? (
                           <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
                             <Image
-                              src={category.image.src}
-                              alt={category.name}
+                              src={column.image.src}
+                              alt={column.name}
                               fill
                               className="object-cover"
                             />
@@ -172,25 +254,25 @@ export function MegaMenu({
                           </div>
                         )}
                         <span className="text-sm font-bold text-gray-900 uppercase tracking-wide group-hover:text-[#7a3205] transition-colors">
-                          {category.name}
+                          {column.name}
                         </span>
                       </Link>
                       
                       {/* Subcategories */}
                       <div className="space-y-2">
-                        {category.children.slice(0, 8).map((child) => (
+                        {column.children.slice(0, 8).map((child) => (
                           <Link
                             key={child.id}
-                            href={`/${locale}/shop?category=${child.slug}`}
+                            href={child.url || `/${locale}/shop?category=${child.slug}`}
                             onClick={onClose}
                             className="block text-sm text-gray-600 hover:text-[#7a3205] transition-colors"
                           >
                             {child.name}
                           </Link>
                         ))}
-                        {category.children.length > 8 && (
+                        {column.children.length > 8 && (
                           <Link
-                            href={`/${locale}/shop?category=${category.slug}`}
+                            href={column.url || `/${locale}/shop?category=${column.slug}`}
                             onClick={onClose}
                             className="block text-sm font-medium text-[#7a3205] hover:text-[#5a2504] transition-colors"
                           >
@@ -203,10 +285,12 @@ export function MegaMenu({
                 </div>
               </div>
 
-              {/* Right Side - Featured Products */}
+              {/* Right Side - Featured Products (4th column) */}
               <div className={cn("w-[340px] flex-shrink-0", isRTL ? "order-1" : "order-2")}>
                 <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">
-                  {isRTL ? "وصل حديثاً" : "New Arrivals"}
+                  {menuData?.featuredProductIds && menuData.featuredProductIds.length > 0
+                    ? (isRTL ? "منتجات مميزة" : "Featured Products")
+                    : (isRTL ? "وصل حديثاً" : "New Arrivals")}
                 </h3>
                                 {productsLoading ? (
                                   <MiniProductGridSkeleton count={4} />

@@ -819,3 +819,114 @@ export async function getPages(locale?: Locale): Promise<WPPage[]> {
 export function stripHtmlTags(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim();
 }
+
+// Mega Menu Types
+export interface MegaMenuColumn {
+  id: number;
+  name: string;
+  slug: string;
+  url: string;
+  image: { src: string } | null;
+  children: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    url: string;
+  }>;
+}
+
+export interface MegaMenuData {
+  columns: MegaMenuColumn[];
+  featuredProductIds: number[];
+}
+
+function extractCategorySlugFromUrl(url: string): string {
+  if (!url) return "";
+  const match = url.match(/[?&]category=([^&]+)/);
+  if (match) return match[1];
+  const pathMatch = url.match(/\/shop\/([^/?]+)/);
+  if (pathMatch) return pathMatch[1];
+  return "";
+}
+
+function parseProductIds(label: string): number[] {
+  const ids: number[] = [];
+  const matches = label.match(/\[(\d+)\]/g);
+  if (matches) {
+    matches.forEach((match) => {
+      const id = parseInt(match.replace(/[\[\]]/g, ""), 10);
+      if (!isNaN(id)) {
+        ids.push(id);
+      }
+    });
+  }
+  return ids;
+}
+
+function isProductIdsLabel(label: string): boolean {
+  return /^\[[\d,\[\]\s]+\]?$/.test(label.trim()) || /\[\d+\]/.test(label);
+}
+
+export async function getMegaMenuData(locale?: Locale): Promise<MegaMenuData | null> {
+  const menu = await getPrimaryMenu(locale);
+  
+  if (!menu || !menu.items || menu.items.length === 0) {
+    return null;
+  }
+
+  const shopAllItem = menu.items.find(
+    (item) => 
+      item.title.toLowerCase() === "shop all" || 
+      item.title.toLowerCase() === "shop" ||
+      item.title === "تسوق" ||
+      item.title === "تسوق الكل"
+  );
+
+  if (!shopAllItem || !shopAllItem.children || shopAllItem.children.length === 0) {
+    return null;
+  }
+
+  const columns: MegaMenuColumn[] = [];
+  const featuredProductIds: number[] = [];
+
+  for (const child of shopAllItem.children) {
+    if (isProductIdsLabel(child.title)) {
+      const ids = parseProductIds(child.title);
+      featuredProductIds.push(...ids);
+      continue;
+    }
+
+    const column: MegaMenuColumn = {
+      id: child.id,
+      name: child.title,
+      slug: extractCategorySlugFromUrl(child.url),
+      url: child.url,
+      image: null,
+      children: [],
+    };
+
+    if (child.children && child.children.length > 0) {
+      for (const subChild of child.children) {
+        if (isProductIdsLabel(subChild.title)) {
+          const ids = parseProductIds(subChild.title);
+          featuredProductIds.push(...ids);
+          continue;
+        }
+
+        column.children.push({
+          id: subChild.id,
+          name: subChild.title,
+          slug: extractCategorySlugFromUrl(subChild.url),
+          url: subChild.url,
+        });
+      }
+    }
+
+    columns.push(column);
+  }
+
+  return {
+    columns,
+    featuredProductIds,
+  };
+}
