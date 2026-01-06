@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Menu, X, ShoppingBag, User, Heart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { CurrencySwitcher } from "@/components/common/CurrencySwitcher";
@@ -16,8 +16,9 @@ import type { SiteSettings, WPMenuItem } from "@/types/wordpress";
 import type { HeaderSettings, TopbarSettings } from "@/lib/api/wordpress";
 import { CategoriesDrawer } from "@/components/layout/CategoriesDrawer";
 import { DesktopSearchDropdown } from "@/components/layout/DesktopSearchDropdown";
-import { MegaMenu, preloadCategoriesCache } from "@/components/layout/MegaMenu";
+import { MegaMenu } from "@/components/layout/MegaMenu";
 import { MobileCategoryMenu } from "@/components/layout/MobileCategoryMenu";
+import { getNavigationItems } from "@/config/menu";
 
 interface HeaderProps {
   locale: Locale;
@@ -43,11 +44,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
   const { setIsAccountDrawerOpen } = useAuth();
   const { wishlistItemsCount } = useWishlist();
 
-    useEffect(() => {
-      preloadCategoriesCache(locale);
-    }, [locale]);
-
-    const handleShopMouseEnter = useCallback(() => {
+    const handleShopMouseEnter= useCallback(() => {
       if (megaMenuTimeoutRef.current) {
         clearTimeout(megaMenuTimeoutRef.current);
       }
@@ -70,20 +67,9 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
     setIsMegaMenuOpen(false);
   }, []);
 
-    const defaultNavigation = [
-    { name: dictionary.common.home, href: `/${locale}` },
-    { name: dictionary.common.shop, href: `/${locale}/shop` },
-    { name: dictionary.common.about, href: `/${locale}/about` },
-    { name: dictionary.common.contact, href: `/${locale}/contact` },
-    { name: dictionary.common.faq, href: `/${locale}/faq` },
-  ];
-
-  const navigation = menuItems && menuItems.length > 0
-    ? menuItems.map((item) => ({
-        name: item.title,
-        href: item.url.startsWith("http") ? item.url : `/${locale}${item.url}`,
-      }))
-    : defaultNavigation;
+  // Static navigation items from config (ignoring menuItems from WordPress)
+  void menuItems; // Reserved for future use if needed
+  const navigation = getNavigationItems(locale);
 
   return (
     <>
@@ -149,25 +135,23 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
             {/* Desktop navigation */}
             <nav className="hidden md:flex md:gap-x-8">
               {navigation.map((item) => {
-                const isShopItem = item.href === `/${locale}/shop`;
-                
-                                if (isShopItem) {
-                                  return (
-                                    <div
-                                      key={item.name}
-                                      className="relative"
-                                      onMouseEnter={handleShopMouseEnter}
-                                      onMouseLeave={handleShopMouseLeave}
-                                    >
-                                      <Link
-                                        href={item.href}
-                                        onClick={handleMegaMenuClose}
-                                        className={cn(
-                                          "text-sm font-bold text-[#7a3205] transition-colors hover:text-[#5a2504]",
-                                          "flex items-center gap-1",
-                                          isMegaMenuOpen && "text-[#5a2504]"
-                                        )}
-                                      >
+                if (item.hasMegaMenu) {
+                  return (
+                    <div
+                      key={item.name}
+                      className="relative"
+                      onMouseEnter={handleShopMouseEnter}
+                      onMouseLeave={handleShopMouseLeave}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={handleMegaMenuClose}
+                        className={cn(
+                          "text-sm font-bold text-[#7a3205] transition-colors hover:text-[#5a2504]",
+                          "flex items-center gap-1",
+                          isMegaMenuOpen && "text-[#5a2504]"
+                        )}
+                      >
                         {item.name}
                         <svg
                           className={cn(
@@ -261,8 +245,8 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
         >
           <div className="space-y-1 px-4 pb-3 pt-2">
             {navigation.map((item) => {
-              const isShopItem = item.href === `/${locale}/shop`;
-              if (isShopItem) {
+              // Skip items with mega menu - they are handled by MobileCategoryMenu
+              if (item.hasMegaMenu) {
                 return null;
               }
               return (

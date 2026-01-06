@@ -6,68 +6,42 @@ import Image from "next/image";
 import { Grid3X3 } from "lucide-react";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
-import type { WCCategory, WCProduct } from "@/types/woocommerce";
-import { getCategories, getProducts } from "@/lib/api/woocommerce";
-import { decodeHtmlEntities, cn, getProductSlugFromPermalink } from "@/lib/utils";
+import type { WCProduct } from "@/types/woocommerce";
+import { getProducts } from "@/lib/api/woocommerce";
+import { cn, getProductSlugFromPermalink } from "@/lib/utils";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { CategoriesGridSkeleton, MiniProductGridSkeleton } from "@/components/common/Skeleton";
+import { MiniProductGridSkeleton } from "@/components/common/Skeleton";
+import { getMegaMenuCategories } from "@/config/menu";
 
-// DEV MODE: Cache disabled for faster development - uncomment when done
-// const categoriesCache: Record<string, { data: WCCategory[]; timestamp: number }> = {};
-// const productsCache: Record<string, { data: WCProduct[]; timestamp: number }> = {};
-// const CACHE_TTL = 5 * 60 * 1000;
-const fetchPromise: Record<string, Promise<WCCategory[]> | null> = {};
 const productsFetchPromise: Record<string, Promise<WCProduct[]> | null> = {};
 
-export interface CategoryWithChildren extends WCCategory {
-  children: WCCategory[];
+/**
+ * Static menu category type with children
+ */
+export interface StaticMenuCategory {
+  id: number;
+  name: string;
+  slug: string;
+  image: { src: string } | null;
+  parent: number;
+  count: number;
+  children: Array<{
+    id: number;
+    name: string;
+    slug: string;
+    parent: number;
+    count: number;
+  }>;
 }
 
-export function organizeCategoriesByHierarchy(categories: WCCategory[]): CategoryWithChildren[] {
-  const parentCategories = categories.filter(cat => cat.parent === 0);
-  const childCategories = categories.filter(cat => cat.parent !== 0);
-  
-  return parentCategories.map(parent => ({
-    ...parent,
-    children: childCategories.filter(child => child.parent === parent.id)
-  }));
-}
-
-export async function preloadCategoriesCache(locale: Locale): Promise<void> {
-  // DEV MODE: Cache disabled for faster development
-  // const cached = categoriesCache[locale];
-  // if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-  //   return;
-  // }
-
-  if (fetchPromise[locale]) {
-    await fetchPromise[locale];
-    return;
-  }
-
-  try {
-    fetchPromise[locale] = getCategories(locale).then((cats) => {
-      const filtered = cats.filter((cat) => cat.count > 0);
-      // DEV MODE: Cache disabled
-      // categoriesCache[locale] = { data: filtered, timestamp: Date.now() };
-      return filtered;
-    });
-    await fetchPromise[locale];
-  } catch (error) {
-    console.error("Failed to preload categories cache:", error);
-  } finally {
-    fetchPromise[locale] = null;
-  }
-}
-
-export function getCachedCategories(locale: string): WCCategory[] | null {
-  // DEV MODE: Cache disabled for faster development
-  // const cached = categoriesCache[locale];
-  // if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-  //   return cached.data;
-  // }
-  void locale; // Suppress unused parameter warning
-  return null;
+/**
+ * No-op function for backward compatibility
+ * Categories are now static, no preloading needed
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function preloadCategoriesCache(_locale: Locale): Promise<void> {
+  // Categories are now static - no preloading needed
+  return;
 }
 
 interface MegaMenuProps {
@@ -83,51 +57,19 @@ export function MegaMenu({
   locale,
   dictionary,
 }: MegaMenuProps) {
-  // DEV MODE: Cache disabled for faster development
-  const [categories, setCategories] = useState<WCCategory[]>([]);
+  void dictionary; // Reserved for future use
+  
+  // Static categories from config
+  const staticCategories = getMegaMenuCategories(locale);
+  
+  // Featured products state (still fetched dynamically)
   const [featuredProducts, setFeaturedProducts] = useState<WCProduct[]>([]);
-  const [loading, setLoading] = useState(false);
   const [productsLoading, setProductsLoading] = useState(false);
-  const hasFetchedRef = useRef(false);
   const hasProductsFetchedRef = useRef(false);
   const isRTL = locale === "ar";
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const fetchCategoriesData = useCallback(async () => {
-    // DEV MODE: Cache disabled for faster development
-    if (fetchPromise[locale]) {
-      try {
-        const cats = await fetchPromise[locale];
-        if (cats) {
-          setCategories(cats);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-      return;
-    }
-
-    setLoading(true);
-    try {
-      fetchPromise[locale] = getCategories(locale).then((cats) => {
-        const filtered = cats.filter((cat) => cat.count > 0);
-        return filtered;
-      });
-
-      const cats = await fetchPromise[locale];
-      if (cats) {
-        setCategories(cats);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-      fetchPromise[locale] = null;
-    }
-  }, [locale]);
-
   const fetchFeaturedProducts = useCallback(async () => {
-    // DEV MODE: Cache disabled for faster development
     if (productsFetchPromise[locale]) {
       try {
         const prods = await productsFetchPromise[locale];
@@ -165,15 +107,6 @@ export function MegaMenu({
   }, [locale]);
 
   useEffect(() => {
-    // DEV MODE: Cache disabled for faster development - always fetch fresh data
-    if (isOpen && !hasFetchedRef.current) {
-      hasFetchedRef.current = true;
-      fetchCategoriesData();
-    }
-  }, [isOpen, locale, fetchCategoriesData]);
-
-  useEffect(() => {
-    // DEV MODE: Cache disabled for faster development - always fetch fresh data
     if (isOpen && !hasProductsFetchedRef.current) {
       hasProductsFetchedRef.current = true;
       fetchFeaturedProducts();
@@ -181,13 +114,10 @@ export function MegaMenu({
   }, [isOpen, locale, fetchFeaturedProducts]);
 
   useEffect(() => {
-    hasFetchedRef.current = false;
     hasProductsFetchedRef.current = false;
   }, [locale]);
 
   if (!isOpen) return null;
-
-  const hierarchicalCategories = organizeCategoriesByHierarchy(categories);
 
   return (
     <>
@@ -209,17 +139,7 @@ export function MegaMenu({
         onMouseLeave={onClose}
       >
         <div className="container mx-auto px-6 py-8">
-                    {loading ? (
-                      <div className="flex gap-8">
-                        <div className="flex-1">
-                          <CategoriesGridSkeleton count={4} />
-                        </div>
-                        <div className="w-[340px] flex-shrink-0">
-                          <div className="h-4 w-24 bg-gray-200 rounded animate-pulse mb-4" />
-                          <MiniProductGridSkeleton count={4} />
-                        </div>
-                      </div>
-                    ) : hierarchicalCategories.length === 0 ? (
+          {staticCategories.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Grid3X3 className="mb-4 h-16 w-16 text-gray-200" />
               <p className="text-gray-400">No categories found</p>
@@ -229,7 +149,7 @@ export function MegaMenu({
               {/* Left Side - Categories with Images */}
               <div className={cn("flex-1", isRTL ? "order-2" : "order-1")}>
                 <div className="grid grid-cols-4 gap-8">
-                  {hierarchicalCategories.slice(0, 4).map((category) => (
+                  {staticCategories.slice(0, 4).map((category) => (
                     <div key={category.id} className="flex flex-col">
                       {/* Category Header with Image */}
                       <Link
@@ -241,7 +161,7 @@ export function MegaMenu({
                           <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
                             <Image
                               src={category.image.src}
-                              alt={decodeHtmlEntities(category.name)}
+                              alt={category.name}
                               fill
                               className="object-cover"
                             />
@@ -252,7 +172,7 @@ export function MegaMenu({
                           </div>
                         )}
                         <span className="text-sm font-bold text-gray-900 uppercase tracking-wide group-hover:text-[#7a3205] transition-colors">
-                          {decodeHtmlEntities(category.name)}
+                          {category.name}
                         </span>
                       </Link>
                       
@@ -265,7 +185,7 @@ export function MegaMenu({
                             onClick={onClose}
                             className="block text-sm text-gray-600 hover:text-[#7a3205] transition-colors"
                           >
-                            {decodeHtmlEntities(child.name)}
+                            {child.name}
                           </Link>
                         ))}
                         {category.children.length > 8 && (
