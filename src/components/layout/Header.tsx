@@ -18,7 +18,7 @@ import { CategoriesDrawer } from "@/components/layout/CategoriesDrawer";
 import { DesktopSearchDropdown } from "@/components/layout/DesktopSearchDropdown";
 import { MegaMenu } from "@/components/layout/MegaMenu";
 import { MobileCategoryMenu } from "@/components/layout/MobileCategoryMenu";
-import { getNavigationItems } from "@/config/menu";
+import { getDynamicNavigationItems } from "@/config/menu";
 
 interface HeaderProps {
   locale: Locale;
@@ -67,9 +67,8 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
     setIsMegaMenuOpen(false);
   }, []);
 
-  // Static navigation items from config (ignoring menuItems from WordPress)
-  void menuItems; // Reserved for future use if needed
-  const navigation = getNavigationItems(locale);
+  // Dynamic navigation items from WordPress menu
+  const navigation = getDynamicNavigationItems(menuItems, locale);
 
   return (
     <>
