@@ -69,6 +69,7 @@ function asl_render_admin_page() {
         </nav>
         <form method="post">
             <?php wp_nonce_field('asl_home_settings_nonce'); ?>
+            <input type="hidden" name="asl_current_tab" value="<?php echo esc_attr($tab); ?>">
             <div class="tab-content" style="background:#fff;padding:20px;border:1px solid #ccd0d4;border-top:none;">
                 <?php
                 switch($tab) {
@@ -343,73 +344,101 @@ function asl_render_mobile_page() {
 }
 
 function asl_save_home_settings() {
-    set_theme_mod('asl_hero_enabled', isset($_POST['asl_hero_enabled']));
-    set_theme_mod('asl_hero_hide_mobile', isset($_POST['asl_hero_hide_mobile']));
-    set_theme_mod('asl_hero_hide_desktop', isset($_POST['asl_hero_hide_desktop']));
-    set_theme_mod('asl_hero_autoplay', isset($_POST['asl_hero_autoplay']));
-    set_theme_mod('asl_hero_autoplay_delay', absint($_POST['asl_hero_autoplay_delay'] ?? 5000));
-    set_theme_mod('asl_hero_loop', isset($_POST['asl_hero_loop']));
-    $slides = array();
-    if (isset($_POST['asl_hero_slides']) && is_array($_POST['asl_hero_slides'])) {
-        foreach ($_POST['asl_hero_slides'] as $s) {
-            $slides[] = array('image'=>esc_url_raw($s['image']??''),'mobile'=>esc_url_raw($s['mobile']??''),'link'=>asl_sanitize_link($s['link']??''));
-        }
+    $tab = isset($_POST['asl_current_tab']) ? sanitize_text_field($_POST['asl_current_tab']) : '';
+    
+    switch ($tab) {
+        case 'hero':
+            set_theme_mod('asl_hero_enabled', isset($_POST['asl_hero_enabled']));
+            set_theme_mod('asl_hero_hide_mobile', isset($_POST['asl_hero_hide_mobile']));
+            set_theme_mod('asl_hero_hide_desktop', isset($_POST['asl_hero_hide_desktop']));
+            set_theme_mod('asl_hero_autoplay', isset($_POST['asl_hero_autoplay']));
+            set_theme_mod('asl_hero_autoplay_delay', absint($_POST['asl_hero_autoplay_delay'] ?? 5000));
+            set_theme_mod('asl_hero_loop', isset($_POST['asl_hero_loop']));
+            $slides = array();
+            if (isset($_POST['asl_hero_slides']) && is_array($_POST['asl_hero_slides'])) {
+                foreach ($_POST['asl_hero_slides'] as $s) {
+                    $slides[] = array('image'=>esc_url_raw($s['image']??''),'mobile'=>esc_url_raw($s['mobile']??''),'link'=>asl_sanitize_link($s['link']??''));
+                }
+            }
+            set_theme_mod('asl_hero_slides', $slides);
+            break;
+            
+        case 'new-products':
+            asl_save_products_section('new_products');
+            break;
+            
+        case 'bestseller':
+            asl_save_products_section('bestseller');
+            break;
+            
+        case 'featured':
+            asl_save_products_section('featured');
+            break;
+            
+        case 'categories':
+            set_theme_mod('asl_categories_enabled', isset($_POST['asl_categories_enabled']));
+            set_theme_mod('asl_categories_hide_mobile', isset($_POST['asl_categories_hide_mobile']));
+            set_theme_mod('asl_categories_hide_desktop', isset($_POST['asl_categories_hide_desktop']));
+            set_theme_mod('asl_categories_title', sanitize_text_field($_POST['asl_categories_title']??''));
+            set_theme_mod('asl_categories_title_ar', sanitize_text_field($_POST['asl_categories_title_ar']??''));
+            set_theme_mod('asl_categories_count', absint($_POST['asl_categories_count']??6));
+            set_theme_mod('asl_categories_cols_desktop', absint($_POST['asl_categories_cols_desktop']??6));
+            set_theme_mod('asl_categories_cols_tablet', absint($_POST['asl_categories_cols_tablet']??4));
+            set_theme_mod('asl_categories_cols_mobile', absint($_POST['asl_categories_cols_mobile']??3));
+            break;
+            
+        case 'collections':
+            set_theme_mod('asl_collections_enabled', isset($_POST['asl_collections_enabled']));
+            set_theme_mod('asl_collections_hide_mobile', isset($_POST['asl_collections_hide_mobile']));
+            set_theme_mod('asl_collections_hide_desktop', isset($_POST['asl_collections_hide_desktop']));
+            set_theme_mod('asl_collections_title', sanitize_text_field($_POST['asl_collections_title']??''));
+            set_theme_mod('asl_collections_title_ar', sanitize_text_field($_POST['asl_collections_title_ar']??''));
+            set_theme_mod('asl_collections_layout', sanitize_text_field($_POST['asl_collections_layout']??'grid'));
+            set_theme_mod('asl_collections_cols_desktop', absint($_POST['asl_collections_cols_desktop']??3));
+            set_theme_mod('asl_collections_cols_tablet', absint($_POST['asl_collections_cols_tablet']??2));
+            set_theme_mod('asl_collections_cols_mobile', absint($_POST['asl_collections_cols_mobile']??1));
+            $collections = array();
+            if (isset($_POST['asl_collections_items']) && is_array($_POST['asl_collections_items'])) {
+                foreach ($_POST['asl_collections_items'] as $item) {
+                    $collections[] = array('image'=>esc_url_raw($item['image']??''),'title'=>sanitize_text_field($item['title']??''),'title_ar'=>sanitize_text_field($item['title_ar']??''),'description'=>sanitize_textarea_field($item['description']??''),'description_ar'=>sanitize_textarea_field($item['description_ar']??''),'link'=>asl_sanitize_link($item['link']??''));
+                }
+            }
+            set_theme_mod('asl_collections_items', $collections);
+            break;
+            
+        case 'banners':
+            set_theme_mod('asl_banners_enabled', isset($_POST['asl_banners_enabled']));
+            set_theme_mod('asl_banners_hide_mobile', isset($_POST['asl_banners_hide_mobile']));
+            set_theme_mod('asl_banners_hide_desktop', isset($_POST['asl_banners_hide_desktop']));
+            set_theme_mod('asl_banners_layout', sanitize_text_field($_POST['asl_banners_layout']??'grid'));
+            set_theme_mod('asl_banners_cols_desktop', absint($_POST['asl_banners_cols_desktop']??2));
+            set_theme_mod('asl_banners_cols_tablet', absint($_POST['asl_banners_cols_tablet']??2));
+            set_theme_mod('asl_banners_cols_mobile', absint($_POST['asl_banners_cols_mobile']??1));
+            $banners = array();
+            if (isset($_POST['asl_banners_items']) && is_array($_POST['asl_banners_items'])) {
+                foreach ($_POST['asl_banners_items'] as $item) {
+                    $banners[] = array('image'=>esc_url_raw($item['image']??''),'mobile'=>esc_url_raw($item['mobile']??''),'title'=>sanitize_text_field($item['title']??''),'title_ar'=>sanitize_text_field($item['title_ar']??''),'subtitle'=>sanitize_text_field($item['subtitle']??''),'subtitle_ar'=>sanitize_text_field($item['subtitle_ar']??''),'link'=>asl_sanitize_link($item['link']??''));
+                }
+            }
+            set_theme_mod('asl_banners_items', $banners);
+            break;
     }
-    set_theme_mod('asl_hero_slides', $slides);
-    foreach (['new_products','bestseller','featured'] as $key) {
-        set_theme_mod("asl_{$key}_enabled", isset($_POST["asl_{$key}_enabled"]));
-        set_theme_mod("asl_{$key}_hide_mobile", isset($_POST["asl_{$key}_hide_mobile"]));
-        set_theme_mod("asl_{$key}_hide_desktop", isset($_POST["asl_{$key}_hide_desktop"]));
-        set_theme_mod("asl_{$key}_title", sanitize_text_field($_POST["asl_{$key}_title"]??''));
-        set_theme_mod("asl_{$key}_title_ar", sanitize_text_field($_POST["asl_{$key}_title_ar"]??''));
-        set_theme_mod("asl_{$key}_subtitle", sanitize_text_field($_POST["asl_{$key}_subtitle"]??''));
-        set_theme_mod("asl_{$key}_subtitle_ar", sanitize_text_field($_POST["asl_{$key}_subtitle_ar"]??''));
-        set_theme_mod("asl_{$key}_count", absint($_POST["asl_{$key}_count"]??8));
-        set_theme_mod("asl_{$key}_display", sanitize_text_field($_POST["asl_{$key}_display"]??'slider'));
-        set_theme_mod("asl_{$key}_autoplay", isset($_POST["asl_{$key}_autoplay"]));
-        set_theme_mod("asl_{$key}_cols_desktop", absint($_POST["asl_{$key}_cols_desktop"]??4));
-        set_theme_mod("asl_{$key}_cols_tablet", absint($_POST["asl_{$key}_cols_tablet"]??3));
-        set_theme_mod("asl_{$key}_cols_mobile", absint($_POST["asl_{$key}_cols_mobile"]??2));
-    }
-    set_theme_mod('asl_categories_enabled', isset($_POST['asl_categories_enabled']));
-    set_theme_mod('asl_categories_hide_mobile', isset($_POST['asl_categories_hide_mobile']));
-    set_theme_mod('asl_categories_hide_desktop', isset($_POST['asl_categories_hide_desktop']));
-    set_theme_mod('asl_categories_title', sanitize_text_field($_POST['asl_categories_title']??''));
-    set_theme_mod('asl_categories_title_ar', sanitize_text_field($_POST['asl_categories_title_ar']??''));
-    set_theme_mod('asl_categories_count', absint($_POST['asl_categories_count']??6));
-    set_theme_mod('asl_categories_cols_desktop', absint($_POST['asl_categories_cols_desktop']??6));
-    set_theme_mod('asl_categories_cols_tablet', absint($_POST['asl_categories_cols_tablet']??4));
-    set_theme_mod('asl_categories_cols_mobile', absint($_POST['asl_categories_cols_mobile']??3));
-    set_theme_mod('asl_collections_enabled', isset($_POST['asl_collections_enabled']));
-    set_theme_mod('asl_collections_hide_mobile', isset($_POST['asl_collections_hide_mobile']));
-    set_theme_mod('asl_collections_hide_desktop', isset($_POST['asl_collections_hide_desktop']));
-    set_theme_mod('asl_collections_title', sanitize_text_field($_POST['asl_collections_title']??''));
-    set_theme_mod('asl_collections_title_ar', sanitize_text_field($_POST['asl_collections_title_ar']??''));
-    set_theme_mod('asl_collections_layout', sanitize_text_field($_POST['asl_collections_layout']??'grid'));
-    set_theme_mod('asl_collections_cols_desktop', absint($_POST['asl_collections_cols_desktop']??3));
-    set_theme_mod('asl_collections_cols_tablet', absint($_POST['asl_collections_cols_tablet']??2));
-    set_theme_mod('asl_collections_cols_mobile', absint($_POST['asl_collections_cols_mobile']??1));
-    $collections = array();
-    if (isset($_POST['asl_collections_items']) && is_array($_POST['asl_collections_items'])) {
-        foreach ($_POST['asl_collections_items'] as $item) {
-            $collections[] = array('image'=>esc_url_raw($item['image']??''),'title'=>sanitize_text_field($item['title']??''),'title_ar'=>sanitize_text_field($item['title_ar']??''),'description'=>sanitize_textarea_field($item['description']??''),'description_ar'=>sanitize_textarea_field($item['description_ar']??''),'link'=>asl_sanitize_link($item['link']??''));
-        }
-    }
-    set_theme_mod('asl_collections_items', $collections);
-    set_theme_mod('asl_banners_enabled', isset($_POST['asl_banners_enabled']));
-    set_theme_mod('asl_banners_hide_mobile', isset($_POST['asl_banners_hide_mobile']));
-    set_theme_mod('asl_banners_hide_desktop', isset($_POST['asl_banners_hide_desktop']));
-    set_theme_mod('asl_banners_layout', sanitize_text_field($_POST['asl_banners_layout']??'grid'));
-    set_theme_mod('asl_banners_cols_desktop', absint($_POST['asl_banners_cols_desktop']??2));
-    set_theme_mod('asl_banners_cols_tablet', absint($_POST['asl_banners_cols_tablet']??2));
-    set_theme_mod('asl_banners_cols_mobile', absint($_POST['asl_banners_cols_mobile']??1));
-    $banners = array();
-    if (isset($_POST['asl_banners_items']) && is_array($_POST['asl_banners_items'])) {
-        foreach ($_POST['asl_banners_items'] as $item) {
-            $banners[] = array('image'=>esc_url_raw($item['image']??''),'mobile'=>esc_url_raw($item['mobile']??''),'title'=>sanitize_text_field($item['title']??''),'title_ar'=>sanitize_text_field($item['title_ar']??''),'subtitle'=>sanitize_text_field($item['subtitle']??''),'subtitle_ar'=>sanitize_text_field($item['subtitle_ar']??''),'link'=>asl_sanitize_link($item['link']??''));
-        }
-    }
-    set_theme_mod('asl_banners_items', $banners);
+}
+
+function asl_save_products_section($key) {
+    set_theme_mod("asl_{$key}_enabled", isset($_POST["asl_{$key}_enabled"]));
+    set_theme_mod("asl_{$key}_hide_mobile", isset($_POST["asl_{$key}_hide_mobile"]));
+    set_theme_mod("asl_{$key}_hide_desktop", isset($_POST["asl_{$key}_hide_desktop"]));
+    set_theme_mod("asl_{$key}_title", sanitize_text_field($_POST["asl_{$key}_title"]??''));
+    set_theme_mod("asl_{$key}_title_ar", sanitize_text_field($_POST["asl_{$key}_title_ar"]??''));
+    set_theme_mod("asl_{$key}_subtitle", sanitize_text_field($_POST["asl_{$key}_subtitle"]??''));
+    set_theme_mod("asl_{$key}_subtitle_ar", sanitize_text_field($_POST["asl_{$key}_subtitle_ar"]??''));
+    set_theme_mod("asl_{$key}_count", absint($_POST["asl_{$key}_count"]??8));
+    set_theme_mod("asl_{$key}_display", sanitize_text_field($_POST["asl_{$key}_display"]??'slider'));
+    set_theme_mod("asl_{$key}_autoplay", isset($_POST["asl_{$key}_autoplay"]));
+    set_theme_mod("asl_{$key}_cols_desktop", absint($_POST["asl_{$key}_cols_desktop"]??4));
+    set_theme_mod("asl_{$key}_cols_tablet", absint($_POST["asl_{$key}_cols_tablet"]??3));
+    set_theme_mod("asl_{$key}_cols_mobile", absint($_POST["asl_{$key}_cols_mobile"]??2));
 }
 
 function asl_save_header_settings() {
