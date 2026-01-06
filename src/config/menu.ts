@@ -64,6 +64,89 @@ export function getNavigationItems(locale: Locale) {
 }
 
 /**
+ * Navigation item type for dynamic WordPress menu
+ */
+export interface DynamicNavigationItem {
+  id: number;
+  name: string;
+  href: string;
+  hasMegaMenu: boolean;
+}
+
+/**
+ * Check if a menu item should have a mega menu
+ * Only "Shop All" / "Shop" / "تسوق" items should have mega menu
+ */
+function shouldHaveMegaMenu(title: string): boolean {
+  const megaMenuTitles = ["shop all", "shop", "تسوق", "تسوق الكل"];
+  return megaMenuTitles.includes(title.toLowerCase().trim());
+}
+
+/**
+ * Normalize WordPress URL to locale-aware frontend route
+ */
+function normalizeMenuUrl(url: string, locale: Locale): string {
+  if (!url || url === "#") return `/${locale}`;
+  
+  let normalizedUrl = url;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    try {
+      const urlObj = new URL(url);
+      normalizedUrl = urlObj.pathname;
+    } catch {
+      normalizedUrl = url;
+    }
+  }
+  
+  normalizedUrl = normalizedUrl.replace(/^\/?(en|ar)\//, "/");
+  
+  if (normalizedUrl === "/" || normalizedUrl === "") {
+    return `/${locale}`;
+  }
+  
+  if (normalizedUrl.startsWith("/category/")) {
+    const slug = normalizedUrl.replace("/category/", "");
+    return `/${locale}/category/${slug}`;
+  }
+  
+  if (normalizedUrl.startsWith("/shop")) {
+    return `/${locale}/shop`;
+  }
+  
+  if (!normalizedUrl.startsWith("/")) {
+    normalizedUrl = "/" + normalizedUrl;
+  }
+  
+  return `/${locale}${normalizedUrl}`;
+}
+
+/**
+ * Get dynamic navigation items from WordPress menu
+ * Only top-level items are returned, with mega menu flag for Shop All
+ */
+export function getDynamicNavigationItems(
+  menuItems: Array<{ id: number; title: string; url: string; parent: number }> | null | undefined,
+  locale: Locale
+): DynamicNavigationItem[] {
+  if (!menuItems || menuItems.length === 0) {
+    return getNavigationItems(locale);
+  }
+  
+  const topLevelItems = menuItems.filter((item) => item.parent === 0);
+  
+  if (topLevelItems.length === 0) {
+    return getNavigationItems(locale);
+  }
+  
+  return topLevelItems.map((item) => ({
+    id: item.id,
+    name: item.title,
+    href: normalizeMenuUrl(item.url, locale),
+    hasMegaMenu: shouldHaveMegaMenu(item.title),
+  }));
+}
+
+/**
  * Menu Category Type
  *
  * Represents a category in the mega menu.
