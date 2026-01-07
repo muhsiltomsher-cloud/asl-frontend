@@ -104,30 +104,39 @@ export async function getProducts(params?: {
   locale?: Locale;
   currency?: Currency;
 }): Promise<WCProductsResponse> {
-  const searchParams = new URLSearchParams();
+  try {
+    const searchParams = new URLSearchParams();
 
-  if (params?.page) searchParams.set("page", params.page.toString());
-  if (params?.per_page) searchParams.set("per_page", params.per_page.toString());
-  if (params?.category) searchParams.set("category", params.category);
-  if (params?.search) searchParams.set("search", params.search);
-  if (params?.orderby) searchParams.set("orderby", params.orderby);
-  if (params?.order) searchParams.set("order", params.order);
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.per_page) searchParams.set("per_page", params.per_page.toString());
+    if (params?.category) searchParams.set("category", params.category);
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.orderby) searchParams.set("orderby", params.orderby);
+    if (params?.order) searchParams.set("order", params.order);
 
-  const queryString = searchParams.toString();
-  const endpoint = `/products${queryString ? `?${queryString}` : ""}`;
+    const queryString = searchParams.toString();
+    const endpoint = `/products${queryString ? `?${queryString}` : ""}`;
 
-  const { data: products, total, totalPages } = await fetchAPIWithPagination<WCProduct[]>(endpoint, {
-    tags: ["products"],
-    locale: params?.locale,
-    currency: params?.currency,
-    revalidate: 300,
-  });
+    const { data: products, total, totalPages } = await fetchAPIWithPagination<WCProduct[]>(endpoint, {
+      tags: ["products"],
+      locale: params?.locale,
+      currency: params?.currency,
+      revalidate: 300,
+    });
 
-  return {
-    products,
-    total,
-    totalPages,
-  };
+    return {
+      products,
+      total,
+      totalPages,
+    };
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+    return {
+      products: [],
+      total: 0,
+      totalPages: 0,
+    };
+  }
 }
 
 // Helper to check if a slug contains non-ASCII characters (e.g., Arabic)
@@ -215,14 +224,19 @@ export async function getProductById(
 
 // Categories API - Memoized for request deduplication
 export const getCategories = cache(async function getCategories(locale?: Locale, currency?: Currency): Promise<WCCategory[]> {
-  const categories = await fetchAPI<WCCategory[]>("/products/categories", {
-    tags: ["categories"],
-    locale,
-    currency,
-    revalidate: 600, // Cache categories longer as they change less frequently
-  });
+  try {
+    const categories = await fetchAPI<WCCategory[]>("/products/categories", {
+      tags: ["categories"],
+      locale,
+      currency,
+      revalidate: 600, // Cache categories longer as they change less frequently
+    });
 
-  return categories;
+    return categories;
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    return [];
+  }
 });
 
 // Memoized version for request deduplication
