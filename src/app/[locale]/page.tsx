@@ -52,10 +52,21 @@ export default async function HomePage({ params }: HomePageProps) {
     getFreeGiftProductIds(),
   ]);
 
-  // Create a mapping of category ID to English slug for URL generation
+  // Create a mapping of localized category ID to English slug for URL generation
+  // WPML assigns different IDs for different locales, so we match by index position
+  // Both category lists are returned in the same order from the API
   const englishCategorySlugs: Record<number, string> = {};
-  englishCategories.forEach((cat) => {
-    englishCategorySlugs[cat.id] = cat.slug;
+  
+  // Filter to root categories only (parent === 0) and exclude uncategorized
+  const localizedRootCategories = categories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
+  const englishRootCategories = englishCategories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
+  
+  // Map localized category IDs to English slugs by matching index position
+  // The API returns categories in a consistent order across locales
+  localizedRootCategories.forEach((localizedCat, index) => {
+    if (index < englishRootCategories.length) {
+      englishCategorySlugs[localizedCat.id] = englishRootCategories[index].slug;
+    }
   });
 
   // Filter out gift products from the home page
