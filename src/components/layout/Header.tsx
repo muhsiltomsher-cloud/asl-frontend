@@ -121,7 +121,8 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
                   alt={siteSettings?.logo?.alt || siteSettings?.site_name || "Logo"}
                   width={140}
                   height={90}
-                  className="w-auto h-16 md:h-20"
+                  className="h-16 md:h-20"
+                  style={{ width: "auto", height: "auto", maxHeight: "64px" }}
                   priority
                 />
               ) : (

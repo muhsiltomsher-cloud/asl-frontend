@@ -44,7 +44,8 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
                   alt={siteSettings.logo.alt || siteSettings.site_name || "Logo"}
                   width={150}
                   height={110}
-                  className="mx-auto h-[70px] w-auto md:mx-0 md:h-[110px]"
+                  className="mx-auto md:mx-0"
+                  style={{ width: "auto", height: "auto", maxHeight: "70px" }}
                   loading="lazy"
                 />
               ) : (
