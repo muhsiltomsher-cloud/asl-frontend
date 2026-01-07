@@ -169,7 +169,6 @@ export function CategoriesDrawer({
                       )}
                                             <div className="flex-1 min-w-0">
                                               <span className="font-medium block truncate">{decodeHtmlEntities(category.name)}</span>
-                                              <span className="text-sm text-gray-500">{category.count} products</span>
                                             </div>
                       <ChevronRight className={`h-5 w-5 flex-shrink-0 text-gray-400 ${isRTL ? "rotate-180" : ""}`} />
                     </Link>

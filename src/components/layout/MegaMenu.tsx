@@ -117,10 +117,10 @@ export function MegaMenu({
 
     setProductsLoading(true);
     try {
-      // If we have specific product IDs from the menu, fetch those
+      // If we have specific product IDs from the menu, fetch those (only the selected ones)
       if (productIds && productIds.length > 0) {
         productsFetchPromise[locale] = Promise.all(
-          productIds.slice(0, 4).map((id) => getProductById(id, locale))
+          productIds.map((id) => getProductById(id, locale))
         ).then((products) => products.filter((p): p is WCProduct => p !== null));
       } else {
         // Fallback to latest products
@@ -293,10 +293,10 @@ export function MegaMenu({
                     : (isRTL ? "وصل حديثاً" : "New Arrivals")}
                 </h3>
                                 {productsLoading ? (
-                                  <MiniProductGridSkeleton count={4} />
+                                  <MiniProductGridSkeleton count={menuData?.featuredProductIds?.length || 4} />
                                 ) : featuredProducts.length > 0 ? (
                   <div className="grid grid-cols-2 gap-4">
-                    {featuredProducts.slice(0, 4).map((product) => {
+                    {featuredProducts.map((product) => {
                       const productSlug = getProductSlugFromPermalink(product.permalink, product.slug);
                       return (
                       <Link
