@@ -9,6 +9,7 @@ import { useFreeGift } from "@/contexts/FreeGiftContext";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { BundleItemsList } from "@/components/cart/BundleItemsList";
 import { CartItemSkeleton } from "@/components/common/Skeleton";
+import type { Currency } from "@/config/site";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -46,6 +47,7 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
     const isRTL = locale === "ar";
   const currencyMinorUnit = cart?.currency?.currency_minor_unit ?? 2;
   const divisor = Math.pow(10, currencyMinorUnit);
+  const cartCurrency = (cart?.currency?.currency_code || "AED") as Currency;
 
   const handleQuantityChange = async (itemKey: string, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -79,6 +81,7 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
           price={parseFloat(cartSubtotal) / divisor}
           className="text-lg font-semibold"
           iconSize="sm"
+          sourceCurrency={cartCurrency}
         />
       </div>
 
@@ -181,6 +184,7 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
                         <FormattedPrice
                           price={parseFloat(item.price) / divisor}
                           iconSize="xs"
+                          sourceCurrency={cartCurrency}
                         /> x {item.quantity.value}
                       </p>
                     )}
