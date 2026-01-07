@@ -179,11 +179,23 @@ async function getUserId(): Promise<number | null> {
   const userCookie = cookieStore.get(USER_COOKIE)?.value;
   
   if (userCookie) {
+    // Try parsing the cookie value - it might be already decoded or URL-encoded
+    // First try parsing directly (for already decoded values)
     try {
-      const userData = JSON.parse(decodeURIComponent(userCookie));
-      return userData.user_id || null;
+      const userData = JSON.parse(userCookie);
+      if (userData.user_id) {
+        return userData.user_id;
+      }
     } catch {
-      // Ignore parse errors
+      // If direct parse fails, try URL-decoding first
+      try {
+        const userData = JSON.parse(decodeURIComponent(userCookie));
+        if (userData.user_id) {
+          return userData.user_id;
+        }
+      } catch {
+        // Ignore parse errors
+      }
     }
   }
   
