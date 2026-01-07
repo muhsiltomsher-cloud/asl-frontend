@@ -7,7 +7,7 @@ import { Grid3X3 } from "lucide-react";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
 import type { WCProduct } from "@/types/woocommerce";
-import { getProducts, getProductById } from "@/lib/api/woocommerce";
+import { getProductById } from "@/lib/api/woocommerce";
 import { cn, getProductSlugFromPermalink } from "@/lib/utils";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { MiniProductGridSkeleton, CategoriesGridSkeleton } from "@/components/common/Skeleton";
@@ -101,8 +101,8 @@ export function MegaMenu({
     }
   }, [locale]);
 
-  // Fetch featured products - either by specific IDs from menu or latest products
-  const fetchFeaturedProducts = useCallback(async (productIds?: number[]) => {
+  // Fetch featured products - only by specific IDs from menu (no fallback)
+  const fetchFeaturedProducts = useCallback(async (productIds: number[]) => {
     if (productsFetchPromise[locale]) {
       try {
         const prods = await productsFetchPromise[locale];
@@ -117,20 +117,10 @@ export function MegaMenu({
 
     setProductsLoading(true);
     try {
-      // If we have specific product IDs from the menu, fetch those (only the selected ones)
-      if (productIds && productIds.length > 0) {
-        productsFetchPromise[locale] = Promise.all(
-          productIds.map((id) => getProductById(id, locale))
-        ).then((products) => products.filter((p): p is WCProduct => p !== null));
-      } else {
-        // Fallback to latest products
-        productsFetchPromise[locale] = getProducts({
-          per_page: 4,
-          orderby: "date",
-          order: "desc",
-          locale,
-        }).then((response) => response.products);
-      }
+      // Fetch only the specific product IDs from the menu
+      productsFetchPromise[locale] = Promise.all(
+        productIds.map((id) => getProductById(id, locale))
+      ).then((products) => products.filter((p): p is WCProduct => p !== null));
 
       const prods = await productsFetchPromise[locale];
       if (prods) {
@@ -152,18 +142,20 @@ export function MegaMenu({
     }
   }, [isOpen, fetchMenuData]);
 
-  // Fetch products after menu data is loaded (or immediately if no menu data)
+  // Fetch products only after menu data is loaded - only show products if specific IDs are configured
   useEffect(() => {
-    if (isOpen && !hasProductsFetchedRef.current) {
-      hasProductsFetchedRef.current = true;
-      // If we have menu data with product IDs, use those
+    if (isOpen && !hasProductsFetchedRef.current && !menuLoading) {
+      // Only fetch products if we have specific product IDs from WordPress menu
       if (menuData?.featuredProductIds && menuData.featuredProductIds.length > 0) {
+        hasProductsFetchedRef.current = true;
         fetchFeaturedProducts(menuData.featuredProductIds);
-      } else {
-        fetchFeaturedProducts();
+      } else if (menuData !== null) {
+        // Menu data loaded but no product IDs configured - don't show any products
+        hasProductsFetchedRef.current = true;
+        setFeaturedProducts([]);
       }
     }
-  }, [isOpen, menuData, fetchFeaturedProducts]);
+  }, [isOpen, menuData, menuLoading, fetchFeaturedProducts]);
 
   // Reset fetch flags when locale changes
   useEffect(() => {
