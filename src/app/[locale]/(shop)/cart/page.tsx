@@ -391,7 +391,7 @@ export default function CartPage() {
                                         <span className="text-amber-600 font-semibold">{isRTL ? "مجاني" : "FREE"}</span>
                                       ) : (
                                         <FormattedPrice
-                                          price={parseFloat(item.totals.total) / divisor}
+                                          price={parseFloat(item.price) * item.quantity.value / divisor}
                                           className="font-semibold"
                                           iconSize="xs"
                                           sourceCurrency={currency}

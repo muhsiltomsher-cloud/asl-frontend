@@ -654,7 +654,7 @@ export default function CheckoutPage() {
                                   </div>
                                   {/* Price */}
                                   <FormattedPrice
-                                    price={parseFloat(item.totals.total) / divisor}
+                                    price={parseFloat(item.price) * item.quantity.value / divisor}
                                     className="text-sm font-medium"
                                     iconSize="xs"
                                     sourceCurrency={currency}
