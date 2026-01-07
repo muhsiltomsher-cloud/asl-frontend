@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getProducts, getCategories } from "@/lib/api/woocommerce";
+import { getProducts, getCategories, getFreeGiftProductIds } from "@/lib/api/woocommerce";
 import { getHomePageSettings } from "@/lib/api/wordpress";
 import {
   HeroSlider,
@@ -43,11 +43,17 @@ export default async function HomePage({ params }: HomePageProps) {
   const isRTL = locale === "ar";
 
   // Fetch all data in parallel
-  const [{ products }, categories, homeSettings] = await Promise.all([
+  const [{ products: allProducts }, categories, homeSettings, giftProductIds] = await Promise.all([
     getProducts({ per_page: 20, locale: locale as Locale }),
     getCategories(locale as Locale),
     getHomePageSettings(locale as Locale),
+    getFreeGiftProductIds(),
   ]);
+
+  // Filter out gift products from the home page
+  const products = allProducts.filter(
+    (product) => !giftProductIds.includes(product.id)
+  );
 
   // Translations for sections - using dictionary for dynamic content
   const sectionTexts = {
