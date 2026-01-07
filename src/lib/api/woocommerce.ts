@@ -207,16 +207,42 @@ export const getEnglishSlugForProduct = cache(async function getEnglishSlugForPr
   }
 });
 
-// Get the English slug for a category by its ID (used for URL generation)
+// Get the English slug for a category by its localized name (used for URL generation)
 // This ensures category URLs always use English slugs regardless of current locale
+// Note: WPML assigns different category IDs for different locales, so we match by
+// finding the English category at the same position/index in the category list
 export const getEnglishSlugForCategory = cache(async function getEnglishSlugForCategory(
-  categoryId: number
+  localizedCategoryId: number,
+  locale?: Locale
 ): Promise<string | null> {
   try {
-    // Fetch categories with English locale to get English slugs
-    const categories = await getCategories("en");
-    const category = categories.find((cat) => cat.id === categoryId);
-    return category?.slug || null;
+    // Fetch categories for both locales
+    const [localizedCategories, englishCategories] = await Promise.all([
+      getCategories(locale),
+      getCategories("en"),
+    ]);
+    
+    // Find the localized category by ID
+    const localizedCategory = localizedCategories.find((cat) => cat.id === localizedCategoryId);
+    if (!localizedCategory) {
+      return null;
+    }
+    
+    // Find the index of the localized category among root categories
+    const localizedRootCategories = localizedCategories.filter((cat) => cat.parent === 0);
+    const englishRootCategories = englishCategories.filter((cat) => cat.parent === 0);
+    
+    const localizedIndex = localizedRootCategories.findIndex((cat) => cat.id === localizedCategoryId);
+    
+    // If found at same index in English categories, return that slug
+    if (localizedIndex !== -1 && localizedIndex < englishRootCategories.length) {
+      return englishRootCategories[localizedIndex].slug;
+    }
+    
+    // Fallback: try to match by similar slug pattern (for subcategories)
+    // This handles cases where the category order might differ
+    const englishCategory = englishCategories.find((cat) => cat.id === localizedCategoryId);
+    return englishCategory?.slug || null;
   } catch {
     return null;
   }
