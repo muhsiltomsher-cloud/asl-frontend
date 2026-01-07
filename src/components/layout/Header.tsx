@@ -17,7 +17,6 @@ import type { HeaderSettings, TopbarSettings } from "@/lib/api/wordpress";
 import { CategoriesDrawer } from "@/components/layout/CategoriesDrawer";
 import { DesktopSearchDropdown } from "@/components/layout/DesktopSearchDropdown";
 import { MegaMenu } from "@/components/layout/MegaMenu";
-import { MobileCategoryMenu } from "@/components/layout/MobileCategoryMenu";
 import { getDynamicNavigationItems } from "@/config/menu";
 
 interface HeaderProps {
@@ -245,7 +244,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
         >
           <div className="space-y-1 px-4 pb-3 pt-2">
             {navigation.map((item) => {
-              // Skip items with mega menu - they are handled by MobileCategoryMenu
+              // Skip items with mega menu - they are handled separately
               if (item.hasMegaMenu) {
                 return null;
               }
@@ -260,13 +259,6 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
                 </Link>
               );
             })}
-            
-            {/* Mobile Category Menu with hierarchy */}
-            <MobileCategoryMenu
-              locale={locale}
-              dictionary={dictionary}
-              onNavigate={() => setIsMobileMenuOpen(false)}
-            />
           </div>
         </div>
       </header>
