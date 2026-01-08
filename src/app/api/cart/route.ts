@@ -23,8 +23,14 @@ async function getCurrency(): Promise<string | null> {
   return cookieStore.get(CURRENCY_COOKIE)?.value || null;
 }
 
-// Get locale from cookie or referer URL
+// Get locale from query parameter, cookie, or referer URL
 async function getLocale(request: NextRequest): Promise<string | null> {
+  // First, check for locale in query parameter (highest priority for explicit requests)
+  const localeParam = request.nextUrl.searchParams.get("locale");
+  if (localeParam && (localeParam === "en" || localeParam === "ar")) {
+    return localeParam;
+  }
+  
   const cookieStore = await cookies();
   const localeCookie = cookieStore.get(LOCALE_COOKIE)?.value;
   if (localeCookie) return localeCookie;
