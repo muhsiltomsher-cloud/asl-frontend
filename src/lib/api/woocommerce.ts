@@ -475,7 +475,13 @@ export async function getBundleConfig(
       return null;
     }
 
-    return response.json();
+    const text = await response.text();
+    if (!text || text === 'null' || text.trim() === '') {
+      return null;
+    }
+
+    const data = JSON.parse(text);
+    return data;
   } catch {
     return null;
   }
