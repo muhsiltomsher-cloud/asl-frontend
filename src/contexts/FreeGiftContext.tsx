@@ -60,7 +60,12 @@ function getCartStateHash(
   return `${subtotal}::${itemsHash}`;
 }
 
-export function FreeGiftProvider({ children }: { children: React.ReactNode }) {
+interface FreeGiftProviderProps {
+  children: React.ReactNode;
+  locale: string;
+}
+
+export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
   const { cart, cartItems, cartSubtotal, addToCart, removeCartItem, updateCartItem } = useCart();
   const { currency } = useCurrency();
   const [rules, setRules] = useState<FreeGiftRule[]>([]);
@@ -87,7 +92,7 @@ export function FreeGiftProvider({ children }: { children: React.ReactNode }) {
   const fetchRules = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/free-gifts?currency=${currency}`);
+      const response = await fetch(`/api/free-gifts?currency=${currency}&locale=${locale}`);
       const data = await response.json();
 
       if (data.success && data.rules) {
@@ -98,7 +103,7 @@ export function FreeGiftProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [currency]);
+  }, [currency, locale]);
 
   useEffect(() => {
     fetchRules();

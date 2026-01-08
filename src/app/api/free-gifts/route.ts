@@ -7,10 +7,18 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const currency = searchParams.get("currency");
+    const locale = searchParams.get("locale");
 
     let url = `${API_BASE}/wp-json/asl-free-gifts/v1/rules`;
+    const params: string[] = [];
     if (currency) {
-      url += `?currency=${encodeURIComponent(currency)}`;
+      params.push(`currency=${encodeURIComponent(currency)}`);
+    }
+    if (locale) {
+      params.push(`lang=${encodeURIComponent(locale)}`);
+    }
+    if (params.length > 0) {
+      url += `?${params.join("&")}`;
     }
 
     const response = await fetch(url, {
