@@ -448,9 +448,11 @@ export interface BundleConfig {
   eligible_categories?: number[];
   exclude_categories?: number[];
   eligible_products: number[];
+  exclude_products?: number[];
   unique_products: number[];
   total_slots: number;
   required_slots: number;
+  with_box_price?: number;
   shipping_fee?: string;
   slot_labels?: Record<string, string>;
   enabled?: boolean;
