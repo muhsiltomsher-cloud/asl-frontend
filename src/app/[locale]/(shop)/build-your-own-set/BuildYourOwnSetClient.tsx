@@ -6,6 +6,7 @@ import { X, Plus, Minus, Search, Check } from "lucide-react";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { useCart } from "@/contexts/CartContext";
 import { useNotification } from "@/contexts/NotificationContext";
+import { useFreeGift } from "@/contexts/FreeGiftContext";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { BundleConfig } from "@/lib/api/woocommerce";
@@ -37,6 +38,7 @@ export function BuildYourOwnSetClient({
   const isRTL = locale === "ar";
   const { addToCart } = useCart();
   const { notify } = useNotification();
+  const { getFreeGiftProductIds } = useFreeGift();
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
@@ -64,12 +66,27 @@ export function BuildYourOwnSetClient({
   }, [bundleConfig]);
 
   const productOptions: ProductOption[] = useMemo(() => {
+    // Get free gift product IDs to exclude from bundle selection
+    const freeGiftProductIds = new Set(getFreeGiftProductIds());
+    
+    // Get the bundle product ID to exclude from bundle selection
+    const bundleProductId = bundleProduct?.id;
+    
     // Filter products by eligible list if configured
     const eligibleProducts = eligibleProductIds
       ? products.filter((p) => eligibleProductIds.has(p.id))
       : products;
+    
+    // Filter out bundle product itself and free gift products
+    const filteredProducts = eligibleProducts.filter((p) => {
+      // Exclude the bundle product itself
+      if (bundleProductId && p.id === bundleProductId) return false;
+      // Exclude free gift products
+      if (freeGiftProductIds.has(p.id)) return false;
+      return true;
+    });
 
-    return eligibleProducts.map((product) => {
+    return filteredProducts.map((product) => {
       const categoryName = product.categories?.[0]?.name?.toLowerCase() || "";
       let category: CategoryFilter = "all";
       if (categoryName.includes("perfume") || categoryName.includes("عطر")) {
@@ -93,7 +110,7 @@ export function BuildYourOwnSetClient({
         category,
       };
     });
-  }, [products, eligibleProductIds]);
+  }, [products, eligibleProductIds, getFreeGiftProductIds, bundleProduct]);
 
   const selectedIds = useMemo(() => {
     return new Set(selections.filter((s) => s !== null).map((s) => s!.id));
