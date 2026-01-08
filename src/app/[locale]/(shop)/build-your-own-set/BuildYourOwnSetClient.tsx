@@ -59,6 +59,24 @@ export function BuildYourOwnSetClient({
     return new Set(bundleConfig.eligible_products);
   }, [bundleConfig]);
 
+  // Get eligible category IDs from bundle config (if configured)
+  const eligibleCategoryIds = useMemo(() => {
+    if (!bundleConfig?.eligible_categories?.length) return null;
+    return new Set(bundleConfig.eligible_categories);
+  }, [bundleConfig]);
+
+  // Get exclude product IDs from bundle config
+  const excludeProductIds = useMemo(() => {
+    if (!bundleConfig?.exclude_products?.length) return new Set<number>();
+    return new Set(bundleConfig.exclude_products);
+  }, [bundleConfig]);
+
+  // Get exclude category IDs from bundle config
+  const excludeCategoryIds = useMemo(() => {
+    if (!bundleConfig?.exclude_categories?.length) return new Set<number>();
+    return new Set(bundleConfig.exclude_categories);
+  }, [bundleConfig]);
+
   // Get unique product IDs from bundle config (products that can only be selected once)
   const uniqueProductIds = useMemo(() => {
     if (!bundleConfig?.unique_products?.length) return new Set<number>();
@@ -72,18 +90,47 @@ export function BuildYourOwnSetClient({
     // Get the bundle product ID to exclude from bundle selection
     const bundleProductId = bundleProduct?.id;
     
-    // Filter products by eligible list if configured
-    const eligibleProducts = eligibleProductIds
-      ? products.filter((p) => eligibleProductIds.has(p.id))
-      : products;
-    
-    // Filter out bundle product itself and free gift products
-    const filteredProducts = eligibleProducts.filter((p) => {
+    // Filter products based on eligibility rules
+    const filteredProducts = products.filter((p) => {
       // Exclude the bundle product itself
       if (bundleProductId && p.id === bundleProductId) return false;
+      
       // Exclude free gift products
       if (freeGiftProductIds.has(p.id)) return false;
-      return true;
+      
+      // Exclude products in exclude_products list
+      if (excludeProductIds.has(p.id)) return false;
+      
+      // Exclude products in excluded categories
+      if (excludeCategoryIds.size > 0) {
+        const productCategoryIds = p.categories?.map(c => c.id) || [];
+        if (productCategoryIds.some(catId => excludeCategoryIds.has(catId))) return false;
+      }
+      
+      // Check eligibility - if both eligible_products and eligible_categories are empty, allow all
+      const hasEligibleProducts = eligibleProductIds && eligibleProductIds.size > 0;
+      const hasEligibleCategories = eligibleCategoryIds && eligibleCategoryIds.size > 0;
+      
+      if (!hasEligibleProducts && !hasEligibleCategories) {
+        // No eligibility restrictions, allow all (except excluded)
+        return true;
+      }
+      
+      // Check if product is in eligible_products list
+      if (hasEligibleProducts && eligibleProductIds.has(p.id)) {
+        return true;
+      }
+      
+      // Check if product is in an eligible category
+      if (hasEligibleCategories) {
+        const productCategoryIds = p.categories?.map(c => c.id) || [];
+        if (productCategoryIds.some(catId => eligibleCategoryIds.has(catId))) {
+          return true;
+        }
+      }
+      
+      // If eligibility rules exist but product doesn't match any, exclude it
+      return false;
     });
 
     return filteredProducts.map((product) => {
@@ -110,7 +157,7 @@ export function BuildYourOwnSetClient({
         category,
       };
     });
-  }, [products, eligibleProductIds, getFreeGiftProductIds, bundleProduct]);
+  }, [products, eligibleProductIds, eligibleCategoryIds, excludeProductIds, excludeCategoryIds, getFreeGiftProductIds, bundleProduct]);
 
   const selectedIds = useMemo(() => {
     return new Set(selections.filter((s) => s !== null).map((s) => s!.id));
