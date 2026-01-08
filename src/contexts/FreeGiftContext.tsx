@@ -226,8 +226,6 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       });
       matchingRules.sort((a, b) => a.priority - b.priority);
 
-      lastProcessedStateRef.current = currentStateHash;
-
       const currentGiftKeys: string[] = [];
       const currentActiveGifts: FreeGiftRule[] = [];
 
@@ -263,6 +261,9 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       const rulesToAdd = matchingRules.filter((rule) => !existingGiftProductIds.has(rule.product_id));
 
       if (giftsToRemove.length === 0 && rulesToAdd.length === 0) {
+        // Only update the hash when no changes are needed
+        // This prevents re-processing the same state
+        lastProcessedStateRef.current = currentStateHash;
         setActiveGifts(matchingRules);
         return;
       }
@@ -288,6 +289,9 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
         }
 
         setActiveGifts(matchingRules);
+        // Update the hash after all gifts have been added/removed
+        // This allows the effect to re-run and add remaining gifts if needed
+        lastProcessedStateRef.current = currentStateHash;
       } finally {
         isProcessingRef.current = false;
       }
