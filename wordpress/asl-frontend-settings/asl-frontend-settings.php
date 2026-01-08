@@ -617,6 +617,13 @@ add_action('admin_head', function() {
 // ============================================================================
 
 add_action('rest_api_init', function() {
+    // Get bundle config by product slug (for frontend detection)
+    register_rest_route('asl-bundles/v1', '/config', array(
+        'methods' => 'GET',
+        'callback' => 'asl_bundles_get_config_by_slug',
+        'permission_callback' => '__return_true',
+    ));
+
     // Get all bundles or filter by product_id
     register_rest_route('asl-bundles/v1', '/bundles', array(
         'methods' => 'GET',
@@ -652,6 +659,89 @@ add_action('rest_api_init', function() {
         'permission_callback' => 'asl_bundles_check_permission',
     ));
 });
+
+// Get bundle configuration by product slug
+function asl_bundles_get_config_by_slug($request) {
+    $slug = $request->get_param('slug');
+    
+    if (empty($slug)) {
+        return new WP_Error('missing_slug', 'Product slug is required', array('status' => 400));
+    }
+    
+    // Find product by slug
+    $args = array(
+        'post_type' => 'product',
+        'name' => $slug,
+        'posts_per_page' => 1,
+    );
+    $products = get_posts($args);
+    
+    if (empty($products)) {
+        return new WP_Error('product_not_found', 'Product not found', array('status' => 404));
+    }
+    
+    $product_id = $products[0]->ID;
+    
+    // Check if bundle is enabled for this product via post meta
+    $bundle_enabled = get_post_meta($product_id, '_asl_bundle_enabled', true);
+    
+    if ($bundle_enabled !== 'yes') {
+        return null;
+    }
+    
+    // Get bundle configuration from bundles data
+    $bundles = get_option('asl_bundles_data', array());
+    $product_bundle = null;
+    
+    foreach ($bundles as $bundle) {
+        if (isset($bundle['product_id']) && intval($bundle['product_id']) === $product_id && !empty($bundle['is_enabled'])) {
+            $product_bundle = $bundle;
+            break;
+        }
+    }
+    
+    if (!$product_bundle) {
+        // Return basic config if bundle is enabled but no detailed config exists
+        return array(
+            'product_id' => $product_id,
+            'enabled' => true,
+            'eligible_products' => array(),
+            'unique_products' => array(),
+            'total_slots' => 5,
+            'required_slots' => 3,
+        );
+    }
+    
+    // Transform bundle data to config format expected by frontend
+    $eligible_products = array();
+    $eligible_categories = array();
+    
+    if (!empty($product_bundle['items'])) {
+        foreach ($product_bundle['items'] as $item) {
+            if (!empty($item['rule']['products'])) {
+                $eligible_products = array_merge($eligible_products, $item['rule']['products']);
+            }
+            if (!empty($item['rule']['categories'])) {
+                $eligible_categories = array_merge($eligible_categories, $item['rule']['categories']);
+            }
+        }
+    }
+    
+    return array(
+        'product_id' => $product_id,
+        'bundle_id' => $product_bundle['id'] ?? null,
+        'bundle_type' => $product_bundle['bundle_type'] ?? 'custom',
+        'eligible_categories' => array_unique($eligible_categories),
+        'eligible_products' => array_unique($eligible_products),
+        'unique_products' => array(),
+        'total_slots' => count($product_bundle['items'] ?? array()) ?: 5,
+        'required_slots' => 3,
+        'shipping_fee' => $product_bundle['shipping_fee'] ?? 'apply_to_each_bundled_product',
+        'enabled' => true,
+        'title' => $product_bundle['title'] ?? '',
+        'pricing' => $product_bundle['pricing'] ?? null,
+    );
+}
 
 function asl_bundles_check_permission() {
     return current_user_can('manage_options') || current_user_can('manage_woocommerce');
@@ -790,3 +880,512 @@ function asl_bundles_sanitize_bundle($data) {
     
     return $bundle;
 }
+
+// ============================================================================
+// ASL BUNDLES - PRODUCT METABOX FOR ENABLING BUNDLES
+// ============================================================================
+
+// Add metabox to product edit page
+add_action('add_meta_boxes', function() {
+    add_meta_box(
+        'asl_bundle_settings',
+        'ASL Bundle Settings',
+        'asl_bundle_metabox_render',
+        'product',
+        'side',
+        'high'
+    );
+});
+
+// Render the bundle metabox
+function asl_bundle_metabox_render($post) {
+    wp_nonce_field('asl_bundle_metabox', 'asl_bundle_metabox_nonce');
+    
+    $bundle_enabled = get_post_meta($post->ID, '_asl_bundle_enabled', true);
+    $bundles = get_option('asl_bundles_data', array());
+    
+    // Find existing bundle config for this product
+    $product_bundle = null;
+    foreach ($bundles as $bundle) {
+        if (isset($bundle['product_id']) && intval($bundle['product_id']) === $post->ID) {
+            $product_bundle = $bundle;
+            break;
+        }
+    }
+    
+    // Get frontend URL from options or use default
+    $frontend_url = get_option('asl_frontend_url', 'https://aslfrontend.stagingndemo.com');
+    ?>
+    <div class="asl-bundle-metabox">
+        <p>
+            <label>
+                <input type="checkbox" name="asl_bundle_enabled" value="yes" <?php checked($bundle_enabled, 'yes'); ?>>
+                <strong>Enable Bundle Builder</strong>
+            </label>
+        </p>
+        <p class="description">
+            When enabled, customers visiting this product will be redirected to the bundle builder page where they can select products to include in their bundle.
+        </p>
+        
+        <?php if ($bundle_enabled === 'yes'): ?>
+            <hr style="margin: 15px 0;">
+            <p><strong>Bundle Status:</strong></p>
+            <?php if ($product_bundle && !empty($product_bundle['is_enabled'])): ?>
+                <p style="color: green;">Bundle configuration is active.</p>
+                <p>
+                    <a href="<?php echo esc_url($frontend_url . '/en/bundle-manager?productId=' . $post->ID); ?>" 
+                       target="_blank" 
+                       class="button button-secondary">
+                        Edit Bundle Configuration
+                    </a>
+                </p>
+            <?php else: ?>
+                <p style="color: orange;">Bundle is enabled but no configuration exists yet.</p>
+                <p>
+                    <a href="<?php echo esc_url($frontend_url . '/en/bundle-manager?productId=' . $post->ID); ?>" 
+                       target="_blank" 
+                       class="button button-primary">
+                        Create Bundle Configuration
+                    </a>
+                </p>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+    <style>
+        .asl-bundle-metabox .description {
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    </style>
+    <?php
+}
+
+// Save the bundle metabox data
+add_action('save_post_product', function($post_id) {
+    // Check nonce
+    if (!isset($_POST['asl_bundle_metabox_nonce']) || 
+        !wp_verify_nonce($_POST['asl_bundle_metabox_nonce'], 'asl_bundle_metabox')) {
+        return;
+    }
+    
+    // Check autosave
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    
+    // Check permissions
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    
+    // Save bundle enabled status
+    $bundle_enabled = isset($_POST['asl_bundle_enabled']) ? 'yes' : 'no';
+    update_post_meta($post_id, '_asl_bundle_enabled', $bundle_enabled);
+});
+
+// ============================================================================
+// ASL FREE GIFTS - REST API ENDPOINTS & ADMIN PAGE
+// ============================================================================
+
+// Add Free Gifts submenu under WooCommerce
+add_action('admin_menu', function() {
+    add_submenu_page(
+        'woocommerce',
+        'Free Gifts',
+        'Free Gifts',
+        'manage_woocommerce',
+        'asl-free-gifts',
+        'asl_free_gifts_render_admin_page'
+    );
+}, 99);
+
+// Enqueue admin scripts for Free Gifts page
+add_action('admin_enqueue_scripts', function($hook) {
+    if ($hook !== 'woocommerce_page_asl-free-gifts') return;
+    wp_enqueue_script('jquery');
+    wp_enqueue_style('woocommerce_admin_styles');
+});
+
+// Render Free Gifts admin page
+function asl_free_gifts_render_admin_page() {
+    if (!current_user_can('manage_woocommerce')) {
+        wp_die('You do not have sufficient permissions to access this page.');
+    }
+
+    // Handle form submission
+    if (isset($_POST['asl_free_gifts_save']) && check_admin_referer('asl_free_gifts_nonce')) {
+        asl_free_gifts_save_rules();
+        echo '<div class="notice notice-success is-dismissible"><p>Free gift rules saved successfully!</p></div>';
+    }
+
+    // Handle delete action
+    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['rule_id'])) {
+        if (check_admin_referer('asl_delete_free_gift_' . $_GET['rule_id'])) {
+            asl_free_gifts_delete_rule(sanitize_text_field($_GET['rule_id']));
+            echo '<div class="notice notice-success is-dismissible"><p>Rule deleted successfully!</p></div>';
+        }
+    }
+
+    $rules = get_option('asl_free_gifts_rules', array());
+    $products = asl_free_gifts_get_products_list();
+    $currencies = array('AED', 'SAR', 'KWD', 'BHD', 'OMR', 'QAR', 'USD');
+    
+    ?>
+    <div class="wrap">
+        <h1>Free Gift Rules</h1>
+        <p>Configure automatic free gifts based on cart value thresholds. When a customer's cart reaches the minimum value, the free gift product will be automatically added to their cart.</p>
+        
+        <form method="post" id="asl-free-gifts-form">
+            <?php wp_nonce_field('asl_free_gifts_nonce'); ?>
+            
+            <h2>Global Settings</h2>
+            <table class="form-table">
+                <tr>
+                    <th scope="row">Hide Free Gift Products from Shop</th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="asl_free_gifts_hide_from_shop" value="1" <?php checked(get_option('asl_free_gifts_hide_from_shop', true)); ?>>
+                            Hide products marked as free gifts from shop listing and search results
+                        </label>
+                    </td>
+                </tr>
+            </table>
+            
+            <h2>Free Gift Rules <button type="button" class="button" id="asl-add-free-gift-rule">+ Add New Rule</button></h2>
+            
+            <div id="asl-free-gifts-rules">
+                <?php if (empty($rules)): ?>
+                    <?php asl_free_gifts_render_rule_row(0, array(), $products, $currencies); ?>
+                <?php else: ?>
+                    <?php foreach ($rules as $index => $rule): ?>
+                        <?php asl_free_gifts_render_rule_row($index, $rule, $products, $currencies); ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+            
+            <p class="submit">
+                <input type="submit" name="asl_free_gifts_save" class="button button-primary" value="Save All Rules">
+            </p>
+        </form>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            var ruleIndex = <?php echo max(0, count($rules) - 1); ?>;
+            
+            $('#asl-add-free-gift-rule').on('click', function() {
+                ruleIndex++;
+                var template = `
+                <div class="asl-free-gift-rule" style="background:#fff;border:1px solid #ccd0d4;padding:20px;margin-bottom:20px;">
+                    <h3>Rule #${ruleIndex + 1} <button type="button" class="button asl-remove-rule" style="float:right;color:#a00;">Remove Rule</button></h3>
+                    <table class="form-table">
+                        <tr>
+                            <th>Enabled</th>
+                            <td><label><input type="checkbox" name="asl_free_gifts_rules[${ruleIndex}][enabled]" value="1" checked> Active</label></td>
+                        </tr>
+                        <tr>
+                            <th>Rule Name</th>
+                            <td><input type="text" name="asl_free_gifts_rules[${ruleIndex}][name]" class="regular-text" placeholder="e.g., Free Gift for orders over 750 AED"></td>
+                        </tr>
+                        <tr>
+                            <th>Minimum Cart Value</th>
+                            <td><input type="number" name="asl_free_gifts_rules[${ruleIndex}][min_cart_value]" class="small-text" min="0" step="0.01" value="0"></td>
+                        </tr>
+                        <tr>
+                            <th>Currency</th>
+                            <td>
+                                <select name="asl_free_gifts_rules[${ruleIndex}][currency]">
+                                    <?php foreach ($currencies as $curr): ?>
+                                    <option value="<?php echo esc_attr($curr); ?>"><?php echo esc_html($curr); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Free Gift Product</th>
+                            <td>
+                                <select name="asl_free_gifts_rules[${ruleIndex}][product_id]" class="regular-text">
+                                    <option value="">-- Select Product --</option>
+                                    <?php foreach ($products as $product): ?>
+                                    <option value="<?php echo esc_attr($product['id']); ?>"><?php echo esc_html($product['name']); ?> (ID: <?php echo esc_html($product['id']); ?>)</option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Priority</th>
+                            <td>
+                                <input type="number" name="asl_free_gifts_rules[${ruleIndex}][priority]" class="small-text" min="1" value="10">
+                                <p class="description">Lower number = higher priority. If multiple rules match, only the highest priority gift is added.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Message (EN)</th>
+                            <td><input type="text" name="asl_free_gifts_rules[${ruleIndex}][message_en]" class="large-text" placeholder="Congratulations! You've earned a free gift!"></td>
+                        </tr>
+                        <tr>
+                            <th>Message (AR)</th>
+                            <td><input type="text" name="asl_free_gifts_rules[${ruleIndex}][message_ar]" class="large-text" dir="rtl" placeholder="تهانينا! لقد حصلت على هدية مجانية!"></td>
+                        </tr>
+                    </table>
+                </div>`;
+                $('#asl-free-gifts-rules').append(template);
+            });
+            
+            $(document).on('click', '.asl-remove-rule', function() {
+                if (confirm('Are you sure you want to remove this rule?')) {
+                    $(this).closest('.asl-free-gift-rule').remove();
+                }
+            });
+        });
+        </script>
+    </div>
+    <?php
+}
+
+// Render a single rule row
+function asl_free_gifts_render_rule_row($index, $rule, $products, $currencies) {
+    $enabled = isset($rule['enabled']) ? $rule['enabled'] : true;
+    $name = isset($rule['name']) ? $rule['name'] : '';
+    $min_cart_value = isset($rule['min_cart_value']) ? $rule['min_cart_value'] : 0;
+    $currency = isset($rule['currency']) ? $rule['currency'] : 'AED';
+    $product_id = isset($rule['product_id']) ? $rule['product_id'] : '';
+    $priority = isset($rule['priority']) ? $rule['priority'] : 10;
+    $message_en = isset($rule['message_en']) ? $rule['message_en'] : '';
+    $message_ar = isset($rule['message_ar']) ? $rule['message_ar'] : '';
+    ?>
+    <div class="asl-free-gift-rule" style="background:#fff;border:1px solid #ccd0d4;padding:20px;margin-bottom:20px;">
+        <h3>Rule #<?php echo $index + 1; ?> <button type="button" class="button asl-remove-rule" style="float:right;color:#a00;">Remove Rule</button></h3>
+        <table class="form-table">
+            <tr>
+                <th>Enabled</th>
+                <td><label><input type="checkbox" name="asl_free_gifts_rules[<?php echo $index; ?>][enabled]" value="1" <?php checked($enabled); ?>> Active</label></td>
+            </tr>
+            <tr>
+                <th>Rule Name</th>
+                <td><input type="text" name="asl_free_gifts_rules[<?php echo $index; ?>][name]" value="<?php echo esc_attr($name); ?>" class="regular-text" placeholder="e.g., Free Gift for orders over 750 AED"></td>
+            </tr>
+            <tr>
+                <th>Minimum Cart Value</th>
+                <td><input type="number" name="asl_free_gifts_rules[<?php echo $index; ?>][min_cart_value]" value="<?php echo esc_attr($min_cart_value); ?>" class="small-text" min="0" step="0.01"></td>
+            </tr>
+            <tr>
+                <th>Currency</th>
+                <td>
+                    <select name="asl_free_gifts_rules[<?php echo $index; ?>][currency]">
+                        <?php foreach ($currencies as $curr): ?>
+                        <option value="<?php echo esc_attr($curr); ?>" <?php selected($currency, $curr); ?>><?php echo esc_html($curr); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Free Gift Product</th>
+                <td>
+                    <select name="asl_free_gifts_rules[<?php echo $index; ?>][product_id]" class="regular-text">
+                        <option value="">-- Select Product --</option>
+                        <?php foreach ($products as $product): ?>
+                        <option value="<?php echo esc_attr($product['id']); ?>" <?php selected($product_id, $product['id']); ?>><?php echo esc_html($product['name']); ?> (ID: <?php echo esc_html($product['id']); ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>Priority</th>
+                <td>
+                    <input type="number" name="asl_free_gifts_rules[<?php echo $index; ?>][priority]" value="<?php echo esc_attr($priority); ?>" class="small-text" min="1">
+                    <p class="description">Lower number = higher priority. If multiple rules match, only the highest priority gift is added.</p>
+                </td>
+            </tr>
+            <tr>
+                <th>Message (EN)</th>
+                <td><input type="text" name="asl_free_gifts_rules[<?php echo $index; ?>][message_en]" value="<?php echo esc_attr($message_en); ?>" class="large-text" placeholder="Congratulations! You've earned a free gift!"></td>
+            </tr>
+            <tr>
+                <th>Message (AR)</th>
+                <td><input type="text" name="asl_free_gifts_rules[<?php echo $index; ?>][message_ar]" value="<?php echo esc_attr($message_ar); ?>" class="large-text" dir="rtl" placeholder="تهانينا! لقد حصلت على هدية مجانية!"></td>
+            </tr>
+        </table>
+    </div>
+    <?php
+}
+
+// Save free gift rules
+function asl_free_gifts_save_rules() {
+    $hide_from_shop = isset($_POST['asl_free_gifts_hide_from_shop']) ? true : false;
+    update_option('asl_free_gifts_hide_from_shop', $hide_from_shop);
+    
+    $rules = array();
+    if (isset($_POST['asl_free_gifts_rules']) && is_array($_POST['asl_free_gifts_rules'])) {
+        foreach ($_POST['asl_free_gifts_rules'] as $rule) {
+            if (empty($rule['product_id'])) continue; // Skip rules without a product
+            
+            $rules[] = array(
+                'id' => isset($rule['id']) ? sanitize_text_field($rule['id']) : wp_generate_uuid4(),
+                'enabled' => isset($rule['enabled']) ? true : false,
+                'name' => sanitize_text_field($rule['name'] ?? ''),
+                'min_cart_value' => floatval($rule['min_cart_value'] ?? 0),
+                'currency' => sanitize_text_field($rule['currency'] ?? 'AED'),
+                'product_id' => intval($rule['product_id']),
+                'priority' => intval($rule['priority'] ?? 10),
+                'message_en' => sanitize_text_field($rule['message_en'] ?? ''),
+                'message_ar' => sanitize_text_field($rule['message_ar'] ?? ''),
+            );
+        }
+    }
+    
+    // Sort by priority
+    usort($rules, function($a, $b) {
+        return $a['priority'] - $b['priority'];
+    });
+    
+    update_option('asl_free_gifts_rules', $rules);
+}
+
+// Delete a single rule
+function asl_free_gifts_delete_rule($rule_id) {
+    $rules = get_option('asl_free_gifts_rules', array());
+    $rules = array_filter($rules, function($rule) use ($rule_id) {
+        return $rule['id'] !== $rule_id;
+    });
+    update_option('asl_free_gifts_rules', array_values($rules));
+}
+
+// Get list of products for dropdown
+function asl_free_gifts_get_products_list() {
+    $products = array();
+    
+    $args = array(
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+        'post_status' => 'publish',
+        'orderby' => 'title',
+        'order' => 'ASC',
+    );
+    
+    $query = new WP_Query($args);
+    
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $products[] = array(
+                'id' => get_the_ID(),
+                'name' => get_the_title(),
+            );
+        }
+        wp_reset_postdata();
+    }
+    
+    return $products;
+}
+
+// REST API endpoint to get free gift rules
+add_action('rest_api_init', function() {
+    register_rest_route('asl-free-gifts/v1', '/rules', array(
+        'methods' => 'GET',
+        'callback' => 'asl_free_gifts_api_get_rules',
+        'permission_callback' => '__return_true',
+    ));
+    
+    register_rest_route('asl-free-gifts/v1', '/settings', array(
+        'methods' => 'GET',
+        'callback' => 'asl_free_gifts_api_get_settings',
+        'permission_callback' => '__return_true',
+    ));
+});
+
+function asl_free_gifts_api_get_rules($request) {
+    $rules = get_option('asl_free_gifts_rules', array());
+    $currency = $request->get_param('currency');
+    
+    // Filter only enabled rules
+    $active_rules = array_filter($rules, function($rule) {
+        return !empty($rule['enabled']);
+    });
+    
+    // Filter by currency if specified
+    if ($currency) {
+        $active_rules = array_filter($active_rules, function($rule) use ($currency) {
+            return $rule['currency'] === $currency;
+        });
+    }
+    
+    // Enrich with product data
+    $enriched_rules = array();
+    foreach ($active_rules as $rule) {
+        $product = wc_get_product($rule['product_id']);
+        if ($product) {
+            $rule['product'] = array(
+                'id' => $product->get_id(),
+                'name' => $product->get_name(),
+                'slug' => $product->get_slug(),
+                'price' => $product->get_price(),
+                'image' => wp_get_attachment_url($product->get_image_id()),
+            );
+        }
+        $enriched_rules[] = $rule;
+    }
+    
+    return array(
+        'success' => true,
+        'rules' => array_values($enriched_rules),
+    );
+}
+
+function asl_free_gifts_api_get_settings() {
+    return array(
+        'success' => true,
+        'hide_from_shop' => get_option('asl_free_gifts_hide_from_shop', true),
+    );
+}
+
+// Get array of free gift product IDs (for hiding from shop)
+function asl_free_gifts_get_product_ids() {
+    $rules = get_option('asl_free_gifts_rules', array());
+    $product_ids = array();
+    
+    foreach ($rules as $rule) {
+        if (!empty($rule['product_id'])) {
+            $product_ids[] = intval($rule['product_id']);
+        }
+    }
+    
+    return array_unique($product_ids);
+}
+
+// Hide free gift products from shop if setting is enabled
+add_action('woocommerce_product_query', function($query) {
+    if (is_admin()) return;
+    if (!get_option('asl_free_gifts_hide_from_shop', true)) return;
+    
+    $free_gift_ids = asl_free_gifts_get_product_ids();
+    if (empty($free_gift_ids)) return;
+    
+    $query->set('post__not_in', array_merge(
+        $query->get('post__not_in') ?: array(),
+        $free_gift_ids
+    ));
+});
+
+// Also hide from WooCommerce Store API (for headless/Next.js frontend)
+add_filter('woocommerce_rest_product_object_query', function($args, $request) {
+    if (!get_option('asl_free_gifts_hide_from_shop', true)) return $args;
+    
+    $free_gift_ids = asl_free_gifts_get_product_ids();
+    if (empty($free_gift_ids)) return $args;
+    
+    $existing_exclude = isset($args['post__not_in']) ? $args['post__not_in'] : array();
+    $args['post__not_in'] = array_merge($existing_exclude, $free_gift_ids);
+    
+    return $args;
+}, 10, 2);
+
+// Hide from search results
+add_filter('woocommerce_product_search_results', function($product_ids) {
+    if (!get_option('asl_free_gifts_hide_from_shop', true)) return $product_ids;
+    
+    $free_gift_ids = asl_free_gifts_get_product_ids();
+    if (empty($free_gift_ids)) return $product_ids;
+    
+    return array_diff($product_ids, $free_gift_ids);
+});
