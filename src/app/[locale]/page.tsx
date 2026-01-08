@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getProducts, getCategories, getFreeGiftProductIds } from "@/lib/api/woocommerce";
+import { getProducts, getCategories, getFreeGiftProductIds, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
 import { getHomePageSettings } from "@/lib/api/wordpress";
 import {
   HeroSlider,
@@ -44,12 +44,13 @@ export default async function HomePage({ params }: HomePageProps) {
 
   // Fetch all data in parallel
   // Fetch both localized categories (for names) and English categories (for URL slugs)
-  const [{ products: allProducts }, categories, englishCategories, homeSettings, giftProductIds] = await Promise.all([
+  const [{ products: allProducts }, categories, englishCategories, homeSettings, giftProductIds, bundleProductSlugs] = await Promise.all([
     getProducts({ per_page: 20, locale: locale as Locale }),
     getCategories(locale as Locale),
     getCategories("en"), // Always fetch English categories for URL slugs
     getHomePageSettings(locale as Locale),
     getFreeGiftProductIds(),
+    getBundleEnabledProductSlugs(),
   ]);
 
   // Create a mapping of localized category ID to English slug for URL generation
@@ -147,6 +148,7 @@ export default async function HomePage({ params }: HomePageProps) {
               isRTL={isRTL}
               viewAllText={sectionTexts.viewAll}
               className="bg-[#f7f6f2]"
+              bundleProductSlugs={bundleProductSlugs}
             />
 
       {/* Shop by Category */}
@@ -167,6 +169,7 @@ export default async function HomePage({ params }: HomePageProps) {
         locale={locale as Locale}
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
+        bundleProductSlugs={bundleProductSlugs}
       />
 
       {/* Bestseller Products Section */}
@@ -177,6 +180,7 @@ export default async function HomePage({ params }: HomePageProps) {
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
         className="bg-[#f7f6f2]"
+        bundleProductSlugs={bundleProductSlugs}
       />
 
       {/* Our Collections */}
