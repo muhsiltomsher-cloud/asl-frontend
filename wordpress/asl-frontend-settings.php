@@ -617,6 +617,13 @@ add_action('admin_head', function() {
 // ============================================================================
 
 add_action('rest_api_init', function() {
+    // Get bundle config by product slug (for frontend detection)
+    register_rest_route('asl-bundles/v1', '/config', array(
+        'methods' => 'GET',
+        'callback' => 'asl_bundles_get_config_by_slug',
+        'permission_callback' => '__return_true',
+    ));
+
     // Get all bundles or filter by product_id
     register_rest_route('asl-bundles/v1', '/bundles', array(
         'methods' => 'GET',
@@ -652,6 +659,89 @@ add_action('rest_api_init', function() {
         'permission_callback' => 'asl_bundles_check_permission',
     ));
 });
+
+// Get bundle configuration by product slug
+function asl_bundles_get_config_by_slug($request) {
+    $slug = $request->get_param('slug');
+    
+    if (empty($slug)) {
+        return new WP_Error('missing_slug', 'Product slug is required', array('status' => 400));
+    }
+    
+    // Find product by slug
+    $args = array(
+        'post_type' => 'product',
+        'name' => $slug,
+        'posts_per_page' => 1,
+    );
+    $products = get_posts($args);
+    
+    if (empty($products)) {
+        return new WP_Error('product_not_found', 'Product not found', array('status' => 404));
+    }
+    
+    $product_id = $products[0]->ID;
+    
+    // Check if bundle is enabled for this product via post meta
+    $bundle_enabled = get_post_meta($product_id, '_asl_bundle_enabled', true);
+    
+    if ($bundle_enabled !== 'yes') {
+        return null;
+    }
+    
+    // Get bundle configuration from bundles data
+    $bundles = get_option('asl_bundles_data', array());
+    $product_bundle = null;
+    
+    foreach ($bundles as $bundle) {
+        if (isset($bundle['product_id']) && intval($bundle['product_id']) === $product_id && !empty($bundle['is_enabled'])) {
+            $product_bundle = $bundle;
+            break;
+        }
+    }
+    
+    if (!$product_bundle) {
+        // Return basic config if bundle is enabled but no detailed config exists
+        return array(
+            'product_id' => $product_id,
+            'enabled' => true,
+            'eligible_products' => array(),
+            'unique_products' => array(),
+            'total_slots' => 5,
+            'required_slots' => 3,
+        );
+    }
+    
+    // Transform bundle data to config format expected by frontend
+    $eligible_products = array();
+    $eligible_categories = array();
+    
+    if (!empty($product_bundle['items'])) {
+        foreach ($product_bundle['items'] as $item) {
+            if (!empty($item['rule']['products'])) {
+                $eligible_products = array_merge($eligible_products, $item['rule']['products']);
+            }
+            if (!empty($item['rule']['categories'])) {
+                $eligible_categories = array_merge($eligible_categories, $item['rule']['categories']);
+            }
+        }
+    }
+    
+    return array(
+        'product_id' => $product_id,
+        'bundle_id' => $product_bundle['id'] ?? null,
+        'bundle_type' => $product_bundle['bundle_type'] ?? 'custom',
+        'eligible_categories' => array_unique($eligible_categories),
+        'eligible_products' => array_unique($eligible_products),
+        'unique_products' => array(),
+        'total_slots' => count($product_bundle['items'] ?? array()) ?: 5,
+        'required_slots' => 3,
+        'shipping_fee' => $product_bundle['shipping_fee'] ?? 'apply_to_each_bundled_product',
+        'enabled' => true,
+        'title' => $product_bundle['title'] ?? '',
+        'pricing' => $product_bundle['pricing'] ?? null,
+    );
+}
 
 function asl_bundles_check_permission() {
     return current_user_can('manage_options') || current_user_can('manage_woocommerce');
@@ -790,6 +880,109 @@ function asl_bundles_sanitize_bundle($data) {
     
     return $bundle;
 }
+
+// ============================================================================
+// ASL BUNDLES - PRODUCT METABOX FOR ENABLING BUNDLES
+// ============================================================================
+
+// Add metabox to product edit page
+add_action('add_meta_boxes', function() {
+    add_meta_box(
+        'asl_bundle_settings',
+        'ASL Bundle Settings',
+        'asl_bundle_metabox_render',
+        'product',
+        'side',
+        'high'
+    );
+});
+
+// Render the bundle metabox
+function asl_bundle_metabox_render($post) {
+    wp_nonce_field('asl_bundle_metabox', 'asl_bundle_metabox_nonce');
+    
+    $bundle_enabled = get_post_meta($post->ID, '_asl_bundle_enabled', true);
+    $bundles = get_option('asl_bundles_data', array());
+    
+    // Find existing bundle config for this product
+    $product_bundle = null;
+    foreach ($bundles as $bundle) {
+        if (isset($bundle['product_id']) && intval($bundle['product_id']) === $post->ID) {
+            $product_bundle = $bundle;
+            break;
+        }
+    }
+    
+    // Get frontend URL from options or use default
+    $frontend_url = get_option('asl_frontend_url', 'https://aslfrontend.stagingndemo.com');
+    ?>
+    <div class="asl-bundle-metabox">
+        <p>
+            <label>
+                <input type="checkbox" name="asl_bundle_enabled" value="yes" <?php checked($bundle_enabled, 'yes'); ?>>
+                <strong>Enable Bundle Builder</strong>
+            </label>
+        </p>
+        <p class="description">
+            When enabled, customers visiting this product will be redirected to the bundle builder page where they can select products to include in their bundle.
+        </p>
+        
+        <?php if ($bundle_enabled === 'yes'): ?>
+            <hr style="margin: 15px 0;">
+            <p><strong>Bundle Status:</strong></p>
+            <?php if ($product_bundle && !empty($product_bundle['is_enabled'])): ?>
+                <p style="color: green;">Bundle configuration is active.</p>
+                <p>
+                    <a href="<?php echo esc_url($frontend_url . '/en/bundle-manager?productId=' . $post->ID); ?>" 
+                       target="_blank" 
+                       class="button button-secondary">
+                        Edit Bundle Configuration
+                    </a>
+                </p>
+            <?php else: ?>
+                <p style="color: orange;">Bundle is enabled but no configuration exists yet.</p>
+                <p>
+                    <a href="<?php echo esc_url($frontend_url . '/en/bundle-manager?productId=' . $post->ID); ?>" 
+                       target="_blank" 
+                       class="button button-primary">
+                        Create Bundle Configuration
+                    </a>
+                </p>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+    <style>
+        .asl-bundle-metabox .description {
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+    </style>
+    <?php
+}
+
+// Save the bundle metabox data
+add_action('save_post_product', function($post_id) {
+    // Check nonce
+    if (!isset($_POST['asl_bundle_metabox_nonce']) || 
+        !wp_verify_nonce($_POST['asl_bundle_metabox_nonce'], 'asl_bundle_metabox')) {
+        return;
+    }
+    
+    // Check autosave
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    
+    // Check permissions
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    
+    // Save bundle enabled status
+    $bundle_enabled = isset($_POST['asl_bundle_enabled']) ? 'yes' : 'no';
+    update_post_meta($post_id, '_asl_bundle_enabled', $bundle_enabled);
+});
 
 // ============================================================================
 // ASL FREE GIFTS - REST API ENDPOINTS & ADMIN PAGE
