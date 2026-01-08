@@ -12,6 +12,9 @@ import type { Locale } from "@/config/site";
 const STORAGE_KEY = "asl_product_view_preference";
 const PREFERENCE_CHANGE_EVENT = "asl_preference_change";
 
+let cachedPreference: ViewPreference | null = null;
+let cachedStorageValue: string | null = null;
+
 function getProductPrice(product: WCProduct): number {
   const priceStr = product.prices?.price || "0";
   const price = parseFloat(priceStr);
@@ -71,19 +74,25 @@ const DEFAULT_PREFERENCE: ViewPreference = {
 function getPreferenceSnapshot(): ViewPreference {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === cachedStorageValue && cachedPreference !== null) {
+      return cachedPreference;
+    }
+    cachedStorageValue = stored;
     if (stored) {
       const parsed = JSON.parse(stored) as ViewPreference;
       if (
         (parsed.viewMode === "grid" || parsed.viewMode === "list") &&
         [2, 3, 4, 5].includes(parsed.gridColumns)
       ) {
-        return parsed;
+        cachedPreference = parsed;
+        return cachedPreference;
       }
     }
   } catch {
     // Ignore localStorage errors
   }
-  return DEFAULT_PREFERENCE;
+  cachedPreference = DEFAULT_PREFERENCE;
+  return cachedPreference;
 }
 
 function getServerSnapshot(): ViewPreference {
