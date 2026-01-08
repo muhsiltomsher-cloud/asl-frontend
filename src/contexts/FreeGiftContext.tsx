@@ -24,6 +24,13 @@ export interface FreeGiftRule {
   };
 }
 
+interface GiftProgress {
+  hasNextGift: boolean;
+  amountNeeded: number;
+  nextGiftRule: FreeGiftRule | null;
+  currentSubtotal: number;
+}
+
 interface FreeGiftContextType {
   rules: FreeGiftRule[];
   isLoading: boolean;
@@ -34,6 +41,7 @@ interface FreeGiftContextType {
   getFreeGiftProductIds: () => number[];
   refreshRules: () => Promise<void>;
   getGiftMessages: (locale: string) => string[];
+  getGiftProgress: () => GiftProgress;
 }
 
 const FreeGiftContext = createContext<FreeGiftContextType | undefined>(undefined);
@@ -124,6 +132,48 @@ export function FreeGiftProvider({ children }: { children: React.ReactNode }) {
       .map((gift) => locale === "ar" ? gift.message_ar : gift.message_en)
       .filter((msg) => msg && msg.trim() !== "");
   }, [activeGifts]);
+
+  const getGiftProgress = useCallback((): GiftProgress => {
+    // Calculate subtotal without gift items
+    const giftProductIds = new Set(rules.map(r => r.product_id));
+    const subtotalValue = parseFloat(cartSubtotal) / divisor;
+    
+    // Calculate gift items total to subtract from subtotal
+    let giftsTotalValue = 0;
+    for (const item of cartItems) {
+      if (giftProductIds.has(item.id)) {
+        giftsTotalValue += (parseFloat(item.price) / divisor * item.quantity.value);
+      }
+    }
+    const subtotalWithoutGifts = subtotalValue - giftsTotalValue;
+
+    // Find enabled rules for current currency, sorted by min_cart_value
+    const eligibleRules = rules
+      .filter((rule) => rule.enabled && rule.currency === currency)
+      .sort((a, b) => a.min_cart_value - b.min_cart_value);
+
+    // Find the next gift rule that hasn't been unlocked yet
+    const nextGiftRule = eligibleRules.find((rule) => {
+      return subtotalWithoutGifts < rule.min_cart_value;
+    });
+
+    if (nextGiftRule) {
+      const amountNeeded = nextGiftRule.min_cart_value - subtotalWithoutGifts;
+      return {
+        hasNextGift: true,
+        amountNeeded: Math.ceil(amountNeeded),
+        nextGiftRule,
+        currentSubtotal: subtotalWithoutGifts,
+      };
+    }
+
+    return {
+      hasNextGift: false,
+      amountNeeded: 0,
+      nextGiftRule: null,
+      currentSubtotal: subtotalWithoutGifts,
+    };
+  }, [rules, cartItems, cartSubtotal, currency, divisor]);
 
   useEffect(() => {
     const processGiftLogic = async () => {
@@ -260,6 +310,7 @@ export function FreeGiftProvider({ children }: { children: React.ReactNode }) {
         getFreeGiftProductIds,
         refreshRules: fetchRules,
         getGiftMessages,
+        getGiftProgress,
       }}
     >
       {children}
