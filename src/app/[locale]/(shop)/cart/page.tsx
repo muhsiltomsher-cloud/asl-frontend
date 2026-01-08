@@ -42,7 +42,7 @@ export default function CartPage() {
     couponDiscount,
   } = useCart();
     const { isAuthenticated, user } = useAuth();
-    const { isFreeGiftItem, getGiftMessages, activeGifts } = useFreeGift();
+    const { isFreeGiftItem, activeGifts } = useFreeGift();
     const { currency } = useCurrency();
 
     const isRTL = locale === "ar";
@@ -421,13 +421,35 @@ export default function CartPage() {
               {activeGifts.length > 0 && (
                 <div className="border-t p-4 bg-gradient-to-r from-amber-50 to-orange-50">
                   <div className="flex items-start gap-3">
-                    <Gift className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <div className="space-y-1">
-                      {getGiftMessages(locale).map((message, index) => (
-                        <p key={index} className="text-sm font-medium text-amber-800">
-                          {message}
-                        </p>
-                      ))}
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex-shrink-0">
+                      <Gift className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-semibold text-amber-900 mb-2">
+                        {isRTL ? "تهانينا! لقد حصلت على هدايا مجانية" : "Congratulations! You've unlocked free gifts"}
+                      </h3>
+                      <div className="space-y-2">
+                        {activeGifts.map((gift, index) => (
+                          <div key={index} className="flex items-center gap-2 bg-white/60 rounded-lg px-3 py-2">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
+                              <Gift className="h-3 w-3 text-amber-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-amber-900">
+                                {gift.product?.name || (isRTL ? "هدية مجانية" : "Free Gift")}
+                              </p>
+                              {(isRTL ? gift.message_ar : gift.message_en) && (
+                                <p className="text-xs text-amber-700">
+                                  {isRTL ? gift.message_ar : gift.message_en}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                              {isRTL ? "مجاني" : "FREE"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
