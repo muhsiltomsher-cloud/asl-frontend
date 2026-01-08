@@ -11,13 +11,15 @@ import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { BundleConfig } from "@/lib/api/woocommerce";
 
+type CategoryFilter = "all" | "perfumes" | "oils" | "lotions" | "home";
+
 interface ProductOption {
   id: number;
   name: string;
   price: number;
   slug: string;
   image: string;
-  category: string;
+  category: CategoryFilter;
 }
 
 interface BuildYourOwnSetClientProps {
@@ -26,8 +28,6 @@ interface BuildYourOwnSetClientProps {
   bundleProduct?: WCProduct | null;
   bundleConfig?: BundleConfig | null;
 }
-
-type CategoryFilter = "all" | "perfumes" | "oils" | "lotions" | "home";
 
 export function BuildYourOwnSetClient({
   products,
@@ -46,9 +46,10 @@ export function BuildYourOwnSetClient({
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   // Get required and optional slots from bundle config
+  // total_slots = required_slots + optional_slots, so we calculate optional from the difference
   const requiredSlots = bundleConfig?.required_slots || 3;
-  const optionalSlots = bundleConfig?.optional_slots ?? 2;
-  const totalSlots = requiredSlots + optionalSlots;
+  const totalSlots = bundleConfig?.total_slots || 5;
+  const optionalSlots = totalSlots - requiredSlots;
 
   // Initialize selections array based on total slots
   const [selections, setSelections] = useState<(ProductOption | null)[]>(() => 
