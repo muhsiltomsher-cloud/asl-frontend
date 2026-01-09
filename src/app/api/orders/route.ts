@@ -182,6 +182,7 @@ export async function POST(request: NextRequest) {
       order: data,
       order_id: data.id,
       order_key: data.order_key,
+      payment_url: data.payment_url || null,
     });
   } catch (error) {
     return NextResponse.json(
