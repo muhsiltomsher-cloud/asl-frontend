@@ -3,27 +3,36 @@ import { siteConfig } from "@/config/site";
 
 const STORE_API_BASE = `${siteConfig.apiUrl}/wp-json/wc/store/v1`;
 
-export interface StorePaymentGateway {
-  id: string;
-  title: string;
-  description: string;
-  order: number;
-}
+const PAYMENT_METHOD_DETAILS: Record<string, { title: string; description: string }> = {
+  myfatoorah_v2: {
+    title: "Credit/Debit Card",
+    description: "Pay securely with your credit or debit card via MyFatoorah",
+  },
+  tabby_installments: {
+    title: "Tabby - Pay in Installments",
+    description: "Split your purchase into 4 interest-free payments",
+  },
+  "tamara-gateway": {
+    title: "Tamara - Buy Now Pay Later",
+    description: "Pay in easy installments with Tamara",
+  },
+  cod: {
+    title: "Cash on Delivery",
+    description: "Pay with cash upon delivery",
+  },
+  bacs: {
+    title: "Bank Transfer",
+    description: "Make your payment directly into our bank account",
+  },
+};
 
-export interface PaymentGateway {
-  id: string;
-  title: string;
-  description: string;
-  enabled: boolean;
-  order: number;
-  method_title: string;
-  method_description: string;
-  settings?: Record<string, unknown>;
+interface CartResponse {
+  payment_methods?: string[];
 }
 
 export async function GET() {
   try {
-    const url = `${STORE_API_BASE}/payment-gateways`;
+    const url = `${STORE_API_BASE}/cart`;
     
     const response = await fetch(url, {
       method: "GET",
@@ -35,29 +44,36 @@ export async function GET() {
       },
     });
 
-    const data = await response.json();
+    const data: CartResponse = await response.json();
 
     if (!response.ok) {
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: data.code || "payment_gateways_error",
-            message: data.message || "Failed to get payment gateways.",
+            code: "payment_gateways_error",
+            message: "Failed to get payment gateways.",
           },
         },
         { status: response.status }
       );
     }
 
-    const gateways = (Array.isArray(data) ? data : [])
-      .sort((a: StorePaymentGateway, b: StorePaymentGateway) => (a.order || 0) - (b.order || 0))
-      .map((gateway: StorePaymentGateway) => ({
-        id: gateway.id,
-        title: gateway.title,
-        description: gateway.description,
-        method_title: gateway.title,
-      }));
+    const paymentMethodIds = data.payment_methods || [];
+    
+    const gateways = paymentMethodIds.map((id: string, index: number) => {
+      const details = PAYMENT_METHOD_DETAILS[id] || {
+        title: id.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+        description: "",
+      };
+      return {
+        id,
+        title: details.title,
+        description: details.description,
+        method_title: details.title,
+        order: index,
+      };
+    });
 
     return NextResponse.json({ 
       success: true, 
