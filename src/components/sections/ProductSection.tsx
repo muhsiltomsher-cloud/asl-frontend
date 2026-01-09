@@ -15,6 +15,7 @@ interface ProductSectionProps {
   viewAllText?: string;
   className?: string;
   isLoading?: boolean;
+  bundleProductSlugs?: string[];
 }
 
 function ProductCardSkeleton() {
@@ -55,6 +56,7 @@ export function ProductSection({
   viewAllText = "View All",
   className = "",
   isLoading = false,
+  bundleProductSlugs = [],
 }: ProductSectionProps) {
   if (isLoading) {
     return <ProductSectionSkeleton count={settings.products_count || 4} />;
@@ -109,6 +111,7 @@ export function ProductSection({
           products={products.slice(0, settings.products_count)}
           locale={locale}
           columns={4}
+          bundleProductSlugs={bundleProductSlugs}
         />
 
         {settings.show_view_all && (
