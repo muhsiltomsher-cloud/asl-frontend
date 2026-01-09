@@ -8,6 +8,14 @@ import type { Locale } from "@/config/site";
 import type { CategorySectionSettings } from "@/types/wordpress";
 import { decodeHtmlEntities } from "@/lib/utils";
 
+interface ExtraCategoryItem {
+  id: string;
+  name: { en: string; ar: string };
+  slug: string;
+  href: string;
+  image?: string;
+}
+
 interface CategorySectionProps {
   settings: CategorySectionSettings;
   categories: WCCategory[];
@@ -18,6 +26,7 @@ interface CategorySectionProps {
   className?: string;
   isLoading?: boolean;
   englishCategorySlugs?: Record<number, string>;
+  extraItems?: ExtraCategoryItem[];
 }
 
 function CategoryCardSkeleton() {
@@ -32,7 +41,7 @@ function CategoryCardSkeleton() {
   );
 }
 
-export function CategorySectionSkeleton({ count = 4 }: { count?: number }) {
+export function CategorySectionSkeleton({ count = 6 }: { count?: number }) {
   return (
     <section className="bg-[#f7f6f2] py-12 md:py-16">
       <div className="container mx-auto px-4">
@@ -40,7 +49,7 @@ export function CategorySectionSkeleton({ count = 4 }: { count?: number }) {
           <Skeleton className="mx-auto h-8 w-48 md:h-9" />
           <Skeleton className="mx-auto mt-2 h-5 w-64" />
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6 md:gap-6">
           {Array.from({ length: count }).map((_, i) => (
             <CategoryCardSkeleton key={i} />
           ))}
@@ -59,9 +68,10 @@ export function CategorySection({
   className = "",
   isLoading = false,
   englishCategorySlugs = {},
+  extraItems = [],
 }: CategorySectionProps) {
   if (isLoading) {
-    return <CategorySectionSkeleton count={settings.categories_count || 4} />;
+    return <CategorySectionSkeleton count={settings.categories_count || 6} />;
   }
 
   if (!settings.enabled || categories.length === 0) {
@@ -115,26 +125,55 @@ export function CategorySection({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6 md:gap-6">
           {displayCategories.map((category) => {
-            // Use English slug for URL (falls back to localized slug if not available)
             const categorySlugForUrl = englishCategorySlugs[category.id] || category.slug;
             return (
+              <Link
+                key={category.slug}
+                href={`/${locale}/category/${categorySlugForUrl}`}
+                className="group flex flex-col"
+              >
+                <div className="relative aspect-[3/2] overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-lg">
+                  {category.image?.src ? (
+                    <Image
+                      src={category.image.src}
+                      alt={category.image.alt || decodeHtmlEntities(category.name)}
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-stone-200">
+                      <span className="text-stone-400">No image</span>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 text-center">
+                  <h3 className="text-base font-semibold text-amber-900 transition-colors group-hover:text-amber-700 md:text-lg">
+                    {decodeHtmlEntities(category.name)}
+                  </h3>
+                </div>
+              </Link>
+            );
+          })}
+          {extraItems.map((item) => (
             <Link
-              key={category.slug}
-              href={`/${locale}/category/${categorySlugForUrl}`}
+              key={item.id}
+              href={item.href}
               className="group flex flex-col"
             >
               <div className="relative aspect-[3/2] overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-lg">
-                {category.image?.src ? (
-                                    <Image
-                                      src={category.image.src}
-                                      alt={category.image.alt || decodeHtmlEntities(category.name)}
-                                      fill
-                                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 25vw"
-                                      className="object-contain transition-transform duration-300 group-hover:scale-105"
-                                      loading="lazy"
-                                    />
+                {item.image ? (
+                  <Image
+                    src={item.image}
+                    alt={item.name[locale]}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-stone-200">
                     <span className="text-stone-400">No image</span>
@@ -142,13 +181,12 @@ export function CategorySection({
                 )}
               </div>
               <div className="mt-3 text-center">
-                                <h3 className="text-base font-semibold text-amber-900 transition-colors group-hover:text-amber-700 md:text-lg">
-                                  {decodeHtmlEntities(category.name)}
-                                </h3>
+                <h3 className="text-base font-semibold text-amber-900 transition-colors group-hover:text-amber-700 md:text-lg">
+                  {item.name[locale]}
+                </h3>
               </div>
             </Link>
-          );
-          })}
+          ))}
         </div>
 
         {settings.show_view_all && (
