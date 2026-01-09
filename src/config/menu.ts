@@ -53,6 +53,40 @@ export const navigationItems: NavigationItem[] = [
 ];
 
 /**
+ * Static Header Category Links
+ *
+ * Category links displayed in the header navigation.
+ * Order: Oils, Gift Sets, Perfumes, Personal Care, Home Fragrances
+ */
+export const headerCategoryLinks: NavigationItem[] = [
+  {
+    name: { en: "Shop All", ar: "تسوق الكل" },
+    href: "/shop",
+    hasMegaMenu: true,
+  },
+  {
+    name: { en: "Oils", ar: "الزيوت" },
+    href: "/category/fragrance-oils",
+  },
+  {
+    name: { en: "Gift Sets", ar: "مجموعات الهدايا" },
+    href: "/category/gift-sets",
+  },
+  {
+    name: { en: "Perfumes", ar: "العطور" },
+    href: "/category/perfumes",
+  },
+  {
+    name: { en: "Personal Care", ar: "العناية الشخصية" },
+    href: "/category/personal-care",
+  },
+  {
+    name: { en: "Home Fragrances", ar: "عطور المنزل" },
+    href: "/category/home-fragrances",
+  },
+];
+
+/**
  * Get navigation items for a specific locale
  */
 export function getNavigationItems(locale: Locale) {
@@ -60,6 +94,18 @@ export function getNavigationItems(locale: Locale) {
     name: item.name[locale],
     href: `/${locale}${item.href}`,
     hasMegaMenu: item.hasMegaMenu,
+  }));
+}
+
+/**
+ * Get header category links for a specific locale
+ */
+export function getHeaderCategoryLinks(locale: Locale) {
+  return headerCategoryLinks.map((item, index) => ({
+    id: index + 1,
+    name: item.name[locale],
+    href: `/${locale}${item.href}`,
+    hasMegaMenu: item.hasMegaMenu ?? false,
   }));
 }
 
