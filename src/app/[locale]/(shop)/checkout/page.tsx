@@ -335,7 +335,14 @@ export default function CheckoutPage() {
       }
       clearSelectedCoupons();
 
-      router.push(`/${locale}/order-confirmation?order_id=${data.order_id}&order_key=${data.order_key}`);
+      // Check if payment gateway requires redirect (e.g., MyFatoorah, Tabby, Tamara)
+      if (data.payment_url) {
+        // Redirect to external payment gateway
+        window.location.href = data.payment_url;
+      } else {
+        // For COD and other non-redirect payment methods, go to order confirmation
+        router.push(`/${locale}/order-confirmation?order_id=${data.order_id}&order_key=${data.order_key}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred while placing your order");
       setIsSubmitting(false);
