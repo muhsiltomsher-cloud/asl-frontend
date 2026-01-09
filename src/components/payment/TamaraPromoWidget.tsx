@@ -48,11 +48,12 @@ interface TamaraPromoWidgetProps {
 export function TamaraPromoWidget({ price, currency, locale }: TamaraPromoWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  
+  // Get public key at module level for conditional rendering
+  const publicKey = process.env.NEXT_PUBLIC_TAMARA_PUBLIC_KEY;
 
   useEffect(() => {
     if (initialized.current) return;
-
-    const publicKey = process.env.NEXT_PUBLIC_TAMARA_PUBLIC_KEY;
 
     if (!publicKey || price <= 0) return;
 
@@ -87,10 +88,10 @@ export function TamaraPromoWidget({ price, currency, locale }: TamaraPromoWidget
         existingScript.remove();
       }
     };
-  }, [price, currency, locale]);
+  }, [price, currency, locale, publicKey]);
 
   // Don't render if price is too low or no public key
-  if (price <= 0) return null;
+  if (price <= 0 || !publicKey) return null;
 
   // Format price based on currency
   const formattedPrice = currency === "KWD" ? price.toFixed(3) : price.toFixed(2);
