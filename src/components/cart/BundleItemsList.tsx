@@ -137,18 +137,26 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
     return null;
   }
 
-  const bundleTotal = getBundleItemsTotal(bundleItems);
+  // Get the cart item quantity (how many bundles are in cart)
+  const cartQuantity = item.quantity?.value || 1;
+
+  // Calculate base totals (for 1 bundle)
+  const baseBundleTotal = getBundleItemsTotal(bundleItems);
   
-  // Get box price - pass bundleTotal for fallback calculation
-  const boxPrice = getBoxPrice(item, bundleTotal);
+  // Get box price per bundle - pass baseBundleTotal for fallback calculation
+  const baseBoxPrice = getBoxPrice(item, baseBundleTotal);
+  
+  // Multiply by cart quantity for display
+  const bundleTotal = baseBundleTotal * cartQuantity;
+  const boxPrice = baseBoxPrice !== null ? baseBoxPrice * cartQuantity : null;
   
   // Separate regular items from add-ons
   const regularItems = bundleItems.filter(bi => !bi.is_addon);
   const addonItems = bundleItems.filter(bi => bi.is_addon);
   
-  // Calculate totals for each category
-  const regularItemsTotal = getBundleItemsTotal(regularItems);
-  const addonItemsTotal = getBundleItemsTotal(addonItems);
+  // Calculate totals for each category (multiplied by cart quantity)
+  const regularItemsTotal = getBundleItemsTotal(regularItems) * cartQuantity;
+  const addonItemsTotal = getBundleItemsTotal(addonItems) * cartQuantity;
 
   // Calculate total (items + box)
   const totalPrice = bundleTotal + (boxPrice || 0);
@@ -163,17 +171,19 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
             <span className="font-medium">{isRTL ? "المنتجات:" : "Products:"}</span>
             <ul className="mt-0.5 space-y-0.5">
               {regularItems.map((bi, idx) => {
-                const price = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
-                const qty = bi.quantity || 1;
+                const basePrice = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
+                const baseQty = bi.quantity || 1;
+                const displayQty = baseQty * cartQuantity;
+                const displayPrice = basePrice !== undefined ? basePrice * cartQuantity : undefined;
                 return (
                   <li key={`${bi.product_id}-${idx}`} className="flex items-center justify-between gap-1">
                     <span className="flex items-center gap-1">
                       <span className="h-1 w-1 rounded-full bg-amber-500 flex-shrink-0"></span>
                       <span className="truncate">{bi.name || `Product #${bi.product_id}`}</span>
-                      <span className="text-gray-400 flex-shrink-0">x{qty}</span>
+                      <span className="text-gray-400 flex-shrink-0">x{displayQty}</span>
                     </span>
-                    {showPrices && price !== undefined && price > 0 && (
-                      <FormattedPrice price={price} className="text-xs text-gray-400 flex-shrink-0" iconSize="xs" />
+                    {showPrices && displayPrice !== undefined && displayPrice > 0 && (
+                      <FormattedPrice price={displayPrice} className="text-xs text-gray-400 flex-shrink-0" iconSize="xs" />
                     )}
                   </li>
                 );
@@ -196,17 +206,19 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
             </div>
             <ul className="mt-0.5 space-y-0.5">
               {addonItems.map((bi, idx) => {
-                const price = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
-                const qty = bi.quantity || 1;
+                const basePrice = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
+                const baseQty = bi.quantity || 1;
+                const displayQty = baseQty * cartQuantity;
+                const displayPrice = basePrice !== undefined ? basePrice * cartQuantity : undefined;
                 return (
                   <li key={`addon-${bi.product_id}-${idx}`} className="flex items-center justify-between gap-1">
                     <span className="flex items-center gap-1">
                       <span className="h-1 w-1 rounded-full bg-amber-600 flex-shrink-0"></span>
                       <span className="truncate">{bi.name || `Product #${bi.product_id}`}</span>
-                      <span className="text-amber-400 flex-shrink-0">x{qty}</span>
+                      <span className="text-amber-400 flex-shrink-0">x{displayQty}</span>
                     </span>
-                    {showPrices && price !== undefined && price > 0 && (
-                      <FormattedPrice price={price} className="text-xs text-amber-500 flex-shrink-0" iconSize="xs" />
+                    {showPrices && displayPrice !== undefined && displayPrice > 0 && (
+                      <FormattedPrice price={displayPrice} className="text-xs text-amber-500 flex-shrink-0" iconSize="xs" />
                     )}
                   </li>
                 );
@@ -257,17 +269,19 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
           <p className="mb-2 text-xs font-medium text-gray-600">{isRTL ? "المنتجات:" : "Products:"}</p>
           <ul className="space-y-1.5">
             {regularItems.map((bi, idx) => {
-              const price = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
-              const qty = bi.quantity || 1;
+              const basePrice = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
+              const baseQty = bi.quantity || 1;
+              const displayQty = baseQty * cartQuantity;
+              const displayPrice = basePrice !== undefined ? basePrice * cartQuantity : undefined;
               return (
                 <li key={`${bi.product_id}-${idx}`} className="flex items-center justify-between gap-2 text-xs">
                   <span className="flex items-center gap-1.5 text-gray-600">
                     <span className="h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
                     <span>{bi.name || `Product #${bi.product_id}`}</span>
-                    <span className="text-gray-400">x{qty}</span>
+                    <span className="text-gray-400">x{displayQty}</span>
                   </span>
-                  {showPrices && price !== undefined && price > 0 && (
-                    <FormattedPrice price={price} className="text-xs text-gray-500 flex-shrink-0" iconSize="xs" />
+                  {showPrices && displayPrice !== undefined && displayPrice > 0 && (
+                    <FormattedPrice price={displayPrice} className="text-xs text-gray-500 flex-shrink-0" iconSize="xs" />
                   )}
                 </li>
               );
@@ -290,17 +304,19 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
           </div>
           <ul className="space-y-1.5">
             {addonItems.map((bi, idx) => {
-              const price = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
-              const qty = bi.quantity || 1;
+              const basePrice = typeof bi.price === "string" ? parseFloat(bi.price) : bi.price;
+              const baseQty = bi.quantity || 1;
+              const displayQty = baseQty * cartQuantity;
+              const displayPrice = basePrice !== undefined ? basePrice * cartQuantity : undefined;
               return (
                 <li key={`addon-${bi.product_id}-${idx}`} className="flex items-center justify-between gap-2 text-xs">
                   <span className="flex items-center gap-1.5 text-amber-700">
                     <span className="h-1.5 w-1.5 rounded-full bg-amber-600 flex-shrink-0"></span>
                     <span>{bi.name || `Product #${bi.product_id}`}</span>
-                    <span className="text-amber-400">x{qty}</span>
+                    <span className="text-amber-400">x{displayQty}</span>
                   </span>
-                  {showPrices && price !== undefined && price > 0 && (
-                    <FormattedPrice price={price} className="text-xs text-amber-500 flex-shrink-0" iconSize="xs" />
+                  {showPrices && displayPrice !== undefined && displayPrice > 0 && (
+                    <FormattedPrice price={displayPrice} className="text-xs text-amber-500 flex-shrink-0" iconSize="xs" />
                   )}
                 </li>
               );
