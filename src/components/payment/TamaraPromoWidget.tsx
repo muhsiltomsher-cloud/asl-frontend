@@ -8,6 +8,7 @@ declare global {
     TamaraProductWidget?: {
       init: (config: {
         lang: string;
+        country: string;
         currency: string;
         publicKey: string;
       }) => void;
@@ -15,6 +16,7 @@ declare global {
     };
     tamaraWidgetConfig?: {
       lang: string;
+      country: string;
       currency: string;
       publicKey: string;
     };
@@ -49,17 +51,20 @@ export function TamaraPromoWidget({ price, currency, locale }: TamaraPromoWidget
   const containerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
   
-  // Get public key at module level for conditional rendering
+  // Get public key and country at module level for conditional rendering
   const publicKey = process.env.NEXT_PUBLIC_TAMARA_PUBLIC_KEY;
+  // Country code for Tamara widget (SA for Saudi Arabia, AE for UAE)
+  const country = process.env.NEXT_PUBLIC_TAMARA_COUNTRY || "AE";
 
   useEffect(() => {
     if (initialized.current) return;
 
     if (!publicKey || price <= 0) return;
 
-    // Set up Tamara widget config
+    // Set up Tamara widget config with required country parameter
     window.tamaraWidgetConfig = {
       lang: locale === "ar" ? "ar" : "en",
+      country: country,
       currency: currency.toUpperCase(),
       publicKey: publicKey,
     };
@@ -72,6 +77,7 @@ export function TamaraPromoWidget({ price, currency, locale }: TamaraPromoWidget
       if (window.TamaraProductWidget) {
         window.TamaraProductWidget.init({
           lang: locale === "ar" ? "ar" : "en",
+          country: country,
           currency: currency.toUpperCase(),
           publicKey: publicKey,
         });
@@ -88,7 +94,7 @@ export function TamaraPromoWidget({ price, currency, locale }: TamaraPromoWidget
         existingScript.remove();
       }
     };
-  }, [price, currency, locale, publicKey]);
+  }, [price, currency, locale, publicKey, country]);
 
   // Don't render if price is too low or no public key
   if (price <= 0 || !publicKey) return null;
