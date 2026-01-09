@@ -71,15 +71,30 @@ select:disabled,
   cursor: not-allowed;
 }
 
-/* Tabby and Tamara widget transparent backgrounds */
+/* Tabby and Tamara widget styling - transparent backgrounds, smaller font, website font */
 #tabby-promo-widget,
 #tabby-promo-widget * {
   background: transparent !important;
   background-color: transparent !important;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
 }
 
 tamara-widget,
 tamara-widget * {
   background: transparent !important;
   background-color: transparent !important;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+}
+
+/* Arabic font for payment widgets */
+[lang="ar"] #tabby-promo-widget,
+[lang="ar"] #tabby-promo-widget * {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif !important;
+}
+
+[lang="ar"] tamara-widget,
+[lang="ar"] tamara-widget * {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif !important;
 }
