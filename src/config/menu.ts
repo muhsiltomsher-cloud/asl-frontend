@@ -70,11 +70,11 @@ export const headerCategoryLinks: NavigationItem[] = [
   },
   {
     name: { en: "Gift Sets", ar: "مجموعات الهدايا" },
-    href: "/category/gift-sets",
+    href: "/category/gifts-set",
   },
   {
     name: { en: "Perfumes", ar: "العطور" },
-    href: "/category/perfumes",
+    href: "/category/perfumes-oils",
   },
   {
     name: { en: "Personal Care", ar: "العناية الشخصية" },
@@ -253,7 +253,7 @@ export const megaMenuCategories: MenuCategory[] = [
   {
     id: 2,
     name: { en: "Gift Sets", ar: "مجموعات الهدايا" },
-    slug: "gift-sets",
+    slug: "gifts-set",
     image: "",
     children: [
       { id: 201, name: { en: "For Him", ar: "له" }, slug: "gift-sets-for-him" },
@@ -264,7 +264,7 @@ export const megaMenuCategories: MenuCategory[] = [
   {
     id: 3,
     name: { en: "Perfumes", ar: "العطور" },
-    slug: "perfumes",
+    slug: "perfumes-oils",
     image: "",
     children: [
       { id: 301, name: { en: "Men's Perfumes", ar: "عطور رجالية" }, slug: "mens-perfumes" },
