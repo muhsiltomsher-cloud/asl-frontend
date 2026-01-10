@@ -66,9 +66,9 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-50 transform transition-all duration-300 ease-out",
+        "fixed bottom-0 left-0 right-0 z-[60] transform transition-all duration-300 ease-out",
         "bg-white border-t border-gray-200 shadow-lg",
-        "md:bottom-4 md:left-4 md:right-4 md:rounded-xl md:border md:max-w-lg"
+        "md:bottom-4 md:left-auto md:right-4 md:rounded-xl md:border md:max-w-md"
       )}
       dir={isRTL ? "rtl" : "ltr"}
     >
