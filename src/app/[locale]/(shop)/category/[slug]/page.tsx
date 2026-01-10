@@ -88,7 +88,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">{decodeHtmlEntities(category.name)}</h1>
+        <h1 className="text-xl font-bold text-gray-900 md:text-2xl">{decodeHtmlEntities(category.name)}</h1>
         {category.description && (
           <p className="mt-2 text-gray-600">{category.description}</p>
         )}
