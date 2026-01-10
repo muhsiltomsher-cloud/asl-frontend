@@ -105,14 +105,14 @@ export function ProductCard({ product, locale, className }: ProductCardProps) {
         {/* Product info */}
         <div className="mt-3 space-y-1">
           {/* Category */}
-          {product.productCategories?.nodes?.[0] && (
-                        <p className="text-sm text-gray-500 md:text-base">
-                          {product.productCategories.nodes[0].name}
-                        </p>
-          )}
+                    {product.productCategories?.nodes?.[0] && (
+                      <p className="text-[10px] text-gray-500 md:text-xs">
+                        {product.productCategories.nodes[0].name}
+                      </p>
+                    )}
 
-          {/* Name */}
-                    <h3 className="text-base font-medium text-gray-900 line-clamp-2 uppercase md:text-lg">
+                    {/* Name */}
+                    <h3 className="text-xs font-medium text-gray-900 line-clamp-2 uppercase md:text-sm">
                       {product.name}
                     </h3>
 
