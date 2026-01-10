@@ -159,14 +159,14 @@ export function WCProductCard({
 
         <div className="mt-4 space-y-2">
                     {product.categories?.[0] && (
-                      <p className="text-xs font-medium uppercase tracking-wider text-amber-600">
-                        {decodeHtmlEntities(product.categories[0].name)}
-                      </p>
+                                            <p className="text-sm font-medium uppercase tracking-wider text-amber-600 md:text-base">
+                                              {decodeHtmlEntities(product.categories[0].name)}
+                                            </p>
                     )}
 
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-amber-800 transition-colors uppercase">
-            {product.name}
-          </h3>
+                    <h3 className="text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-amber-800 transition-colors uppercase md:text-lg">
+                      {product.name}
+                    </h3>
 
           <div className="flex items-center gap-2">
             {product.on_sale ? (
