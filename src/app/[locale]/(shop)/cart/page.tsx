@@ -231,7 +231,7 @@ export default function CartPage() {
           </div>
         )}
 
-        <h1 className="mb-8 text-3xl font-bold text-gray-900">
+        <h1 className="mb-8 text-xl md:text-3xl font-bold text-gray-900">
           {texts.cart} {cartItemsCount > 0 && `(${cartItemsCount})`}
         </h1>
 

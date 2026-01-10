@@ -510,7 +510,7 @@ export default function CheckoutPage() {
           )}
         </div>
 
-        <h1 className="mb-8 text-3xl font-bold text-gray-900 font-sans">
+        <h1 className="mb-8 text-xl md:text-3xl font-bold text-gray-900 font-sans">
           {isRTL ? "الدفع" : "Checkout"}
         </h1>
 
