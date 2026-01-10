@@ -175,7 +175,7 @@ header                {parentCategories.map((category) => {
                     <li key={category.id}>
                       <div className="flex items-center">
                         <Link
-                          href={`/${locale}/shop?category=${category.slug}`}
+                          href={`/${locale}/category/${category.slug}`}
                           onClick={onClose}
                           className="flex flex-1 items-center gap-3 rounded-lg px-4 py-3 text-gray-900 font-semibold transition-all hover:bg-gray-100 active:scale-[0.98]"
                         >
@@ -226,7 +226,7 @@ header                {parentCategories.map((category) => {
                           {childCategories.map((child) => (
                             <li key={child.id}>
                               <Link
-                                href={`/${locale}/shop?category=${child.slug}`}
+                                href={`/${locale}/category/${child.slug}`}
                                 onClick={onClose}
                                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-600 transition-all hover:bg-amber-50 hover:text-amber-700"
                               >
