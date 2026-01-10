@@ -17,6 +17,7 @@ import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { LocationCurrencyBanner } from "@/components/common/LocationCurrencyBanner";
+import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
 import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings } from "@/lib/api/wordpress";
 
 interface LocaleLayoutProps {
@@ -150,6 +151,7 @@ export default async function LocaleLayout({
                             }}
                           />
                                                 <LocationCurrencyBanner locale={validLocale} />
+                                                <CookieConsentBanner locale={validLocale} />
                                                         </WishlistProvider>
                                             </FreeGiftProvider>
                     </CartProvider>
