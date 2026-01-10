@@ -1,10 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import useSWR, { mutate } from "swr";
 import type { CoCartResponse, CoCartItem } from "@/lib/api/cocart";
 import { getAuthToken } from "@/lib/api/auth";
 import { useNotification } from "./NotificationContext";
+import { useAuth } from "./AuthContext";
 
 // Cache key now includes locale for proper multilingual support
 const getCartCacheKey = (locale: string) => `/api/cart?locale=${locale}`;
@@ -85,6 +86,10 @@ export function CartProvider({ children, locale }: CartProviderProps) {
   // Use locale-aware cache key for proper multilingual support
   const cacheKey = getCartCacheKey(locale);
   
+  // Get authentication state to refresh cart after login
+  const { isAuthenticated, user } = useAuth();
+  const wasAuthenticatedRef = useRef(isAuthenticated);
+  
   // Use SWR for cart data with automatic caching and deduplication
   const { data: cart, isLoading: swrLoading, isValidating, mutate: mutateCart } = useSWR<CoCartResponse | null>(
     cacheKey,
@@ -109,6 +114,21 @@ export function CartProvider({ children, locale }: CartProviderProps) {
     }, 100);
     return () => clearTimeout(timer);
   }, [mutateCart]);
+
+  // Refresh cart when user logs in - this ensures the authenticated user's
+  // cart is loaded immediately after login
+  useEffect(() => {
+    // Check if user just logged in (transition from not authenticated to authenticated)
+    if (isAuthenticated && !wasAuthenticatedRef.current) {
+      // Small delay to ensure auth cookies are set before fetching cart
+      const timer = setTimeout(() => {
+        mutateCart();
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+    // Update the ref to track current auth state
+    wasAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated, user, mutateCart]);
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedCoupons, setSelectedCoupons] = useState<SelectedCoupon[]>([]);
