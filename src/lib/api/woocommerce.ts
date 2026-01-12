@@ -574,12 +574,31 @@ export async function getFreeGiftProductInfo(currency?: string): Promise<FreeGif
         (rule: { hide_from_shop?: boolean }) => rule.hide_from_shop === true
       );
       
-      return {
-        ids: hiddenRules.map((rule: { product_id: number }) => rule.product_id),
-        slugs: hiddenRules
-          .map((rule: { product_slug?: string }) => rule.product_slug)
-          .filter((slug: string | undefined): slug is string => !!slug),
-      };
+      const ids = hiddenRules.map((rule: { product_id: number }) => rule.product_id);
+      
+      // Try to get slugs from the rules first (if API provides them)
+      let slugs = hiddenRules
+        .map((rule: { product_slug?: string }) => rule.product_slug)
+        .filter((slug: string | undefined): slug is string => !!slug);
+      
+      // If no slugs from rules, fetch product details to get slugs
+      // This is needed because WPML assigns different product IDs per locale,
+      // but slugs remain consistent across translations
+      if (slugs.length === 0 && ids.length > 0) {
+        const productSlugs = await Promise.all(
+          ids.map(async (id: number) => {
+            try {
+              const product = await getProductById(id, "en");
+              return product?.slug;
+            } catch {
+              return undefined;
+            }
+          })
+        );
+        slugs = productSlugs.filter((slug): slug is string => !!slug);
+      }
+      
+      return { ids, slugs };
     }
     
     return { ids: [], slugs: [] };
