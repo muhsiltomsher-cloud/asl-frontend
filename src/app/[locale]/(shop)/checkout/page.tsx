@@ -330,15 +330,20 @@ export default function CheckoutPage() {
         throw new Error(data.error?.message || "Failed to create order");
       }
 
-      if (clearCart) {
-        await clearCart();
-      }
-      clearSelectedCoupons();
-
             // Check payment method type and handle accordingly
             const isMyFatoorahPayment = formData.paymentMethod.startsWith("myfatoorah");
             const isTabbyPayment = formData.paymentMethod.startsWith("tabby");
             const isTamaraPayment = formData.paymentMethod.startsWith("tamara");
+            const isExternalPayment = isMyFatoorahPayment || isTabbyPayment || isTamaraPayment;
+
+            // Only clear cart for non-external payment methods (like COD)
+            // For external payments, cart will be cleared in order-confirmation after payment is verified
+            if (!isExternalPayment) {
+              if (clearCart) {
+                await clearCart();
+              }
+              clearSelectedCoupons();
+            }
       
             const billingInfo = formData.sameAsShipping ? formData.shipping : formData.billing;
             const baseUrl = window.location.origin;
