@@ -72,8 +72,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     fetchCurrencies();
   }, []);
 
-  // Load currency from cookie after hydration to avoid SSR/client mismatch
+  // Load currency from cookie after hydration and after currencies are loaded
   useEffect(() => {
+    // Wait until currencies are loaded from API (more than just the default)
+    if (isLoading || currencies.length <= 1) return;
     if (hasHydrated.current) return;
     hasHydrated.current = true;
     
@@ -84,7 +86,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         setCurrencyState(savedCurrency);
       });
     }
-  }, [currencies]);
+  }, [currencies, isLoading]);
 
   const setCurrency = useCallback((newCurrency: Currency) => {
     setCurrencyState(newCurrency);
