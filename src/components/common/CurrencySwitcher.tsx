@@ -189,7 +189,7 @@ export function CurrencySwitcher({ className, locale = "en" }: CurrencySwitcherP
                       )}>
                         {curr.code}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="hidden text-xs text-gray-500" data-currency-symbol={curr.symbol}>
                         {curr.symbol}
                       </p>
                     </div>
