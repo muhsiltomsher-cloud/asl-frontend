@@ -2,7 +2,8 @@
  * Site Configuration
  * 
  * Main configuration file for the Aromatic Scents Lab frontend.
- * Update these values when deploying to different environments.
+ * These values are read from environment variables when available,
+ * with fallbacks for local development.
  */
 export const siteConfig = {
   // Site name - displayed in browser title, meta tags, etc.
@@ -11,18 +12,16 @@ export const siteConfig = {
   // Site description - used for SEO meta description
   description: "Premium fragrances and aromatic products",
   
-  // Frontend URL - update this when deploying to production
-  // Local: http://localhost:3000
-  // Production: https://app.aromaticscentslab.com
-  url: "https://app.aromaticscentslab.com",
+  // Frontend URL - reads from NEXT_PUBLIC_SITE_URL environment variable
+  // Fallback for local development: https://app.aromaticscentslab.com
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://app.aromaticscentslab.com",
   
-  // Open Graph image URL - used for social media sharing
-  ogImage: "https://app.aromaticscentslab.com/og.jpg",
+  // Open Graph image URL - uses the site URL for the og image
+  ogImage: `${process.env.NEXT_PUBLIC_SITE_URL || "https://app.aromaticscentslab.com"}/og.jpg`,
   
-  // WordPress/WooCommerce Backend API URL
-  // Staging: https://staging.aromaticscentslab.com
-  // Production: https://aromaticscentslab.com (or your production backend)
-  apiUrl: "https://staging.aromaticscentslab.com",
+  // WordPress/WooCommerce Backend API URL - reads from NEXT_PUBLIC_WC_API_URL environment variable
+  // Fallback for local development: https://staging.aromaticscentslab.com
+  apiUrl: process.env.NEXT_PUBLIC_WC_API_URL || "https://staging.aromaticscentslab.com",
   
   // Social media links
   links: {
