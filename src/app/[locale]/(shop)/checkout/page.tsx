@@ -292,14 +292,13 @@ export default function CheckoutPage() {
 
         // Include subtotal and total to override WooCommerce's default product price
         // This is essential for bundle products where the total includes bundled items
+        // Note: item.totals.subtotal and item.totals.total are already in decimal format (not minor units)
         if (item.totals?.subtotal) {
-          // Convert from minor units (cents) to decimal format
-          const subtotalValue = parseFloat(item.totals.subtotal) / divisor;
+          const subtotalValue = parseFloat(item.totals.subtotal);
           lineItem.subtotal = subtotalValue.toFixed(2);
         }
         if (item.totals?.total) {
-          // Convert from minor units (cents) to decimal format
-          const totalValue = parseFloat(item.totals.total) / divisor;
+          const totalValue = parseFloat(item.totals.total);
           lineItem.total = totalValue.toFixed(2);
         }
 
