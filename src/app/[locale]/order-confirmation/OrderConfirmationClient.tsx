@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/common/Button";
+import { useCart } from "@/contexts/CartContext";
 
 interface OrderData {
   id: number;
@@ -38,6 +39,8 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
   const isRTL = locale === "ar";
+  const { clearCart } = useCart();
+  const cartClearedRef = useRef(false);
 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,6 +63,17 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
         }
 
         setOrder(data.data);
+        
+        // Clear cart after successfully fetching order (for external payment methods)
+        // Use ref to prevent clearing cart multiple times
+        if (!cartClearedRef.current) {
+          cartClearedRef.current = true;
+          try {
+            await clearCart();
+          } catch (cartError) {
+            console.error("Failed to clear cart:", cartError);
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load order details");
       } finally {
@@ -68,7 +82,7 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
     };
 
     fetchOrder();
-  }, [orderId]);
+  }, [orderId, clearCart]);
 
   if (loading) {
     return (
