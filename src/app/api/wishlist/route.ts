@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
 import { cookies } from "next/headers";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
 const API_BASE = siteConfig.apiUrl;
 // TI WooCommerce Wishlist REST API - uses WooCommerce REST API namespace
@@ -43,8 +44,8 @@ function setCachedShareKey(_userId: number, _shareKey: string): void {
 
 // WooCommerce REST API authentication (required for /wc/v3/ endpoints)
 function getWooCommerceCredentials() {
-  const consumerKey = process.env.WC_CONSUMER_KEY || "";
-  const consumerSecret = process.env.WC_CONSUMER_SECRET || "";
+  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || "";
+  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || "";
   return { consumerKey, consumerSecret };
 }
 

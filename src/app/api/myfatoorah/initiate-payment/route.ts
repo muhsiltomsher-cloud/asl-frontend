@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
-const MYFATOORAH_API_URL = process.env.MYFATOORAH_TEST_MODE === "true"
-  ? "https://apitest.myfatoorah.com/v2/SendPayment"
-  : "https://api.myfatoorah.com/v2/SendPayment";
+function getMyFatoorahApiUrl(): string {
+  return getEnvVar("MYFATOORAH_TEST_MODE") === "true"
+    ? "https://apitest.myfatoorah.com/v2/SendPayment"
+    : "https://api.myfatoorah.com/v2/SendPayment";
+}
 
 interface InitiatePaymentRequest {
   order_id: number;
@@ -19,7 +22,7 @@ interface InitiatePaymentRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.MYFATOORAH_API_KEY;
+    const apiKey = getEnvVar("MYFATOORAH_API_KEY");
     
     if (!apiKey) {
       console.error("MyFatoorah API Error: MYFATOORAH_API_KEY environment variable is not configured");
@@ -83,7 +86,7 @@ export async function POST(request: NextRequest) {
       UserDefinedField: order_key,
     };
 
-    const response = await fetch(MYFATOORAH_API_URL, {
+    const response = await fetch(getMyFatoorahApiUrl(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
