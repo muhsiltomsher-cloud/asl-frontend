@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
 const TABBY_API_URL = "https://api.tabby.ai/api/v2/checkout";
 
@@ -32,8 +33,8 @@ interface TabbySessionRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const secretKey = process.env.TABBY_SECRET_KEY;
-    const merchantCode = process.env.TABBY_MERCHANT_CODE || "default";
+    const secretKey = getEnvVar("TABBY_SECRET_KEY");
+    const merchantCode = getEnvVar("TABBY_MERCHANT_CODE") || "default";
 
     if (!secretKey) {
       console.error("Tabby API Error: TABBY_SECRET_KEY environment variable is not configured");
