@@ -304,7 +304,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                                   {item.meta_data
                                     .filter((meta) => meta.key.startsWith("_bundle_item_"))
                                     .map((meta, idx) => (
-                                      <p key={idx}>{meta.display_value || meta.value}</p>
+                                      <p key={idx}>{String(meta.display_value || meta.value || '')}</p>
                                     ))}
                                 </div>
                               )}
