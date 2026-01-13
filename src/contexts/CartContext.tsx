@@ -415,7 +415,7 @@ export function CartProvider({ children, locale }: CartProviderProps) {
   const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
   const cartItemsCount = cart?.item_count || 0;
   const rawCartSubtotal = cart?.totals?.subtotal || "0";
-  const cartTotal = cart?.totals?.total || "0";
+  const rawCartTotal = cart?.totals?.total || "0";
 
   // Calculate the total bundle items price across all cart items
   // This is needed because CoCart only knows about the base product price, not the bundle items
@@ -442,6 +442,13 @@ export function CartProvider({ children, locale }: CartProviderProps) {
     const rawSubtotal = parseFloat(rawCartSubtotal) || 0;
     return (rawSubtotal + bundleItemsAdjustment).toString();
   }, [rawCartSubtotal, bundleItemsAdjustment]);
+
+  // Adjusted cart total that includes bundle items price
+  // The total from CoCart doesn't include bundle items, so we need to add the adjustment
+  const cartTotal = useMemo(() => {
+    const rawTotal = parseFloat(rawCartTotal) || 0;
+    return (rawTotal + bundleItemsAdjustment).toString();
+  }, [rawCartTotal, bundleItemsAdjustment]);
 
   const couponDiscount = selectedCoupons.reduce((total, coupon) => {
     const subtotal = parseFloat(cartSubtotal);
