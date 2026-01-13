@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
@@ -109,6 +109,7 @@ const emptyAddress: AddressFormData = {
 export default function CheckoutPage() {
   const { locale } = useParams<{ locale: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
     const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, isLoading: isCartLoading } = useCart();
     const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
     const isRTL = locale === "ar";
@@ -118,6 +119,8 @@ export default function CheckoutPage() {
     const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
         const [showBillingSection, setShowBillingSection] = useState(false);
         const [emptyCartCountdown, setEmptyCartCountdown] = useState<number | null>(null);
+        const [paymentError, setPaymentError] = useState<string | null>(null);
+        const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   
             const [couponCode, setCouponCode] = useState("");
         const [couponError, setCouponError] = useState("");
@@ -235,6 +238,57 @@ export default function CheckoutPage() {
           };
                   fetchPaymentGateways();
                 }, []);
+
+        // Check for payment error from redirect (MyFatoorah, Tabby, Tamara)
+        useEffect(() => {
+          const verifyFailedPayment = async () => {
+            const myFatoorahPaymentId = searchParams.get("paymentId");
+            const tabbyPaymentId = searchParams.get("payment_id");
+            const tamaraOrderId = searchParams.get("orderId");
+            const orderId = searchParams.get("order_id");
+            
+            // Only verify if we have payment params and an order_id (indicates redirect from payment gateway)
+            if (!orderId) return;
+            
+            const hasPaymentParams = myFatoorahPaymentId || tabbyPaymentId || tamaraOrderId;
+            if (!hasPaymentParams) return;
+            
+            setIsVerifyingPayment(true);
+            
+            try {
+              let verifyUrl = "";
+              
+              if (myFatoorahPaymentId) {
+                verifyUrl = `/api/myfatoorah/verify-payment?paymentId=${myFatoorahPaymentId}`;
+              } else if (tabbyPaymentId) {
+                verifyUrl = `/api/tabby/verify-payment?payment_id=${tabbyPaymentId}`;
+              } else if (tamaraOrderId) {
+                verifyUrl = `/api/tamara/verify-payment?order_id=${tamaraOrderId}`;
+              }
+              
+              if (verifyUrl) {
+                const verifyResponse = await fetch(verifyUrl);
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success && verifyData.payment_status === "failed") {
+                  const errorMessage = verifyData.status_message || verifyData.error_message || 
+                    (isRTL ? "فشل الدفع. يرجى المحاولة مرة أخرى أو استخدام طريقة دفع مختلفة." : "Payment failed. Please try again or use a different payment method.");
+                  setPaymentError(errorMessage);
+                } else if (!verifyData.success) {
+                  // API call failed, show generic error
+                  setPaymentError(isRTL ? "فشل الدفع. يرجى المحاولة مرة أخرى." : "Payment failed. Please try again.");
+                }
+              }
+            } catch (err) {
+              console.error("Failed to verify payment:", err);
+              setPaymentError(isRTL ? "فشل الدفع. يرجى المحاولة مرة أخرى." : "Payment failed. Please try again.");
+            } finally {
+              setIsVerifyingPayment(false);
+            }
+          };
+          
+          verifyFailedPayment();
+        }, [searchParams, isRTL]);
 
 // Empty cart detection and auto-redirect
         const isEmptyCart = !isCartLoading && cartItems.length === 0 && parseFloat(cartTotal) === 0;
@@ -755,6 +809,48 @@ export default function CheckoutPage() {
         {error && (
           <div className="mb-6 rounded-lg border border-black/10 bg-white p-4 text-red-600">
             {error}
+          </div>
+        )}
+
+        {/* Payment Error from Gateway Redirect */}
+        {isVerifyingPayment && (
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-300 border-t-blue-600"></div>
+              <span className="text-blue-700">
+                {isRTL ? "جاري التحقق من حالة الدفع..." : "Verifying payment status..."}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {paymentError && !isVerifyingPayment && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-red-100">
+                <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-red-800">
+                  {isRTL ? "فشل الدفع" : "Payment Failed"}
+                </h3>
+                <p className="mt-1 text-sm text-red-700">
+                  {paymentError}
+                </p>
+                <p className="mt-2 text-sm text-red-600">
+                  {isRTL ? "يرجى التحقق من تفاصيل الدفع والمحاولة مرة أخرى." : "Please check your payment details and try again."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPaymentError(null)}
+                className="flex-shrink-0 text-red-400 hover:text-red-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         )}
 
