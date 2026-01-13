@@ -82,10 +82,11 @@ export function getBundleItemsTotal(bundleItems: BundleItem[]): number {
 }
 
 /**
- * Extracts box price from cart item data, or calculates it from item price minus bundle items total
+ * Extracts box price from cart item data
  * Falls back to localStorage if cart_item_data is empty (CoCart doesn't persist custom data)
+ * Only returns a box price if one was explicitly configured - does not try to calculate it
  */
-export function getBoxPrice(item: CoCartItem, bundleItemsTotal?: number): number | null {
+export function getBoxPrice(item: CoCartItem): number | null {
   try {
     const cartItemData = item.cart_item_data;
     
@@ -103,40 +104,8 @@ export function getBoxPrice(item: CoCartItem, bundleItemsTotal?: number): number
       if (typeof storedBoxPrice === "number" && storedBoxPrice > 0) return storedBoxPrice;
     }
     
-    // Fallback: calculate box price from item price minus bundle items total
-    // This handles cases where cart_item_data.box_price is not stored correctly by CoCart
-    if (bundleItemsTotal !== undefined && bundleItemsTotal > 0) {
-      // Get the raw price value from CoCart
-      const rawPrice = item.totals?.total 
-        ? parseFloat(item.totals.total)
-        : item.price 
-          ? parseFloat(item.price)
-          : null;
-      
-      if (rawPrice !== null) {
-        // Try different interpretations of the price format:
-        // 1. Price is already in display format (e.g., 2600.00)
-        // 2. Price is in cents/minor units (e.g., 260000)
-        
-        // First try: assume price is in display format (no division)
-        if (rawPrice > bundleItemsTotal) {
-          const calculatedBoxPrice = rawPrice - bundleItemsTotal;
-          if (calculatedBoxPrice > 0) {
-            return calculatedBoxPrice;
-          }
-        }
-        
-        // Second try: assume price is in cents (divide by 100)
-        const priceInCents = rawPrice / 100;
-        if (priceInCents > bundleItemsTotal) {
-          const calculatedBoxPrice = priceInCents - bundleItemsTotal;
-          if (calculatedBoxPrice > 0) {
-            return calculatedBoxPrice;
-          }
-        }
-      }
-    }
-    
+    // Don't try to calculate box price from cart item price - this leads to incorrect values
+    // Box price should only be shown if explicitly configured in the bundle
     return null;
   } catch {
     return null;
@@ -160,8 +129,8 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
   // Calculate base totals (for 1 bundle)
   const baseBundleTotal = getBundleItemsTotal(bundleItems);
   
-  // Get box price per bundle - pass baseBundleTotal for fallback calculation
-  const baseBoxPrice = getBoxPrice(item, baseBundleTotal);
+  // Get box price per bundle (only if explicitly configured)
+  const baseBoxPrice = getBoxPrice(item);
   
   // Multiply by cart quantity for display
   const bundleTotal = baseBundleTotal * cartQuantity;
