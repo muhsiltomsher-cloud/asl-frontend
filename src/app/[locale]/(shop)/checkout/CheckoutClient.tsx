@@ -1217,10 +1217,10 @@ export default function CheckoutClient() {
                                                                     paypal: { en: "PayPal", ar: "باي بال" },
                                                                     stripe: { en: "Credit Card", ar: "بطاقة ائتمان" },
                                                                     card: { en: "Credit Card", ar: "بطاقة ائتمان" },
-                                                                    myfatoorah_v2: { en: "Pay with MyFatoorah", ar: "الدفع مع ماي فاتورة" },
-                                                                    myfatoorah: { en: "Pay with MyFatoorah", ar: "الدفع مع ماي فاتورة" },
-                                                                    myfatoorah_cards: { en: "Pay with Card (MyFatoorah)", ar: "الدفع بالبطاقة (ماي فاتورة)" },
-                                                                    myfatoorah_embedded: { en: "Pay with MyFatoorah", ar: "الدفع مع ماي فاتورة" },
+                                                                    myfatoorah_v2: { en: "Credit/Debit Card", ar: "بطاقة ائتمان/خصم" },
+                                                                    myfatoorah: { en: "Credit/Debit Card", ar: "بطاقة ائتمان/خصم" },
+                                                                    myfatoorah_cards: { en: "Credit/Debit Card", ar: "بطاقة ائتمان/خصم" },
+                                                                    myfatoorah_embedded: { en: "Credit/Debit Card", ar: "بطاقة ائتمان/خصم" },
                                                                   };
                                                                   return labels[id]?.[isRTL ? "ar" : "en"] || title;
                                                                 };
@@ -1248,23 +1248,35 @@ export default function CheckoutClient() {
                                                                 const getGatewayIcon = (id: string) => {
                                                                   if (id === "tabby" || id === "tabby_installments" || id === "tabby_checkout") {
                                                                     return (
-                                                                      <div className="flex h-8 w-12 items-center justify-center rounded bg-[#3BFFC1] px-1">
-                                                                        <span className="text-xs font-bold text-black">tabby</span>
-                                                                      </div>
+                                                                      <Image
+                                                                        src="/images/payment/tabby.png"
+                                                                        alt="Tabby"
+                                                                        width={60}
+                                                                        height={32}
+                                                                        className="h-8 w-auto object-contain"
+                                                                      />
                                                                     );
                                                                   }
                                                                   if (id === "tamara") {
                                                                     return (
-                                                                      <div className="flex h-8 w-12 items-center justify-center rounded bg-[#F5D5C8] px-1">
-                                                                        <span className="text-xs font-bold text-[#1A1A1A]">tamara</span>
-                                                                      </div>
+                                                                      <Image
+                                                                        src="/images/payment/tamara.png"
+                                                                        alt="Tamara"
+                                                                        width={60}
+                                                                        height={32}
+                                                                        className="h-8 w-auto object-contain"
+                                                                      />
                                                                     );
                                                                   }
                                                                   if (id === "myfatoorah_v2" || id === "myfatoorah" || id === "myfatoorah_cards" || id === "myfatoorah_embedded") {
                                                                     return (
-                                                                      <div className="flex h-8 w-16 items-center justify-center rounded bg-[#0066B3] px-1">
-                                                                        <span className="text-[10px] font-bold text-white">MyFatoorah</span>
-                                                                      </div>
+                                                                      <Image
+                                                                        src="/images/payment/credit-debit-card.png"
+                                                                        alt="Credit/Debit Card"
+                                                                        width={80}
+                                                                        height={32}
+                                                                        className="h-8 w-auto object-contain"
+                                                                      />
                                                                     );
                                                                   }
                                                                   if (id === "cod") {
