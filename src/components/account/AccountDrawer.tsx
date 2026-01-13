@@ -202,7 +202,7 @@ export function AccountDrawer({
             {locale === "en" ? "Language" : "اللغة"}
           </span>
         </div>
-        <span className="text-sm text-gray-500">
+        <span className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600">
           {localeConfig[alternateLocale].name}
         </span>
       </Link>
@@ -221,7 +221,7 @@ export function AccountDrawer({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">
+            <span className="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600">
               {currentCurrency?.symbol} {currentCurrency?.code}
             </span>
             <ChevronDown className={cn("h-4 w-4 text-gray-400 transition-transform", isCurrencyDropdownOpen && "rotate-180")} />
