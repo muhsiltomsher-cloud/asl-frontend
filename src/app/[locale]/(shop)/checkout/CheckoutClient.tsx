@@ -553,7 +553,26 @@ export default function CheckoutClient() {
         if (bundleItems && bundleItems.length > 0) {
           const metaData: Array<{ key: string; value: string }> = [];
           
-          // Add each bundle item as a separate meta entry for better display in WooCommerce
+          // Add structured bundle data for frontend order display (OrderBundleItemsList)
+          // This allows the order details page to show the bundle breakdown
+          metaData.push({
+            key: "_bundle_items",
+            value: JSON.stringify(bundleItems),
+          });
+          
+          // Add bundle totals
+          const bundleItemsTotal = getBundleItemsTotal(bundleItems);
+          const boxPrice = getBoxPrice(item);
+          
+          // Add box price as structured data for frontend
+          if (boxPrice && boxPrice > 0) {
+            metaData.push({
+              key: "_box_price",
+              value: boxPrice.toString(),
+            });
+          }
+          
+          // Add each bundle item as a separate meta entry for better display in WooCommerce admin
           bundleItems.forEach((bundleItem, index) => {
             const itemName = bundleItem.name || `Product #${bundleItem.product_id}`;
             const itemQty = bundleItem.quantity || 1;
@@ -572,10 +591,7 @@ export default function CheckoutClient() {
             });
           });
           
-          // Add bundle totals
-          const bundleItemsTotal = getBundleItemsTotal(bundleItems);
-          const boxPrice = getBoxPrice(item);
-          
+          // Add human-readable totals for WooCommerce admin
           if (bundleItemsTotal > 0) {
             metaData.push({
               key: "Items Total",
