@@ -536,21 +536,26 @@ export default function CheckoutClient() {
           variation_id: item.variation_id || undefined,
         };
 
-        // Include subtotal and total to override WooCommerce's default product price
-        // This is essential for bundle products where the total includes bundled items
-        // Note: item.totals.subtotal and item.totals.total are already in decimal format (not minor units)
-        if (item.totals?.subtotal) {
-          const subtotalValue = parseFloat(item.totals.subtotal);
-          lineItem.subtotal = subtotalValue.toFixed(2);
-        }
-        if (item.totals?.total) {
-          const totalValue = parseFloat(item.totals.total);
-          lineItem.total = totalValue.toFixed(2);
-        }
-
-        // Include bundle items as meta_data so they display in WooCommerce admin
+        // Check if this is a bundle product and calculate correct total
         const bundleItems = getBundleItems(item);
-        if (bundleItems && bundleItems.length > 0) {
+        const isBundleProduct = bundleItems && bundleItems.length > 0;
+        
+        if (isBundleProduct) {
+          // For bundle products, calculate the correct total: Box Price + Products Total
+          // CoCart only knows about the base WooCommerce product price, not the bundled items
+          const bundleItemsTotal = getBundleItemsTotal(bundleItems);
+          const boxPrice = getBoxPrice(item);
+          
+          // Calculate the correct bundle total per item
+          const correctBundleTotal = bundleItemsTotal + (boxPrice || 0);
+          
+          // Multiply by quantity for the line item total
+          const quantity = item.quantity?.value || 1;
+          const lineItemTotal = correctBundleTotal * quantity;
+          
+          lineItem.subtotal = lineItemTotal.toFixed(2);
+          lineItem.total = lineItemTotal.toFixed(2);
+          
           const metaData: Array<{ key: string; value: string }> = [];
           
           // Add structured bundle data for frontend order display (OrderBundleItemsList)
@@ -559,10 +564,6 @@ export default function CheckoutClient() {
             key: "_bundle_items",
             value: JSON.stringify(bundleItems),
           });
-          
-          // Add bundle totals
-          const bundleItemsTotal = getBundleItemsTotal(bundleItems);
-          const boxPrice = getBoxPrice(item);
           
           // Add box price as structured data for frontend
           if (boxPrice && boxPrice > 0) {
