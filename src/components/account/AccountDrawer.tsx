@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { User, Package, MapPin, Heart, Settings, LogOut, X, ChevronRight, Globe, ChevronDown, Check, Coins } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -13,6 +14,32 @@ import Typography from "@mui/material/Typography";
 import { Button } from "@/components/common/Button";
 import { localeConfig, type Locale, type Currency } from "@/config/site";
 import { getPathWithoutLocale, cn } from "@/lib/utils";
+
+const currencyCountryCodes: Record<string, string> = {
+  AED: "ae",
+  SAR: "sa",
+  QAR: "qa",
+  KWD: "kw",
+  BHD: "bh",
+  OMR: "om",
+  USD: "us",
+  EUR: "eu",
+  GBP: "gb",
+  INR: "in",
+  PKR: "pk",
+  EGP: "eg",
+  JOD: "jo",
+  LBP: "lb",
+  IQD: "iq",
+  YER: "ye",
+  SYP: "sy",
+  TRY: "tr",
+  MAD: "ma",
+  TND: "tn",
+  DZD: "dz",
+  LYD: "ly",
+  SDG: "sd",
+};
 
 interface AccountDrawerProps {
   locale: string;
@@ -249,12 +276,19 @@ export function AccountDrawer({
                     aria-selected={currency === curr.code}
                   >
                     <span className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold border",
+                      "flex h-8 w-8 items-center justify-center rounded-full overflow-hidden border",
                       currency === curr.code 
-                        ? "bg-[#7a3205] text-white border-[#7a3205]" 
-                        : "bg-gray-100 text-gray-600 border-gray-200"
+                        ? "border-[#7a3205] ring-2 ring-[#7a3205]" 
+                        : "border-gray-200"
                     )}>
-                      {curr.code.substring(0, 2)}
+                      <Image
+                        src={`https://flagcdn.com/w40/${currencyCountryCodes[curr.code] || "un"}.png`}
+                        alt={curr.code}
+                        width={32}
+                        height={24}
+                        className="object-cover"
+                        unoptimized
+                      />
                     </span>
                     <div className="flex flex-1 flex-col items-start">
                       <span className={cn(
