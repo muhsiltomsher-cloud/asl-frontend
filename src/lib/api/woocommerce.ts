@@ -642,15 +642,42 @@ export async function getBundleEnabledProductSlugs(): Promise<string[]> {
 
       const bundles = await bundlesResponse.json();
       if (Array.isArray(bundles)) {
-        // Filter enabled bundles and extract product slugs
-        return bundles
-          .filter((bundle: { is_enabled?: boolean; enabled?: boolean }) => 
+        // Filter enabled bundles
+        const enabledBundles = bundles.filter(
+          (bundle: { is_enabled?: boolean; enabled?: boolean }) => 
             bundle.is_enabled || bundle.enabled
-          )
+        );
+
+        // First try to extract slugs directly if available
+        const directSlugs = enabledBundles
           .map((bundle: { product_slug?: string; slug?: string }) => 
             bundle.product_slug || bundle.slug
           )
           .filter((slug: string | undefined): slug is string => !!slug);
+
+        if (directSlugs.length > 0) {
+          return directSlugs;
+        }
+
+        // If no slugs available, fetch product slugs from product IDs
+        const productIds = enabledBundles
+          .map((bundle: { product_id?: number }) => bundle.product_id)
+          .filter((id: number | undefined): id is number => typeof id === 'number');
+
+        if (productIds.length > 0) {
+          // Fetch product slugs from WooCommerce API
+          const slugPromises = productIds.map(async (productId: number) => {
+            try {
+              const product = await getProductById(productId);
+              return product?.slug || null;
+            } catch {
+              return null;
+            }
+          });
+
+          const slugs = await Promise.all(slugPromises);
+          return slugs.filter((slug): slug is string => slug !== null);
+        }
       }
       return [];
     }
