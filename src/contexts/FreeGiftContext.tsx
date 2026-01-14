@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useCart } from "./CartContext";
 import { useCurrency } from "./CurrencyContext";
 
@@ -79,6 +80,7 @@ interface FreeGiftProviderProps {
 export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
   const { cart, cartItems, cartSubtotal, addToCart, removeCartItem, updateCartItem, setIsCartOpen } = useCart();
   const { currency } = useCurrency();
+  const pathname = usePathname();
   const [rules, setRules] = useState<FreeGiftRule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeGifts, setActiveGifts] = useState<FreeGiftRule[]>([]);
@@ -303,7 +305,11 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
             });
             
             // Open mini cart and dispatch event for gift highlight effect
-            setIsCartOpen(true);
+            // Don't open cart on order confirmation page
+            const isOrderConfirmationPage = pathname?.includes("/order-confirmation");
+            if (!isOrderConfirmationPage) {
+              setIsCartOpen(true);
+            }
             const giftName = rule.product?.name || rule.name;
             if (typeof window !== "undefined") {
               window.dispatchEvent(new CustomEvent(NEW_GIFT_ADDED_EVENT, { 
