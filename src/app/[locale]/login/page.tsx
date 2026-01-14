@@ -136,7 +136,7 @@ export default function LoginPage({ params }: LoginPageProps) {
 
   return (
     <div 
-      className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12"
+      className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-8 md:py-12"
       style={{ 
         backgroundImage: 'url(https://staging.aromaticscentslab.com/wp-content/uploads/2025/12/page-bg.jpg)',
         backgroundSize: 'cover',
@@ -145,15 +145,17 @@ export default function LoginPage({ params }: LoginPageProps) {
       }}
     >
       <div className="w-full max-w-5xl">
-        <div className={`flex flex-col lg:flex-row gap-8 lg:gap-16 ${isRTL ? "lg:flex-row-reverse" : ""}`}>
+        <div className={`flex flex-col lg:flex-row gap-0 overflow-hidden rounded-2xl shadow-2xl ${isRTL ? "lg:flex-row-reverse" : ""}`}>
           {/* Left Column - Login Form */}
-          <div className="flex-1 bg-white p-8 lg:p-12">
+          <div className="flex-1 bg-white p-6 md:p-8 lg:p-12">
             <div className={`mb-6 ${isRTL ? "text-right" : "text-left"}`}>
-              <h1 className="text-sm font-bold tracking-widest text-black uppercase">{texts.login}</h1>
-              <div className="mt-2 border-b border-gray-300"></div>
+              <div className="inline-block">
+                <h1 className="text-sm font-bold tracking-widest text-[#92400e] uppercase">{texts.login}</h1>
+                <div className="mt-2 h-0.5 bg-gradient-to-r from-[#92400e] to-[#d4a574]"></div>
+              </div>
             </div>
 
-            <h2 className={`text-xl font-semibold text-black mb-8 ${isRTL ? "text-right" : "text-left"}`}>
+            <h2 className={`text-xl md:text-2xl font-semibold text-gray-800 mb-6 md:mb-8 ${isRTL ? "text-right" : "text-left"}`}>
               {texts.loginTitle}
             </h2>
 
@@ -199,7 +201,7 @@ export default function LoginPage({ params }: LoginPageProps) {
 
               <Button
                 type="submit"
-                className="w-full bg-white text-black border border-black rounded-full hover:bg-gray-100 focus-visible:ring-black mt-6"
+                className="w-full bg-gradient-to-r from-[#92400e] to-[#b45309] text-white border-0 rounded-full hover:from-[#78350f] hover:to-[#92400e] focus-visible:ring-[#92400e] mt-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                 isLoading={isLoading}
                 disabled={isLoading}
               >
@@ -208,10 +210,10 @@ export default function LoginPage({ params }: LoginPageProps) {
             </form>
 
             <div className={`mt-6 text-sm ${isRTL ? "text-right" : "text-left"}`}>
-              <span className="text-gray-600">{texts.noAccount} </span>
+              <span className="text-gray-500">{texts.noAccount} </span>
               <Link
                 href={`/${locale}/register`}
-                className="font-medium text-[#92400e] hover:underline"
+                className="font-semibold text-[#92400e] hover:text-[#78350f] transition-colors"
               >
                 {texts.signUpLink}
               </Link>
@@ -219,36 +221,36 @@ export default function LoginPage({ params }: LoginPageProps) {
           </div>
 
           {/* Right Column - Find Your Scent & Benefits */}
-          <div className={`flex-1 bg-white p-8 lg:p-12 ${isRTL ? "text-right" : "text-left"}`}>
+          <div className={`flex-1 bg-gradient-to-br from-[#fef3e2] via-[#fde9d0] to-[#fcd9b8] p-6 md:p-8 lg:p-12 ${isRTL ? "text-right" : "text-left"}`}>
             {/* Find Your Scent Section */}
-            <div className={`flex items-start gap-4 mb-8 ${isRTL ? "flex-row-reverse" : ""}`}>
+            <div className="flex items-start gap-4 mb-8 p-4 md:p-6 bg-white/60 backdrop-blur-sm rounded-xl shadow-sm">
               <div className="flex-shrink-0">
-                <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M28 8H52V25L62 45V85C62 90 58 95 52 95H28C22 95 18 90 18 85V45L28 25V8Z" stroke="black" strokeWidth="2" fill="white"/>
-                  <rect x="28" y="2" width="24" height="8" stroke="black" strokeWidth="2" fill="white"/>
-                  <path d="M25 50H55" stroke="black" strokeWidth="1"/>
-                  <text x="40" y="42" textAnchor="middle" fontSize="8" fontWeight="bold" fill="black">Find</text>
-                  <text x="40" y="52" textAnchor="middle" fontSize="8" fontWeight="bold" fill="black">Your</text>
-                  <text x="40" y="62" textAnchor="middle" fontSize="10" fontWeight="bold" fill="black">Scent</text>
-                  <circle cx="32" cy="75" r="3" fill="black"/>
-                  <circle cx="40" cy="80" r="2" fill="black"/>
-                  <circle cx="48" cy="75" r="3" fill="black"/>
-                  <path d="M35 3L37 0M43 0L45 3M40 0V4" stroke="black" strokeWidth="1"/>
+                <svg width="70" height="90" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-md">
+                  <path d="M28 8H52V25L62 45V85C62 90 58 95 52 95H28C22 95 18 90 18 85V45L28 25V8Z" stroke="#92400e" strokeWidth="2" fill="white"/>
+                  <rect x="28" y="2" width="24" height="8" stroke="#92400e" strokeWidth="2" fill="white"/>
+                  <path d="M25 50H55" stroke="#92400e" strokeWidth="1"/>
+                  <text x="40" y="42" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#92400e">Find</text>
+                  <text x="40" y="52" textAnchor="middle" fontSize="8" fontWeight="bold" fill="#92400e">Your</text>
+                  <text x="40" y="62" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#92400e">Scent</text>
+                  <circle cx="32" cy="75" r="3" fill="#d4a574"/>
+                  <circle cx="40" cy="80" r="2" fill="#b45309"/>
+                  <circle cx="48" cy="75" r="3" fill="#d4a574"/>
+                  <path d="M35 3L37 0M43 0L45 3M40 0V4" stroke="#92400e" strokeWidth="1"/>
                 </svg>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-black mb-2">{texts.findYourScent}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{texts.findYourScentDesc}</p>
+                <h3 className="text-lg md:text-xl font-bold text-[#92400e] mb-2">{texts.findYourScent}</h3>
+                <p className="text-gray-700 text-sm leading-relaxed">{texts.findYourScentDesc}</p>
               </div>
             </div>
 
             {/* Benefits Section */}
-            <div>
-              <h4 className="text-lg font-bold text-black mb-4">{texts.benefits}</h4>
-              <div className="space-y-4">
+            <div className="bg-white/40 backdrop-blur-sm rounded-xl p-4 md:p-6">
+              <h4 className="text-lg font-bold text-[#92400e] mb-4">{texts.benefits}</h4>
+              <div className="space-y-3">
                 {benefits.map((benefit, index) => (
-                  <div key={index} className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300">
+                  <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-[#92400e] to-[#b45309] text-white shadow-md">
                       {benefit.icon === "percent" && (
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <circle cx="12" cy="12" r="10"/>
@@ -281,7 +283,7 @@ export default function LoginPage({ params }: LoginPageProps) {
                         </svg>
                       )}
                     </div>
-                    <span className="text-black font-medium">{benefit.text}</span>
+                    <span className="text-gray-800 font-medium">{benefit.text}</span>
                   </div>
                 ))}
               </div>
