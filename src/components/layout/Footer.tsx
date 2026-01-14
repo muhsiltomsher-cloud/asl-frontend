@@ -4,6 +4,7 @@ import { Facebook, Instagram, Twitter } from "lucide-react";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Dictionary } from "@/i18n";
 import type { SiteSettings } from "@/types/wordpress";
+import { NewsletterForm } from "@/components/common/NewsletterForm";
 
 interface FooterProps {
   locale: Locale;
@@ -132,19 +133,13 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
             <p className="mb-3 text-sm text-gray-600 md:mb-4">
               {dictionary.footer.subscribeText}
             </p>
-            <form className="flex flex-col gap-2 sm:flex-row">
-              <input
-                type="email"
-                placeholder={dictionary.footer.emailPlaceholder}
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2.5 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
-              />
-              <button
-                type="submit"
-                className="rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
-              >
-                {dictionary.footer.subscribe}
-              </button>
-            </form>
+            <NewsletterForm
+              locale={locale}
+              dictionary={{
+                emailPlaceholder: dictionary.footer.emailPlaceholder,
+                subscribe: dictionary.footer.subscribe,
+              }}
+            />
           </div>
         </div>
 
