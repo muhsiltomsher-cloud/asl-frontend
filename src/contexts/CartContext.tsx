@@ -7,6 +7,7 @@ import { getAuthToken } from "@/lib/api/auth";
 import { useNotification } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { getBundleItems, getBundleItemsTotal } from "@/components/cart/BundleItemsList";
+import { getBundleData } from "@/lib/utils/bundleStorage";
 
 // Cache key now includes locale for proper multilingual support
 const getCartCacheKey = (locale: string) => `/api/cart?locale=${locale}`;
@@ -432,16 +433,12 @@ export function CartProvider({ children, locale }: CartProviderProps) {
       if (bundleItems && bundleItems.length > 0) {
         // Check if pricing_mode was explicitly set (not just defaulting to "sum")
         // We check both cart_item_data (from PHP) and localStorage (from bundle builder)
+        // The localStorage uses the bundleStorage utility which stores data under "asl_bundle_cart_data"
+        // with product IDs as keys
+        const storedBundleData = getBundleData(item.id);
         const hasExplicitPricingMode = 
           item.cart_item_data?.pricing_mode !== undefined ||
-          (typeof window !== "undefined" && (() => {
-            try {
-              const stored = localStorage.getItem(`bundle_${item.id}`);
-              return stored && JSON.parse(stored)?.pricing_mode !== undefined;
-            } catch {
-              return false;
-            }
-          })());
+          storedBundleData?.pricing_mode !== undefined;
         
         // If pricing_mode is explicitly set, skip adjustment - the bundle builder
         // has already calculated the correct total (either fixed price or sum)
