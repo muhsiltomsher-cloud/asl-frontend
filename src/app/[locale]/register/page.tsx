@@ -148,7 +148,7 @@ export default function RegisterPage({ params }: RegisterPageProps) {
 
     try {
       const response = await register({
-        username: `${formData.firstName} ${formData.lastName}`,
+        username: formData.email,
         email: formData.email,
         password: formData.password,
         first_name: formData.firstName,
