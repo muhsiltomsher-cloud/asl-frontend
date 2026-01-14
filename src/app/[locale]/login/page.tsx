@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/common/Input";
 import { Button } from "@/components/common/Button";
 import { useAuth } from "@/contexts/AuthContext";
-import Image from "next/image";
 
 interface LoginPageProps {
   params: Promise<{ locale: string }>;
@@ -224,13 +223,18 @@ export default function LoginPage({ params }: LoginPageProps) {
             {/* Find Your Scent Section */}
             <div className={`flex items-start gap-4 mb-8 ${isRTL ? "flex-row-reverse" : ""}`}>
               <div className="flex-shrink-0">
-                <Image
-                  src="https://staging.aromaticscentslab.com/wp-content/uploads/2025/06/find-your-scent.png"
-                  alt="Find Your Scent"
-                  width={80}
-                  height={100}
-                  className="object-contain"
-                />
+                <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M28 8H52V25L62 45V85C62 90 58 95 52 95H28C22 95 18 90 18 85V45L28 25V8Z" stroke="black" strokeWidth="2" fill="white"/>
+                  <rect x="28" y="2" width="24" height="8" stroke="black" strokeWidth="2" fill="white"/>
+                  <path d="M25 50H55" stroke="black" strokeWidth="1"/>
+                  <text x="40" y="42" textAnchor="middle" fontSize="8" fontWeight="bold" fill="black">Find</text>
+                  <text x="40" y="52" textAnchor="middle" fontSize="8" fontWeight="bold" fill="black">Your</text>
+                  <text x="40" y="62" textAnchor="middle" fontSize="10" fontWeight="bold" fill="black">Scent</text>
+                  <circle cx="32" cy="75" r="3" fill="black"/>
+                  <circle cx="40" cy="80" r="2" fill="black"/>
+                  <circle cx="48" cy="75" r="3" fill="black"/>
+                  <path d="M35 3L37 0M43 0L45 3M40 0V4" stroke="black" strokeWidth="1"/>
+                </svg>
               </div>
               <div>
                 <h3 className="text-xl font-bold text-black mb-2">{texts.findYourScent}</h3>
