@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { OrderPrice } from "@/components/common/OrderPrice";
 import { getOrder, formatOrderStatus, formatDate, type Order } from "@/lib/api/customer";
-import { isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
+import { OrderBundleItemsList, isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
 import { siteConfig } from "@/config/site";
 
 interface InvoicePageProps {
@@ -343,14 +343,8 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                                   {t.freeGift}
                                 </span>
                               )}
-                              {isBundle && item.meta_data && (
-                                <div className="mt-1 text-xs text-gray-500">
-                                  {item.meta_data
-                                    .filter((meta) => meta.key.startsWith("_bundle_item_"))
-                                    .map((meta, idx) => (
-                                      <p key={idx}>{String(meta.display_value || meta.value || '')}</p>
-                                    ))}
-                                </div>
+                              {isBundle && (
+                                <OrderBundleItemsList item={item} locale={locale} compact={true} showPrices={true} />
                               )}
                             </div>
                           </div>
