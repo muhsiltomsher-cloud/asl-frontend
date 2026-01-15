@@ -159,7 +159,9 @@ export default async function LocaleLayout({
                           />
                                                                                                 <LocationCurrencyBanner locale={validLocale} />
                                                                                                 <CookieConsentBanner locale={validLocale} />
-                                                                                                <WhatsAppFloatingButton phoneNumber="971506071405" />
+                                                                                                <div className="print:hidden">
+                                                                                                  <WhatsAppFloatingButton phoneNumber="971506071405" />
+                                                                                                </div>
                                                         </WishlistProvider>
                                             </FreeGiftProvider>
                     </CartProvider>
