@@ -9,6 +9,7 @@ import { Button } from "@/components/common/Button";
 import { OrderPrice } from "@/components/common/OrderPrice";
 import { getOrder, formatOrderStatus, formatDate, type Order } from "@/lib/api/customer";
 import { isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
+import { siteConfig } from "@/config/site";
 
 interface InvoicePageProps {
   params: Promise<{ locale: string; id: string }>;
@@ -78,12 +79,30 @@ export default function InvoicePage({ params }: InvoicePageProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   const resolvedParams = use(params);
   const locale = resolvedParams.locale as "en" | "ar";
   const orderId = resolvedParams.id;
   const t = translations[locale] || translations.en;
   const isRTL = locale === "ar";
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const response = await fetch(`${siteConfig.apiUrl}/wp-json/asl/v1/site-settings`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.logo?.url) {
+            setLogoUrl(data.logo.url);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch logo:", err);
+      }
+    };
+    fetchLogo();
+  }, []);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -197,8 +216,21 @@ export default function InvoicePage({ params }: InvoicePageProps) {
           </Button>
         </div>
 
-        <div className="mx-auto max-w-4xl bg-white rounded-lg shadow-sm print:shadow-none print:rounded-none">
-          <div className="p-8 print:p-6">
+        <div className="mx-auto max-w-4xl bg-white rounded-lg shadow-sm print:shadow-none print:rounded-none relative overflow-hidden">
+          {logoUrl && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none print:flex">
+              <div className="relative w-[400px] h-[400px] opacity-[0.06]">
+                <Image
+                  src={logoUrl}
+                  alt="Watermark"
+                  fill
+                  className="object-contain"
+                  unoptimized
+                />
+              </div>
+            </div>
+          )}
+          <div className="p-8 print:p-6 relative z-10">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-8 pb-8 border-b">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">{t.invoice}</h1>
@@ -208,8 +240,20 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                   <p><span className="font-medium">{t.status}:</span> {formatOrderStatus(order.status)}</p>
                 </div>
               </div>
-              <div className="text-right">
-                <h2 className="text-xl font-bold text-gray-900 mb-1">Aromatic Scents Lab</h2>
+              <div className={`${isRTL ? "text-left" : "text-right"}`}>
+                {logoUrl ? (
+                  <div className={`relative h-16 w-40 mb-2 ${isRTL ? "" : "ml-auto"}`}>
+                    <Image
+                      src={logoUrl}
+                      alt="Aromatic Scents Lab"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">Aromatic Scents Lab</h2>
+                )}
                 <p className="text-sm text-gray-600">www.aromaticscentslab.com</p>
               </div>
             </div>
