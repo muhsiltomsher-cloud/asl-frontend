@@ -33,40 +33,40 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 md:py-12">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
-      <div className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900">
+      <div className="mx-auto max-w-3xl">
+        <h1 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
           {pageContent.title}
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-gray-600">
+        <p className="mb-2 text-lg text-gray-600">
           {pageContent.subtitle}
         </p>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mb-8 text-sm text-gray-500">
           {pageContent.lastUpdated}
         </p>
-      </div>
 
-      <div className="mx-auto max-w-4xl">
         <div className="space-y-8">
           {pageContent.sections.map((section, index) => (
-            <section key={index} className="rounded-lg border bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            <div key={index}>
+              <h2 className="mb-3 text-xl font-semibold text-gray-900">
                 {index + 1}. {section.title}
               </h2>
-              <p className="leading-relaxed text-gray-600">{section.content}</p>
-            </section>
+              <p className="leading-relaxed text-gray-600">
+                {section.content}
+              </p>
+            </div>
           ))}
         </div>
 
-        <div className="mt-12 rounded-lg bg-gray-50 p-6 text-center">
-          <p className="text-gray-600">
+        <div className="mt-12 border-t border-gray-200 pt-8">
+          <p className="mb-4 text-gray-600">
             {pageContent.contactCta}
           </p>
           <a
             href={`/${locale}/contact`}
-            className="mt-4 inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            className="inline-flex items-center text-gray-900 underline hover:text-gray-700"
           >
             {dictionary.common.contact}
           </a>

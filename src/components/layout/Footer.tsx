@@ -28,7 +28,7 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
       { name: dictionary.footer.shippingInfo, href: `/${locale}/shipping` },
       { name: dictionary.footer.returnPolicy, href: `/${locale}/returns` },
       { name: dictionary.footer.privacyPolicy, href: `/${locale}/privacy` },
-      { name: dictionary.footer.termsConditions, href: `/${locale}/terms` },
+      { name: dictionary.footer.termsConditions, href: `/${locale}/terms-and-conditions` },
     ],
   };
 
