@@ -218,8 +218,8 @@ export default function InvoicePage({ params }: InvoicePageProps) {
 
         <div className="mx-auto max-w-4xl bg-white rounded-lg shadow-sm print:shadow-none print:rounded-none relative overflow-hidden">
           {logoUrl && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none print:flex">
-              <div className="relative w-[400px] h-[400px] opacity-[0.06]">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none invoice-watermark">
+              <div className="relative w-[400px] h-[400px]">
                 <Image
                   src={logoUrl}
                   alt="Watermark"
@@ -466,10 +466,16 @@ export default function InvoicePage({ params }: InvoicePageProps) {
       </div>
 
       <style jsx global>{`
+        .invoice-watermark {
+          opacity: 0.06;
+        }
         @media print {
           body {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+          }
+          .invoice-watermark {
+            opacity: 0.03;
           }
           .print\\:hidden {
             display: none !important;
