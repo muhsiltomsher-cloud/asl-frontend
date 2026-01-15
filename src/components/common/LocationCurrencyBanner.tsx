@@ -14,15 +14,20 @@ interface LocationCurrencyBannerProps {
 const BANNER_DISMISSED_COOKIE = "asl_currency_banner_dismissed";
 const CURRENCY_COOKIE = "wcml_currency";
 
-// Map country codes to currencies
-const countryToCurrency: Record<string, Currency> = {
+// Map Gulf country codes to their local currencies
+// All other countries will default to USD
+const gulfCountryCurrencies: Record<string, Currency> = {
   AE: "AED", // UAE
   SA: "SAR", // Saudi Arabia
   KW: "KWD", // Kuwait
   BH: "BHD", // Bahrain
   OM: "OMR", // Oman
   QA: "QAR", // Qatar
-  US: "USD", // United States
+};
+
+// Get currency for a country code - Gulf countries get local currency, all others get USD
+const getCurrencyForCountry = (countryCode: string): Currency => {
+  return gulfCountryCurrencies[countryCode] || "USD";
 };
 
 export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBannerProps) {
@@ -53,8 +58,8 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
         const data = await response.json();
         const countryCode = data.country_code;
         
-        if (countryCode && countryToCurrency[countryCode]) {
-          const detected = countryToCurrency[countryCode];
+        if (countryCode) {
+          const detected = getCurrencyForCountry(countryCode);
           // Only show banner if detected currency is different from current
           if (detected !== currency) {
             setSuggestedCurrency(detected);
