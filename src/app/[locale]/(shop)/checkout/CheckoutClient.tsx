@@ -1086,8 +1086,9 @@ export default function CheckoutClient() {
                     <Checkbox
                       id="create-account"
                       checked={createAccount}
-                      onCheckedChange={(checked) => {
-                        setCreateAccount(checked === true);
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setCreateAccount(checked);
                         if (!checked) {
                           setAccountPassword("");
                           setConfirmPassword("");
