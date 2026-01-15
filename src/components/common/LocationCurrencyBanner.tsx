@@ -96,12 +96,15 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
       setCurrency(suggestedCurrency);
     }
     setIsVisible(false);
-    // Use appropriate cookie based on banner type
-    const cookieName = isGulfBanner ? GULF_BANNER_DISMISSED_COOKIE : BANNER_DISMISSED_COOKIE;
-    setCookie(cookieName, "true", {
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: "/",
-    });
+    // For Gulf banners, don't set cookie on accept - this allows the banner to show again
+    // if the user switches away from their local currency again
+    // For standard banners (first-time visitors), set cookie to prevent showing again
+    if (!isGulfBanner) {
+      setCookie(BANNER_DISMISSED_COOKIE, "true", {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: "/",
+      });
+    }
   };
 
   const handleDismiss = () => {
