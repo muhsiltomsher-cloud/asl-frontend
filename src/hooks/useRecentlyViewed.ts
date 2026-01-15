@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useSyncExternalStore } from "react";
+import { useMemo, useCallback, useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "asl_recently_viewed";
 const MAX_ITEMS = 10;
@@ -27,7 +27,7 @@ function getServerSnapshot(): string {
 export function useRecentlyViewed() {
   const storageValue = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   
-  const recentlyViewedIds = (() => {
+  const recentlyViewedIds = useMemo(() => {
     try {
       const items: RecentlyViewedItem[] = JSON.parse(storageValue);
       return items
@@ -36,9 +36,9 @@ export function useRecentlyViewed() {
     } catch {
       return [];
     }
-  })();
+  }, [storageValue]);
 
-  const [isLoaded] = useState(true);
+  const isLoaded = true;
 
   const addToRecentlyViewed = useCallback((productId: number) => {
     if (typeof window === "undefined") return;
