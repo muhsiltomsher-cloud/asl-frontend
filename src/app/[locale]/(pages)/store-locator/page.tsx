@@ -337,7 +337,7 @@ export default function StoreLocatorPage() {
                     <MapPin className="h-7 w-7 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
+                    <h2 className="text-3xl font-bold uppercase text-amber-900 md:text-4xl">
                       {isRTL ? country.nameAr : country.name}
                     </h2>
                     <p className="text-sm text-amber-600">
@@ -349,88 +349,68 @@ export default function StoreLocatorPage() {
                 </div>
               </div>
 
-              {/* Regions within Country */}
-              {country.regions.map((region, regionIndex) => (
-                <div key={region.id} className={regionIndex > 0 ? "mt-12" : ""}>
-                  {/* Region Header */}
-                  <div className="mb-6 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-400/20">
-                      <MapPin className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-amber-800 md:text-2xl">
-                        {isRTL ? region.nameAr : region.name}
-                      </h3>
-                      <p className="text-xs text-amber-500">
-                        {isRTL
-                          ? `${region.stores.length} ${region.stores.length === 1 ? "متجر" : "متاجر"}`
-                          : `${region.stores.length} ${region.stores.length === 1 ? "Store" : "Stores"}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Store Cards Grid */}
-                  <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {region.stores.map((store) => (
-                      <div
-                        key={store.id}
-                        className="group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-900/10"
-                      >
-                        {/* Store Image */}
-                        <div className="relative h-48 overflow-hidden">
-                          <Image
-                            src={store.image}
-                            alt={isRTL ? store.nameAr : store.name}
-                            fill
-                            className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                          
-                          {/* City Badge */}
-                          <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-amber-900 backdrop-blur-sm">
-                            {isRTL ? region.nameAr : region.name}
-                          </div>
-
-                          {/* Store Name Overlay */}
-                          <div className="absolute bottom-4 left-4 right-4">
-                            <h4 className="text-xl font-bold text-white drop-shadow-lg">
-                              {isRTL ? store.nameAr : store.name}
-                            </h4>
-                          </div>
+              {/* Store Cards Grid - All stores in country */}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {country.regions.flatMap((region) =>
+                  region.stores.map((store) => (
+                    <div
+                      key={store.id}
+                      className="group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-900/10"
+                    >
+                      {/* Store Image */}
+                      <div className="relative h-48 overflow-hidden">
+                        <Image
+                          src={store.image}
+                          alt={isRTL ? store.nameAr : store.name}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                        
+                        {/* City Badge */}
+                        <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-amber-900 backdrop-blur-sm">
+                          {isRTL ? store.cityAr : store.city}
                         </div>
 
-                        {/* Store Details */}
-                        <div className="p-5">
-                          <div className="mb-4 space-y-3">
-                            <div className="flex items-center gap-3 text-amber-700">
-                              <Building2 className="h-4 w-4 flex-shrink-0" />
-                              <span className="text-sm">{isRTL ? store.floorAr : store.floor}</span>
-                            </div>
-                            <div className="flex items-center gap-3 text-amber-700">
-                              <Clock className="h-4 w-4 flex-shrink-0" />
-                              <span className="text-sm">{content.openingHoursValue}</span>
-                            </div>
-                          </div>
-
-                          {/* Action Button */}
-                          <a
-                            href={store.googleMapsUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700 hover:shadow-xl hover:shadow-amber-500/30"
-                          >
-                            <Navigation className="h-4 w-4" />
-                            {content.getDirections}
-                          </a>
+                        {/* Store Name Overlay */}
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h4 className="text-xl font-bold text-white drop-shadow-lg">
+                            {isRTL ? store.nameAr : store.name}
+                          </h4>
                         </div>
-
-                        {/* Decorative Corner */}
-                        <div className="absolute -right-8 -top-8 h-16 w-16 rounded-full bg-amber-100/50 transition-transform duration-500 group-hover:scale-150" />
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+
+                      {/* Store Details */}
+                      <div className="p-5">
+                        <div className="mb-4 space-y-3">
+                          <div className="flex items-center gap-3 text-amber-700">
+                            <Building2 className="h-4 w-4 flex-shrink-0" />
+                            <span className="text-sm">{isRTL ? store.floorAr : store.floor}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-amber-700">
+                            <Clock className="h-4 w-4 flex-shrink-0" />
+                            <span className="text-sm">{content.openingHoursValue}</span>
+                          </div>
+                        </div>
+
+                        {/* Action Button */}
+                        <a
+                          href={store.googleMapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700 hover:shadow-xl hover:shadow-amber-500/30"
+                        >
+                          <Navigation className="h-4 w-4" />
+                          {content.getDirections}
+                        </a>
+                      </div>
+
+                      {/* Decorative Corner */}
+                      <div className="absolute -right-8 -top-8 h-16 w-16 rounded-full bg-amber-100/50 transition-transform duration-500 group-hover:scale-150" />
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           ))}
         </div>
