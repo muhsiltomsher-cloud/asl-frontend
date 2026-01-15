@@ -18,7 +18,7 @@ export function CheckoutFooter({ locale, dictionary, siteSettings }: CheckoutFoo
     { name: dictionary.common.shop, href: `/${locale}/shop` },
     { name: dictionary.common.contact, href: `/${locale}/contact` },
     { name: dictionary.footer.privacyPolicy, href: `/${locale}/privacy` },
-    { name: dictionary.footer.termsConditions, href: `/${locale}/terms` },
+    { name: dictionary.footer.termsConditions, href: `/${locale}/terms-and-conditions` },
   ];
 
   return (
