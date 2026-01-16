@@ -179,15 +179,9 @@ function NoteIcon({ noteType, noteContent }: { noteType: "payment" | "status" | 
     if (noteContent.includes("Paid") || noteContent.includes("Success") || noteContent.includes("Completed")) {
       return <CheckCircle className="h-5 w-5" />;
     }
-    return <Clock className="h-5 w-5" />;
+    return noteType === "payment" ? <CreditCard className="h-5 w-5" /> : <Clock className="h-5 w-5" />;
   }
   
-  if (noteType === "payment") {
-    return <CreditCard className="h-5 w-5" />;
-  }
-  if (noteType === "status") {
-    return <Clock className="h-5 w-5" />;
-  }
   return <FileText className="h-5 w-5" />;
 }
 
