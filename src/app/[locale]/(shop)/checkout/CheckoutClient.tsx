@@ -845,7 +845,7 @@ export default function CheckoutClient() {
                   currency_iso: data.order?.currency || "KWD",
                   language: locale === "ar" ? "ar" : "en",
                   callback_url: `${baseUrl}/${locale}/order-confirmation`,
-                  error_url: `${baseUrl}/${locale}/checkout`,
+                  error_url: `${baseUrl}/${locale}/order-confirmation`,
                 }),
               });
 
@@ -888,8 +888,8 @@ export default function CheckoutClient() {
                   })),
                   language: locale === "ar" ? "ar" : "en",
                   success_url: `${baseUrl}/${locale}/order-confirmation`,
-                  cancel_url: `${baseUrl}/${locale}/checkout`,
-                  failure_url: `${baseUrl}/${locale}/checkout`,
+                  cancel_url: `${baseUrl}/${locale}/order-confirmation`,
+                  failure_url: `${baseUrl}/${locale}/order-confirmation`,
                 }),
               });
 
@@ -943,8 +943,8 @@ export default function CheckoutClient() {
                     sku: item.id?.toString() || "",
                   })),
                   success_url: `${baseUrl}/${locale}/order-confirmation`,
-                  failure_url: `${baseUrl}/${locale}/checkout`,
-                  cancel_url: `${baseUrl}/${locale}/checkout`,
+                  failure_url: `${baseUrl}/${locale}/order-confirmation`,
+                  cancel_url: `${baseUrl}/${locale}/order-confirmation`,
                 }),
               });
 
