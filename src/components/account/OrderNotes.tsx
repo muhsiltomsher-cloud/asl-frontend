@@ -42,6 +42,7 @@ const translations = {
     invoiceError: "Invoice Error",
     showMore: "Show more",
     showLess: "Show less",
+    storeAuthor: "Store",
   },
   ar: {
     orderNotes: "ملاحظات الطلب",
@@ -61,6 +62,7 @@ const translations = {
     invoiceError: "خطأ في الفاتورة",
     showMore: "عرض المزيد",
     showLess: "عرض أقل",
+    storeAuthor: "المتجر",
   },
 };
 
@@ -138,6 +140,25 @@ function formatNoteDate(dateString: string, locale: string): string {
   });
 }
 
+function formatAuthorName(author: string, t: typeof translations.en): string {
+  const systemAuthors = [
+    "admin",
+    "woocommerce",
+    "system",
+    "administrator",
+    "store",
+    "shop",
+  ];
+  
+  const normalizedAuthor = author.toLowerCase().trim();
+  
+  if (!author || systemAuthors.includes(normalizedAuthor)) {
+    return t.storeAuthor;
+  }
+  
+  return author;
+}
+
 function PaymentDetailsCard({ 
   details, 
   t 
@@ -212,7 +233,7 @@ function NoteItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="font-medium text-sm">
-              {note.author || "System"}
+              {formatAuthorName(note.author || "", t)}
             </span>
             <span className="text-xs opacity-75">
               {formatNoteDate(note.date_created, locale)}
