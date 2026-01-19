@@ -104,7 +104,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
 
   // Check if this product has a bundle configuration
-  const bundleConfig = await getBundleConfig(slug);
+  // Pass locale to get correct product/category IDs for the current language
+  const bundleConfig = await getBundleConfig(slug, locale as Locale);
   
   // If bundle is enabled for this product, show the bundle builder inline
   if (bundleConfig && bundleConfig.enabled) {
