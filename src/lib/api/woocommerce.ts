@@ -550,15 +550,24 @@ export interface BundleConfig {
 }
 
 export async function getBundleConfig(
-  productSlug: string
+  productSlug: string,
+  locale?: Locale
 ): Promise<BundleConfig | null> {
   try {
+    let url = `${siteConfig.apiUrl}/wp-json/asl-bundles/v1/config?slug=${productSlug}`;
+    
+    // Add locale parameter for WPML language support
+    // This ensures the bundle config returns product/category IDs for the correct language
+    if (locale) {
+      url = `${url}&lang=${locale}`;
+    }
+    
     const response = await fetch(
-      `${siteConfig.apiUrl}/wp-json/asl-bundles/v1/config?slug=${productSlug}`,
+      url,
       {
         next: {
           revalidate: 60,
-          tags: ["bundle-config", `bundle-config-${productSlug}`],
+          tags: ["bundle-config", `bundle-config-${productSlug}`, locale ? `bundle-config-${productSlug}-${locale}` : ""].filter(Boolean),
         },
       }
     );
