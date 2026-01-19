@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { X, Plus, Minus, Search, Check } from "lucide-react";
+import { X, Plus, Minus, Search, Check, ChevronDown } from "lucide-react";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { TamaraPromoWidget } from "@/components/payment/TamaraPromoWidget";
 import { useCart } from "@/contexts/CartContext";
@@ -13,6 +13,57 @@ import { saveBundleData } from "@/lib/utils/bundleStorage";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { BundleConfig } from "@/lib/api/woocommerce";
+
+function sanitizeProductDescription(html: string): string {
+  if (!html) return "";
+  
+  let sanitized = html;
+  
+  sanitized = sanitized.replace(/<div[^>]*class="[^"]*tinv[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+  sanitized = sanitized.replace(/<div[^>]*class="[^"]*yith[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+  sanitized = sanitized.replace(/<a[^>]*class="[^"]*tinvwl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, "");
+  sanitized = sanitized.replace(/<a[^>]*aria-label="Add to Wishlist"[^>]*>[\s\S]*?<\/a>/gi, "");
+  sanitized = sanitized.replace(/<p>\s*<\/p>/gi, "");
+  sanitized = sanitized.replace(/Add to Wishlist/gi, "");
+  sanitized = sanitized.trim();
+  
+  return sanitized;
+}
+
+interface AccordionSectionProps {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+function AccordionSection({ title, isOpen, onToggle, children }: AccordionSectionProps) {
+  return (
+    <div className="border-b border-gray-200">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between py-4 text-left"
+      >
+        <span className="text-sm font-medium uppercase tracking-wide text-gray-900">
+          {title}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-200 ${
+          isOpen ? "max-h-[500px] pb-4" : "max-h-0"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 type CategoryFilter = "all" | "perfumes" | "oils" | "lotions" | "home";
 
@@ -46,10 +97,15 @@ export function BuildYourOwnSetClient({
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+    const [openAccordion, setOpenAccordion] = useState<string | null>(null);
 
-  // Get required and optional slots from bundle config
+    const toggleAccordion = (section: string) => {
+      setOpenAccordion(openAccordion === section ? null : section);
+    };
+
+    // Get required and optional slots from bundle config
   // Use optional_slots directly from API (defaults to 0 if not set)
   const requiredSlots = bundleConfig?.required_slots || 3;
   const optionalSlots = bundleConfig?.optional_slots ?? 0;
@@ -416,10 +472,18 @@ export function BuildYourOwnSetClient({
       select: "Select",
       selected: "Selected",
       close: "Close",
-      itemsSelected: "items selected",
-      requiredItems: "required",
-    },
-    ar: {
+          itemsSelected: "items selected",
+          requiredItems: "required",
+          characteristics: "Characteristics",
+          description: "Description",
+          paymentDelivery: "Payment & Delivery",
+          category: "Category",
+          sku: "SKU",
+          noDescription: "No description available",
+          paymentInfo: "We accept all major credit cards and cash on delivery.",
+          deliveryInfo: "Free shipping on orders over 300 AED. Delivery within 2-5 business days.",
+        },
+        ar: {
       title: "اصنع مجموعتك الخاصة",
       description:
         "سواء كنت تدلل نفسك أو تفاجئ شخصًا مميزًا، فإن صناديق ASL تجمع أفضل العطور ومنتجات العناية بالجسم.",
@@ -449,12 +513,20 @@ export function BuildYourOwnSetClient({
       select: "اختر",
       selected: "مختار",
       close: "إغلاق",
-      itemsSelected: "منتجات مختارة",
-      requiredItems: "مطلوب",
-    },
-  };
+        itemsSelected: "منتجات مختارة",
+        requiredItems: "مطلوب",
+        characteristics: "الخصائص",
+        description: "الوصف",
+        paymentDelivery: "الدفع والتوصيل",
+        category: "الفئة",
+        sku: "رمز المنتج",
+        noDescription: "لا يوجد وصف متاح",
+        paymentInfo: "نقبل جميع بطاقات الائتمان الرئيسية والدفع عند الاستلام.",
+        deliveryInfo: "شحن مجاني للطلبات التي تزيد عن 300 درهم. التوصيل خلال 2-5 أيام عمل.",
+      },
+    };
 
-  const t = translations[isRTL ? "ar" : "en"];
+    const t = translations[isRTL ? "ar" : "en"];
 
   const allCategories: { key: CategoryFilter; label: string }[] = [
     { key: "all", label: t.all },
@@ -507,15 +579,7 @@ export function BuildYourOwnSetClient({
             </div>
           )}
 
-          {/* Full description - displayed prominently if available */}
-          {bundleProduct?.description && (
-            <div 
-              className="prose prose-sm max-w-none text-gray-600"
-              dangerouslySetInnerHTML={{ __html: bundleProduct.description }}
-            />
-          )}
-
-          {/* Your Box Section */}
+                    {/* Your Box Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">{t.yourBox}</h2>
@@ -750,13 +814,68 @@ export function BuildYourOwnSetClient({
               disabled={!isValid || isAddingToCart}
               className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-[#C4885B] bg-[#C4885B] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 hover:bg-transparent hover:text-[#C4885B] disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-400"
             >
-              {isAddingToCart ? t.adding : t.addToCart}
-            </button>
-          </div>
-        </div>
-      </div>
+                    {isAddingToCart ? t.adding : t.addToCart}
+                  </button>
+                </div>
 
-      {/* Product Picker Modal */}
+                {/* Accordion Sections */}
+                <div className="border-t border-gray-200 pt-2">
+                  {/* Characteristics */}
+                  <AccordionSection
+                    title={t.characteristics}
+                    isOpen={openAccordion === "characteristics"}
+                    onToggle={() => toggleAccordion("characteristics")}
+                  >
+                    <div className="space-y-2 text-sm">
+                      {bundleProduct?.categories && bundleProduct.categories.length > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{t.category}</span>
+                          <span className="text-gray-900">{bundleProduct.categories[0].name}</span>
+                        </div>
+                      )}
+                      {bundleProduct?.sku && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{t.sku}</span>
+                          <span className="text-gray-900">{bundleProduct.sku}</span>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionSection>
+
+                  {/* Description */}
+                  <AccordionSection
+                    title={t.description}
+                    isOpen={openAccordion === "description"}
+                    onToggle={() => toggleAccordion("description")}
+                  >
+                    {bundleProduct?.description && sanitizeProductDescription(bundleProduct.description) ? (
+                      <div
+                        className="prose prose-sm max-w-none text-gray-600"
+                        dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(bundleProduct.description) }}
+                      />
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        {t.noDescription}
+                      </p>
+                    )}
+                  </AccordionSection>
+
+                  {/* Payment & Delivery */}
+                  <AccordionSection
+                    title={t.paymentDelivery}
+                    isOpen={openAccordion === "payment"}
+                    onToggle={() => toggleAccordion("payment")}
+                  >
+                    <div className="space-y-3 text-sm text-gray-600">
+                      <p>{t.paymentInfo}</p>
+                      <p>{t.deliveryInfo}</p>
+                    </div>
+                  </AccordionSection>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Picker Modal */}
       {activeSlot !== null && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
           <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-t-2xl bg-white sm:rounded-2xl">
