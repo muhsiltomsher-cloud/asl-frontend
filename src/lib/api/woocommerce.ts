@@ -603,6 +603,8 @@ export async function getFreeGiftProductIds(currency?: string): Promise<number[]
 
 // Get both IDs and slugs for free gift products
 // Slugs are needed for filtering across WPML locales since product IDs differ per locale
+// Note: WPML may create different slugs for Arabic products (e.g., "free-gift-2" instead of "free-gift")
+// so we need to fetch slugs for both English and Arabic locales
 export async function getFreeGiftProductInfo(currency?: string): Promise<FreeGiftInfo> {
   try {
     let url = `${siteConfig.apiUrl}/wp-json/asl-free-gifts/v1/rules`;
@@ -639,21 +641,34 @@ export async function getFreeGiftProductInfo(currency?: string): Promise<FreeGif
         )
         .filter((slug: string | undefined): slug is string => !!slug);
       
-      // If no slugs from rules, fetch product details to get slugs
-      // This is needed because WPML assigns different product IDs per locale,
-      // but slugs remain consistent across translations
-      if (slugs.length === 0 && ids.length > 0) {
-        const productSlugs = await Promise.all(
-          ids.map(async (id: number) => {
-            try {
-              const product = await getProductById(id, "en");
-              return product?.slug;
-            } catch {
-              return undefined;
-            }
-          })
+      // Fetch product details to get slugs for BOTH English and Arabic locales
+      // WPML may create different slugs for each locale (e.g., "free-gift" vs "free-gift-2")
+      if (ids.length > 0) {
+        const allSlugs = await Promise.all(
+          ids.flatMap((id: number) => [
+            // Fetch English product slug
+            (async () => {
+              try {
+                const product = await getProductById(id, "en");
+                return product?.slug;
+              } catch {
+                return undefined;
+              }
+            })(),
+            // Fetch Arabic product slug (may be different due to WPML)
+            (async () => {
+              try {
+                const product = await getProductById(id, "ar");
+                return product?.slug;
+              } catch {
+                return undefined;
+              }
+            })(),
+          ])
         );
-        slugs = productSlugs.filter((slug): slug is string => !!slug);
+        // Combine existing slugs with fetched slugs, removing duplicates
+        const fetchedSlugs = allSlugs.filter((slug): slug is string => !!slug);
+        slugs = [...new Set([...slugs, ...fetchedSlugs])];
       }
       
       return { ids, slugs };
