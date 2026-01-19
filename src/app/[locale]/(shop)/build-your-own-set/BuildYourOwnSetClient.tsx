@@ -714,14 +714,14 @@ export function BuildYourOwnSetClient({
             {/* Product Grid */}
             <div className="max-h-[60vh] overflow-y-auto p-4">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {filteredProducts.map((product) => {
-                  // Check if product is already selected
-                  const isSelected = selectedIds.has(product.id);
-                  // Check if product is unique (can only be selected once) and already selected
-                  const isUniqueAndSelected = uniqueProductIds.has(product.id) && isSelected;
-                  // Product is disabled if it's a unique product that's already selected
-                  // Non-unique products can be selected multiple times
-                  const isDisabled = isUniqueAndSelected;
+                  {filteredProducts.map((product) => {
+                    // Check if product is already selected in another slot
+                    const isSelected = selectedIds.has(product.id);
+                    // Check if this product is currently in the active slot (allow re-selecting same product)
+                    const isCurrentSlotProduct = activeSlot !== null && selections[activeSlot]?.id === product.id;
+                    // Product is disabled if it's already selected in another slot
+                    // Allow selecting the same product that's already in the current slot (for "change" action)
+                    const isDisabled = isSelected && !isCurrentSlotProduct;
                   return (
                     <button
                       key={product.id}
