@@ -438,41 +438,75 @@ function asl_free_gifts_get_product_ids() {
 }
 
 /**
- * Hide free gift products from shop (based on per-rule hide_from_shop setting)
+ * Get array of password-protected product IDs
+ * These products should be hidden from shop listings and search results
+ */
+function asl_get_password_protected_product_ids() {
+    global $wpdb;
+    
+    // Query for all products with a non-empty post_password
+    $results = $wpdb->get_col(
+        $wpdb->prepare(
+            "SELECT ID FROM {$wpdb->posts} 
+             WHERE post_type = %s 
+             AND post_status = 'publish' 
+             AND post_password != ''",
+            'product'
+        )
+    );
+    
+    return array_map('intval', $results);
+}
+
+/**
+ * Get all product IDs that should be hidden from shop
+ * Includes both free gift products (with hide_from_shop) and password-protected products
+ */
+function asl_get_hidden_product_ids() {
+    $free_gift_ids = asl_free_gifts_get_product_ids();
+    $password_protected_ids = asl_get_password_protected_product_ids();
+    
+    return array_unique(array_merge($free_gift_ids, $password_protected_ids));
+}
+
+/**
+ * Hide products from shop (free gifts with hide_from_shop AND password-protected products)
  */
 function asl_free_gift_hide_from_shop($query) {
     if (is_admin()) return;
     
-    $free_gift_ids = asl_free_gifts_get_product_ids();
-    if (empty($free_gift_ids)) return;
+    $hidden_ids = asl_get_hidden_product_ids();
+    if (empty($hidden_ids)) return;
     
     $query->set('post__not_in', array_merge(
         $query->get('post__not_in') ?: array(),
-        $free_gift_ids
+        $hidden_ids
     ));
 }
 
 /**
  * Hide from WooCommerce Store API (for headless/Next.js frontend)
+ * Hides both free gift products (with hide_from_shop) and password-protected products
  */
 function asl_free_gift_hide_from_rest_api($args, $request) {
-    $free_gift_ids = asl_free_gifts_get_product_ids();
-    if (empty($free_gift_ids)) return $args;
+    $hidden_ids = asl_get_hidden_product_ids();
+    if (empty($hidden_ids)) return $args;
     
     $existing_exclude = isset($args['post__not_in']) ? $args['post__not_in'] : array();
-    $args['post__not_in'] = array_merge($existing_exclude, $free_gift_ids);
+    $args['post__not_in'] = array_merge($existing_exclude, $hidden_ids);
     
     return $args;
 }
 
 /**
  * Hide from search results
+ * Hides both free gift products (with hide_from_shop) and password-protected products
  */
 function asl_free_gift_hide_from_search($product_ids) {
-    $free_gift_ids = asl_free_gifts_get_product_ids();
-    if (empty($free_gift_ids)) return $product_ids;
+    $hidden_ids = asl_get_hidden_product_ids();
+    if (empty($hidden_ids)) return $product_ids;
     
-    return array_diff($product_ids, $free_gift_ids);
+    return array_diff($product_ids, $hidden_ids);
 }
 
 // Initialize ASL Free Gift
