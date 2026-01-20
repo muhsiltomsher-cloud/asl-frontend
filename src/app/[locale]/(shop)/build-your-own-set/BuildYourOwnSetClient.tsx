@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { X, Plus, Minus, Search, Check, ChevronDown } from "lucide-react";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { TamaraPromoWidget } from "@/components/payment/TamaraPromoWidget";
+import { PaymentWidgets } from "@/components/payment/PaymentWidgets";
 import { useCart } from "@/contexts/CartContext";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useFreeGift } from "@/contexts/FreeGiftContext";
@@ -765,11 +765,9 @@ export function BuildYourOwnSetClient({
             </div>
           </div>
 
-          {/* Payment Widgets */}
+          {/* Payment Widgets - Only shows if payment gateway is enabled */}
           {total > 0 && (
-            <div className="space-y-2 rounded-lg bg-[#e7e2d6] p-3">
-              <TamaraPromoWidget price={total} currency={currency} locale={locale} />
-            </div>
+            <PaymentWidgets price={total} currency={currency} locale={locale} />
           )}
 
           {/* Quantity and Add to Cart */}

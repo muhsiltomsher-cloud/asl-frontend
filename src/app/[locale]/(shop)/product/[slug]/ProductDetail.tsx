@@ -14,7 +14,9 @@ import { RelatedProducts } from "@/components/shop/RelatedProducts";
 import { RecentlyViewed } from "@/components/shop/RecentlyViewed";
 import { ProductAddons } from "@/components/shop/ProductAddons";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { PaymentWidgets } from "@/components/payment/PaymentWidgets";
 import { useCart } from "@/contexts/CartContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import type { WCProduct } from "@/types/woocommerce";
@@ -311,6 +313,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], addonForm
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [addonErrors, setAddonErrors] = useState<Record<string, string>>({});
     const { addToCart } = useCart();
+    const { currency } = useCurrency();
     const { addToWishlist, removeFromWishlist, isInWishlist, getWishlistItemId } = useWishlist();
     const { isAuthenticated } = useAuth();
     const router = useRouter();
@@ -816,6 +819,13 @@ export function ProductDetail({ product, locale, relatedProducts = [], addonForm
               />
             </div>
           )}
+
+          {/* Payment Widgets - Only shows if payment gateway is enabled */}
+          <PaymentWidgets 
+            price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)} 
+            currency={currency} 
+            locale={locale} 
+          />
 
           {/* Add to Cart Section */}
           <div className="space-y-4">
