@@ -173,13 +173,25 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       return true;
     }
 
-    // Fallback check: product ID matches a gift rule (check both EN and AR product IDs)
+    // Secondary check: product ID matches a gift rule (check both EN and AR product IDs)
     // This handles cases where CoCart doesn't preserve the flag
     // and where the gift product has a non-zero price
-    return rules.some((rule) => {
+    const matchesRule = rules.some((rule) => {
       const localizedProductId = getLocalizedProductId(rule, locale);
       return localizedProductId === item.id || rule.product_id === item.id || rule.product_id_ar === item.id;
     });
+    if (matchesRule) return true;
+
+    // Tertiary check: item has price 0 and slug contains "free-gift" or "هدية"
+    // This handles edge cases where the product ID might not match due to WPML translation issues
+    const itemPrice = parseFloat(item.price);
+    const itemSlug = item.slug?.toLowerCase() || '';
+    const itemName = item.name?.toLowerCase() || '';
+    if (itemPrice === 0 && (itemSlug.includes('free-gift') || itemSlug.includes('gift') || itemName.includes('free gift') || itemName.includes('هدية'))) {
+      return true;
+    }
+
+    return false;
   }, [cartItems, rules, locale]);
 
   const isFreeGiftProduct = useCallback((productId: number): boolean => {
