@@ -788,7 +788,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], addonForm
                     {product.description && sanitizeProductDescription(product.description) && (
                       <div className="relative">
                         <div
-                          className={`prose prose-sm max-w-none text-gray-600 ${!isDescriptionExpanded ? 'line-clamp-4' : ''}`}
+                          className={`prose prose-sm max-w-none text-gray-600 ${!isDescriptionExpanded ? 'line-clamp-4 overflow-hidden' : ''}`}
                           dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description) }}
                         />
                         <button
