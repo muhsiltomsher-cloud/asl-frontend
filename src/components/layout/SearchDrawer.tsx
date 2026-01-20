@@ -15,6 +15,7 @@ import type { WCProduct } from "@/types/woocommerce";
 import { getProducts } from "@/lib/api/woocommerce";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { getProductSlugFromPermalink, decodeHtmlEntities } from "@/lib/utils";
+import { useFreeGift } from "@/contexts/FreeGiftContext";
 
 interface SearchDrawerProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export function SearchDrawer({
   dictionary,
 }: SearchDrawerProps) {
   const router = useRouter();
+  const { getFreeGiftProductIds } = useFreeGift();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<WCProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,14 +53,19 @@ export function SearchDrawer({
         per_page: 6,
         locale,
       });
-      setResults(response.products);
+      // Filter out free gift products from search results
+      const freeGiftIds = getFreeGiftProductIds();
+      const filteredProducts = response.products.filter(
+        (product) => !freeGiftIds.includes(product.id)
+      );
+      setResults(filteredProducts);
     } catch (error) {
       console.error("Search error:", error);
       setResults([]);
     } finally {
       setLoading(false);
     }
-  }, [locale]);
+  }, [locale, getFreeGiftProductIds]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
