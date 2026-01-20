@@ -106,7 +106,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
 
         {/* Main header */}
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-20 xl:h-24">
+          <div className="relative flex items-center justify-between h-16 xl:h-20">
             {/* Mobile: Left side - Menu button only */}
             <button
               type="button"
@@ -121,8 +121,8 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
               )}
             </button>
 
-            {/* Logo */}
-            <Link href={`/${locale}`} className="flex items-center">
+            {/* Logo - centered on mobile */}
+            <Link href={`/${locale}`} className="flex items-center absolute left-1/2 -translate-x-1/2 xl:static xl:translate-x-0">
               {headerSettings?.logo || siteSettings?.logo?.url ? (
                 <Image
                   src={headerSettings?.logo || siteSettings?.logo?.url || ""}
