@@ -109,7 +109,7 @@ export function MobileBottomBar({ locale, settings, dictionary }: MobileBottomBa
                     <IconComponent className="h-5 w-5" />
                   </div>
                   {label && (
-                    <span className="text-[10px] font-medium leading-tight">{label}</span>
+                    <span className="text-[9px] font-medium leading-tight">{label}</span>
                   )}
                 </button>
               );
@@ -130,7 +130,7 @@ export function MobileBottomBar({ locale, settings, dictionary }: MobileBottomBa
                   )}
                 </div>
                 {label && (
-                  <span className="text-[10px] font-medium leading-tight">{label}</span>
+                  <span className="text-[9px] font-medium leading-tight">{label}</span>
                 )}
               </Link>
             );

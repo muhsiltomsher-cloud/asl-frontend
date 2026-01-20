@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Home } from "lucide-react";
 import { Input } from "@/components/common/Input";
 import { Button } from "@/components/common/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -124,6 +125,16 @@ export default function LoginPage({ params }: LoginPageProps) {
         <div className="overflow-hidden rounded-2xl shadow-2xl">
           {/* Login Form */}
           <div className="bg-white p-6 md:p-8 lg:p-12">
+            {/* Home Icon */}
+            <div className="mb-4">
+              <Link
+                href={`/${locale}`}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#f7f6f2] text-[#92400e] hover:bg-[#92400e] hover:text-white transition-all duration-300"
+                aria-label="Home"
+              >
+                <Home className="h-5 w-5" />
+              </Link>
+            </div>
             <div className={`mb-6 ${isRTL ? "text-right" : "text-left"}`}>
               <div className="inline-block">
                 <h1 className="text-sm font-bold tracking-widest text-[#92400e] uppercase">{texts.login}</h1>
