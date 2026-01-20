@@ -1,4 +1,5 @@
 import type { CoCartItem } from "@/lib/api/cocart";
+import type { FreeGiftRule } from "@/contexts/FreeGiftContext";
 
 export interface MiniCartDrawerProps {
   locale: string;
@@ -46,7 +47,5 @@ export interface GiftSectionProps {
     currentSubtotal: number;
     nextGiftRule?: { min_cart_value: number } | null;
   };
-  activeGifts: Array<{
-    product?: { name?: string } | null;
-  }>;
+  activeGifts: FreeGiftRule[];
 }
