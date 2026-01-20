@@ -97,6 +97,7 @@ interface FreeGiftContextType {
 const FreeGiftContext = createContext<FreeGiftContextType | undefined>(undefined);
 
 const FREE_GIFT_ITEM_DATA_KEY = "_asl_free_gift";
+const FREE_GIFT_RULE_ID_KEY = "_asl_free_gift_rule_id";
 
 // Helper to generate a stable hash of cart state for comparison
 // Only include non-gift items in the hash to prevent re-processing when gifts are added
@@ -297,19 +298,29 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       // A gift item is identified by:
       // 1. Having the _asl_free_gift flag in cart_item_data (if CoCart preserves it)
       // 2. OR having a product_id that matches a gift rule (check both EN and AR product IDs)
-      const existingFreeGifts: Array<{ item: typeof cartItems[0]; rule: FreeGiftRule | undefined }> = [];
+      // We now also track the rule ID to support multiple rules with the same product
+      const existingFreeGifts: Array<{ item: typeof cartItems[0]; rule: FreeGiftRule | undefined; ruleId: string | undefined }> = [];
       for (const item of cartItems) {
         const isFreeGiftFlag = item.cart_item_data?.[FREE_GIFT_ITEM_DATA_KEY] === true;
-        // Check if item matches any gift rule (both EN and AR product IDs)
-        const matchingRule = rules.find((rule) => {
-          const localizedProductId = getLocalizedProductId(rule, locale);
-          return localizedProductId === item.id || rule.product_id === item.id || rule.product_id_ar === item.id;
-        });
+        const storedRuleId = item.cart_item_data?.[FREE_GIFT_RULE_ID_KEY] as string | undefined;
+        
+        // If we have a stored rule ID, find that specific rule
+        // Otherwise, find any matching rule by product ID (for backwards compatibility)
+        let matchingRule: FreeGiftRule | undefined;
+        if (storedRuleId) {
+          matchingRule = rules.find((rule) => rule.id === storedRuleId);
+        } else {
+          // Check if item matches any gift rule (both EN and AR product IDs)
+          matchingRule = rules.find((rule) => {
+            const localizedProductId = getLocalizedProductId(rule, locale);
+            return localizedProductId === item.id || rule.product_id === item.id || rule.product_id_ar === item.id;
+          });
+        }
         
         // If the product matches a gift rule, treat it as a gift
         // This handles cases where CoCart doesn't preserve the flag
         if (isFreeGiftFlag || matchingRule) {
-          existingFreeGifts.push({ item, rule: matchingRule });
+          existingFreeGifts.push({ item, rule: matchingRule, ruleId: storedRuleId || matchingRule?.id });
         }
       }
 
@@ -357,15 +368,14 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
         }
       }
 
-      const existingGiftProductIds = new Set(existingFreeGifts.map(({ item }) => item.id));
-      // Use locale-aware product IDs for matching
-      const matchingProductIds = new Set(matchingRules.map((r) => getLocalizedProductId(r, locale)));
+      // Track by rule ID to support multiple rules with the same product
+      const existingGiftRuleIds = new Set(existingFreeGifts.map(({ ruleId }) => ruleId).filter(Boolean));
+      const matchingRuleIds = new Set(matchingRules.map((r) => r.id));
 
-      const giftsToRemove = existingFreeGifts.filter(({ item }) => !matchingProductIds.has(item.id));
-      const rulesToAdd = matchingRules.filter((rule) => {
-        const localizedProductId = getLocalizedProductId(rule, locale);
-        return !existingGiftProductIds.has(localizedProductId);
-      });
+      // Remove gifts whose rules no longer match (by rule ID)
+      const giftsToRemove = existingFreeGifts.filter(({ ruleId }) => !ruleId || !matchingRuleIds.has(ruleId));
+      // Add gifts for rules that don't have a gift yet (by rule ID)
+      const rulesToAdd = matchingRules.filter((rule) => !existingGiftRuleIds.has(rule.id));
 
       if (giftsToRemove.length === 0 && rulesToAdd.length === 0) {
         // Only update the hash when no changes are needed
@@ -385,13 +395,15 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
           }
         }
 
-        for (const rule of rulesToAdd) {
-          try {
-            // Use locale-aware product ID when adding to cart
-            const localizedProductId = getLocalizedProductId(rule, locale);
-            await addToCartRef.current(localizedProductId, 1, undefined, undefined, {
-              [FREE_GIFT_ITEM_DATA_KEY]: true,
-            });
+                for (const rule of rulesToAdd) {
+                  try {
+                    // Use locale-aware product ID when adding to cart
+                    // Include rule ID in cart_item_data to support multiple rules with the same product
+                    const localizedProductId = getLocalizedProductId(rule, locale);
+                    await addToCartRef.current(localizedProductId, 1, undefined, undefined, {
+                      [FREE_GIFT_ITEM_DATA_KEY]: true,
+                      [FREE_GIFT_RULE_ID_KEY]: rule.id,
+                    });
             
             // Open mini cart and dispatch event for gift highlight effect
             // Don't open cart on order confirmation page
