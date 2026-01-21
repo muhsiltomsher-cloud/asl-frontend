@@ -815,9 +815,11 @@ export default function CheckoutClient() {
 
             // Only clear cart for non-external payment methods (like COD)
             // For external payments, cart will be cleared in order-confirmation after payment is verified
+            // Note: We don't await clearCart() to avoid blocking the redirect if the cart API is slow
+            // The order is already created successfully, so we should redirect immediately
             if (!isExternalPayment) {
               if (clearCart) {
-                await clearCart();
+                clearCart().catch((err) => console.error("Failed to clear cart:", err));
               }
               clearSelectedCoupons();
             }
