@@ -1,17 +1,37 @@
 import { notFound, redirect } from "next/navigation";
 import { getProductBySlug, getRelatedProducts, getProducts, getEnglishSlugForProduct, getBundleConfig, getFreeGiftProductIds, getHiddenProductIds, getCategoryBySlug, getEnglishSlugForCategory } from "@/lib/api/woocommerce";
 import { getProductAddons } from "@/lib/api/wcpa";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateProductJsonLd } from "@/lib/utils/seo";
 import { ProductDetail } from "./ProductDetail";
 import { BuildYourOwnSetClient } from "../../build-your-own-set/BuildYourOwnSetClient";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig, type Locale } from "@/config/site";
 import { decodeHtmlEntities } from "@/lib/utils";
 import type { Metadata } from "next";
+import type { WCProduct } from "@/types/woocommerce";
 
 // Helper to check if a slug contains non-ASCII characters (e.g., Arabic)
 function isNonAsciiSlug(slug: string): boolean {
   return /[^\x00-\x7F]/.test(slug);
+}
+
+// Helper to generate product JSON-LD data from WCProduct
+function getProductJsonLdData(product: WCProduct, locale: string, slug: string) {
+  const minorUnit = product.prices.currency_minor_unit || 2;
+  const divisor = Math.pow(10, minorUnit);
+  const price = (parseInt(product.prices.price, 10) / divisor).toFixed(2);
+  
+  return generateProductJsonLd({
+    name: decodeHtmlEntities(product.name),
+    description: decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 500),
+    image: product.images[0]?.src || "",
+    price,
+    currency: product.prices.currency_code,
+    sku: product.sku || undefined,
+    availability: product.is_in_stock ? "InStock" : "OutOfStock",
+    url: `${siteConfig.url}/${locale}/product/${slug}`,
+  });
 }
 
 // Increased revalidate time for better cache hit rates (5 minutes instead of 60 seconds)
@@ -134,15 +154,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
     ];
     
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
-        <BuildYourOwnSetClient
-          products={bundleProducts}
-          locale={locale as Locale}
-          bundleProduct={product}
-          bundleConfig={bundleConfig}
-        />
-      </div>
+      <>
+        <JsonLd data={getProductJsonLdData(product, locale, slug)} />
+        <div className="container mx-auto px-4 py-8">
+          <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
+          <BuildYourOwnSetClient
+            products={bundleProducts}
+            locale={locale as Locale}
+            bundleProduct={product}
+            bundleConfig={bundleConfig}
+          />
+        </div>
+      </>
     );
   }
 
@@ -183,14 +206,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const localizedCategoryName = localizedCategory?.name || primaryCategory?.name || null;
 
   return (
-    <ProductDetail
-      product={product}
-      locale={locale as Locale}
-      relatedProducts={relatedProducts}
-      addonForms={productAddons?.forms}
-      englishCategorySlug={englishCategorySlug}
-      localizedCategoryName={localizedCategoryName}
-      hiddenGiftProductIds={hiddenGiftProductIds}
-    />
+    <>
+      <JsonLd data={getProductJsonLdData(product, locale, slug)} />
+      <ProductDetail
+        product={product}
+        locale={locale as Locale}
+        relatedProducts={relatedProducts}
+        addonForms={productAddons?.forms}
+        englishCategorySlug={englishCategorySlug}
+        localizedCategoryName={localizedCategoryName}
+        hiddenGiftProductIds={hiddenGiftProductIds}
+      />
+    </>
   );
 }
