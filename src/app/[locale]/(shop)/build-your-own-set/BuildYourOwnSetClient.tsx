@@ -140,12 +140,6 @@ export function BuildYourOwnSetClient({
     return new Set(bundleConfig.exclude_categories);
   }, [bundleConfig]);
 
-  // Get unique product IDs from bundle config (products that can only be selected once)
-  const uniqueProductIds = useMemo(() => {
-    if (!bundleConfig?.unique_products?.length) return new Set<number>();
-    return new Set(bundleConfig.unique_products);
-  }, [bundleConfig]);
-
   // Get slot-specific configuration for the active slot
   const activeSlotConfig = useMemo(() => {
     if (activeSlot === null || !bundleConfig?.slots?.length) return null;
