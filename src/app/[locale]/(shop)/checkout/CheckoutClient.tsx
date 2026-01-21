@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
@@ -163,6 +163,12 @@ export default function CheckoutClient() {
         const [confirmPassword, setConfirmPassword] = useState("");
         const [passwordError, setPasswordError] = useState<string | null>(null);
         const [isCreatingAccount, setIsCreatingAccount] = useState(false);
+        
+        // Email registration check state
+        const [isEmailRegistered, setIsEmailRegistered] = useState(false);
+        const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+        const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+        const emailCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const currencyMinorUnit = cart?.currency?.currency_minor_unit ?? 2;
   const divisor = Math.pow(10, currencyMinorUnit);
@@ -531,6 +537,66 @@ export default function CheckoutClient() {
   const handleNotesChange = (value: string) => {
     setFormData((prev) => ({ ...prev, orderNotes: value }));
   };
+
+  // Check if email is registered (debounced)
+  const checkEmailRegistration = useCallback(async (email: string) => {
+    // Don't check if user is already authenticated
+    if (isAuthenticated) {
+      setIsEmailRegistered(false);
+      setShowLoginPrompt(false);
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setIsEmailRegistered(false);
+      setShowLoginPrompt(false);
+      return;
+    }
+
+    setIsCheckingEmail(true);
+    try {
+      const response = await fetch(`/api/customer/check-email?email=${encodeURIComponent(email)}`);
+      const data = await response.json();
+      
+      if (data.success && data.data.isRegistered) {
+        setIsEmailRegistered(true);
+        setShowLoginPrompt(true);
+      } else {
+        setIsEmailRegistered(false);
+        setShowLoginPrompt(false);
+      }
+    } catch (error) {
+      console.error("Failed to check email registration:", error);
+      setIsEmailRegistered(false);
+      setShowLoginPrompt(false);
+    } finally {
+      setIsCheckingEmail(false);
+    }
+  }, [isAuthenticated]);
+
+  // Debounced email check when email changes
+  useEffect(() => {
+    const email = formData.shipping.email;
+    
+    // Clear any existing timeout
+    if (emailCheckTimeoutRef.current) {
+      clearTimeout(emailCheckTimeoutRef.current);
+    }
+
+    // Set a new timeout to check email after 500ms of no typing
+    emailCheckTimeoutRef.current = setTimeout(() => {
+      checkEmailRegistration(email);
+    }, 500);
+
+    // Cleanup on unmount
+    return () => {
+      if (emailCheckTimeoutRef.current) {
+        clearTimeout(emailCheckTimeoutRef.current);
+      }
+    };
+  }, [formData.shipping.email, checkEmailRegistration]);
 
   const handleSelectSavedAddress = (address: SavedAddress) => {
     setSelectedAddressId(address.id);
@@ -1120,13 +1186,18 @@ export default function CheckoutClient() {
                               {isRTL ? "معلومات الاتصال" : "Contact Information"}
                             </h2>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Input
-                  label={isRTL ? "البريد الإلكتروني" : "Email"}
-                  type="email"
-                  required
-                  value={formData.shipping.email}
-                  onChange={(e) => handleShippingChange("email", e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    label={isRTL ? "البريد الإلكتروني" : "Email"}
+                    type="email"
+                    required
+                    value={formData.shipping.email}
+                    onChange={(e) => handleShippingChange("email", e.target.value)}
+                  />
+                  {isCheckingEmail && (
+                    <div className="absolute right-3 top-9 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+                  )}
+                </div>
                 <Input
                   label={isRTL ? "رقم الهاتف" : "Phone"}
                   type="tel"
@@ -1135,6 +1206,47 @@ export default function CheckoutClient() {
                   onChange={(e) => handleShippingChange("phone", e.target.value)}
                 />
               </div>
+              
+              {/* Login Prompt for Registered Email */}
+              {showLoginPrompt && !isAuthenticated && (
+                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-medium text-amber-800">
+                        {isRTL ? "هذا البريد الإلكتروني مسجل بالفعل" : "This email is already registered"}
+                      </h3>
+                      <p className="mt-1 text-sm text-amber-700">
+                        {isRTL 
+                          ? "يرجى تسجيل الدخول لربط هذا الطلب بحسابك وتتبع طلباتك بسهولة."
+                          : "Please log in to link this order to your account and easily track your orders."}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="primary"
+                          size="sm"
+                          onClick={() => router.push(`/${locale}/login?redirect=${encodeURIComponent(`/${locale}/checkout`)}`)}
+                        >
+                          {isRTL ? "تسجيل الدخول" : "Log In"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowLoginPrompt(false)}
+                        >
+                          {isRTL ? "المتابعة كضيف" : "Continue as Guest"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Create Account Option - Only for guest users */}
               {!isAuthenticated && (
