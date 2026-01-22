@@ -113,10 +113,14 @@ export async function GET() {
             };
           });
 
+        // Check if MyFatoorah test mode is enabled
+        const myFatoorahTestMode = getEnvVar("MYFATOORAH_TEST_MODE") === "true";
+
         return NextResponse.json({ 
           success: true, 
           gateways: enabledGateways,
           source: "woocommerce_rest_api", // Indicates reliable enabled status
+          myfatoorah_test_mode: myFatoorahTestMode,
         });
       }
     }
@@ -172,10 +176,14 @@ export async function GET() {
         };
       });
 
+    // Check if MyFatoorah test mode is enabled
+    const myFatoorahTestMode = getEnvVar("MYFATOORAH_TEST_MODE") === "true";
+
     return NextResponse.json({ 
       success: true, 
       gateways,
       source: "store_api_fallback", // Indicates we couldn't verify enabled status from REST API
+      myfatoorah_test_mode: myFatoorahTestMode,
     });
   } catch (error) {
     return NextResponse.json(
