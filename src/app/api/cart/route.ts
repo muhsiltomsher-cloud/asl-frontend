@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 const API_BASE = siteConfig.apiUrl;
 const CART_KEY_COOKIE = "cocart_cart_key";
 const AUTH_TOKEN_COOKIE = "asl_auth_token";
+const AUTH_REFRESH_TOKEN_COOKIE = "asl_refresh_token";
 const CURRENCY_COOKIE = "wcml_currency";
 const LOCALE_COOKIE = "NEXT_LOCALE";
 
@@ -19,6 +20,35 @@ async function getCartKey(): Promise<string | null> {
 async function getAuthToken(): Promise<string | null> {
   const cookieStore = await cookies();
   return cookieStore.get(AUTH_TOKEN_COOKIE)?.value || null;
+}
+
+async function getRefreshToken(): Promise<string | null> {
+  const cookieStore = await cookies();
+  return cookieStore.get(AUTH_REFRESH_TOKEN_COOKIE)?.value || null;
+}
+
+// Attempt to refresh the JWT token using the refresh token
+async function tryRefreshToken(): Promise<string | null> {
+  const refreshTokenValue = await getRefreshToken();
+  if (!refreshTokenValue) return null;
+
+  try {
+    const response = await fetch(`${API_BASE}/wp-json/cocart/jwt/refresh-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": USER_AGENT,
+      },
+      body: JSON.stringify({ refresh_token: refreshTokenValue }),
+    });
+
+    if (!response.ok) return null;
+
+    const data = await response.json();
+    return data.jwt_token || data.token || null;
+  } catch {
+    return null;
+  }
 }
 
 async function getCurrency(): Promise<string | null> {
@@ -134,6 +164,7 @@ async function getStoreApiAuth(): Promise<{ cartToken: string | null; nonce: str
 function createResponseWithCartKey(
   data: Record<string, unknown>,
   cartKey: string | null,
+  newAuthToken: string | null = null,
   status: number = 200
 ): NextResponse {
   const response = NextResponse.json(data, { status });
@@ -143,6 +174,17 @@ function createResponseWithCartKey(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    });
+  }
+  
+  // Update auth token cookie if we refreshed it
+  if (newAuthToken) {
+    response.cookies.set(AUTH_TOKEN_COOKIE, newAuthToken, {
+      httpOnly: false, // Needs to be accessible by client-side JS
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     });
@@ -173,14 +215,34 @@ export async function GET(request: NextRequest) {
     });
 
     let data = await response.json();
+    let refreshedToken: string | null = null;
 
-    // If auth failed and we had a token, retry as guest (token might be stale/invalid)
+    // If auth failed and we had a token, try to refresh the token first
     if (!response.ok && authToken && isAuthError(response.status, data)) {
-      response = await fetch(guestUrl, {
-        method: "GET",
-        headers: getGuestHeaders(),
-      });
-      data = await response.json();
+      refreshedToken = await tryRefreshToken();
+      
+      if (refreshedToken) {
+        // Retry with the refreshed token
+        response = await fetch(authUrl, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": USER_AGENT,
+            "Authorization": `Bearer ${refreshedToken}`,
+          },
+        });
+        data = await response.json();
+      }
+      
+      // If token refresh failed or request still fails, fall back to guest
+      if (!refreshedToken || !response.ok) {
+        refreshedToken = null; // Don't update cookie if we're falling back to guest
+        response = await fetch(guestUrl, {
+          method: "GET",
+          headers: getGuestHeaders(),
+        });
+        data = await response.json();
+      }
     }
 
     // If guest request failed with 403 and we have a stale cart key, retry without cart key
@@ -209,7 +271,7 @@ export async function GET(request: NextRequest) {
 
     // Store cart_key for future requests (for guest users or when falling back to guest)
     const newCartKey = data.cart_key ? data.cart_key : null;
-    return createResponseWithCartKey({ success: true, cart: data }, newCartKey);
+    return createResponseWithCartKey({ success: true, cart: data }, newCartKey, refreshedToken);
   } catch (error) {
     return NextResponse.json(
       {
@@ -358,18 +420,42 @@ export async function POST(request: NextRequest) {
 
     let response = await fetch(url, fetchOptions);
     let data = await response.json();
+    let refreshedToken: string | null = null;
 
-    // If auth failed and we had a token, retry as guest (token might be stale/invalid)
+    // If auth failed and we had a token, try to refresh the token first
     if (!response.ok && authToken && isAuthError(response.status, data)) {
-      const guestFetchOptions: RequestInit = {
-        method,
-        headers: getGuestHeaders(),
-      };
-      if (method !== "DELETE" && Object.keys(body).length > 0) {
-        guestFetchOptions.body = JSON.stringify(body);
+      refreshedToken = await tryRefreshToken();
+      
+      if (refreshedToken) {
+        // Retry with the refreshed token
+        const refreshedFetchOptions: RequestInit = {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            "User-Agent": USER_AGENT,
+            "Authorization": `Bearer ${refreshedToken}`,
+          },
+        };
+        if (method !== "DELETE" && Object.keys(body).length > 0) {
+          refreshedFetchOptions.body = JSON.stringify(body);
+        }
+        response = await fetch(baseUrl, refreshedFetchOptions);
+        data = await response.json();
       }
-      response = await fetch(guestUrl, guestFetchOptions);
-      data = await response.json();
+      
+      // If token refresh failed or request still fails, fall back to guest
+      if (!refreshedToken || !response.ok) {
+        refreshedToken = null; // Don't update cookie if we're falling back to guest
+        const guestFetchOptions: RequestInit = {
+          method,
+          headers: getGuestHeaders(),
+        };
+        if (method !== "DELETE" && Object.keys(body).length > 0) {
+          guestFetchOptions.body = JSON.stringify(body);
+        }
+        response = await fetch(guestUrl, guestFetchOptions);
+        data = await response.json();
+      }
     }
 
     // If guest request failed with 403 and we have a stale cart key, retry without cart key
@@ -402,7 +488,7 @@ export async function POST(request: NextRequest) {
 
     // Store cart_key for future requests (for guest users or when falling back to guest)
     const newCartKey = data.cart_key ? data.cart_key : null;
-    return createResponseWithCartKey({ success: true, cart: data }, newCartKey);
+    return createResponseWithCartKey({ success: true, cart: data }, newCartKey, refreshedToken);
   } catch (error) {
     return NextResponse.json(
       {
