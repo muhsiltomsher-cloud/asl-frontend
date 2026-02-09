@@ -273,6 +273,10 @@ export default async function ContactPage({ params }: ContactPageProps) {
                         <a href={`mailto:${item.content}`} className="text-amber-700 transition-colors hover:text-amber-900">
                           {item.content}
                         </a>
+                      ) : item.key === "address" ? (
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.content)}`} target="_blank" rel="noopener noreferrer" className="text-amber-700 transition-colors hover:text-amber-900">
+                          {item.content}
+                        </a>
                       ) : (
                         <p className="text-amber-700">{item.content}</p>
                       )}
