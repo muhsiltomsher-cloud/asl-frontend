@@ -17,6 +17,7 @@ import { getCustomer, getSavedAddressesFromCustomer, type Customer, type SavedAd
 import { featureFlags, type Locale } from "@/config/site";
 import { MapPin, Check, ChevronDown, ChevronUp, Tag, X, Truck } from "lucide-react";
 import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getPricingMode, getFixedPrice, getBundleTotal } from "@/components/cart/BundleItemsList";
+import { PhoneInput } from "@/components/common/PhoneInput";
 
 interface ShippingRate {
   rate_id: string;
@@ -1250,12 +1251,13 @@ export default function CheckoutClient() {
                     <div className="absolute right-3 top-9 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
                   )}
                 </div>
-                <Input
+                <PhoneInput
                   label={isRTL ? "رقم الهاتف" : "Phone"}
-                  type="tel"
                   required
                   value={formData.shipping.phone}
-                  onChange={(e) => handleShippingChange("phone", e.target.value)}
+                  onChange={(phone) => handleShippingChange("phone", phone)}
+                  countryCode={formData.shipping.country}
+                  isRTL={isRTL}
                 />
               </div>
               
@@ -1669,11 +1671,12 @@ export default function CheckoutClient() {
                     onChange={(value) => handleBillingChange("country", value)}
                     isRTL={isRTL}
                   />
-                  <Input
+                  <PhoneInput
                     label={isRTL ? "رقم الهاتف" : "Phone"}
-                    type="tel"
                     value={formData.billing.phone}
-                    onChange={(e) => handleBillingChange("phone", e.target.value)}
+                    onChange={(phone) => handleBillingChange("phone", phone)}
+                    countryCode={formData.billing.country}
+                    isRTL={isRTL}
                   />
                   <Input
                     label={isRTL ? "البريد الإلكتروني" : "Email"}
