@@ -10,6 +10,7 @@ import { CurrencySwitcher } from "@/components/common/CurrencySwitcher";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { cn } from "@/lib/utils";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
@@ -40,14 +41,27 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
   // Hide top bar on cart and checkout pages
   const hideTopBar = pathname?.includes("/cart") || pathname?.includes("/checkout");
 
-  // Get topbar text based on locale
-  const topbarText = topbarSettings?.enabled !== false
-    ? (isRTL && topbarSettings?.textAr ? topbarSettings.textAr : topbarSettings?.text) || ""
-    : "";
   const [isCategoriesDrawerOpen, setIsCategoriesDrawerOpen] = useState(false);
   const { cartItemsCount, setIsCartOpen } = useCart();
   const { setIsAccountDrawerOpen } = useAuth();
   const { wishlistItemsCount } = useWishlist();
+  const { convertPrice, getCurrencyInfo } = useCurrency();
+
+  const currencyInfo = getCurrencyInfo();
+
+  const resolveTopbarText = (text: string): string => {
+    if (!topbarSettings?.freeShippingThreshold) return text;
+    const convertedAmount = convertPrice(topbarSettings.freeShippingThreshold);
+    const roundedAmount = Math.ceil(convertedAmount);
+    let resolved = text.replace(/\{\{amount\}\}/g, String(roundedAmount));
+    resolved = resolved.replace(/\{\{currency\}\}/g, currencyInfo.code);
+    return resolved;
+  };
+
+  const rawTopbarText = topbarSettings?.enabled !== false
+    ? (isRTL && topbarSettings?.textAr ? topbarSettings.textAr : topbarSettings?.text) || ""
+    : "";
+  const topbarText = resolveTopbarText(rawTopbarText);
 
     const handleShopMouseEnter= useCallback(() => {
       if (megaMenuTimeoutRef.current) {

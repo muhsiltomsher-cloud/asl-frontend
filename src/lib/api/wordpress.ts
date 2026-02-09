@@ -156,6 +156,7 @@ interface WPPluginTopbarSettings {
   bgColor: string;
   textColor: string;
   dismissible: boolean;
+  freeShippingThreshold?: number;
 }
 
 // Frontend types for topbar
@@ -167,6 +168,7 @@ export interface TopbarSettings {
   bgColor: string;
   textColor: string;
   dismissible: boolean;
+  freeShippingThreshold: number | null;
 }
 
 export interface MobileBarItem {
@@ -726,12 +728,13 @@ export async function getMobileBarSettings(locale?: Locale): Promise<MobileBarSe
 // Default topbar settings
 const defaultTopbarSettings: TopbarSettings = {
   enabled: true,
-  text: "Free shipping on orders over 200 SAR",
-  textAr: "شحن مجاني للطلبات فوق 200 ريال",
+  text: "Free shipping on orders over {{amount}} {{currency}}",
+  textAr: "شحن مجاني للطلبات فوق {{amount}} {{currency}}",
   link: null,
   bgColor: "#f3f4f6",
   textColor: "#4b5563",
   dismissible: false,
+  freeShippingThreshold: 500,
 };
 
 // Fetch topbar settings from WordPress Plugin API
@@ -757,6 +760,7 @@ export async function getTopbarSettings(locale?: Locale): Promise<TopbarSettings
     bgColor: data.bgColor || defaultTopbarSettings.bgColor,
     textColor: data.textColor || defaultTopbarSettings.textColor,
     dismissible: data.dismissible,
+    freeShippingThreshold: data.freeShippingThreshold ?? defaultTopbarSettings.freeShippingThreshold,
   };
 }
 
