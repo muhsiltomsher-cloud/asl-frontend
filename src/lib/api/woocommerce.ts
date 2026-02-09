@@ -128,9 +128,15 @@ export async function getProducts(params?: {
       revalidate: 300,
     });
 
+    const visibleProducts = products.filter(
+      (product) =>
+        product.is_purchasable !== false &&
+        (!product.catalog_visibility || product.catalog_visibility === "visible" || product.catalog_visibility === "catalog")
+    );
+
     return {
-      products,
-      total,
+      products: visibleProducts,
+      total: total - (products.length - visibleProducts.length),
       totalPages,
     };
   } catch (error) {
@@ -1023,8 +1029,9 @@ export async function getFeaturedProducts(params?: {
       variations: [],
       grouped_products: [],
       has_options: false,
-      is_purchasable: product.purchasable !== false,
+      is_purchasable: product.purchasable !== false && product.status === "publish",
       is_in_stock: product.stock_status === "instock",
+      catalog_visibility: (product.catalog_visibility as WCProduct["catalog_visibility"]) || "visible",
       is_on_backorder: product.stock_status === "onbackorder",
       low_stock_remaining: null,
       stock_availability: {
@@ -1044,9 +1051,15 @@ export async function getFeaturedProducts(params?: {
       extensions: {},
     }));
 
+    const visibleFeatured = transformedProducts.filter(
+      (product) =>
+        product.is_purchasable !== false &&
+        (!product.catalog_visibility || product.catalog_visibility === "visible" || product.catalog_visibility === "catalog")
+    );
+
     return {
-      products: transformedProducts,
-      total,
+      products: visibleFeatured,
+      total: total - (transformedProducts.length - visibleFeatured.length),
       totalPages,
     };
   } catch (error) {
