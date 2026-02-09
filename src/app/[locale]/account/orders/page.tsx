@@ -2,10 +2,14 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, Package, Eye, FileText } from "lucide-react";
+import { Package, Eye, FileText } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { OrderPrice } from "@/components/common/OrderPrice";
+import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
+import { AccountPageHeader } from "@/components/account/AccountPageHeader";
+import { AccountEmptyState } from "@/components/account/AccountEmptyState";
+import { AccountLoadingSpinner } from "@/components/account/AccountLoadingSpinner";
 import { getCustomerOrders, formatOrderStatus, getOrderStatusColor, formatDate, type Order } from "@/lib/api/customer";
 
 interface OrdersPageProps {
@@ -51,7 +55,7 @@ const translations = {
 
 
 export default function OrdersPage({ params }: OrdersPageProps) {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -84,75 +88,32 @@ export default function OrdersPage({ params }: OrdersPageProps) {
     }
   }, [isAuthenticated, user]);
 
-  if (authLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Package className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <p className="mb-8 text-gray-500">{t.notLoggedIn}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/login`}>{t.login}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="mb-8">
-        <Link
-          href={`/${locale}/account`}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
-          {t.backToAccount}
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-          {t.orders}
-        </h1>
-      </div>
+    <AccountAuthGuard
+      locale={locale}
+      icon={Package}
+      notLoggedInText={t.notLoggedIn}
+      loginText={t.login}
+    >
+      <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
+        <AccountPageHeader
+          locale={locale}
+          title={t.orders}
+          backHref={`/${locale}/account`}
+          backLabel={t.backToAccount}
+        />
 
-      {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4" />
-          <p className="text-gray-500">{t.loading}</p>
-        </div>
-      ) : orders.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Package className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">
-            {t.orderHistory}
-          </h3>
-          <p className="mb-8 text-gray-500">{t.noOrders}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/shop`}>{t.startShopping}</Link>
-          </Button>
-        </div>
-      ) : (
+        {isLoading ? (
+          <AccountLoadingSpinner message={t.loading} />
+        ) : orders.length === 0 ? (
+          <AccountEmptyState
+            icon={Package}
+            title={t.orderHistory}
+            message={t.noOrders}
+            actionLabel={t.startShopping}
+            actionHref={`/${locale}/shop`}
+          />
+        ) : (
         <div className="space-y-4">
           {orders.map((order) => (
             <div
@@ -206,6 +167,7 @@ export default function OrdersPage({ params }: OrdersPageProps) {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </AccountAuthGuard>
   );
 }

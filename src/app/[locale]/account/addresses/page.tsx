@@ -2,10 +2,13 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Edit2, Plus, X, Save, Trash2, Star } from "lucide-react";
+import { MapPin, Edit2, Plus, X, Save, Trash2, Star } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
+import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
+import { AccountPageHeader } from "@/components/account/AccountPageHeader";
+import { AccountLoadingSpinner } from "@/components/account/AccountLoadingSpinner";
 import { Checkbox } from "@/components/common/Checkbox";
 import { CountrySelect } from "@/components/common/CountrySelect";
 import {
@@ -449,7 +452,7 @@ function DeleteConfirmModal({
 }
 
 export default function AddressesPage({ params }: AddressesPageProps) {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -615,59 +618,26 @@ export default function AddressesPage({ params }: AddressesPageProps) {
     setIsModalOpen(true);
   };
 
-  if (authLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <MapPin className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <p className="mb-8 text-gray-500">{t.notLoggedIn}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/login`}>{t.login}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="mb-8">
-        <Link
-          href={`/${locale}/account`}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
-          {t.backToAccount}
-        </Link>
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-            {t.addresses}
-          </h1>
+    <AccountAuthGuard
+      locale={locale}
+      icon={MapPin}
+      notLoggedInText={t.notLoggedIn}
+      loginText={t.login}
+    >
+      <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
+        <AccountPageHeader
+          locale={locale}
+          title={t.addresses}
+          backHref={`/${locale}/account`}
+          backLabel={t.backToAccount}
+        />
+        <div className="flex items-center justify-end -mt-4 mb-6">
           <Button variant="primary" size="sm" onClick={handleOpenAddModal}>
             <Plus className={`h-4 w-4 ${isRTL ? "ml-1" : "mr-1"}`} />
             {t.addAddress}
           </Button>
         </div>
-      </div>
 
       {message && (
         <div
@@ -682,10 +652,7 @@ export default function AddressesPage({ params }: AddressesPageProps) {
       )}
 
       {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4" />
-          <p className="text-gray-500">{t.loading}</p>
-        </div>
+        <AccountLoadingSpinner message={t.loading} />
       ) : savedAddresses.length === 0 ? (
         <div className="text-center py-16">
           <div className="mb-6 flex justify-center">
@@ -739,5 +706,6 @@ export default function AddressesPage({ params }: AddressesPageProps) {
         isRTL={isRTL}
       />
     </div>
+    </AccountAuthGuard>
   );
 }

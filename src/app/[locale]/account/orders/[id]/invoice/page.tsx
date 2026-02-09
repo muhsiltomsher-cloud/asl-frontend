@@ -6,6 +6,9 @@ import Image from "next/image";
 import { ArrowLeft, Package, Printer, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
+import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
+import { AccountLoadingSpinner } from "@/components/account/AccountLoadingSpinner";
+import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 import { OrderPrice } from "@/components/common/OrderPrice";
 import { getOrder, formatOrderStatus, formatDate, type Order } from "@/lib/api/customer";
 import { OrderBundleItemsList, isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
@@ -75,7 +78,7 @@ const translations = {
 };
 
 export default function InvoicePage({ params }: InvoicePageProps) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,73 +137,32 @@ export default function InvoicePage({ params }: InvoicePageProps) {
     window.print();
   };
 
-  if (authLoading) {
+  const renderContent = () => {
+    if (isLoading) {
+      return <AccountLoadingSpinner message={t.loading} />;
+    }
+
+    if (error || !order) {
+      return (
+        <AccountEmptyState
+          icon={Package}
+          title={t.invoiceNotFound}
+          message={error || ""}
+          actionLabel={t.backToOrders}
+          actionHref={`/${locale}/account/orders`}
+        />
+      );
+    }
+
+    return renderInvoice();
+  };
+
+  const renderInvoice = () => {
+    if (!order) return null;
+    const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) - parseFloat(order.total_tax) + parseFloat(order.discount_total);
+
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Package className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <p className="mb-8 text-gray-500">{t.notLoggedIn}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/login`}>{t.login}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4" />
-          <p className="text-gray-500">{t.loading}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !order) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Package className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">{t.invoiceNotFound}</h3>
-          <p className="mb-8 text-gray-500">{error}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/account/orders`}>{t.backToOrders}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) - parseFloat(order.total_tax) + parseFloat(order.discount_total);
-
-  return (
-    <div className="min-h-screen bg-gray-50" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="min-h-screen bg-gray-50" dir={isRTL ? "rtl" : "ltr"}>
       <div className="container mx-auto px-4 py-8 print:py-0 print:px-0">
         <div className="mb-6 flex items-center justify-between print:hidden">
           <Link
@@ -493,6 +455,18 @@ export default function InvoicePage({ params }: InvoicePageProps) {
           }
         }
       `}</style>
-    </div>
+      </div>
+    );
+  };
+
+  return (
+    <AccountAuthGuard
+      locale={locale}
+      icon={Package}
+      notLoggedInText={t.notLoggedIn}
+      loginText={t.login}
+    >
+      {renderContent()}
+    </AccountAuthGuard>
   );
 }

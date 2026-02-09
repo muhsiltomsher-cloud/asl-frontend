@@ -6,6 +6,9 @@ import Image from "next/image";
 import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, Gift, XCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
+import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
+import { AccountLoadingSpinner } from "@/components/account/AccountLoadingSpinner";
+import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 import { OrderPrice, OrderCurrencyBadge } from "@/components/common/OrderPrice";
 import { getOrder, formatOrderStatus, getOrderStatusColor, formatDate, canCancelOrder, cancelOrder, type Order, type OrderLineItem } from "@/lib/api/customer";
 import { OrderBundleItemsList, isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
@@ -192,7 +195,7 @@ function AddressCard({ title, address, icon: Icon }: { title: string; address: O
 }
 
 export default function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -291,73 +294,32 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
     }
   };
 
-  if (authLoading) {
+  const renderContent = () => {
+    if (isLoading) {
+      return <AccountLoadingSpinner message={t.loading} />;
+    }
+
+    if (error || !order) {
+      return (
+        <AccountEmptyState
+          icon={Package}
+          title={t.orderNotFound}
+          message={error || ""}
+          actionLabel={t.backToOrders}
+          actionHref={`/${locale}/account/orders`}
+        />
+      );
+    }
+
+    return renderOrderDetails();
+  };
+
+  const renderOrderDetails = () => {
+    if (!order) return null;
+    const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) - parseFloat(order.total_tax) + parseFloat(order.discount_total);
+
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Package className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <p className="mb-8 text-gray-500">{t.notLoggedIn}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/login`}>{t.login}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4" />
-          <p className="text-gray-500">{t.loading}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !order) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Package className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">{t.orderNotFound}</h3>
-          <p className="mb-8 text-gray-500">{error}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/account/orders`}>{t.backToOrders}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) - parseFloat(order.total_tax) + parseFloat(order.discount_total);
-
-  return (
-    <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
       <div className="mb-8">
         <Link
           href={`/${locale}/account/orders`}
@@ -535,63 +497,75 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
         <OrderNotes orderId={order.id} locale={locale} />
       </div>
 
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" dir={isRTL ? "rtl" : "ltr"}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-                <XCircle className="h-5 w-5 text-red-600" />
+        {showCancelModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl" dir={isRTL ? "rtl" : "ltr"}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">{t.cancelOrder}</h3>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">{t.cancelOrder}</h3>
-            </div>
-            
-            <p className="text-gray-600 mb-4">{t.cancelOrderConfirm}</p>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.cancelReason}
-              </label>
-              <textarea
-                value={cancelReason}
-                onChange={(e) => setCancelReason(e.target.value)}
-                placeholder={t.cancelReasonPlaceholder}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-                rows={3}
-              />
-            </div>
-
-            {cancelError && (
-              <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                {cancelError}
+              
+              <p className="text-gray-600 mb-4">{t.cancelOrderConfirm}</p>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t.cancelReason}
+                </label>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder={t.cancelReasonPlaceholder}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+                  rows={3}
+                />
               </div>
-            )}
 
-            <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setShowCancelModal(false);
-                  setCancelReason("");
-                  setCancelError(null);
-                }}
-                disabled={isCancelling}
-              >
-                {t.cancel}
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleCancelOrder}
-                disabled={isCancelling}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                {isCancelling ? t.cancelling : t.confirm}
-              </Button>
+              {cancelError && (
+                <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                  {cancelError}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowCancelModal(false);
+                    setCancelReason("");
+                    setCancelError(null);
+                  }}
+                  disabled={isCancelling}
+                >
+                  {t.cancel}
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleCancelOrder}
+                  disabled={isCancelling}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  {isCancelling ? t.cancelling : t.confirm}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <AccountAuthGuard
+      locale={locale}
+      icon={Package}
+      notLoggedInText={t.notLoggedIn}
+      loginText={t.login}
+    >
+      {renderContent()}
+    </AccountAuthGuard>
   );
 }

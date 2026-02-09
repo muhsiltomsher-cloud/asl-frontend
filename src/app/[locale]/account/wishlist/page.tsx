@@ -3,12 +3,15 @@
 import { useEffect, use, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Heart, ShoppingCart, Trash2, Eye } from "lucide-react";
+import { Heart, ShoppingCart, Trash2, Eye } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/common/Button";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
+import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
+import { AccountPageHeader } from "@/components/account/AccountPageHeader";
+import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 
 function getSlugFromProductUrl(productUrl: string | undefined): string | null {
   if (!productUrl) return null;
@@ -50,7 +53,7 @@ const translations = {
 };
 
 export default function WishlistPage({ params }: WishlistPageProps) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { wishlistItems, isLoading: wishlistLoading, removeFromWishlist, refreshWishlist } = useWishlist();
   const { addToCart, isLoading: cartLoading } = useCart();
   const [bundleProductSlugs, setBundleProductSlugs] = useState<string[]>([]);
@@ -103,77 +106,37 @@ export default function WishlistPage({ params }: WishlistPageProps) {
   };
 
 
-  if (authLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Heart className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <p className="mb-8 text-gray-500">{t.notLoggedIn}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/login`}>{t.login}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   const isLoading = wishlistLoading;
 
   return (
-    <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="mb-8">
-        <Link
-          href={`/${locale}/account`}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
-          {t.backToAccount}
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-          {t.wishlist}
-        </h1>
-      </div>
+    <AccountAuthGuard
+      locale={locale}
+      icon={Heart}
+      notLoggedInText={t.notLoggedIn}
+      loginText={t.login}
+    >
+      <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
+        <AccountPageHeader
+          locale={locale}
+          title={t.wishlist}
+          backHref={`/${locale}/account`}
+          backLabel={t.backToAccount}
+        />
 
-      {isLoading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4" />
-          <p className="text-gray-500">{t.loading}</p>
-        </div>
-      ) : wishlistItems.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <Heart className="h-12 w-12 text-gray-400" />
-            </div>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-black rounded-full mx-auto mb-4" />
+            <p className="text-gray-500">{t.loading}</p>
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">
-            {t.wishlist}
-          </h3>
-          <p className="mb-8 text-gray-500">{t.emptyWishlist}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/shop`}>{t.startShopping}</Link>
-          </Button>
-        </div>
-      ) : (
+        ) : wishlistItems.length === 0 ? (
+          <AccountEmptyState
+            icon={Heart}
+            title={t.wishlist}
+            message={t.emptyWishlist}
+            actionLabel={t.startShopping}
+            actionHref={`/${locale}/shop`}
+          />
+        ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {wishlistItems.map((item) => (
             <div
@@ -240,6 +203,7 @@ export default function WishlistPage({ params }: WishlistPageProps) {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </AccountAuthGuard>
   );
 }
