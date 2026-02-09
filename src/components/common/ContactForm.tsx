@@ -31,10 +31,15 @@ export function ContactForm({ locale }: ContactFormProps) {
     message: "",
   });
 
+  const namePattern = /^[a-zA-Z\u0600-\u06FF\s'-]*$/;
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    if ((name === "firstName" || name === "lastName") && !namePattern.test(value)) {
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError(null);
   };
