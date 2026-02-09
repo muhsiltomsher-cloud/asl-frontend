@@ -45,7 +45,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
   const { cartItemsCount, setIsCartOpen } = useCart();
   const { setIsAccountDrawerOpen } = useAuth();
   const { wishlistItemsCount } = useWishlist();
-  const { convertPrice, getCurrencyInfo } = useCurrency();
+  const { convertPrice, getCurrencyInfo, currencies } = useCurrency();
 
   const currencyInfo = getCurrencyInfo();
 
@@ -53,9 +53,20 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
     if (!topbarSettings?.freeShippingThreshold) return text;
     const convertedAmount = convertPrice(topbarSettings.freeShippingThreshold);
     const roundedAmount = Math.ceil(convertedAmount);
-    let resolved = text.replace(/\{\{amount\}\}/g, String(roundedAmount));
-    resolved = resolved.replace(/\{\{currency\}\}/g, currencyInfo.code);
-    return resolved;
+
+    if (text.includes("{{amount}}") || text.includes("{{currency}}")) {
+      let resolved = text.replace(/\{\{amount\}\}/g, String(roundedAmount));
+      resolved = resolved.replace(/\{\{currency\}\}/g, currencyInfo.code);
+      return resolved;
+    }
+
+    if (currencies.length > 0) {
+      const currencyCodes = currencies.map(c => c.code).join("|");
+      const pattern = new RegExp(`(\\d[\\d,.]*)\\s*(${currencyCodes})`, "g");
+      return text.replace(pattern, `${roundedAmount} ${currencyInfo.code}`);
+    }
+
+    return text;
   };
 
   const rawTopbarText = topbarSettings?.enabled !== false
