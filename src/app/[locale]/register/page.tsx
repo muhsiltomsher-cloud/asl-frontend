@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { Home } from "lucide-react";
 import { Input } from "@/components/common/Input";
 import { Button } from "@/components/common/Button";
+import { PhoneInput } from "@/components/common/PhoneInput";
 import { register } from "@/lib/api/auth";
+import { validatePhoneNumber, parsePhoneNumber } from "@/lib/utils/phone";
 import { useNotification } from "@/contexts/NotificationContext";
 
 interface RegisterPageProps {
@@ -117,6 +119,14 @@ export default function RegisterPage({ params }: RegisterPageProps) {
 
     if (!formData.phone.trim()) {
       newErrors.phone = texts.phoneRequired;
+    } else {
+      const parsed = parsePhoneNumber(formData.phone);
+      if (parsed.localNumber) {
+        const validation = validatePhoneNumber(parsed.localNumber, "AE");
+        if (!validation.isValid) {
+          newErrors.phone = isRTL ? validation.errorAr : validation.error;
+        }
+      }
     }
 
     if (!formData.email.trim()) {
@@ -246,16 +256,17 @@ export default function RegisterPage({ params }: RegisterPageProps) {
                 className="border-gray-300 rounded-none"
               />
 
-              <Input
-                name="phone"
-                type="tel"
-                placeholder={texts.phonePlaceholder}
+              <PhoneInput
+                label={texts.phone}
                 value={formData.phone}
-                onChange={handleInputChange}
+                onChange={(phone) => {
+                  setFormData((prev) => ({ ...prev, phone }));
+                  if (errors.phone) {
+                    setErrors((prev) => ({ ...prev, phone: undefined }));
+                  }
+                }}
                 error={errors.phone}
-                autoComplete="tel"
-                dir={isRTL ? "rtl" : "ltr"}
-                className="border-gray-300 rounded-none"
+                isRTL={isRTL}
               />
 
               <Input

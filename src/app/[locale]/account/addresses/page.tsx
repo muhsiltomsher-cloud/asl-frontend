@@ -11,6 +11,7 @@ import { AccountPageHeader } from "@/components/account/AccountPageHeader";
 import { AccountLoadingSpinner } from "@/components/account/AccountLoadingSpinner";
 import { Checkbox } from "@/components/common/Checkbox";
 import { CountrySelect } from "@/components/common/CountrySelect";
+import { PhoneInput } from "@/components/common/PhoneInput";
 import {
   getCustomer,
   getSavedAddressesFromCustomer,
@@ -335,11 +336,12 @@ function AddressModal({
               />
             </div>
 
-            <Input
+            <PhoneInput
               label={t.phone}
-              type="tel"
               value={formData.phone || ""}
-              onChange={handleChange("phone")}
+              onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
+              countryCode={formData.country}
+              isRTL={isRTL}
             />
 
             <Input

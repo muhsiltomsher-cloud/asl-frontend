@@ -2,7 +2,8 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { User, Mail, Phone, Save } from "lucide-react";
+import { User, Mail, Save } from "lucide-react";
+import { PhoneInput } from "@/components/common/PhoneInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
@@ -223,23 +224,12 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               </div>
             </div>
 
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
-                {t.phone}
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  placeholder={t.phone}
-                  className="pl-10"
-                />
-              </div>
-            </div>
+            <PhoneInput
+              label={t.phone}
+              value={formData.phone}
+              onChange={(phone) => setFormData({ ...formData, phone })}
+              isRTL={isRTL}
+            />
 
             {message && (
               <div
