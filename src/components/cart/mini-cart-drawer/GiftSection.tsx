@@ -2,10 +2,13 @@
 
 import { Gift } from "lucide-react";
 import { getLocalizedProduct } from "@/contexts/FreeGiftContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import type { GiftSectionProps } from "./types";
 
 export function GiftSection({ locale, currency, giftProgress, activeGifts }: GiftSectionProps) {
   const isRTL = locale === "ar";
+  const { convertPrice } = useCurrency();
+  const convertedAmountNeeded = Math.ceil(convertPrice(giftProgress.amountNeeded));
 
   return (
     <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200">
@@ -18,8 +21,8 @@ export function GiftSection({ locale, currency, giftProgress, activeGifts }: Gif
             <div className="flex-1">
               <p className="text-xs font-semibold text-amber-900">
                 {isRTL 
-                  ? `أضف ${giftProgress.amountNeeded} ${currency} للحصول على هدية مجانية!`
-                  : `Add ${giftProgress.amountNeeded} ${currency} more to get a free gift!`
+                  ? `أضف ${convertedAmountNeeded} ${currency} للحصول على هدية مجانية!`
+                  : `Add ${convertedAmountNeeded} ${currency} more to get a free gift!`
                 }
               </p>
             </div>

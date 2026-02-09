@@ -43,7 +43,7 @@ export default function CartPage() {
   } = useCart();
             const { isAuthenticated, user } = useAuth();
             const { isFreeGiftItem, activeGifts, getGiftProgress, isLoading: isLoadingGiftRules, rules } = useFreeGift();
-            const { currency } = useCurrency();
+            const { currency, convertPrice } = useCurrency();
             const giftProgress = getGiftProgress();
     
       const hasGiftItemsInCart = cartItems.some(item => isFreeGiftItem(item.item_key));
@@ -266,8 +266,8 @@ export default function CartPage() {
                 <div className="flex-1">
                                     <p className="text-sm font-semibold text-amber-900">
                                       {isRTL 
-                                        ? `أضف ${giftProgress.amountNeeded} ${currency} للحصول على هدية مجانية!`
-                                        : `Add ${giftProgress.amountNeeded} ${currency} more to get a free gift!`
+                                        ? `أضف ${Math.ceil(convertPrice(giftProgress.amountNeeded))} ${currency} للحصول على هدية مجانية!`
+                                        : `Add ${Math.ceil(convertPrice(giftProgress.amountNeeded))} ${currency} more to get a free gift!`
                                       }
                                     </p>
                   <p className="text-xs text-amber-700">
