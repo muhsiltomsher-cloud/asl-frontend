@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { API_BASE, backendHeaders, backendAuthHeaders, noCacheUrl, safeJsonResponse } from "@/lib/utils/backendFetch";
+import { API_BASE, backendHeaders, backendPostHeaders, backendAuthHeaders, noCacheUrl, safeJsonResponse } from "@/lib/utils/backendFetch";
 
 const CART_KEY_COOKIE = "cocart_cart_key";
 const AUTH_TOKEN_COOKIE = "asl_auth_token";
@@ -31,7 +31,7 @@ async function tryRefreshToken(): Promise<string | null> {
   try {
     const response = await fetch(noCacheUrl(`${API_BASE}/wp-json/cocart/jwt/refresh-token`), {
       method: "POST",
-      headers: backendHeaders(),
+      headers: backendPostHeaders(),
       body: JSON.stringify({ refresh_token: refreshTokenValue }),
     });
 
@@ -319,7 +319,7 @@ export async function POST(request: NextRequest) {
         
         const storeApiResponse = await fetch(noCacheUrl(storeApiUrl), {
           method: "POST",
-          headers: backendHeaders({
+          headers: backendPostHeaders({
             "Cart-Token": cartToken,
             "X-WP-Nonce": nonce,
           }),
@@ -383,6 +383,7 @@ export async function POST(request: NextRequest) {
 
     if (method !== "DELETE" && Object.keys(body).length > 0) {
       fetchOptions.body = JSON.stringify(body);
+      fetchOptions.headers = { ...(fetchOptions.headers as Record<string, string>), "Content-Type": "application/json" };
     }
 
     let response = await fetch(noCacheUrl(url), fetchOptions);
@@ -399,6 +400,7 @@ export async function POST(request: NextRequest) {
         };
         if (method !== "DELETE" && Object.keys(body).length > 0) {
           refreshedFetchOptions.body = JSON.stringify(body);
+          refreshedFetchOptions.headers = { ...(refreshedFetchOptions.headers as Record<string, string>), "Content-Type": "application/json" };
         }
         response = await fetch(noCacheUrl(baseUrl), refreshedFetchOptions);
         data = await safeJsonResponse(response);
@@ -412,6 +414,7 @@ export async function POST(request: NextRequest) {
         };
         if (method !== "DELETE" && Object.keys(body).length > 0) {
           guestFetchOptions.body = JSON.stringify(body);
+          guestFetchOptions.headers = { ...(guestFetchOptions.headers as Record<string, string>), "Content-Type": "application/json" };
         }
         response = await fetch(noCacheUrl(guestUrl), guestFetchOptions);
         data = await safeJsonResponse(response);
@@ -426,6 +429,7 @@ export async function POST(request: NextRequest) {
       };
       if (method !== "DELETE" && Object.keys(body).length > 0) {
         freshGuestFetchOptions.body = JSON.stringify(body);
+        freshGuestFetchOptions.headers = { ...(freshGuestFetchOptions.headers as Record<string, string>), "Content-Type": "application/json" };
       }
       response = await fetch(noCacheUrl(freshGuestUrl), freshGuestFetchOptions);
       data = await safeJsonResponse(response);

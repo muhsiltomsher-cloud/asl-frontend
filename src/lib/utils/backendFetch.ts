@@ -4,10 +4,16 @@ const API_BASE = siteConfig.apiUrl;
 
 export function backendHeaders(extra?: HeadersInit): HeadersInit {
   return {
-    "Content-Type": "application/json",
     "Accept": "application/json",
     ...extra,
   };
+}
+
+export function backendPostHeaders(extra?: HeadersInit): HeadersInit {
+  return backendHeaders({
+    "Content-Type": "application/json",
+    ...extra,
+  });
 }
 
 export function backendAuthHeaders(token: string, extra?: HeadersInit): HeadersInit {
