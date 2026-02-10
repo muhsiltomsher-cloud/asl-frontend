@@ -118,6 +118,18 @@ export async function verifyAuth(_request: NextRequest): Promise<AuthResult> {
           };
         }
       }
+      if (userData.user_id && userData.user_email) {
+        return {
+          authenticated: true,
+          user: {
+            user_id: userData.user_id,
+            user_email: userData.user_email,
+            user_nicename: userData.user_nicename,
+            user_display_name: userData.user_display_name,
+            token: token,
+          },
+        };
+      }
       return {
         authenticated: false,
         user: null,
