@@ -18,6 +18,7 @@ declare global {
       source: string;
       publicKey: string;
       merchantCode: string;
+      shouldInheritBg?: boolean;
     }) => void;
   }
 }
@@ -25,12 +26,13 @@ declare global {
 export function TabbyPromoWidget({ price, currency, locale }: TabbyPromoWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  
+  // Get public key at component level for conditional rendering
+  const publicKey = process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY;
+  const merchantCode = process.env.NEXT_PUBLIC_TABBY_MERCHANT_CODE || "default";
 
   useEffect(() => {
     if (initialized.current) return;
-    
-    const publicKey = process.env.NEXT_PUBLIC_TABBY_PUBLIC_KEY;
-    const merchantCode = process.env.NEXT_PUBLIC_TABBY_MERCHANT_CODE || "default";
 
     if (!publicKey || price <= 0) return;
 
@@ -53,6 +55,7 @@ export function TabbyPromoWidget({ price, currency, locale }: TabbyPromoWidgetPr
           source: "product",
           publicKey: publicKey,
           merchantCode: merchantCode,
+          shouldInheritBg: true,
         });
         initialized.current = true;
       }
@@ -66,16 +69,16 @@ export function TabbyPromoWidget({ price, currency, locale }: TabbyPromoWidgetPr
         existingScript.remove();
       }
     };
-  }, [price, currency, locale]);
+  }, [price, currency, locale, publicKey, merchantCode]);
 
   // Don't render if price is too low or no public key
-  if (price <= 0) return null;
+  if (price <= 0 || !publicKey) return null;
 
   return (
     <div 
       ref={containerRef} 
       id="tabby-promo-widget" 
-      className="my-3"
+      className="my-3 rounded-lg border border-[#e7e2d6] bg-[#e7e2d6] p-3"
     />
   );
 }

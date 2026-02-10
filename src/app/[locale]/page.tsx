@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getProducts, getCategories, getFreeGiftProductIds, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
+import { getNewProducts, getFeaturedProducts, getBestsellerProducts, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
 import { getHomePageSettings } from "@/lib/api/wordpress";
 import {
   HeroSlider,
@@ -43,15 +43,48 @@ export default async function HomePage({ params }: HomePageProps) {
   const isRTL = locale === "ar";
 
   // Fetch all data in parallel
-  // Fetch both localized categories (for names) and English categories (for URL slugs)
-  const [{ products: allProducts }, categories, englishCategories, homeSettings, giftProductIds, bundleProductSlugs] = await Promise.all([
-    getProducts({ per_page: 20, locale: locale as Locale }),
+  // Fetch separate product lists for each section + English versions for URL slugs
+  const [
+    { products: newProductsRaw },
+    { products: newProductsEn },
+    { products: featuredProductsRaw },
+    { products: featuredProductsEn },
+    { products: bestsellerProductsRaw },
+    { products: bestsellerProductsEn },
+    categories,
+    englishCategories,
+    homeSettings,
+    giftProductInfo,
+    bundleProductSlugs,
+  ] = await Promise.all([
+    getNewProducts({ per_page: 20, locale: locale as Locale }),
+    getNewProducts({ per_page: 20, locale: "en" }),
+    getFeaturedProducts({ per_page: 20, locale: locale as Locale }),
+    getFeaturedProducts({ per_page: 20, locale: "en" }),
+    getBestsellerProducts({ per_page: 20, locale: locale as Locale }),
+    getBestsellerProducts({ per_page: 20, locale: "en" }),
     getCategories(locale as Locale),
-    getCategories("en"), // Always fetch English categories for URL slugs
+    getCategories("en"),
     getHomePageSettings(locale as Locale),
-    getFreeGiftProductIds(),
+    getFreeGiftProductInfo(),
     getBundleEnabledProductSlugs(),
   ]);
+
+  // Create English slug mappings for each section's products
+  const newProductEnglishSlugs: Record<number, string> = {};
+  newProductsEn.forEach((product) => {
+    newProductEnglishSlugs[product.id] = product.slug;
+  });
+
+  const featuredProductEnglishSlugs: Record<number, string> = {};
+  featuredProductsEn.forEach((product) => {
+    featuredProductEnglishSlugs[product.id] = product.slug;
+  });
+
+  const bestsellerProductEnglishSlugs: Record<number, string> = {};
+  bestsellerProductsEn.forEach((product) => {
+    bestsellerProductEnglishSlugs[product.id] = product.slug;
+  });
 
   // Create a mapping of localized category ID to English slug for URL generation
   // WPML assigns different IDs for different locales, so we match by index position
@@ -62,18 +95,35 @@ export default async function HomePage({ params }: HomePageProps) {
   const localizedRootCategories = categories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
   const englishRootCategories = englishCategories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
   
-  // Map localized category IDs to English slugs by matching index position
+  // Map localized category IDs to English slugs and images by matching index position
   // The API returns categories in a consistent order across locales
+  // Also create a fallback image map for categories without images (common in Arabic locale)
+  const englishCategoryImages: Record<number, { src: string; alt: string } | undefined> = {};
+  
   localizedRootCategories.forEach((localizedCat, index) => {
     if (index < englishRootCategories.length) {
       englishCategorySlugs[localizedCat.id] = englishRootCategories[index].slug;
+      // If the localized category doesn't have an image but the English one does, use English image as fallback
+      if (!localizedCat.image?.src && englishRootCategories[index].image?.src) {
+        englishCategoryImages[localizedCat.id] = {
+          src: englishRootCategories[index].image!.src,
+          alt: englishRootCategories[index].image!.alt || englishRootCategories[index].name,
+        };
+      }
     }
   });
 
-  // Filter out gift products from the home page
-  const products = allProducts.filter(
-    (product) => !giftProductIds.includes(product.id)
-  );
+  // Filter out gift products from each section
+  const filterGiftProducts = (productList: typeof newProductsRaw) =>
+    productList.filter(
+      (product) =>
+        !giftProductInfo.ids.includes(product.id) &&
+        !giftProductInfo.slugs.includes(product.slug)
+    );
+
+  const newProducts = filterGiftProducts(newProductsRaw);
+  const featuredProducts = filterGiftProducts(featuredProductsRaw);
+  const bestsellerProducts = filterGiftProducts(bestsellerProductsRaw);
 
   // Translations for sections - using dictionary for dynamic content
   const sectionTexts = {
@@ -132,6 +182,14 @@ export default async function HomePage({ params }: HomePageProps) {
     section_subtitle: homeSettings.collections.section_subtitle || sectionTexts.collections.subtitle,
   };
 
+    const categoryExtraItems: Array<{
+      id: string;
+      name: { en: string; ar: string };
+      slug: string;
+      href: string;
+      image: string;
+    }> = [];
+
   return (
     <div className="flex flex-col">
       {/* Hero Slider */}
@@ -143,12 +201,13 @@ export default async function HomePage({ params }: HomePageProps) {
             {/* New Products Section */}
             <ProductSection
               settings={newProductsSettings}
-              products={products}
+              products={newProducts}
               locale={locale as Locale}
               isRTL={isRTL}
               viewAllText={sectionTexts.viewAll}
               className="bg-[#f7f6f2]"
               bundleProductSlugs={bundleProductSlugs}
+              englishProductSlugs={newProductEnglishSlugs}
             />
 
       {/* Shop by Category */}
@@ -160,27 +219,31 @@ export default async function HomePage({ params }: HomePageProps) {
         viewAllText={sectionTexts.viewAll}
         productsText={sectionTexts.products}
         englishCategorySlugs={englishCategorySlugs}
+        extraItems={categoryExtraItems}
+        fallbackImages={englishCategoryImages}
       />
 
       {/* Featured Products Slider */}
       <FeaturedProductsSlider
         settings={featuredSettings}
-        products={products}
+        products={featuredProducts}
         locale={locale as Locale}
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
         bundleProductSlugs={bundleProductSlugs}
+        englishProductSlugs={featuredProductEnglishSlugs}
       />
 
       {/* Bestseller Products Section */}
       <ProductSection
         settings={bestsellerSettings}
-        products={products}
+        products={bestsellerProducts}
         locale={locale as Locale}
         isRTL={isRTL}
         viewAllText={sectionTexts.viewAll}
         className="bg-[#f7f6f2]"
         bundleProductSlugs={bundleProductSlugs}
+        englishProductSlugs={bestsellerProductEnglishSlugs}
       />
 
       {/* Our Collections */}

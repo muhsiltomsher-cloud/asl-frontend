@@ -2,10 +2,13 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, User, Mail, Phone, Save, Lock, Bell } from "lucide-react";
+import { User, Mail, Save, Lock, Bell, Eye, EyeOff } from "lucide-react";
+import { PhoneInput } from "@/components/common/PhoneInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
+import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
+import { AccountPageHeader } from "@/components/account/AccountPageHeader";
 import { getCustomer, updateCustomer, type Customer } from "@/lib/api/customer";
 
 interface SettingsPageProps {
@@ -29,7 +32,15 @@ const translations = {
     error: "Failed to save changes",
     loading: "Loading settings...",
     securitySection: "Security",
-    passwordInfo: "Password management is handled through your account provider.",
+    changePassword: "Change Password",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    updatePassword: "Update Password",
+    updatingPassword: "Updating...",
+    passwordChanged: "Password changed successfully",
+    passwordError: "Failed to change password",
+    passwordMismatch: "Passwords do not match",
+    passwordTooShort: "Password must be at least 6 characters",
     notificationsSection: "Notifications",
     emailNotifications: "Email Notifications",
     emailNotificationsDesc: "Receive order updates and promotional emails",
@@ -55,7 +66,15 @@ const translations = {
     error: "فشل في حفظ التغييرات",
     loading: "جاري تحميل الإعدادات...",
     securitySection: "الأمان",
-    passwordInfo: "تتم إدارة كلمة المرور من خلال مزود حسابك.",
+    changePassword: "تغيير كلمة المرور",
+    newPassword: "كلمة المرور الجديدة",
+    confirmPassword: "تأكيد كلمة المرور",
+    updatePassword: "تحديث كلمة المرور",
+    updatingPassword: "جاري التحديث...",
+    passwordChanged: "تم تغيير كلمة المرور بنجاح",
+    passwordError: "فشل في تغيير كلمة المرور",
+    passwordMismatch: "كلمات المرور غير متطابقة",
+    passwordTooShort: "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
     notificationsSection: "الإشعارات",
     emailNotifications: "إشعارات البريد الإلكتروني",
     emailNotificationsDesc: "تلقي تحديثات الطلبات والرسائل الترويجية",
@@ -68,13 +87,21 @@ const translations = {
 };
 
 export default function SettingsPage({ params }: SettingsPageProps) {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [smsNotifications, setSmsNotifications] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const resolvedParams = use(params);
   const locale = resolvedParams.locale as "en" | "ar";
@@ -167,53 +194,57 @@ export default function SettingsPage({ params }: SettingsPageProps) {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse">
-          <div className="h-8 w-48 bg-gray-200 rounded mb-8" />
-          <div className="max-w-2xl space-y-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.user_id) return;
 
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="mx-auto max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-              <User className="h-12 w-12 text-gray-400" />
-            </div>
-          </div>
-          <p className="mb-8 text-gray-500">{t.notLoggedIn}</p>
-          <Button asChild variant="primary" size="lg">
-            <Link href={`/${locale}/login`}>{t.login}</Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordMessage({ type: "error", text: t.passwordTooShort });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordMessage({ type: "error", text: t.passwordMismatch });
+      return;
+    }
+
+    setIsChangingPassword(true);
+    setPasswordMessage(null);
+
+    try {
+      const response = await updateCustomer(user.user_id, {
+        password: passwordData.newPassword,
+      } as Partial<Customer> & { password: string });
+
+      if (response.success) {
+        setPasswordMessage({ type: "success", text: t.passwordChanged });
+        setPasswordData({ newPassword: "", confirmPassword: "" });
+        setTimeout(() => setPasswordMessage(null), 3000);
+      } else {
+        setPasswordMessage({ type: "error", text: response.error?.message || t.passwordError });
+      }
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      setPasswordMessage({ type: "error", text: t.passwordError });
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
-      <div className="mb-8">
-        <Link
-          href={`/${locale}/account`}
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ArrowLeft className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
-          {t.backToAccount}
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-          {t.settings}
-        </h1>
-      </div>
+    <AccountAuthGuard
+      locale={locale}
+      icon={User}
+      notLoggedInText={t.notLoggedIn}
+      loginText={t.login}
+    >
+      <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
+        <AccountPageHeader
+          locale={locale}
+          title={t.settings}
+          backHref={`/${locale}/account`}
+          backLabel={t.backToAccount}
+        />
 
       <div className="max-w-2xl space-y-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6">
@@ -282,23 +313,12 @@ export default function SettingsPage({ params }: SettingsPageProps) {
                 </div>
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-700">
-                  {t.phone}
-                </label>
-                <div className="relative">
-                  <Phone className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400`} />
-                  <Input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    placeholder={t.phone}
-                    className={isRTL ? "pr-10" : "pl-10"}
-                  />
-                </div>
-              </div>
+              <PhoneInput
+                label={t.phone}
+                value={formData.phone}
+                onChange={(phone) => setFormData({ ...formData, phone })}
+                isRTL={isRTL}
+              />
 
               {message && (
                 <div
@@ -327,15 +347,90 @@ export default function SettingsPage({ params }: SettingsPageProps) {
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <div className="mb-4 flex items-center gap-4">
+          <div className="mb-6 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
               <Lock className="h-6 w-6 text-gray-600" />
             </div>
             <div>
               <h2 className="font-semibold text-gray-900">{t.securitySection}</h2>
+              <p className="text-sm text-gray-500">{t.changePassword}</p>
             </div>
           </div>
-          <p className="text-sm text-gray-500">{t.passwordInfo}</p>
+
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                {t.newPassword}
+              </label>
+              <div className="relative">
+                <Lock className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400`} />
+                <Input
+                  type={showNewPassword ? "text" : "password"}
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, newPassword: e.target.value })
+                  }
+                  placeholder={t.newPassword}
+                  className={isRTL ? "pr-10 pl-10" : "pl-10 pr-10"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600`}
+                >
+                  {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                {t.confirmPassword}
+              </label>
+              <div className="relative">
+                <Lock className={`absolute ${isRTL ? "right-3" : "left-3"} top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400`} />
+                <Input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={passwordData.confirmPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                  }
+                  placeholder={t.confirmPassword}
+                  className={isRTL ? "pr-10 pl-10" : "pl-10 pr-10"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className={`absolute ${isRTL ? "left-3" : "right-3"} top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600`}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            {passwordMessage && (
+              <div
+                className={`rounded-lg p-3 text-sm ${
+                  passwordMessage.type === "success"
+                    ? "bg-green-50 text-green-800"
+                    : "bg-red-50 text-red-800"
+                }`}
+              >
+                {passwordMessage.text}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              className="w-full"
+              isLoading={isChangingPassword}
+            >
+              <Lock className={`h-4 w-4 ${isRTL ? "ml-2" : "mr-2"}`} />
+              {isChangingPassword ? t.updatingPassword : t.updatePassword}
+            </Button>
+          </form>
         </div>
 
         <div className="rounded-xl border border-gray-200 bg-white p-6">
@@ -391,6 +486,7 @@ export default function SettingsPage({ params }: SettingsPageProps) {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </AccountAuthGuard>
   );
 }

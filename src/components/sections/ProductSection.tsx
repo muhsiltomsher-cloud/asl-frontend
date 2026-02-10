@@ -1,11 +1,19 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { WCProductGrid } from "@/components/shop/WCProductGrid";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import { WCProductCard } from "@/components/shop/WCProductCard";
 import { Button } from "@/components/common/Button";
 import { Skeleton } from "@/components/common/Skeleton";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { ProductSectionSettings } from "@/types/wordpress";
+
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 interface ProductSectionProps {
   settings: ProductSectionSettings;
@@ -16,6 +24,7 @@ interface ProductSectionProps {
   className?: string;
   isLoading?: boolean;
   bundleProductSlugs?: string[];
+  englishProductSlugs?: Record<number, string>;
 }
 
 function ProductCardSkeleton() {
@@ -30,7 +39,7 @@ function ProductCardSkeleton() {
   );
 }
 
-export function ProductSectionSkeleton({ count = 4 }: { count?: number }) {
+export function ProductSectionSkeleton({ count = 5 }: { count?: number }) {
   return (
     <section className="bg-[#f7f6f2] py-12 md:py-16">
       <div className="container mx-auto px-4">
@@ -38,7 +47,7 @@ export function ProductSectionSkeleton({ count = 4 }: { count?: number }) {
           <Skeleton className="h-8 w-48 md:h-9" />
           <Skeleton className="mt-2 h-5 w-64" />
         </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 md:gap-6">
           {Array.from({ length: count }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
@@ -57,6 +66,7 @@ export function ProductSection({
   className = "",
   isLoading = false,
   bundleProductSlugs = [],
+  englishProductSlugs = {},
 }: ProductSectionProps) {
   if (isLoading) {
     return <ProductSectionSkeleton count={settings.products_count || 4} />;
@@ -107,15 +117,72 @@ export function ProductSection({
           )}
         </div>
 
-        <WCProductGrid
-          products={products.slice(0, settings.products_count)}
-          locale={locale}
-          columns={4}
-          bundleProductSlugs={bundleProductSlugs}
-        />
+        {/* Swiper Slider for Products */}
+        <div className="relative product-section-slider">
+          <Swiper
+            modules={[Navigation, Pagination]}
+            spaceBetween={16}
+            slidesPerView={2}
+            navigation={{
+              prevEl: `.product-slider-prev-${settings.section_title?.replace(/\s+/g, '-').toLowerCase() || 'default'}`,
+              nextEl: `.product-slider-next-${settings.section_title?.replace(/\s+/g, '-').toLowerCase() || 'default'}`,
+            }}
+            pagination={{
+              clickable: true,
+              bulletClass: "swiper-pagination-bullet !bg-amber-900/30",
+              bulletActiveClass: "swiper-pagination-bullet-active !bg-amber-900",
+            }}
+            breakpoints={{
+              640: {
+                slidesPerView: 3,
+                spaceBetween: 20,
+              },
+              768: {
+                slidesPerView: 3,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 4,
+                spaceBetween: 24,
+              },
+              1280: {
+                slidesPerView: 5,
+                spaceBetween: 24,
+              },
+            }}
+            className="!pb-12"
+            dir={isRTL ? "rtl" : "ltr"}
+          >
+            {products.slice(0, settings.products_count).map((product) => (
+              <SwiperSlide key={product.id}>
+                <WCProductCard product={product} locale={locale} bundleProductSlugs={bundleProductSlugs} englishSlug={englishProductSlugs[product.id]} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          {/* Navigation Arrows - positioned to center on product image area */}
+          {products.length > 2 && (
+            <>
+              <button
+                type="button"
+                className={`product-slider-prev-${settings.section_title?.replace(/\s+/g, '-').toLowerCase() || 'default'} absolute ${isRTL ? 'right-0' : 'left-0'} top-[32%] z-10 -translate-y-1/2 -translate-x-2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-stone-100 disabled:opacity-50 hidden md:flex items-center justify-center`}
+                aria-label="Previous"
+              >
+                <ChevronLeft className={`h-5 w-5 text-amber-900 ${isRTL ? 'rotate-180' : ''}`} />
+              </button>
+              <button
+                type="button"
+                className={`product-slider-next-${settings.section_title?.replace(/\s+/g, '-').toLowerCase() || 'default'} absolute ${isRTL ? 'left-0' : 'right-0'} top-[32%] z-10 -translate-y-1/2 translate-x-2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-stone-100 disabled:opacity-50 hidden md:flex items-center justify-center`}
+                aria-label="Next"
+              >
+                <ChevronRight className={`h-5 w-5 text-amber-900 ${isRTL ? 'rotate-180' : ''}`} />
+              </button>
+            </>
+          )}
+        </div>
 
         {settings.show_view_all && (
-          <div className="mt-8 text-center md:hidden">
+          <div className="mt-4 text-center md:hidden">
             <Button variant="outline" className="border-amber-900 text-amber-900 hover:bg-amber-900 hover:text-white" asChild>
               <Link href={viewAllLink}>{viewAllText}</Link>
             </Button>

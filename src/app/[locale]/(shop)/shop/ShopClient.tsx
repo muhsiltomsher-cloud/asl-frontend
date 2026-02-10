@@ -20,15 +20,20 @@ interface CachedProducts {
   locale: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCachedProducts(_locale: string): CachedProducts | null {
   // DEV MODE: Cache disabled for faster development
   return null;
 }
 
 function setCachedProducts(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _products: WCProduct[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _total: number,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _totalPages: number,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _locale: string
 ): void {
   // DEV MODE: Cache disabled for faster development - do nothing
@@ -40,6 +45,7 @@ interface ShopClientProps {
   initialTotal?: number;
   initialTotalPages?: number;
   giftProductIds?: number[];
+  giftProductSlugs?: string[];
   bundleProductSlugs?: string[];
 }
 
@@ -47,8 +53,10 @@ export function ShopClient({
   products: initialProducts, 
   locale,
   initialTotal = 0,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   initialTotalPages = 1,
   giftProductIds = [],
+  giftProductSlugs = [],
   bundleProductSlugs = [],
 }: ShopClientProps) {
   const [products, setProducts] = useState<WCProduct[]>(initialProducts);
@@ -89,8 +97,11 @@ export function ShopClient({
         setHasMore(false);
       } else {
         // Filter out gift products from the fetched data
+        // Use both ID and slug matching to handle WPML translations (different IDs per locale)
+        const giftIdsSet = new Set(giftProductIds);
+        const giftSlugsSet = new Set(giftProductSlugs);
         const filteredNewProducts = data.products.filter(
-          (product: WCProduct) => !giftProductIds.includes(product.id)
+          (product: WCProduct) => !giftIdsSet.has(product.id) && !giftSlugsSet.has(product.slug)
         );
         
         const newProducts = [...products, ...filteredNewProducts];
@@ -101,19 +112,19 @@ export function ShopClient({
         
         setProducts(uniqueProducts);
         setCurrentPage(nextPage);
-        // Adjust total to account for filtered gift products
-        const adjustedTotal = data.total - (data.products.length - filteredNewProducts.length);
-        setTotal(adjustedTotal);
-        setHasMore(uniqueProducts.length < adjustedTotal);
+        const giftCountInThisPage = data.products.length - filteredNewProducts.length;
+        const newTotal = total - giftCountInThisPage;
+        setTotal(newTotal);
+        setHasMore(uniqueProducts.length < newTotal);
         
-        setCachedProducts(uniqueProducts, adjustedTotal, data.totalPages, locale);
+        setCachedProducts(uniqueProducts, newTotal, data.totalPages, locale);
       }
     } catch (error) {
       console.error("Error loading more products:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, currentPage, products, locale, giftProductIds]);
+  }, [isLoading, hasMore, currentPage, products, total, locale, giftProductIds, giftProductSlugs]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -181,8 +192,8 @@ export function ShopClient({
         {!hasMore && products.length > 0 && (
           <p className="text-gray-500 text-sm">
             {locale === "ar" 
-              ? `عرض جميع المنتجات (${total})` 
-              : `Showing all ${total} products`}
+              ? `عرض جميع المنتجات (${products.length})` 
+              : `Showing all ${products.length} products`}
           </p>
         )}
       </div>

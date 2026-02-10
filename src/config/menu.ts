@@ -53,6 +53,40 @@ export const navigationItems: NavigationItem[] = [
 ];
 
 /**
+ * Static Header Category Links
+ *
+ * Category links displayed in the header navigation.
+ * Order: Oils, Gift Sets, Perfumes, Personal Care, Home Fragrances
+ */
+export const headerCategoryLinks: NavigationItem[] = [
+  {
+    name: { en: "Shop All", ar: "تسوق الكل" },
+    href: "/shop",
+    hasMegaMenu: true,
+  },
+  {
+    name: { en: "Oils", ar: "الزيوت" },
+    href: "/category/fragrance-oils",
+  },
+  {
+    name: { en: "Gift Sets", ar: "مجموعات الهدايا" },
+    href: "/category/gifts-set",
+  },
+  {
+    name: { en: "Perfumes", ar: "العطور" },
+    href: "/category/perfumes",
+  },
+  {
+    name: { en: "Personal Care", ar: "العناية الشخصية" },
+    href: "/category/personal-care",
+  },
+  {
+    name: { en: "Home Fragrances", ar: "عطور المنزل" },
+    href: "/category/home-fragrances",
+  },
+];
+
+/**
  * Get navigation items for a specific locale
  */
 export function getNavigationItems(locale: Locale) {
@@ -60,6 +94,18 @@ export function getNavigationItems(locale: Locale) {
     name: item.name[locale],
     href: `/${locale}${item.href}`,
     hasMegaMenu: item.hasMegaMenu,
+  }));
+}
+
+/**
+ * Get header category links for a specific locale
+ */
+export function getHeaderCategoryLinks(locale: Locale) {
+  return headerCategoryLinks.map((item, index) => ({
+    id: index + 1,
+    name: item.name[locale],
+    href: `/${locale}${item.href}`,
+    hasMegaMenu: item.hasMegaMenu ?? false,
   }));
 }
 
@@ -199,48 +245,51 @@ export interface MenuSubcategory {
 export const megaMenuCategories: MenuCategory[] = [
   {
     id: 1,
-    name: { en: "Perfumes", ar: "العطور" },
-    slug: "perfumes",
+    name: { en: "Oils", ar: "الزيوت" },
+    slug: "fragrance-oils",
     image: "",
-    children: [
-      { id: 101, name: { en: "Men's Perfumes", ar: "عطور رجالية" }, slug: "mens-perfumes" },
-      { id: 102, name: { en: "Women's Perfumes", ar: "عطور نسائية" }, slug: "womens-perfumes" },
-      { id: 103, name: { en: "Unisex Perfumes", ar: "عطور للجنسين" }, slug: "unisex-perfumes" },
-      { id: 104, name: { en: "Oud Perfumes", ar: "عطور العود" }, slug: "oud-perfumes" },
-    ],
+    children: [],
   },
   {
     id: 2,
-    name: { en: "Body Care", ar: "العناية بالجسم" },
-    slug: "body-care",
+    name: { en: "Gift Sets", ar: "مجموعات الهدايا" },
+    slug: "gifts-set",
     image: "",
     children: [
-      { id: 201, name: { en: "Body Lotions", ar: "لوشن الجسم" }, slug: "body-lotions" },
-      { id: 202, name: { en: "Body Mists", ar: "بخاخات الجسم" }, slug: "body-mists" },
-      { id: 203, name: { en: "Shower Gels", ar: "جل الاستحمام" }, slug: "shower-gels" },
+      { id: 201, name: { en: "For Him", ar: "له" }, slug: "gift-sets-for-him" },
+      { id: 202, name: { en: "For Her", ar: "لها" }, slug: "gift-sets-for-her" },
+      { id: 203, name: { en: "Luxury Sets", ar: "مجموعات فاخرة" }, slug: "luxury-gift-sets" },
     ],
   },
   {
     id: 3,
-    name: { en: "Home Fragrances", ar: "عطور المنزل" },
-    slug: "home-fragrances",
+    name: { en: "Perfumes", ar: "العطور" },
+    slug: "perfumes",
     image: "",
     children: [
-      { id: 301, name: { en: "Candles", ar: "الشموع" }, slug: "candles" },
-      { id: 302, name: { en: "Diffusers", ar: "موزعات العطر" }, slug: "diffusers" },
-      { id: 303, name: { en: "Room Sprays", ar: "بخاخات الغرف" }, slug: "room-sprays" },
-      { id: 304, name: { en: "Incense", ar: "البخور" }, slug: "incense" },
+      { id: 301, name: { en: "Men's Perfumes", ar: "عطور رجالية" }, slug: "mens-perfumes" },
+      { id: 302, name: { en: "Women's Perfumes", ar: "عطور نسائية" }, slug: "womens-perfumes" },
+      { id: 303, name: { en: "Unisex Perfumes", ar: "عطور للجنسين" }, slug: "unisex-perfumes" },
+      { id: 304, name: { en: "Oud Perfumes", ar: "عطور العود" }, slug: "oud-perfumes" },
     ],
   },
   {
     id: 4,
-    name: { en: "Gift Sets", ar: "مجموعات الهدايا" },
-    slug: "gift-sets",
+    name: { en: "Personal Care", ar: "العناية الشخصية" },
+    slug: "personal-care",
+    image: "",
+    children: [],
+  },
+  {
+    id: 5,
+    name: { en: "Home Fragrances", ar: "عطور المنزل" },
+    slug: "home-fragrances",
     image: "",
     children: [
-      { id: 401, name: { en: "For Him", ar: "له" }, slug: "gift-sets-for-him" },
-      { id: 402, name: { en: "For Her", ar: "لها" }, slug: "gift-sets-for-her" },
-      { id: 403, name: { en: "Luxury Sets", ar: "مجموعات فاخرة" }, slug: "luxury-gift-sets" },
+      { id: 501, name: { en: "Candles", ar: "الشموع" }, slug: "candles" },
+      { id: 502, name: { en: "Diffusers", ar: "موزعات العطر" }, slug: "diffusers" },
+      { id: 503, name: { en: "Room Sprays", ar: "بخاخات الغرف" }, slug: "room-sprays" },
+      { id: 504, name: { en: "Incense", ar: "البخور" }, slug: "incense" },
     ],
   },
 ];

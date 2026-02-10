@@ -2,14 +2,68 @@
 
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { X, Plus, Minus, Search, Check } from "lucide-react";
+import { X, Plus, Minus, Search, Check, ChevronDown } from "lucide-react";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
+import { PaymentWidgets } from "@/components/payment/PaymentWidgets";
 import { useCart } from "@/contexts/CartContext";
 import { useNotification } from "@/contexts/NotificationContext";
 import { useFreeGift } from "@/contexts/FreeGiftContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { saveBundleData } from "@/lib/utils/bundleStorage";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { BundleConfig } from "@/lib/api/woocommerce";
+
+function sanitizeProductDescription(html: string): string {
+  if (!html) return "";
+  
+  let sanitized = html;
+  
+  sanitized = sanitized.replace(/<div[^>]*class="[^"]*tinv[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+  sanitized = sanitized.replace(/<div[^>]*class="[^"]*yith[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
+  sanitized = sanitized.replace(/<a[^>]*class="[^"]*tinvwl[^"]*"[^>]*>[\s\S]*?<\/a>/gi, "");
+  sanitized = sanitized.replace(/<a[^>]*aria-label="Add to Wishlist"[^>]*>[\s\S]*?<\/a>/gi, "");
+  sanitized = sanitized.replace(/<p>\s*<\/p>/gi, "");
+  sanitized = sanitized.replace(/Add to Wishlist/gi, "");
+  sanitized = sanitized.trim();
+  
+  return sanitized;
+}
+
+interface AccordionSectionProps {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}
+
+function AccordionSection({ title, isOpen, onToggle, children }: AccordionSectionProps) {
+  return (
+    <div className="border-b border-gray-200">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between py-4 text-left"
+      >
+        <span className="text-sm font-medium uppercase tracking-wide text-gray-900">
+          {title}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-200 ${
+          isOpen ? "max-h-[500px] pb-4" : "max-h-0"
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 type CategoryFilter = "all" | "perfumes" | "oils" | "lotions" | "home";
 
@@ -39,17 +93,23 @@ export function BuildYourOwnSetClient({
   const { addToCart } = useCart();
   const { notify } = useNotification();
   const { getFreeGiftProductIds } = useFreeGift();
+  const { currency } = useCurrency();
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+    const [openAccordion, setOpenAccordion] = useState<string | null>(null);
 
-  // Get required and optional slots from bundle config
-  // total_slots = required_slots + optional_slots, so we calculate optional from the difference
+    const toggleAccordion = (section: string) => {
+      setOpenAccordion(openAccordion === section ? null : section);
+    };
+
+    // Get required and optional slots from bundle config
+  // Use optional_slots directly from API (defaults to 0 if not set)
   const requiredSlots = bundleConfig?.required_slots || 3;
-  const totalSlots = bundleConfig?.total_slots || 5;
-  const optionalSlots = totalSlots - requiredSlots;
+  const optionalSlots = bundleConfig?.optional_slots ?? 0;
+  const totalSlots = requiredSlots + optionalSlots;
 
   // Initialize selections array based on total slots
   const [selections, setSelections] = useState<(ProductOption | null)[]>(() => 
@@ -80,11 +140,35 @@ export function BuildYourOwnSetClient({
     return new Set(bundleConfig.exclude_categories);
   }, [bundleConfig]);
 
-  // Get unique product IDs from bundle config (products that can only be selected once)
-  const uniqueProductIds = useMemo(() => {
-    if (!bundleConfig?.unique_products?.length) return new Set<number>();
-    return new Set(bundleConfig.unique_products);
-  }, [bundleConfig]);
+  // Get slot-specific configuration for the active slot
+  const activeSlotConfig = useMemo(() => {
+    if (activeSlot === null || !bundleConfig?.slots?.length) return null;
+    return bundleConfig.slots[activeSlot] || null;
+  }, [activeSlot, bundleConfig]);
+
+  // Get slot-specific eligible product IDs (if configured for active slot)
+  const slotEligibleProductIds = useMemo(() => {
+    if (!activeSlotConfig?.eligible_products?.length) return null;
+    return new Set(activeSlotConfig.eligible_products);
+  }, [activeSlotConfig]);
+
+  // Get slot-specific eligible category IDs (if configured for active slot)
+  const slotEligibleCategoryIds = useMemo(() => {
+    if (!activeSlotConfig?.eligible_categories?.length) return null;
+    return new Set(activeSlotConfig.eligible_categories);
+  }, [activeSlotConfig]);
+
+  // Get slot-specific exclude product IDs (if configured for active slot)
+  const slotExcludeProductIds = useMemo(() => {
+    if (!activeSlotConfig?.exclude_products?.length) return new Set<number>();
+    return new Set(activeSlotConfig.exclude_products);
+  }, [activeSlotConfig]);
+
+  // Get slot-specific exclude category IDs (if configured for active slot)
+  const slotExcludeCategoryIds = useMemo(() => {
+    if (!activeSlotConfig?.exclude_categories?.length) return new Set<number>();
+    return new Set(activeSlotConfig.exclude_categories);
+  }, [activeSlotConfig]);
 
   const productOptions: ProductOption[] = useMemo(() => {
     // Get free gift product IDs to exclude from bundle selection
@@ -181,12 +265,66 @@ export function BuildYourOwnSetClient({
     return productOptions.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === "all" || product.category === categoryFilter;
-      return matchesSearch && matchesCategory;
+      
+      // If no active slot or no slot-specific config, use global filtering only
+      if (!matchesSearch || !matchesCategory) return false;
+      
+      // Apply slot-specific filtering if configured
+      if (activeSlotConfig) {
+        // Check slot-specific excludes first
+        if (slotExcludeProductIds.has(product.id)) return false;
+        
+        // Check slot-specific category excludes
+        // Note: We need to find the original product to check categories
+        const originalProduct = products.find(p => p.id === product.id);
+        if (originalProduct && slotExcludeCategoryIds.size > 0) {
+          const productCategoryIds = originalProduct.categories?.map(c => c.id) || [];
+          if (productCategoryIds.some(catId => slotExcludeCategoryIds.has(catId))) return false;
+        }
+        
+        // Check slot-specific eligibility
+        const hasSlotEligibleProducts = slotEligibleProductIds && slotEligibleProductIds.size > 0;
+        const hasSlotEligibleCategories = slotEligibleCategoryIds && slotEligibleCategoryIds.size > 0;
+        
+        if (hasSlotEligibleProducts || hasSlotEligibleCategories) {
+          // If slot has specific eligibility rules, product must match at least one
+          if (hasSlotEligibleProducts && slotEligibleProductIds.has(product.id)) {
+            return true;
+          }
+          
+          if (hasSlotEligibleCategories && originalProduct) {
+            const productCategoryIds = originalProduct.categories?.map(c => c.id) || [];
+            if (productCategoryIds.some(catId => slotEligibleCategoryIds.has(catId))) {
+              return true;
+            }
+          }
+          
+          // Slot has eligibility rules but product doesn't match any
+          return false;
+        }
+      }
+      
+      return true;
     });
-  }, [productOptions, searchQuery, categoryFilter]);
+  }, [productOptions, searchQuery, categoryFilter, activeSlotConfig, slotEligibleProductIds, slotEligibleCategoryIds, slotExcludeProductIds, slotExcludeCategoryIds, products]);
 
-  // Get box price from bundle config (if configured)
-  const boxPrice = bundleConfig?.with_box_price || 0;
+  // Get the bundle product's base price from WooCommerce
+  const bundleProductPrice = useMemo(() => {
+    if (!bundleProduct?.prices?.price) return 0;
+    return parseInt(bundleProduct.prices.price) / Math.pow(10, bundleProduct.prices.currency_minor_unit);
+  }, [bundleProduct]);
+
+  // Get pricing mode from bundle config (defaults to "sum" for backwards compatibility)
+  const pricingMode = bundleConfig?.pricing_mode || "sum";
+  
+  // Get fixed price for "fixed" pricing mode
+  const fixedPrice = bundleConfig?.fixed_price || bundleProductPrice;
+
+  // Get box price for "sum" pricing mode: use config value if set, otherwise use bundle product's WooCommerce price
+  // This represents the cost of the box/packaging itself
+  const boxPrice = pricingMode === "fixed" 
+    ? fixedPrice 
+    : (bundleConfig?.with_box_price || bundleProductPrice);
 
   // Calculate required products total (first requiredSlots items)
   const requiredProductsTotal = useMemo(() => {
@@ -208,11 +346,24 @@ export function BuildYourOwnSetClient({
   // Check if any add-on products are selected
   const hasAddOns = selections.slice(requiredSlots).some((s) => s !== null);
   
-  // Total = box price + products (box price always shown, products added when selected)
-  const total = boxPrice + productsTotal;
+  // Calculate total based on pricing mode:
+  // - "fixed": Total is always the fixed price, regardless of selected products
+  // - "sum": Total = box price + sum of selected product prices
+  const total = pricingMode === "fixed" ? fixedPrice : (boxPrice + productsTotal);
 
   const requiredCount = selections.slice(0, requiredSlots).filter((s) => s !== null).length;
   const isValid = requiredCount === requiredSlots;
+
+  // Helper function to get slot label from config or fallback to default
+  const getSlotLabel = (index: number, isOptional: boolean = false) => {
+    // Check if slot has a custom title from backend config
+    const slotConfig = bundleConfig?.slots?.[index];
+    if (slotConfig?.title) {
+      return slotConfig.title;
+    }
+    // Fallback to default translation
+    return isOptional ? t.addExtraWithPrice : `${t.chooseItem} ${index + 1}`;
+  };
 
   const handleSlotClick = (index: number) => {
     setActiveSlot(index);
@@ -250,16 +401,28 @@ export function BuildYourOwnSetClient({
     try {
       const selectedProducts = selections
         .filter((s): s is ProductOption => s !== null)
-        .map((product) => ({
+        .map((product, index) => ({
           product_id: product.id,
           name: product.name,
           price: product.price,
+          is_addon: index >= requiredSlots,
         }));
 
-      await addToCart(bundleProduct.id, quantity, undefined, undefined, {
+      const bundleData = {
         bundle_items: selectedProducts,
         bundle_total: total,
-      });
+        box_price: boxPrice,
+        products_total: productsTotal,
+        required_items_total: requiredProductsTotal,
+        addon_items_total: addOnProductsTotal,
+        pricing_mode: pricingMode,
+        fixed_price: pricingMode === "fixed" ? fixedPrice : undefined,
+      };
+
+      // Save bundle data to localStorage as fallback since CoCart doesn't persist cart_item_data
+      saveBundleData(bundleProduct.id, bundleData);
+
+      await addToCart(bundleProduct.id, quantity, undefined, undefined, bundleData);
       
       notify("success", isRTL ? "تمت إضافة الحزمة إلى السلة" : "Bundle added to cart");
     } catch (error) {
@@ -290,6 +453,7 @@ export function BuildYourOwnSetClient({
       boxPrice: "Box",
       products: "Products",
       addOns: "Add-ons",
+      fixedPrice: "Fixed Price",
       addToCart: "Add to cart",
       adding: "Adding...",
       selectProduct: "Select a Product",
@@ -302,10 +466,18 @@ export function BuildYourOwnSetClient({
       select: "Select",
       selected: "Selected",
       close: "Close",
-      itemsSelected: "items selected",
-      requiredItems: "required",
-    },
-    ar: {
+                  itemsSelected: "items selected",
+              requiredItems: "required",
+              characteristics: "Characteristics",
+              descriptionTab: "Description",
+              paymentDelivery: "Payment & Delivery",
+              category: "Category",
+              sku: "SKU",
+              noDescription: "No description available",
+              paymentInfo: "We accept all major credit cards and cash on delivery.",
+              deliveryInfo: "Free shipping on orders over 300 AED. Delivery within 2-5 business days.",
+            },
+            ar:{
       title: "اصنع مجموعتك الخاصة",
       description:
         "سواء كنت تدلل نفسك أو تفاجئ شخصًا مميزًا، فإن صناديق ASL تجمع أفضل العطور ومنتجات العناية بالجسم.",
@@ -322,6 +494,7 @@ export function BuildYourOwnSetClient({
       boxPrice: "الصندوق",
       products: "المنتجات",
       addOns: "الإضافات",
+      fixedPrice: "سعر ثابت",
       addToCart: "أضف إلى السلة",
       adding: "جاري الإضافة...",
       selectProduct: "اختر منتج",
@@ -334,12 +507,20 @@ export function BuildYourOwnSetClient({
       select: "اختر",
       selected: "مختار",
       close: "إغلاق",
-      itemsSelected: "منتجات مختارة",
-      requiredItems: "مطلوب",
-    },
-  };
+            itemsSelected: "منتجات مختارة",
+          requiredItems: "مطلوب",
+          characteristics: "الخصائص",
+          descriptionTab: "الوصف",
+          paymentDelivery: "الدفع والتوصيل",
+          category: "الفئة",
+          sku: "رمز المنتج",
+          noDescription: "لا يوجد وصف متاح",
+          paymentInfo: "نقبل جميع بطاقات الائتمان الرئيسية والدفع عند الاستلام.",
+          deliveryInfo: "شحن مجاني للطلبات التي تزيد عن 300 درهم. التوصيل خلال 2-5 أيام عمل.",
+        },
+      };
 
-  const t = translations[isRTL ? "ar" : "en"];
+      const t = translations[isRTL ? "ar" : "en"];
 
   const allCategories: { key: CategoryFilter; label: string }[] = [
     { key: "all", label: t.all },
@@ -374,18 +555,25 @@ export function BuildYourOwnSetClient({
             {bundleProduct?.name || t.title}
           </h1>
 
-          {/* Price - Show box price as starting price */}
+          {/* Price - Show bundle product price or calculated total */}
           <div className="text-xl font-bold text-gray-900">
-            <FormattedPrice price={boxPrice > 0 ? boxPrice : total} iconSize="md" />
+            <FormattedPrice price={bundleProductPrice > 0 ? bundleProductPrice : total} iconSize="md" />
           </div>
 
-          {/* Description */}
-          <div className="space-y-2 text-sm text-gray-600">
-            <p>{t.description}</p>
-            <p>{t.instructions}</p>
-          </div>
+          {/* Description - Use product short_description from WordPress if available */}
+          {bundleProduct?.short_description ? (
+            <div 
+              className="space-y-2 text-sm text-gray-600 prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: bundleProduct.short_description }}
+            />
+          ) : (
+            <div className="space-y-2 text-sm text-gray-600">
+              <p>{t.description}</p>
+              <p>{t.instructions}</p>
+            </div>
+          )}
 
-          {/* Your Box Section */}
+                    {/* Your Box Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">{t.yourBox}</h2>
@@ -448,7 +636,7 @@ export function BuildYourOwnSetClient({
                       </div>
                       <div>
                         <p className="font-medium text-gray-600">
-                          {t.chooseItem} {index + 1}
+                          {getSlotLabel(index)}
                         </p>
                         <p className="text-xs text-red-500">{t.required}</p>
                       </div>
@@ -516,7 +704,7 @@ export function BuildYourOwnSetClient({
                         <Plus className="h-6 w-6 text-gray-300" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-400">{t.addExtraWithPrice}</p>
+                        <p className="font-medium text-gray-400">{getSlotLabel(index, true)}</p>
                         <p className="text-xs text-gray-400">{t.optional}</p>
                       </div>
                     </button>
@@ -529,25 +717,37 @@ export function BuildYourOwnSetClient({
 
           {/* Price Breakdown */}
           <div className="space-y-2 border-t border-gray-200 pt-4">
-            {/* Box Price */}
-            {boxPrice > 0 && (
-              <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>{t.boxPrice}</span>
-                <span><FormattedPrice price={boxPrice} iconSize="sm" /></span>
-              </div>
+            {/* For "sum" pricing mode: show breakdown of box price + products */}
+            {pricingMode === "sum" && (
+              <>
+                {/* Box Price */}
+                {boxPrice > 0 && (
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>{t.boxPrice}</span>
+                    <span><FormattedPrice price={boxPrice} iconSize="sm" /></span>
+                  </div>
+                )}
+                {/* Products Price (required items only) */}
+                {requiredProductsTotal > 0 && (
+                  <div className="flex items-center justify-between text-sm text-gray-600">
+                    <span>{t.products}</span>
+                    <span><FormattedPrice price={requiredProductsTotal} iconSize="sm" /></span>
+                  </div>
+                )}
+                {/* Add-ons Price */}
+                {hasAddOns && addOnProductsTotal > 0 && (
+                  <div className="flex items-center justify-between text-sm text-amber-600">
+                    <span>{t.addOns}</span>
+                    <span>+<FormattedPrice price={addOnProductsTotal} iconSize="sm" /></span>
+                  </div>
+                )}
+              </>
             )}
-            {/* Products Price */}
-            {productsTotal > 0 && (
+            {/* For "fixed" pricing mode: show fixed price label */}
+            {pricingMode === "fixed" && (
               <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>{t.products}</span>
-                <span><FormattedPrice price={productsTotal} iconSize="sm" /></span>
-              </div>
-            )}
-            {/* Add-ons Price */}
-            {hasAddOns && addOnProductsTotal > 0 && (
-              <div className="flex items-center justify-between text-sm text-amber-600">
-                <span>{t.addOns}</span>
-                <span>+<FormattedPrice price={addOnProductsTotal} iconSize="sm" /></span>
+                <span>{t.fixedPrice}</span>
+                <span><FormattedPrice price={fixedPrice} iconSize="sm" /></span>
               </div>
             )}
             {/* Total */}
@@ -558,6 +758,11 @@ export function BuildYourOwnSetClient({
               </span>
             </div>
           </div>
+
+          {/* Payment Widgets - Only shows if payment gateway is enabled */}
+          {total > 0 && (
+            <PaymentWidgets price={total} currency={currency} locale={locale} />
+          )}
 
           {/* Quantity and Add to Cart */}
           <div className="flex items-center gap-4">
@@ -601,13 +806,68 @@ export function BuildYourOwnSetClient({
               disabled={!isValid || isAddingToCart}
               className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-[#C4885B] bg-[#C4885B] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 hover:bg-transparent hover:text-[#C4885B] disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-400"
             >
-              {isAddingToCart ? t.adding : t.addToCart}
-            </button>
-          </div>
-        </div>
-      </div>
+                    {isAddingToCart ? t.adding : t.addToCart}
+                  </button>
+                </div>
 
-      {/* Product Picker Modal */}
+                {/* Accordion Sections */}
+                <div className="border-t border-gray-200 pt-2">
+                  {/* Characteristics */}
+                  <AccordionSection
+                    title={t.characteristics}
+                    isOpen={openAccordion === "characteristics"}
+                    onToggle={() => toggleAccordion("characteristics")}
+                  >
+                    <div className="space-y-2 text-sm">
+                      {bundleProduct?.categories && bundleProduct.categories.length > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{t.category}</span>
+                          <span className="text-gray-900">{bundleProduct.categories[0].name}</span>
+                        </div>
+                      )}
+                      {bundleProduct?.sku && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">{t.sku}</span>
+                          <span className="text-gray-900">{bundleProduct.sku}</span>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionSection>
+
+                                    {/* Description */}
+                                    <AccordionSection
+                                      title={t.descriptionTab}
+                                      isOpen={openAccordion === "description"}
+                                      onToggle={() => toggleAccordion("description")}
+                                    >
+                    {bundleProduct?.description && sanitizeProductDescription(bundleProduct.description) ? (
+                      <div
+                        className="prose prose-sm max-w-none text-gray-600"
+                        dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(bundleProduct.description) }}
+                      />
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        {t.noDescription}
+                      </p>
+                    )}
+                  </AccordionSection>
+
+                  {/* Payment & Delivery */}
+                  <AccordionSection
+                    title={t.paymentDelivery}
+                    isOpen={openAccordion === "payment"}
+                    onToggle={() => toggleAccordion("payment")}
+                  >
+                    <div className="space-y-3 text-sm text-gray-600">
+                      <p>{t.paymentInfo}</p>
+                      <p>{t.deliveryInfo}</p>
+                    </div>
+                  </AccordionSection>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Picker Modal */}
       {activeSlot !== null && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
           <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-t-2xl bg-white sm:rounded-2xl">
@@ -658,14 +918,14 @@ export function BuildYourOwnSetClient({
             {/* Product Grid */}
             <div className="max-h-[60vh] overflow-y-auto p-4">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {filteredProducts.map((product) => {
-                  // Check if product is already selected
-                  const isSelected = selectedIds.has(product.id);
-                  // Check if product is unique (can only be selected once) and already selected
-                  const isUniqueAndSelected = uniqueProductIds.has(product.id) && isSelected;
-                  // Product is disabled if it's a unique product that's already selected
-                  // Non-unique products can be selected multiple times
-                  const isDisabled = isUniqueAndSelected;
+                  {filteredProducts.map((product) => {
+                    // Check if product is already selected in another slot
+                    const isSelected = selectedIds.has(product.id);
+                    // Check if this product is currently in the active slot (allow re-selecting same product)
+                    const isCurrentSlotProduct = activeSlot !== null && selections[activeSlot]?.id === product.id;
+                    // Product is disabled if it's already selected in another slot
+                    // Allow selecting the same product that's already in the current slot (for "change" action)
+                    const isDisabled = isSelected && !isCurrentSlotProduct;
                   return (
                     <button
                       key={product.id}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
 import { cookies } from "next/headers";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
 const API_BASE = siteConfig.apiUrl;
 // TI WooCommerce Wishlist REST API - uses WooCommerce REST API namespace
@@ -23,28 +24,32 @@ const USER_COOKIE = "asl_auth_user";
 // }
 // const shareKeyCache = new Map<number, CachedShareKey>();
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCachedProduct(_productId: number): WCProduct | null {
   // DEV MODE: Cache disabled for faster development
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setCachedProduct(_productId: number, _product: WCProduct): void {
   // DEV MODE: Cache disabled for faster development - do nothing
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getCachedShareKey(_userId: number): string | null {
   // DEV MODE: Cache disabled for faster development
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function setCachedShareKey(_userId: number, _shareKey: string): void {
   // DEV MODE: Cache disabled for faster development - do nothing
 }
 
 // WooCommerce REST API authentication (required for /wc/v3/ endpoints)
 function getWooCommerceCredentials() {
-  const consumerKey = process.env.WC_CONSUMER_KEY || "";
-  const consumerSecret = process.env.WC_CONSUMER_SECRET || "";
+  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || "";
+  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || "";
   return { consumerKey, consumerSecret };
 }
 

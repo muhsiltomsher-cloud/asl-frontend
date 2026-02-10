@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
 const API_BASE = `${siteConfig.apiUrl}/wp-json/wc/v3`;
+const STORE_API_BASE = `${siteConfig.apiUrl}/wp-json/wc/store/v1`;
 
 function getWooCommerceCredentials() {
-  const consumerKey = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || "";
-  const consumerSecret = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "";
+  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_KEY") || "";
+  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_SECRET") || "";
   return { consumerKey, consumerSecret };
 }
 
@@ -14,22 +16,118 @@ function getBasicAuthParams(): string {
   return `consumer_key=${consumerKey}&consumer_secret=${consumerSecret}`;
 }
 
-export interface PaymentGateway {
+const PAYMENT_METHOD_DETAILS: Record<string, { title: string; description: string }> = {
+  myfatoorah_v2: {
+    title: "Credit/Debit Card",
+    description: "Pay securely with your credit or debit card via MyFatoorah",
+  },
+  myfatoorah: {
+    title: "Credit/Debit Card",
+    description: "Pay securely with your credit or debit card via MyFatoorah",
+  },
+  myfatoorah_cards: {
+    title: "Credit/Debit Card",
+    description: "Pay securely with your credit or debit card via MyFatoorah",
+  },
+  myfatoorah_embedded: {
+    title: "Credit/Debit Card",
+    description: "Pay securely with your credit or debit card via MyFatoorah",
+  },
+  tabby_installments: {
+    title: "Tabby - Pay in Installments",
+    description: "Split your purchase into 4 interest-free payments",
+  },
+  tabby_checkout: {
+    title: "Tabby - Pay in Installments",
+    description: "Split your purchase into 4 interest-free payments",
+  },
+  tabby: {
+    title: "Tabby - Pay in Installments",
+    description: "Split your purchase into 4 interest-free payments",
+  },
+  "tamara-gateway": {
+    title: "Tamara - Buy Now Pay Later",
+    description: "Pay in easy installments with Tamara",
+  },
+  tamara: {
+    title: "Tamara - Buy Now Pay Later",
+    description: "Pay in easy installments with Tamara",
+  },
+  cod: {
+    title: "Cash on Delivery",
+    description: "Pay with cash upon delivery",
+  },
+  bacs: {
+    title: "Bank Transfer",
+    description: "Make your payment directly into our bank account",
+  },
+};
+
+interface WCPaymentGateway {
   id: string;
   title: string;
   description: string;
-  enabled: boolean;
   order: number;
+  enabled: boolean;
   method_title: string;
   method_description: string;
-  settings?: Record<string, unknown>;
+  settings?: Record<string, { value: string }>;
+}
+
+interface CartResponse {
+  payment_methods?: string[];
 }
 
 export async function GET() {
   try {
-    const url = `${API_BASE}/payment_gateways?${getBasicAuthParams()}`;
+    const { consumerKey, consumerSecret } = getWooCommerceCredentials();
     
-    const response = await fetch(url, {
+    if (consumerKey && consumerSecret) {
+      const url = `${API_BASE}/payment_gateways?${getBasicAuthParams()}`;
+      
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        next: {
+          revalidate: 60,
+        },
+      });
+
+      if (response.ok) {
+        const data: WCPaymentGateway[] = await response.json();
+        
+        const enabledGateways = data
+          .filter((gateway) => gateway.enabled)
+          .sort((a, b) => a.order - b.order)
+          .map((gateway) => {
+            const details = PAYMENT_METHOD_DETAILS[gateway.id];
+            return {
+              id: gateway.id,
+              title: details?.title || gateway.title,
+              description: details?.description || gateway.description || "",
+              method_title: gateway.method_title,
+              order: gateway.order,
+              enabled: true, // Confirmed enabled from WooCommerce REST API
+            };
+          });
+
+        // Check if MyFatoorah test mode is enabled
+        const myFatoorahTestMode = getEnvVar("MYFATOORAH_TEST_MODE") === "true";
+
+        return NextResponse.json({ 
+          success: true, 
+          gateways: enabledGateways,
+          source: "woocommerce_rest_api", // Indicates reliable enabled status
+          myfatoorah_test_mode: myFatoorahTestMode,
+        });
+      }
+    }
+    
+    const storeUrl = `${STORE_API_BASE}/cart`;
+    
+    const storeResponse = await fetch(storeUrl, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -39,34 +137,53 @@ export async function GET() {
       },
     });
 
-    const data = await response.json();
+    const storeData: CartResponse = await storeResponse.json();
 
-    if (!response.ok) {
+    if (!storeResponse.ok) {
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: data.code || "payment_gateways_error",
-            message: data.message || "Failed to get payment gateways.",
+            code: "payment_gateways_error",
+            message: "Failed to get payment gateways.",
           },
         },
-        { status: response.status }
+        { status: storeResponse.status }
       );
     }
 
-    const enabledGateways = data
-      .filter((gateway: PaymentGateway) => gateway.enabled)
-      .sort((a: PaymentGateway, b: PaymentGateway) => (a.order || 0) - (b.order || 0))
-      .map((gateway: PaymentGateway) => ({
-        id: gateway.id,
-        title: gateway.title,
-        description: gateway.description,
-        method_title: gateway.method_title,
-      }));
+    const paymentMethodIds = storeData.payment_methods || [];
+    
+    // When using Store API fallback, we cannot verify if payment methods are actually enabled
+    // in the WooCommerce settings. Only include basic payment methods (COD, bank transfer)
+    // and exclude BNPL providers (Tamara, Tabby) since we can't confirm their enabled status.
+    const excludedFromFallback = ["tamara", "tamara-gateway", "tabby", "tabby_installments", "tabby_checkout"];
+    
+    const gateways = paymentMethodIds
+      .filter((id: string) => !excludedFromFallback.includes(id))
+      .map((id: string, index: number) => {
+        const details = PAYMENT_METHOD_DETAILS[id] || {
+          title: id.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          description: "",
+        };
+        return {
+          id,
+          title: details.title,
+          description: details.description,
+          method_title: details.title,
+          order: index,
+          enabled: true, // Assumed enabled since it's in the cart response
+        };
+      });
+
+    // Check if MyFatoorah test mode is enabled
+    const myFatoorahTestMode = getEnvVar("MYFATOORAH_TEST_MODE") === "true";
 
     return NextResponse.json({ 
       success: true, 
-      gateways: enabledGateways,
+      gateways,
+      source: "store_api_fallback", // Indicates we couldn't verify enabled status from REST API
+      myfatoorah_test_mode: myFatoorahTestMode,
     });
   } catch (error) {
     return NextResponse.json(

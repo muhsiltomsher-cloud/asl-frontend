@@ -1,17 +1,37 @@
 import { notFound, redirect } from "next/navigation";
-import { getProductBySlug, getRelatedProducts, getProducts, getEnglishSlugForProduct, getBundleConfig, getFreeGiftProductIds, getCategoryBySlug, getEnglishSlugForCategory } from "@/lib/api/woocommerce";
+import { getProductBySlug, getRelatedProducts, getProducts, getEnglishSlugForProduct, getBundleConfig, getFreeGiftProductIds, getHiddenProductIds, getCategoryBySlug, getEnglishSlugForCategory } from "@/lib/api/woocommerce";
 import { getProductAddons } from "@/lib/api/wcpa";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateProductJsonLd } from "@/lib/utils/seo";
 import { ProductDetail } from "./ProductDetail";
 import { BuildYourOwnSetClient } from "../../build-your-own-set/BuildYourOwnSetClient";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { siteConfig, type Locale } from "@/config/site";
 import { decodeHtmlEntities } from "@/lib/utils";
 import type { Metadata } from "next";
+import type { WCProduct } from "@/types/woocommerce";
 
 // Helper to check if a slug contains non-ASCII characters (e.g., Arabic)
 function isNonAsciiSlug(slug: string): boolean {
   return /[^\x00-\x7F]/.test(slug);
+}
+
+// Helper to generate product JSON-LD data from WCProduct
+function getProductJsonLdData(product: WCProduct, locale: string, slug: string) {
+  const minorUnit = product.prices.currency_minor_unit || 2;
+  const divisor = Math.pow(10, minorUnit);
+  const price = (parseInt(product.prices.price, 10) / divisor).toFixed(2);
+  
+  return generateProductJsonLd({
+    name: decodeHtmlEntities(product.name),
+    description: decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 500),
+    image: product.images[0]?.src || "",
+    price,
+    currency: product.prices.currency_code,
+    sku: product.sku || undefined,
+    availability: product.is_in_stock ? "InStock" : "OutOfStock",
+    url: `${siteConfig.url}/${locale}/product/${slug}`,
+  });
 }
 
 // Increased revalidate time for better cache hit rates (5 minutes instead of 60 seconds)
@@ -96,15 +116,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // Check if this product is a hidden gift product
+  // Fetch hidden product IDs (free gifts and products with catalog_visibility=hidden) in parallel
+  const [hiddenGiftProductIds, hiddenCatalogProductIds] = await Promise.all([
+    getFreeGiftProductIds(),
+    getHiddenProductIds(),
+  ]);
+  
+  // Check if this product is a hidden gift product or has hidden catalog visibility
   // If so, return 404 to prevent direct URL access
-  const hiddenGiftProductIds = await getFreeGiftProductIds();
-  if (hiddenGiftProductIds.includes(product.id)) {
+  if (hiddenGiftProductIds.includes(product.id) || hiddenCatalogProductIds.includes(product.id)) {
     notFound();
   }
 
   // Check if this product has a bundle configuration
-  const bundleConfig = await getBundleConfig(slug);
+  // Pass locale to get correct product/category IDs for the current language
+  const bundleConfig = await getBundleConfig(slug, locale as Locale);
   
   // If bundle is enabled for this product, show the bundle builder inline
   if (bundleConfig && bundleConfig.enabled) {
@@ -128,28 +154,37 @@ export default async function ProductPage({ params }: ProductPageProps) {
     ];
     
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
-        <BuildYourOwnSetClient
-          products={bundleProducts}
-          locale={locale as Locale}
-          bundleProduct={product}
-          bundleConfig={bundleConfig}
-        />
-      </div>
+      <>
+        <JsonLd data={getProductJsonLdData(product, locale, slug)} />
+        <div className="container mx-auto px-4 py-8">
+          <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
+          <BuildYourOwnSetClient
+            products={bundleProducts}
+            locale={locale as Locale}
+            bundleProduct={product}
+            bundleConfig={bundleConfig}
+          />
+        </div>
+      </>
     );
   }
 
   // Fetch related products, addon forms, and English product (for English category slug) in parallel
-  const [relatedProducts, productAddons, englishProduct] = await Promise.all([
+  const [relatedProductsRaw, productAddons, englishProduct] = await Promise.all([
     getRelatedProducts(product, {
-      per_page: 8,
+      per_page: 12,
       locale: locale as Locale,
     }),
     getProductAddons(product.id, { locale: locale as Locale }),
     // Fetch the same product with English locale to get English category slug
     getProductBySlug(slug, "en"),
   ]);
+
+  // Filter out hidden products from related products (free gifts and products with catalog_visibility=hidden)
+  const hiddenProductIdsSet = new Set([...hiddenGiftProductIds, ...hiddenCatalogProductIds]);
+  const relatedProducts = relatedProductsRaw.filter(
+    (p) => !hiddenProductIdsSet.has(p.id)
+  );
 
   // Get the English category slug from the English product
   // If the English product doesn't exist (WPML assigns different slugs per locale),
@@ -171,13 +206,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const localizedCategoryName = localizedCategory?.name || primaryCategory?.name || null;
 
   return (
-    <ProductDetail
-      product={product}
-      locale={locale as Locale}
-      relatedProducts={relatedProducts}
-      addonForms={productAddons?.forms}
-      englishCategorySlug={englishCategorySlug}
-      localizedCategoryName={localizedCategoryName}
-    />
+    <>
+      <JsonLd data={getProductJsonLdData(product, locale, slug)} />
+      <ProductDetail
+        product={product}
+        locale={locale as Locale}
+        relatedProducts={relatedProducts}
+        addonForms={productAddons?.forms}
+        englishCategorySlug={englishCategorySlug}
+        localizedCategoryName={localizedCategoryName}
+        hiddenGiftProductIds={hiddenGiftProductIds}
+      />
+    </>
   );
 }

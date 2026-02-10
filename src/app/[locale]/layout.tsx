@@ -17,8 +17,10 @@ import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { LocationCurrencyBanner } from "@/components/common/LocationCurrencyBanner";
-import { GiftCelebrationWrapper } from "@/components/common/GiftCelebrationWrapper";
-import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings } from "@/lib/api/wordpress";
+import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
+import { WhatsAppFloatingButton } from "@/components/common/WhatsAppFloatingButton";
+import { NetworkStatusBanner } from "@/components/common/NetworkStatusBanner";
+import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -37,22 +39,79 @@ export async function generateMetadata({
   const { locale } = await params;
   const validLocale = locale as Locale;
   
-  // Fetch site settings to get favicon from backend
-  const siteSettings = await getSiteSettings(validLocale);
+  const [siteSettings, seoSettings] = await Promise.all([
+    getSiteSettings(validLocale),
+    getSeoSettings(validLocale),
+  ]);
   
-  // Build favicon URL with cache-busting parameter
   const faviconUrl = siteSettings.favicon?.url;
   const faviconWithCacheBust = faviconUrl 
     ? `${faviconUrl}${faviconUrl.includes('?') ? '&' : '?'}v=${siteSettings.favicon?.id || Date.now()}`
     : undefined;
-  
+
+  const isArabic = validLocale === "ar";
+  const metaTitle = (isArabic ? seoSettings.titleAr : seoSettings.title) || siteConfig.name;
+  const metaDescription = (isArabic ? seoSettings.descriptionAr : seoSettings.description) || siteConfig.description;
+  const metaKeywords = (isArabic ? seoSettings.keywordsAr : seoSettings.keywords) || undefined;
+
+  const ogTitle = (isArabic ? seoSettings.openGraph.titleAr : seoSettings.openGraph.title) || metaTitle;
+  const ogDescription = (isArabic ? seoSettings.openGraph.descriptionAr : seoSettings.openGraph.description) || metaDescription;
+  const ogImage = seoSettings.openGraph.image || siteConfig.ogImage;
+  const ogSiteName = seoSettings.openGraph.siteName || metaTitle;
+
+  const twitterTitle = (isArabic ? seoSettings.twitter.titleAr : seoSettings.twitter.title) || ogTitle;
+  const twitterDescription = (isArabic ? seoSettings.twitter.descriptionAr : seoSettings.twitter.description) || ogDescription;
+  const twitterImage = seoSettings.twitter.image || ogImage;
+
+  const robotsParts = seoSettings.robots.split(',');
+  const shouldIndex = !robotsParts.includes('noindex');
+  const shouldFollow = !robotsParts.includes('nofollow');
+
   return {
     title: {
-      default: siteConfig.name,
-      template: `%s | ${siteConfig.name}`,
+      default: metaTitle,
+      template: `%s | ${metaTitle}`,
     },
-    description: siteConfig.description,
+    description: metaDescription,
+    keywords: metaKeywords,
     metadataBase: new URL(siteConfig.url),
+    alternates: {
+      canonical: seoSettings.canonicalUrl || undefined,
+    },
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      siteName: ogSiteName,
+      type: seoSettings.openGraph.type as "website" | "article",
+      locale: isArabic ? "ar_SA" : "en_US",
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: ogTitle }] : undefined,
+    },
+    twitter: {
+      card: seoSettings.twitter.card as "summary_large_image" | "summary" | "app",
+      site: seoSettings.twitter.site || undefined,
+      creator: seoSettings.twitter.creator || undefined,
+      title: twitterTitle,
+      description: twitterDescription,
+      images: twitterImage ? [twitterImage] : undefined,
+    },
+    robots: {
+      index: shouldIndex,
+      follow: shouldFollow,
+      googleBot: {
+        index: shouldIndex,
+        follow: shouldFollow,
+        "max-video-preview": -1,
+        "max-image-preview": "large" as const,
+        "max-snippet": -1,
+      },
+    },
+    verification: {
+      google: seoSettings.verification.google || undefined,
+      other: seoSettings.verification.bing ? { "msvalidate.01": seoSettings.verification.bing } : undefined,
+    },
+    other: {
+      ...(seoSettings.openGraph.fbAppId ? { "fb:app_id": seoSettings.openGraph.fbAppId } : {}),
+    },
     icons: faviconWithCacheBust ? {
       icon: faviconWithCacheBust,
       shortcut: faviconWithCacheBust,
@@ -105,21 +164,27 @@ export default async function LocaleLayout({
                 shadow="0 0 10px #92400e,0 0 5px #92400e"
               />
               <div dir={dir} lang={validLocale} className="flex min-h-screen flex-col bg-[#f7f6f2] overflow-x-clip max-w-full">
-                <Header
-                  locale={validLocale}
-                  dictionary={dictionary}
-                  siteSettings={siteSettings}
-                  headerSettings={headerSettings}
-                  menuItems={menuItems?.items}
-                  topbarSettings={topbarSettings}
-                />
+                <div className="print:hidden">
+                  <Header
+                    locale={validLocale}
+                    dictionary={dictionary}
+                    siteSettings={siteSettings}
+                    headerSettings={headerSettings}
+                    menuItems={menuItems?.items}
+                    topbarSettings={topbarSettings}
+                  />
+                </div>
                 <main className="flex-1">{children}</main>
-                <Footer locale={validLocale} dictionary={dictionary} siteSettings={siteSettings} />
-                <MobileBottomBar
-                  locale={validLocale}
-                  settings={mobileBarSettings}
-                  dictionary={dictionary}
-                />
+                <div className="print:hidden">
+                  <Footer locale={validLocale} dictionary={dictionary} siteSettings={siteSettings} />
+                </div>
+                <div className="print:hidden">
+                  <MobileBottomBar
+                    locale={validLocale}
+                    settings={mobileBarSettings}
+                    dictionary={dictionary}
+                  />
+                </div>
               </div>
               <MiniCartDrawer
                 locale={validLocale}
@@ -150,8 +215,12 @@ export default async function LocaleLayout({
                               more: dictionary.common.more,
                             }}
                           />
-                                                <LocationCurrencyBanner locale={validLocale} />
-                                                <GiftCelebrationWrapper locale={validLocale} />
+                                                                                                                                                                                                <NetworkStatusBanner locale={validLocale} />
+                                                                                                                                                                                                <LocationCurrencyBanner locale={validLocale} />
+                                                                                                                                                                                                <CookieConsentBanner locale={validLocale} />
+                                                                                                <div className="print:hidden">
+                                                                                                  <WhatsAppFloatingButton phoneNumber="971506071405" />
+                                                                                                </div>
                                                         </WishlistProvider>
                                             </FreeGiftProvider>
                     </CartProvider>

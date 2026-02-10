@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
 const TABBY_API_URL = "https://api.tabby.ai/api/v2/checkout";
 
@@ -24,6 +25,10 @@ interface TabbySessionRequest {
     unit_price: number;
     category?: string;
   }>;
+  // Optional order totals for accurate payment gateway reporting
+  tax_amount?: number;
+  shipping_amount?: number;
+  discount_amount?: number;
   language?: string;
   success_url: string;
   cancel_url: string;
@@ -32,10 +37,11 @@ interface TabbySessionRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const secretKey = process.env.TABBY_SECRET_KEY;
-    const merchantCode = process.env.TABBY_MERCHANT_CODE || "default";
+    const secretKey = getEnvVar("TABBY_SECRET_KEY");
+    const merchantCode = getEnvVar("TABBY_MERCHANT_CODE") || "default";
 
     if (!secretKey) {
+      console.error("Tabby API Error: TABBY_SECRET_KEY environment variable is not configured");
       return NextResponse.json(
         {
           success: false,
@@ -49,6 +55,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body: TabbySessionRequest = await request.json();
+    
+    console.log("Tabby create-session request:", {
+      order_id: body.order_id,
+      amount: body.amount,
+      currency: body.currency,
+      items_count: body.order_items?.length,
+    });
 
     const {
       order_id,
@@ -59,6 +72,9 @@ export async function POST(request: NextRequest) {
       buyer,
       shipping_address,
       order_items,
+      tax_amount = 0,
+      shipping_amount = 0,
+      discount_amount = 0,
       language = "en",
       success_url,
       cancel_url,
@@ -94,9 +110,9 @@ export async function POST(request: NextRequest) {
           zip: shipping_address?.zip || "",
         },
         order: {
-          tax_amount: "0.00",
-          shipping_amount: "0.00",
-          discount_amount: "0.00",
+          tax_amount: tax_amount.toFixed(2),
+          shipping_amount: shipping_amount.toFixed(2),
+          discount_amount: discount_amount.toFixed(2),
           reference_id: `WC-${order_id}`,
           items: order_items.map((item) => ({
             title: item.title,

@@ -81,6 +81,7 @@ export interface WCProduct {
   has_options: boolean;
   is_purchasable: boolean;
   is_in_stock: boolean;
+  catalog_visibility: "visible" | "catalog" | "search" | "hidden";
   is_on_backorder: boolean;
   low_stock_remaining: number | null;
   stock_availability: {

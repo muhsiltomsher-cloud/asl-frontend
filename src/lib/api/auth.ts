@@ -7,6 +7,10 @@ export interface RegisterData {
   username: string;
   email: string;
   password: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  newsletter?: boolean;
 }
 
 export interface AuthUser {
@@ -22,6 +26,7 @@ export interface AuthUser {
 export interface AuthError {
   code: string;
   message: string;
+  retry_after?: number;
   data?: {
     status: number;
   };
@@ -107,7 +112,12 @@ export async function register(data: RegisterData): Promise<RegisterResponse> {
         username: data.username,
         email: data.email,
         password: data.password,
-        first_name: data.username,
+        first_name: data.first_name || data.username,
+        last_name: data.last_name || "",
+        billing: {
+          phone: data.phone || "",
+        },
+        meta_data: data.newsletter ? [{ key: "newsletter_subscribed", value: "yes" }] : [],
       }),
     });
 

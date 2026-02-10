@@ -5,6 +5,7 @@ import type {
   WCCategory,
   WCProductsResponse,
 } from "@/types/woocommerce";
+import type { BundlePricing } from "@/types/bundle";
 
 const API_BASE = `${siteConfig.apiUrl}/wp-json/wc/store/v1`;
 
@@ -127,9 +128,15 @@ export async function getProducts(params?: {
       revalidate: 300,
     });
 
+    const visibleProducts = products.filter(
+      (product) =>
+        product.is_purchasable !== false &&
+        (!product.catalog_visibility || product.catalog_visibility === "visible" || product.catalog_visibility === "catalog")
+    );
+
     return {
-      products,
-      total,
+      products: visibleProducts,
+      total: total - (products.length - visibleProducts.length),
       totalPages,
     };
   } catch (error) {
@@ -143,6 +150,7 @@ export async function getProducts(params?: {
 }
 
 // Helper to check if a slug contains non-ASCII characters (e.g., Arabic)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isNonAsciiSlug(slug: string): boolean {
   return /[^\x00-\x7F]/.test(slug);
 }
@@ -272,6 +280,31 @@ export async function getProductById(
   }
 }
 
+export async function getProductsByIds(
+  ids: number[],
+  locale?: Locale,
+  currency?: Currency
+): Promise<WCProduct[]> {
+  if (ids.length === 0) {
+    return [];
+  }
+
+  try {
+    const products = await fetchAPI<WCProduct[]>(
+      `/products?include=${ids.join(",")}`,
+      {
+        tags: ["products", ...ids.map((id) => `product-${id}`)],
+        locale,
+        currency,
+      }
+    );
+
+    return products;
+  } catch {
+    return [];
+  }
+}
+
 // Categories API - Memoized for request deduplication
 export const getCategories = cache(async function getCategories(locale?: Locale, currency?: Currency): Promise<WCCategory[]> {
   try {
@@ -342,6 +375,119 @@ function getEnglishSlugFromLocalizedSlug(localizedSlug: string): string | null {
   
   return null;
 }
+
+// Mapping of English tag slugs to Arabic tag slugs
+// This is needed because WPML assigns different slugs for each language
+// and the API returns tags in different orders, making position-based matching unreliable
+// Add new tag mappings here as needed (format: "english-slug": "url-encoded-arabic-slug")
+const ENGLISH_TO_ARABIC_TAG_SLUGS: Record<string, string> = {
+  // Common e-commerce tags - add actual tag slugs from WooCommerce here
+  "new": "%d8%ac%d8%af%d9%8a%d8%af",
+  "sale": "%d8%aa%d8%ae%d9%81%d9%8a%d8%b6",
+  "bestseller": "%d8%a7%d9%84%d8%a3%d9%83%d8%ab%d8%b1-%d9%85%d8%a8%d9%8a%d8%b9%d8%a7",
+  "featured": "%d9%85%d9%85%d9%8a%d8%b2",
+  "exclusive": "%d8%ad%d8%b5%d8%b1%d9%8a",
+  "limited-edition": "%d8%a5%d8%b5%d8%af%d8%a7%d8%b1-%d9%85%d8%ad%d8%af%d9%88%d8%af",
+  "gift": "%d9%87%d8%af%d9%8a%d8%a9",
+  "popular": "%d8%b4%d8%a7%d8%a6%d8%b9",
+  "trending": "%d8%b1%d8%a7%d8%a6%d8%ac",
+  "premium": "%d9%85%d9%85%d9%8a%d8%b2",
+};
+
+// Create a reverse mapping from Arabic tag slugs to English tag slugs
+// This is used to convert Arabic tag slugs back to English slugs for URL generation
+const ARABIC_TO_ENGLISH_TAG_SLUGS: Record<string, string> = Object.fromEntries(
+  Object.entries(ENGLISH_TO_ARABIC_TAG_SLUGS).map(([en, ar]) => [ar, en])
+);
+
+// Helper function to get English slug from an Arabic/localized tag slug
+// Uses the reverse mapping for reliable slug conversion
+export function getEnglishSlugFromLocalizedTagSlug(localizedSlug: string): string | null {
+  // If the slug is already in English (exists in the English-to-Arabic mapping), return it
+  if (ENGLISH_TO_ARABIC_TAG_SLUGS[localizedSlug]) {
+    return localizedSlug;
+  }
+  
+  // Try to find the English slug from the reverse mapping
+  // The localized slug might be URL-encoded or decoded, so try both
+  const englishSlug = ARABIC_TO_ENGLISH_TAG_SLUGS[localizedSlug];
+  if (englishSlug) {
+    return englishSlug;
+  }
+  
+  // Try with URL-decoded version (in case the slug is already encoded)
+  try {
+    const decodedSlug = decodeURIComponent(localizedSlug);
+    // Check if decoded slug matches any Arabic slug pattern
+    for (const [arabicSlug, enSlug] of Object.entries(ARABIC_TO_ENGLISH_TAG_SLUGS)) {
+      const decodedArabicSlug = decodeURIComponent(arabicSlug);
+      if (decodedSlug === decodedArabicSlug) {
+        return enSlug;
+      }
+    }
+  } catch {
+    // Ignore decoding errors
+  }
+  
+  return null;
+}
+
+// Helper function to get Arabic slug from an English tag slug
+// Uses the mapping for reliable slug conversion
+export function getArabicSlugFromEnglishTagSlug(englishSlug: string): string | null {
+  return ENGLISH_TO_ARABIC_TAG_SLUGS[englishSlug] || null;
+}
+
+// Get the English slug for a tag by its localized slug
+// This ensures tag URLs always use English slugs regardless of current locale
+export function getEnglishSlugForTag(
+  localizedTagSlug: string,
+  locale?: Locale
+): string | null {
+  // If locale is English or not specified, the slug is already English
+  if (!locale || locale === "en") {
+    return localizedTagSlug;
+  }
+  
+  // Try to get English slug from the mapping
+  const englishSlug = getEnglishSlugFromLocalizedTagSlug(localizedTagSlug);
+  if (englishSlug) {
+    return englishSlug;
+  }
+  
+  // If no mapping found, return the original slug
+  // This handles cases where the tag might not be in the mapping yet
+  return localizedTagSlug;
+}
+
+// Get the localized tag slug for a given English slug and locale
+// This is useful when you need to find a tag in the localized product data
+export function getLocalizedTagSlug(
+  englishSlug: string,
+  locale?: Locale
+): string {
+  // If locale is English or not specified, return the English slug
+  if (!locale || locale === "en") {
+    return englishSlug;
+  }
+  
+  // Try to get the Arabic slug from the mapping
+  if (locale === "ar") {
+    const arabicSlug = getArabicSlugFromEnglishTagSlug(englishSlug);
+    if (arabicSlug) {
+      return arabicSlug;
+    }
+  }
+  
+  // If no mapping found, return the original slug
+  return englishSlug;
+}
+
+// Export the tag slug mappings for external use (e.g., in components that need to check mappings)
+export const TAG_SLUG_MAPPINGS = {
+  englishToArabic: ENGLISH_TO_ARABIC_TAG_SLUGS,
+  arabicToEnglish: ARABIC_TO_ENGLISH_TAG_SLUGS,
+};
 
 // Memoized version for request deduplication
 // Handles the case where URLs use English slugs but the locale is non-English (e.g., Arabic)
@@ -484,10 +630,21 @@ export const getRelatedProductsByCategoryId = cache(async function getRelatedPro
   }
 });
 
+// Slot-specific configuration for bundle builder
+export interface SlotConfig {
+  id: string | number;
+  title?: string;
+  is_optional?: boolean;
+  eligible_categories?: number[];
+  eligible_products?: number[];
+  exclude_categories?: number[];
+  exclude_products?: number[];
+}
+
 // Bundle Configuration API (from ASL Bundles Creator plugin)
 export interface BundleConfig {
   product_id: number;
-  bundle_id?: number;
+  bundle_id?: string;
   bundle_type?: string;
   eligible_categories?: number[];
   exclude_categories?: number[];
@@ -496,23 +653,40 @@ export interface BundleConfig {
   unique_products: number[];
   total_slots: number;
   required_slots: number;
+  optional_slots?: number;
   with_box_price?: number;
   shipping_fee?: string;
   slot_labels?: Record<string, string>;
   enabled?: boolean;
   title?: string;
+  pricing_mode?: "sum" | "fixed";
+  fixed_price?: number;
+  discount_type?: "none" | "percentage" | "fixed";
+  discount_value?: number;
+  show_individual_prices?: boolean;
+  pricing?: BundlePricing;
+  slots?: SlotConfig[];
 }
 
 export async function getBundleConfig(
-  productSlug: string
+  productSlug: string,
+  locale?: Locale
 ): Promise<BundleConfig | null> {
   try {
+    let url = `${siteConfig.apiUrl}/wp-json/asl-bundles/v1/config?slug=${productSlug}`;
+    
+    // Add locale parameter for WPML language support
+    // This ensures the bundle config returns product/category IDs for the correct language
+    if (locale) {
+      url = `${url}&lang=${locale}`;
+    }
+    
     const response = await fetch(
-      `${siteConfig.apiUrl}/wp-json/asl-bundles/v1/config?slug=${productSlug}`,
+      url,
       {
         next: {
           revalidate: 60,
-          tags: ["bundle-config", `bundle-config-${productSlug}`],
+          tags: ["bundle-config", `bundle-config-${productSlug}`, locale ? `bundle-config-${productSlug}-${locale}` : ""].filter(Boolean),
         },
       }
     );
@@ -536,7 +710,21 @@ export async function getBundleConfig(
 // Fetch free gift product IDs from the backend
 // Used to filter out gift products from shop listings
 // Only returns product IDs where hide_from_shop is true
+export interface FreeGiftInfo {
+  ids: number[];
+  slugs: string[];
+}
+
 export async function getFreeGiftProductIds(currency?: string): Promise<number[]> {
+  const info = await getFreeGiftProductInfo(currency);
+  return info.ids;
+}
+
+// Get both IDs and slugs for free gift products
+// Slugs are needed for filtering across WPML locales since product IDs differ per locale
+// Note: WPML may create different slugs for Arabic products (e.g., "free-gift-2" instead of "free-gift")
+// so we need to fetch slugs for both English and Arabic locales
+export async function getFreeGiftProductInfo(currency?: string): Promise<FreeGiftInfo> {
   try {
     let url = `${siteConfig.apiUrl}/wp-json/asl-free-gifts/v1/rules`;
     if (currency) {
@@ -551,20 +739,105 @@ export async function getFreeGiftProductIds(currency?: string): Promise<number[]
     });
 
     if (!response.ok) {
-      return [];
+      return { ids: [], slugs: [] };
     }
 
     const data = await response.json();
     
     if (data.rules && Array.isArray(data.rules)) {
-      // Only return product IDs where hide_from_shop is true
-      return data.rules
-        .filter((rule: { hide_from_shop?: boolean }) => rule.hide_from_shop === true)
-        .map((rule: { product_id: number }) => rule.product_id);
+      // Return ALL free gift product IDs to hide them from shop listings
+      // Free gift products (including password-protected ones) should only be
+      // accessible through the free gift system, not through normal browsing
+      const allRules = data.rules;
+      
+      const ids = allRules.map((rule: { product_id: number }) => rule.product_id);
+      
+      // Try to get slugs from the rules first (if API provides them)
+      // The API returns slugs in rule.product.slug (nested object)
+      let slugs = allRules
+        .map((rule: { product?: { slug?: string }; product_slug?: string }) => 
+          rule.product?.slug || rule.product_slug
+        )
+        .filter((slug: string | undefined): slug is string => !!slug);
+      
+      // Fetch product details to get slugs for BOTH English and Arabic locales
+      // WPML may create different slugs for each locale (e.g., "free-gift" vs "free-gift-2")
+      if (ids.length > 0) {
+        const allSlugs = await Promise.all(
+          ids.flatMap((id: number) => [
+            // Fetch English product slug
+            (async () => {
+              try {
+                const product = await getProductById(id, "en");
+                return product?.slug;
+              } catch {
+                return undefined;
+              }
+            })(),
+            // Fetch Arabic product slug (may be different due to WPML)
+            (async () => {
+              try {
+                const product = await getProductById(id, "ar");
+                return product?.slug;
+              } catch {
+                return undefined;
+              }
+            })(),
+          ])
+        );
+        // Combine existing slugs with fetched slugs, removing duplicates
+        const fetchedSlugs = allSlugs.filter((slug): slug is string => !!slug);
+        slugs = [...new Set([...slugs, ...fetchedSlugs])];
+      }
+      
+      return { ids, slugs };
+    }
+    
+    return { ids: [], slugs: [] };
+  } catch {
+    return { ids: [], slugs: [] };
+  }
+}
+
+// Fetch product IDs with catalog_visibility set to "hidden"
+// These products should not appear in shop listings, search results, or related products
+// Uses WC REST API v3 which returns catalog_visibility field
+// Note: WooCommerce REST API doesn't support catalog_visibility as a query filter,
+// so we fetch all products and filter client-side by the catalog_visibility property
+export async function getHiddenProductIds(): Promise<number[]> {
+  try {
+    // Fetch all products and filter by catalog_visibility property
+    // The catalog_visibility query param is not supported by WC REST API
+    const url = `${siteConfig.apiUrl}/wp-json/wc/v3/products?per_page=100&status=publish`;
+    
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString("base64")}`,
+      },
+      next: {
+        revalidate: 300,
+        tags: ["products", "hidden-products"],
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Failed to fetch products for hidden check:", response.status);
+      return [];
+    }
+
+    const products = await response.json();
+    
+    if (Array.isArray(products)) {
+      // Filter products where catalog_visibility is "hidden"
+      const hiddenProducts = products.filter(
+        (product: { catalog_visibility?: string }) => product.catalog_visibility === "hidden"
+      );
+      return hiddenProducts.map((product: { id: number }) => product.id);
     }
     
     return [];
-  } catch {
+  } catch (error) {
+    console.error("Failed to fetch hidden products:", error);
     return [];
   }
 }
@@ -601,15 +874,42 @@ export async function getBundleEnabledProductSlugs(): Promise<string[]> {
 
       const bundles = await bundlesResponse.json();
       if (Array.isArray(bundles)) {
-        // Filter enabled bundles and extract product slugs
-        return bundles
-          .filter((bundle: { is_enabled?: boolean; enabled?: boolean }) => 
+        // Filter enabled bundles
+        const enabledBundles = bundles.filter(
+          (bundle: { is_enabled?: boolean; enabled?: boolean }) => 
             bundle.is_enabled || bundle.enabled
-          )
+        );
+
+        // First try to extract slugs directly if available
+        const directSlugs = enabledBundles
           .map((bundle: { product_slug?: string; slug?: string }) => 
             bundle.product_slug || bundle.slug
           )
           .filter((slug: string | undefined): slug is string => !!slug);
+
+        if (directSlugs.length > 0) {
+          return directSlugs;
+        }
+
+        // If no slugs available, fetch product slugs from product IDs
+        const productIds = enabledBundles
+          .map((bundle: { product_id?: number }) => bundle.product_id)
+          .filter((id: number | undefined): id is number => typeof id === 'number');
+
+        if (productIds.length > 0) {
+          // Fetch product slugs from WooCommerce API
+          const slugPromises = productIds.map(async (productId: number) => {
+            try {
+              const product = await getProductById(productId);
+              return product?.slug || null;
+            } catch {
+              return null;
+            }
+          });
+
+          const slugs = await Promise.all(slugPromises);
+          return slugs.filter((slug): slug is string => slug !== null);
+        }
       }
       return [];
     }
@@ -624,6 +924,162 @@ export async function getBundleEnabledProductSlugs(): Promise<string[]> {
     return [];
   } catch {
     return [];
+  }
+}
+
+// Get new products (ordered by date, newest first)
+export async function getNewProducts(params?: {
+  page?: number;
+  per_page?: number;
+  locale?: Locale;
+  currency?: Currency;
+}): Promise<WCProductsResponse> {
+  return getProducts({
+    ...params,
+    orderby: "date",
+    order: "desc",
+  });
+}
+
+// Get bestseller products (ordered by popularity/total sales)
+export async function getBestsellerProducts(params?: {
+  page?: number;
+  per_page?: number;
+  locale?: Locale;
+  currency?: Currency;
+}): Promise<WCProductsResponse> {
+  return getProducts({
+    ...params,
+    orderby: "popularity",
+    order: "desc",
+  });
+}
+
+// Get featured products
+// Note: WooCommerce Store API doesn't have a direct featured filter,
+// so we fetch from the custom endpoint or use a workaround
+export async function getFeaturedProducts(params?: {
+  page?: number;
+  per_page?: number;
+  locale?: Locale;
+  currency?: Currency;
+}): Promise<WCProductsResponse> {
+  try {
+    // Try to fetch featured products from custom endpoint
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set("page", params.page.toString());
+    if (params?.per_page) searchParams.set("per_page", params.per_page.toString());
+    if (params?.locale) searchParams.set("lang", params.locale);
+    
+    const queryString = searchParams.toString();
+    const url = `${siteConfig.apiUrl}/wp-json/wc/v3/products?featured=true&status=publish${queryString ? `&${queryString}` : ""}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString("base64")}`,
+      },
+      next: {
+        revalidate: 300,
+        tags: ["products", "featured-products"],
+      },
+    });
+
+    if (!response.ok) {
+      // Fallback to regular products if featured endpoint fails
+      return getProducts(params);
+    }
+
+    const products = await response.json();
+    const total = parseInt(response.headers.get("X-WP-Total") || "0", 10);
+    const totalPages = parseInt(response.headers.get("X-WP-TotalPages") || "1", 10);
+
+    // Transform WC REST API v3 products to Store API format
+    const transformedProducts: WCProduct[] = products.map((product: Record<string, unknown>) => ({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      parent: product.parent_id || 0,
+      type: product.type || "simple",
+      variation: "",
+      permalink: product.permalink,
+      sku: product.sku || "",
+      short_description: product.short_description || "",
+      description: product.description || "",
+      on_sale: product.on_sale || false,
+      prices: {
+        price: String(Math.round(parseFloat(String(product.price || "0")) * 100)),
+        regular_price: String(Math.round(parseFloat(String(product.regular_price || "0")) * 100)),
+        sale_price: product.sale_price ? String(Math.round(parseFloat(String(product.sale_price)) * 100)) : "",
+        price_range: null,
+        currency_code: "AED",
+        currency_symbol: "AED",
+        currency_minor_unit: 2,
+        currency_decimal_separator: ".",
+        currency_thousand_separator: ",",
+        currency_prefix: "",
+        currency_suffix: " AED",
+      },
+      price_html: product.price_html || "",
+      average_rating: product.average_rating || "0",
+      review_count: product.rating_count || 0,
+      images: Array.isArray(product.images) ? (product.images as Array<Record<string, unknown>>).map((img) => ({
+        id: img.id || 0,
+        src: img.src || "",
+        thumbnail: img.src || "",
+        srcset: "",
+        sizes: "",
+        name: img.name || "",
+        alt: img.alt || "",
+      })) : [],
+      categories: Array.isArray(product.categories) ? (product.categories as Array<Record<string, unknown>>).map((cat) => ({
+        id: cat.id || 0,
+        name: cat.name || "",
+        slug: cat.slug || "",
+        link: "",
+      })) : [],
+      tags: [],
+      brands: [],
+      attributes: [],
+      variations: [],
+      grouped_products: [],
+      has_options: false,
+      is_purchasable: product.purchasable !== false && product.status === "publish",
+      is_in_stock: product.stock_status === "instock",
+      catalog_visibility: (product.catalog_visibility as WCProduct["catalog_visibility"]) || "visible",
+      is_on_backorder: product.stock_status === "onbackorder",
+      low_stock_remaining: null,
+      stock_availability: {
+        text: product.stock_status === "instock" ? "In Stock" : "Out of Stock",
+        class: product.stock_status === "instock" ? "in-stock" : "out-of-stock",
+      },
+      sold_individually: product.sold_individually || false,
+      add_to_cart: {
+        text: "Add to Cart",
+        description: "",
+        url: "",
+        single_text: "Add to Cart",
+        minimum: 1,
+        maximum: 9999,
+        multiple_of: 1,
+      },
+      extensions: {},
+    }));
+
+    const visibleFeatured = transformedProducts.filter(
+      (product) =>
+        product.is_purchasable !== false &&
+        (!product.catalog_visibility || product.catalog_visibility === "visible" || product.catalog_visibility === "catalog")
+    );
+
+    return {
+      products: visibleFeatured,
+      total: total - (transformedProducts.length - visibleFeatured.length),
+      totalPages,
+    };
+  } catch (error) {
+    console.error("Failed to fetch featured products:", error);
+    // Fallback to regular products
+    return getProducts(params);
   }
 }
 

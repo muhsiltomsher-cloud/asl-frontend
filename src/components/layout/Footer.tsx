@@ -1,9 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Dictionary } from "@/i18n";
 import type { SiteSettings } from "@/types/wordpress";
+import { NewsletterForm } from "@/components/common/NewsletterForm";
 
 interface FooterProps {
   locale: Locale;
@@ -27,12 +28,12 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
       { name: dictionary.footer.shippingInfo, href: `/${locale}/shipping` },
       { name: dictionary.footer.returnPolicy, href: `/${locale}/returns` },
       { name: dictionary.footer.privacyPolicy, href: `/${locale}/privacy` },
-      { name: dictionary.footer.termsConditions, href: `/${locale}/terms` },
+      { name: dictionary.footer.termsConditions, href: `/${locale}/terms-and-conditions` },
     ],
   };
 
   return (
-    <footer className="border-t border-gray-100 bg-gray-50 pb-20 md:pb-0">
+    <footer className="main-footer border-t border-gray-100 bg-gray-50 pb-20 md:pb-0">
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-2 lg:grid-cols-4 md:gap-8">
           {/* Brand section - Full width on mobile */}
@@ -77,11 +78,15 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="#"
+                href={siteConfig.links.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="rounded-full bg-gray-200 p-2 text-gray-600 transition-colors hover:bg-gray-300 hover:text-gray-900"
-                aria-label="Twitter"
+                aria-label="X"
               >
-                <Twitter className="h-5 w-5" />
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
               </a>
             </div>
           </div>
@@ -132,19 +137,13 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
             <p className="mb-3 text-sm text-gray-600 md:mb-4">
               {dictionary.footer.subscribeText}
             </p>
-            <form className="flex flex-col gap-2 sm:flex-row">
-              <input
-                type="email"
-                placeholder={dictionary.footer.emailPlaceholder}
-                className="flex-1 rounded-md border border-gray-300 px-3 py-2.5 text-sm focus:border-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
-              />
-              <button
-                type="submit"
-                className="rounded-full bg-gray-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-gray-800"
-              >
-                {dictionary.footer.subscribe}
-              </button>
-            </form>
+            <NewsletterForm
+              locale={locale}
+              dictionary={{
+                emailPlaceholder: dictionary.footer.emailPlaceholder,
+                subscribe: dictionary.footer.subscribe,
+              }}
+            />
           </div>
         </div>
 

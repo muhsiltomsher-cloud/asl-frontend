@@ -4,7 +4,7 @@ import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getCategoryBySlug, getProductsByCategory, getCategories, getFreeGiftProductIds, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
+import { getCategoryBySlug, getProductsByCategory, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { CategoryClient } from "./CategoryClient";
@@ -66,16 +66,19 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  // Fetch products, gift product IDs, and bundle product slugs in parallel
-  const [{ products: allProducts }, giftProductIds, bundleProductSlugs] = await Promise.all([
+  // Fetch products, gift product info (IDs and slugs), and bundle product slugs in parallel
+  const [{ products: allProducts }, giftProductInfo, bundleProductSlugs] = await Promise.all([
     getProductsByCategory(slug, { per_page: 24, locale: locale as Locale }),
-    getFreeGiftProductIds(),
+    getFreeGiftProductInfo(),
     getBundleEnabledProductSlugs(),
   ]);
 
   // Filter out gift products from the category listing
+  // Use both ID and slug matching to handle WPML translations (different IDs per locale)
+  const giftProductSlugsSet = new Set(giftProductInfo.slugs);
+  const giftProductIdsSet = new Set(giftProductInfo.ids);
   const products = allProducts.filter(
-    (product) => !giftProductIds.includes(product.id)
+    (product) => !giftProductIdsSet.has(product.id) && !giftProductSlugsSet.has(product.slug)
   );
 
     const breadcrumbItems = [
@@ -88,15 +91,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{decodeHtmlEntities(category.name)}</h1>
-        {category.description && (
-          <p className="mt-2 text-gray-600">{category.description}</p>
-        )}
+        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">{decodeHtmlEntities(category.name)}</h1>
       </div>
 
       <Suspense fallback={<ProductGridSkeleton count={12} />}>
         <CategoryClient products={products} locale={locale as Locale} bundleProductSlugs={bundleProductSlugs} />
       </Suspense>
+
+      {/* Category description at bottom for SEO - content is indexed but products are shown first */}
+      {category.description && (
+        <div className="mt-12 bg-gradient-to-r from-[#f8f5f0] to-[#faf8f5] rounded-xl p-6 border border-[#e8e4df] shadow-sm">
+          <div 
+            className="text-gray-700 leading-relaxed category-description [&_strong]:block [&_strong]:text-lg [&_strong]:text-gray-900 [&_strong]:font-semibold [&_strong]:mb-2 [&_a]:text-primary [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-primary/50 [&_a]:hover:decoration-primary [&_a]:transition-colors"
+            dangerouslySetInnerHTML={{ __html: category.description }}
+          />
+        </div>
+      )}
     </div>
   );
 }

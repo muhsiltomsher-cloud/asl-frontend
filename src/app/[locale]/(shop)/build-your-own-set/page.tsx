@@ -47,13 +47,14 @@ export default async function BuildYourOwnSetPage({
   ];
 
   // Fetch all products for selection and bundle configuration in parallel
+  // Pass locale to getBundleConfig to get correct product/category IDs for the current language
   const [{ products }, bundleProduct, bundleConfig] = await Promise.all([
     getProducts({
       per_page: 100,
       locale: locale as Locale,
     }),
     getProductBySlug("build-your-own-set", locale as Locale),
-    getBundleConfig("build-your-own-set"),
+    getBundleConfig("build-your-own-set", locale as Locale),
   ]);
 
   return (

@@ -3,9 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Home } from "lucide-react";
 import { Input } from "@/components/common/Input";
 import { Button } from "@/components/common/Button";
+import { PhoneInput } from "@/components/common/PhoneInput";
 import { register } from "@/lib/api/auth";
+import { validatePhoneNumber, parsePhoneNumber } from "@/lib/utils/phone";
 import { useNotification } from "@/contexts/NotificationContext";
 
 interface RegisterPageProps {
@@ -18,16 +21,19 @@ export default function RegisterPage({ params }: RegisterPageProps) {
   const [locale, setLocale] = useState<string>("en");
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
+    phone: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
+  const [newsletter, setNewsletter] = useState(true);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState<{
-    username?: string;
+    name?: string;
+    phone?: string;
     email?: string;
     password?: string;
-    confirmPassword?: string;
+    terms?: string;
     general?: string;
   }>({});
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -40,50 +46,58 @@ export default function RegisterPage({ params }: RegisterPageProps) {
 
   const t = {
     en: {
-      registerTitle: "Create Account",
-      registerSubtitle: "Join us and start shopping",
-      username: "Username",
-      usernamePlaceholder: "Enter your username",
-      email: "Email Address",
-      emailPlaceholder: "Enter your email",
+      register: "REGISTER",
+      registerTitle: "Create an Account – Start Shopping",
+      name: "Name",
+      namePlaceholder: "Name",
+      phone: "Phone number",
+      phonePlaceholder: "Phone number",
+      email: "E-mail",
+      emailPlaceholder: "E-mail",
       password: "Password",
-      passwordPlaceholder: "Enter your password",
-      confirmPassword: "Confirm Password",
-      confirmPasswordPlaceholder: "Confirm your password",
-      registerButton: "Create Account",
+      passwordPlaceholder: "Password",
+      newsletterLabel: "Register to our newsletter",
+      termsLabel: "By signing up, you are agreeing to our",
+      termsLink: "Terms & Conditions",
+      registerButton: "Create account",
       registering: "Creating account...",
       hasAccount: "Already have an account?",
       signInLink: "Sign in",
-      usernameRequired: "Username is required",
+      nameRequired: "Name is required",
+      phoneRequired: "Phone number is required",
       emailRequired: "Email is required",
       emailInvalid: "Please enter a valid email address",
       passwordRequired: "Password is required",
       passwordMinLength: "Password must be at least 6 characters",
-      passwordsNotMatch: "Passwords do not match",
+      termsRequired: "You must accept the Terms & Conditions",
       registerSuccess: "Registration successful! Please login.",
       registerError: "Registration failed. Please try again.",
     },
     ar: {
-      registerTitle: "إنشاء حساب",
-      registerSubtitle: "انضم إلينا وابدأ التسوق",
-      username: "اسم المستخدم",
-      usernamePlaceholder: "أدخل اسم المستخدم",
+      register: "التسجيل",
+      registerTitle: "إنشاء حساب – ابدأ التسوق",
+      name: "الاسم",
+      namePlaceholder: "الاسم",
+      phone: "رقم الهاتف",
+      phonePlaceholder: "رقم الهاتف",
       email: "البريد الإلكتروني",
-      emailPlaceholder: "أدخل بريدك الإلكتروني",
+      emailPlaceholder: "البريد الإلكتروني",
       password: "كلمة المرور",
-      passwordPlaceholder: "أدخل كلمة المرور",
-      confirmPassword: "تأكيد كلمة المرور",
-      confirmPasswordPlaceholder: "أعد إدخال كلمة المرور",
+      passwordPlaceholder: "كلمة المرور",
+      newsletterLabel: "اشترك في نشرتنا الإخبارية",
+      termsLabel: "بالتسجيل، أنت توافق على",
+      termsLink: "الشروط والأحكام",
       registerButton: "إنشاء حساب",
       registering: "جاري إنشاء الحساب...",
       hasAccount: "لديك حساب بالفعل؟",
       signInLink: "تسجيل الدخول",
-      usernameRequired: "اسم المستخدم مطلوب",
+      nameRequired: "الاسم مطلوب",
+      phoneRequired: "رقم الهاتف مطلوب",
       emailRequired: "البريد الإلكتروني مطلوب",
       emailInvalid: "يرجى إدخال بريد إلكتروني صحيح",
       passwordRequired: "كلمة المرور مطلوبة",
       passwordMinLength: "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
-      passwordsNotMatch: "كلمات المرور غير متطابقة",
+      termsRequired: "يجب الموافقة على الشروط والأحكام",
       registerSuccess: "تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول.",
       registerError: "فشل إنشاء الحساب. يرجى المحاولة مرة أخرى.",
     },
@@ -99,8 +113,20 @@ export default function RegisterPage({ params }: RegisterPageProps) {
   const validateForm = (): boolean => {
     const newErrors: typeof errors = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = texts.usernameRequired;
+    if (!formData.name.trim()) {
+      newErrors.name = texts.nameRequired;
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = texts.phoneRequired;
+    } else {
+      const parsed = parsePhoneNumber(formData.phone);
+      if (parsed.localNumber) {
+        const validation = validatePhoneNumber(parsed.localNumber, "AE");
+        if (!validation.isValid) {
+          newErrors.phone = isRTL ? validation.errorAr : validation.error;
+        }
+      }
     }
 
     if (!formData.email.trim()) {
@@ -115,8 +141,8 @@ export default function RegisterPage({ params }: RegisterPageProps) {
       newErrors.password = texts.passwordMinLength;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = texts.passwordsNotMatch;
+    if (!termsAccepted) {
+      newErrors.terms = texts.termsRequired;
     }
 
     setErrors(newErrors);
@@ -133,9 +159,13 @@ export default function RegisterPage({ params }: RegisterPageProps) {
 
     try {
       const response = await register({
-        username: formData.username,
+        username: formData.email,
         email: formData.email,
         password: formData.password,
+        first_name: formData.name,
+        last_name: "",
+        phone: formData.phone,
+        newsletter: newsletter,
       });
 
       if (response.success) {
@@ -166,106 +196,161 @@ export default function RegisterPage({ params }: RegisterPageProps) {
     }
   };
 
-    return (
-      <div 
-        className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-12"
-        style={{ 
-          backgroundImage: 'url(https://staging.aromaticscentslab.com/wp-content/uploads/2025/12/page-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
+  return (
+    <div 
+      className="flex min-h-[calc(100vh-200px)] items-center justify-center px-4 py-8 md:py-12"
+      style={{ 
+        backgroundImage: 'url(https://staging.aromaticscentslab.com/wp-content/uploads/2025/12/page-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       <div className="w-full max-w-md">
-        <div className="rounded-lg border border-[#E8E0D5] bg-white p-8 shadow-sm">
-          <div className={`mb-8 text-center ${isRTL ? "rtl" : ""}`}>
-            <h1 className="text-2xl font-bold text-[#5C4A3D]">{texts.registerTitle}</h1>
-            <p className="mt-2 text-[#8B7355]">{texts.registerSubtitle}</p>
-          </div>
-
-          {errors.general && (
-            <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-600">
-              {errors.general}
+        <div className="overflow-hidden rounded-2xl shadow-2xl">
+          {/* Registration Form */}
+          <div className="bg-white p-6 md:p-8 lg:p-12">
+            {/* Home Icon */}
+            <div className="mb-4">
+              <Link
+                href={`/${locale}`}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#f7f6f2] text-[#92400e] hover:bg-[#92400e] hover:text-white transition-all duration-300"
+                aria-label="Home"
+              >
+                <Home className="h-5 w-5" />
+              </Link>
             </div>
-          )}
-
-          {successMessage && (
-            <div className="mb-6 rounded-md bg-green-50 p-4 text-sm text-green-600">
-              {successMessage}
+            <div className={`mb-6 ${isRTL ? "text-right" : "text-left"}`}>
+              <div className="inline-block">
+                <h1 className="text-sm font-bold tracking-widest text-[#92400e] uppercase">{texts.register}</h1>
+                <div className="mt-2 h-0.5 bg-gradient-to-r from-[#92400e] to-[#d4a574]"></div>
+              </div>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <Input
-              label={texts.username}
-              name="username"
-              type="text"
-              placeholder={texts.usernamePlaceholder}
-              value={formData.username}
-              onChange={handleInputChange}
-              error={errors.username}
-              autoComplete="username"
-              dir={isRTL ? "rtl" : "ltr"}
-              required
-            />
+            <h2 className={`text-xl md:text-2xl font-semibold text-gray-800 mb-6 md:mb-8 ${isRTL ? "text-right" : "text-left"}`}>
+              {texts.registerTitle}
+            </h2>
 
-            <Input
-              label={texts.email}
-              name="email"
-              type="email"
-              placeholder={texts.emailPlaceholder}
-              value={formData.email}
-              onChange={handleInputChange}
-              error={errors.email}
-              autoComplete="email"
-              dir={isRTL ? "rtl" : "ltr"}
-              required
-            />
+            {errors.general && (
+              <div className="mb-6 rounded-md bg-red-50 p-4 text-sm text-red-600">
+                {errors.general}
+              </div>
+            )}
 
-            <Input
-              label={texts.password}
-              name="password"
-              type="password"
-              placeholder={texts.passwordPlaceholder}
-              value={formData.password}
-              onChange={handleInputChange}
-              error={errors.password}
-              autoComplete="new-password"
-              dir={isRTL ? "rtl" : "ltr"}
-              required
-            />
+            {successMessage && (
+              <div className="mb-6 rounded-md bg-green-50 p-4 text-sm text-green-600">
+                {successMessage}
+              </div>
+            )}
 
-            <Input
-              label={texts.confirmPassword}
-              name="confirmPassword"
-              type="password"
-              placeholder={texts.confirmPasswordPlaceholder}
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              error={errors.confirmPassword}
-              autoComplete="new-password"
-              dir={isRTL ? "rtl" : "ltr"}
-              required
-            />
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                name="name"
+                type="text"
+                placeholder={texts.namePlaceholder}
+                value={formData.name}
+                onChange={handleInputChange}
+                error={errors.name}
+                autoComplete="name"
+                dir={isRTL ? "rtl" : "ltr"}
+                className="border-gray-300 rounded-none"
+              />
 
-            <Button
-              type="submit"
-              className="w-full bg-[#92400e] hover:bg-[#78350f] focus-visible:ring-[#92400e]"
-              isLoading={isLoading}
-              disabled={isLoading}
-            >
-              {isLoading ? texts.registering : texts.registerButton}
-            </Button>
-          </form>
+              <PhoneInput
+                label={texts.phone}
+                value={formData.phone}
+                onChange={(phone) => {
+                  setFormData((prev) => ({ ...prev, phone }));
+                  if (errors.phone) {
+                    setErrors((prev) => ({ ...prev, phone: undefined }));
+                  }
+                }}
+                error={errors.phone}
+                isRTL={isRTL}
+              />
 
-          <div className={`mt-6 text-center text-sm ${isRTL ? "rtl" : ""}`}>
-            <span className="text-[#8B7355]">{texts.hasAccount} </span>
-            <Link
-              href={`/${locale}/login`}
-              className="font-medium text-[#92400e] hover:underline"
-            >
-              {texts.signInLink}
-            </Link>
+              <Input
+                name="email"
+                type="email"
+                placeholder={texts.emailPlaceholder}
+                value={formData.email}
+                onChange={handleInputChange}
+                error={errors.email}
+                autoComplete="email"
+                dir={isRTL ? "rtl" : "ltr"}
+                className="border-gray-300 rounded-none"
+              />
+
+              <Input
+                name="password"
+                type="password"
+                placeholder={texts.passwordPlaceholder}
+                value={formData.password}
+                onChange={handleInputChange}
+                error={errors.password}
+                autoComplete="new-password"
+                dir={isRTL ? "rtl" : "ltr"}
+                className="border-gray-300 rounded-none"
+              />
+
+              {/* Newsletter Checkbox */}
+              <div className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <input
+                  type="checkbox"
+                  id="newsletter"
+                  checked={newsletter}
+                  onChange={(e) => setNewsletter(e.target.checked)}
+                  className="w-4 h-4 border-gray-300 rounded accent-[#92400e]"
+                />
+                <label htmlFor="newsletter" className="text-sm text-[#92400e]">
+                  {texts.newsletterLabel}
+                </label>
+              </div>
+
+              {/* Terms Checkbox */}
+              <div className={`flex items-start gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={termsAccepted}
+                  onChange={(e) => {
+                    setTermsAccepted(e.target.checked);
+                    if (errors.terms) {
+                      setErrors((prev) => ({ ...prev, terms: undefined }));
+                    }
+                  }}
+                  className="w-4 h-4 mt-0.5 border-gray-300 rounded accent-[#92400e]"
+                />
+                <label htmlFor="terms" className="text-sm text-black">
+                  {texts.termsLabel}{" "}
+                  <Link href={`/${locale}/terms-and-conditions`} className="text-[#92400e] hover:underline">
+                    {texts.termsLink}
+                  </Link>
+                </label>
+              </div>
+              {errors.terms && (
+                <p className="text-sm text-red-600">{errors.terms}</p>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#92400e] to-[#b45309] text-white border-0 rounded-full hover:from-[#78350f] hover:to-[#92400e] focus-visible:ring-[#92400e] mt-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                isLoading={isLoading}
+                disabled={isLoading}
+              >
+                {isLoading ? texts.registering : texts.registerButton}
+              </Button>
+            </form>
+
+            <div className={`mt-6 text-sm ${isRTL ? "text-right" : "text-left"}`}>
+              <span className="text-gray-500">{texts.hasAccount} </span>
+              <Link
+                href={`/${locale}/login`}
+                className="font-semibold text-[#92400e] hover:text-[#78350f] transition-colors"
+              >
+                {texts.signInLink}
+              </Link>
+            </div>
           </div>
         </div>
       </div>

@@ -1,46 +1,66 @@
 <?php
 /**
- * Plugin Name: ASL Frontend Settings
- * Plugin URI: https://aromaticscentslab.com
- * Description: Admin dashboard and REST API endpoints for ASL Frontend with Media Library upload, dynamic slides, layout options, and ASL Bundles Creator.
- * Version: 5.0.0
- * Author: Aromatic Scents Lab
- * License: GPL v2 or later
+ * ASL Settings - Core Settings Functionality
+ * 
+ * Handles admin pages, REST API endpoints, and settings management
+ * for Home Page, Header & Topbar, SEO, and Mobile Settings.
+ * 
+ * @package ASL_Frontend_Settings
+ * @since 5.9.0
  */
 
 if (!defined('ABSPATH')) exit;
 
-if (defined('ASL_FRONTEND_SETTINGS_LOADED')) {
-    add_action('admin_notices', function() {
-        echo '<div class="notice notice-error"><p><strong>ASL Frontend Settings:</strong> Duplicate plugin detected!</p></div>';
-    });
-    return;
+/**
+ * Initialize ASL Settings
+ */
+function asl_settings_init() {
+    // Admin menu
+    add_action('admin_menu', 'asl_settings_register_menus');
+    
+    // REST API endpoints
+    add_action('rest_api_init', 'asl_settings_register_rest_routes');
+    
+    // Theme support
+    add_action('after_setup_theme', 'asl_settings_theme_support');
+    
+    // CORS handling
+    add_action('rest_api_init', 'asl_settings_cors_handling', 15);
+    
+    // Admin styles
+    add_action('admin_head', 'asl_settings_admin_styles');
+    
+    // Sync: when blogname/blogdescription change (Settings > General), update ASL SEO
+    add_action('update_option_blogname', 'asl_sync_blogname_to_seo', 10, 2);
+    add_action('update_option_blogdescription', 'asl_sync_blogdescription_to_seo', 10, 2);
 }
-define('ASL_FRONTEND_SETTINGS_LOADED', true);
-define('ASL_SETTINGS_VERSION', '5.1.0');
 
-function asl_sanitize_link($url) {
-    if (empty($url)) return '';
-    if (strpos($url, '/') === 0) {
-        return sanitize_text_field($url);
+function asl_sync_blogname_to_seo($old_value, $new_value) {
+    if (!empty($new_value) && $new_value !== get_theme_mod('asl_seo_title','')) {
+        set_theme_mod('asl_seo_title', $new_value);
     }
-    return esc_url_raw($url);
 }
 
-add_action('admin_enqueue_scripts', function($hook) {
-    if (strpos($hook, 'asl-settings') === false) return;
-    wp_enqueue_media();
-    wp_enqueue_script('asl-admin', plugins_url('admin.js', __FILE__), array('jquery'), ASL_SETTINGS_VERSION, true);
-});
+function asl_sync_blogdescription_to_seo($old_value, $new_value) {
+    if ($new_value !== get_theme_mod('asl_seo_description','')) {
+        set_theme_mod('asl_seo_description', $new_value);
+    }
+}
 
-add_action('admin_menu', function() {
+/**
+ * Register admin menus
+ */
+function asl_settings_register_menus() {
     add_menu_page('ASL Settings', 'ASL Settings', 'manage_options', 'asl-settings', 'asl_render_admin_page', 'dashicons-admin-customizer', 30);
     add_submenu_page('asl-settings', 'Home Page', 'Home Page', 'manage_options', 'asl-settings', 'asl_render_admin_page');
     add_submenu_page('asl-settings', 'Header & Topbar', 'Header & Topbar', 'manage_options', 'asl-settings-header', 'asl_render_header_page');
     add_submenu_page('asl-settings', 'SEO Settings', 'SEO Settings', 'manage_options', 'asl-settings-seo', 'asl_render_seo_page');
     add_submenu_page('asl-settings', 'Mobile Settings', 'Mobile Settings', 'manage_options', 'asl-settings-mobile', 'asl_render_mobile_page');
-});
+}
 
+/**
+ * Image field helper
+ */
 function asl_image_field($name, $value = '') {
     $has = !empty($value);
     echo '<div class="asl-image-field">';
@@ -52,6 +72,25 @@ function asl_image_field($name, $value = '') {
     echo '</div></div>';
 }
 
+/**
+ * Logo image field helper (stores attachment ID alongside URL)
+ */
+function asl_logo_image_field($name, $attachment_id = 0) {
+    $url = $attachment_id ? wp_get_attachment_image_url($attachment_id, 'full') : '';
+    $has = !empty($url);
+    echo '<div class="asl-image-field">';
+    echo '<input type="hidden" name="'.esc_attr($name).'" id="'.esc_attr($name).'" value="'.esc_attr($attachment_id).'" class="asl-logo-id-field">';
+    echo '<input type="hidden" name="'.esc_attr($name).'_url" id="'.esc_attr($name).'_url" value="'.esc_url($url).'">';
+    echo '<button type="button" class="button asl-logo-upload-btn" data-target-id="#'.esc_attr($name).'" data-target-url="#'.esc_attr($name).'_url" data-preview="#'.esc_attr($name).'_preview">Upload Image</button>';
+    echo '<button type="button" class="button asl-logo-remove-btn" data-target-id="#'.esc_attr($name).'" data-target-url="#'.esc_attr($name).'_url" data-preview="#'.esc_attr($name).'_preview" style="'.($has ? '' : 'display:none;').'">Remove</button>';
+    echo '<div id="'.esc_attr($name).'_preview" class="asl-preview">';
+    if ($has) echo '<img src="'.esc_url($url).'" style="max-width:300px;max-height:150px;display:block;margin-top:10px;">';
+    echo '</div></div>';
+}
+
+/**
+ * Render main admin page (Home Page settings)
+ */
 function asl_render_admin_page() {
     if (!current_user_can('manage_options')) return;
     if (isset($_POST['asl_save_home_settings']) && check_admin_referer('asl_home_settings_nonce')) {
@@ -89,6 +128,9 @@ function asl_render_admin_page() {
     <?php
 }
 
+/**
+ * Render Hero Slider tab
+ */
 function asl_render_hero_tab() {
     $slides = get_theme_mod('asl_hero_slides', array());
     if (empty($slides)) {
@@ -124,6 +166,9 @@ function asl_render_hero_tab() {
     <?php
 }
 
+/**
+ * Render Products tab (New Products, Bestsellers, Featured)
+ */
 function asl_render_products_tab($key,$label) {
     ?>
     <h2><?php echo $label; ?> Section</h2>
@@ -145,6 +190,9 @@ function asl_render_products_tab($key,$label) {
     <?php
 }
 
+/**
+ * Render Categories tab
+ */
 function asl_render_categories_tab() {
     ?>
     <h2>Categories Section</h2>
@@ -162,6 +210,9 @@ function asl_render_categories_tab() {
     <?php
 }
 
+/**
+ * Render Collections tab
+ */
 function asl_render_collections_tab() {
     $items = get_theme_mod('asl_collections_items', array());
     if (empty($items)) {
@@ -204,6 +255,9 @@ function asl_render_collections_tab() {
     <?php
 }
 
+/**
+ * Render Banners tab
+ */
 function asl_render_banners_tab() {
     $items = get_theme_mod('asl_banners_items', array());
     if (empty($items)) {
@@ -244,6 +298,9 @@ function asl_render_banners_tab() {
     <?php
 }
 
+/**
+ * Render Header & Topbar page
+ */
 function asl_render_header_page() {
     if (!current_user_can('manage_options')) return;
     if (isset($_POST['asl_save_header_settings']) && check_admin_referer('asl_header_settings_nonce')) {
@@ -256,11 +313,14 @@ function asl_render_header_page() {
         <form method="post">
             <?php wp_nonce_field('asl_header_settings_nonce'); ?>
             <div style="background:#fff;padding:20px;border:1px solid #ccd0d4;">
+                <h2>Site Logo</h2>
+                <p class="description">Upload your site logo here. This logo will be used across the entire site (header, footer, invoices, etc.).</p>
+                <table class="form-table">
+                    <tr><th>Logo</th><td><?php asl_logo_image_field('asl_site_logo', get_theme_mod('custom_logo', 0)); ?></td></tr>
+                </table>
                 <h2>Header Settings</h2>
                 <table class="form-table">
                     <tr><th>Sticky Header</th><td><label><input type="checkbox" name="asl_header_sticky" value="1" <?php checked(get_theme_mod('asl_header_sticky',true)); ?>> Enable</label></td></tr>
-                    <tr><th>Sticky Logo</th><td><?php asl_image_field('asl_sticky_logo',get_theme_mod('asl_sticky_logo','')); ?></td></tr>
-                    <tr><th>Dark Mode Logo</th><td><?php asl_image_field('asl_logo_dark',get_theme_mod('asl_logo_dark','')); ?></td></tr>
                 </table>
                 <h2>Promotional Top Bar</h2>
                 <table class="form-table">
@@ -279,26 +339,37 @@ function asl_render_header_page() {
     <?php
 }
 
+/**
+ * Render SEO Settings page
+ */
 function asl_render_seo_page() {
     if (!current_user_can('manage_options')) return;
     if (isset($_POST['asl_save_seo_settings']) && check_admin_referer('asl_seo_settings_nonce')) {
         asl_save_seo_settings();
         echo '<div class="notice notice-success is-dismissible"><p>Settings saved!</p></div>';
     }
+    $seo_tab = isset($_GET['seo_tab']) ? sanitize_text_field($_GET['seo_tab']) : 'general';
     ?>
     <div class="wrap">
         <h1>SEO Settings</h1>
+        <nav class="nav-tab-wrapper">
+            <?php foreach (['general'=>'General','opengraph'=>'Open Graph (Facebook)','twitter'=>'Twitter Card','google'=>'Google & Analytics','advanced'=>'Advanced'] as $k=>$l): ?>
+                <a href="?page=asl-settings-seo&seo_tab=<?php echo $k; ?>" class="nav-tab <?php echo $seo_tab===$k?'nav-tab-active':''; ?>"><?php echo $l; ?></a>
+            <?php endforeach; ?>
+        </nav>
         <form method="post">
             <?php wp_nonce_field('asl_seo_settings_nonce'); ?>
-            <div style="background:#fff;padding:20px;border:1px solid #ccd0d4;">
-                <table class="form-table">
-                    <tr><th>Meta Title (EN)</th><td><input type="text" name="asl_seo_title" value="<?php echo esc_attr(get_theme_mod('asl_seo_title','')); ?>" class="large-text"></td></tr>
-                    <tr><th>Meta Title (AR)</th><td><input type="text" name="asl_seo_title_ar" value="<?php echo esc_attr(get_theme_mod('asl_seo_title_ar','')); ?>" class="large-text" dir="rtl"></td></tr>
-                    <tr><th>Meta Description (EN)</th><td><textarea name="asl_seo_description" class="large-text" rows="3"><?php echo esc_textarea(get_theme_mod('asl_seo_description','')); ?></textarea></td></tr>
-                    <tr><th>Meta Description (AR)</th><td><textarea name="asl_seo_description_ar" class="large-text" rows="3" dir="rtl"><?php echo esc_textarea(get_theme_mod('asl_seo_description_ar','')); ?></textarea></td></tr>
-                    <tr><th>OG Image</th><td><?php asl_image_field('asl_seo_og_image',get_theme_mod('asl_seo_og_image','')); ?></td></tr>
-                    <tr><th>Robots</th><td><select name="asl_seo_robots"><option value="index,follow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'index,follow'); ?>>Index, Follow</option><option value="noindex,follow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'noindex,follow'); ?>>No Index, Follow</option><option value="index,nofollow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'index,nofollow'); ?>>Index, No Follow</option><option value="noindex,nofollow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'noindex,nofollow'); ?>>No Index, No Follow</option></select></td></tr>
-                </table>
+            <input type="hidden" name="asl_seo_current_tab" value="<?php echo esc_attr($seo_tab); ?>">
+            <div style="background:#fff;padding:20px;border:1px solid #ccd0d4;border-top:none;">
+                <?php
+                switch($seo_tab) {
+                    case 'general': asl_render_seo_general_tab(); break;
+                    case 'opengraph': asl_render_seo_opengraph_tab(); break;
+                    case 'twitter': asl_render_seo_twitter_tab(); break;
+                    case 'google': asl_render_seo_google_tab(); break;
+                    case 'advanced': asl_render_seo_advanced_tab(); break;
+                }
+                ?>
             </div>
             <?php submit_button('Save Settings','primary','asl_save_seo_settings'); ?>
         </form>
@@ -306,6 +377,88 @@ function asl_render_seo_page() {
     <?php
 }
 
+function asl_render_seo_general_tab() {
+    $site_title = get_bloginfo('name');
+    $site_tagline = get_bloginfo('description');
+    ?>
+    <h2>General Meta Tags</h2>
+    <p class="description" style="margin-bottom:15px;">These are the default meta tags for your site. The Meta Title (EN) syncs with WordPress Site Title, and Meta Description (EN) syncs with Tagline in <strong>Settings &gt; General</strong> and <strong>Appearance &gt; Customize &gt; Site Identity</strong>.</p>
+    <table class="form-table">
+        <tr><th>Meta Title (EN)</th><td><input type="text" name="asl_seo_title" value="<?php echo esc_attr(get_theme_mod('asl_seo_title',$site_title)); ?>" class="large-text"><p class="description">Synced with WordPress Site Title. Updates here will update Site Title everywhere.</p></td></tr>
+        <tr><th>Meta Title (AR)</th><td><input type="text" name="asl_seo_title_ar" value="<?php echo esc_attr(get_theme_mod('asl_seo_title_ar','')); ?>" class="large-text" dir="rtl"><p class="description">Arabic version of the meta title for RTL pages.</p></td></tr>
+        <tr><th>Meta Description (EN)</th><td><textarea name="asl_seo_description" class="large-text" rows="3"><?php echo esc_textarea(get_theme_mod('asl_seo_description',$site_tagline)); ?></textarea><p class="description">Synced with WordPress Tagline. Updates here will update the Tagline everywhere.</p></td></tr>
+        <tr><th>Meta Description (AR)</th><td><textarea name="asl_seo_description_ar" class="large-text" rows="3" dir="rtl"><?php echo esc_textarea(get_theme_mod('asl_seo_description_ar','')); ?></textarea><p class="description">Arabic version of the meta description for RTL pages.</p></td></tr>
+        <tr><th>Meta Keywords (EN)</th><td><input type="text" name="asl_seo_keywords" value="<?php echo esc_attr(get_theme_mod('asl_seo_keywords','')); ?>" class="large-text"><p class="description">Comma-separated keywords for search engines.</p></td></tr>
+        <tr><th>Meta Keywords (AR)</th><td><input type="text" name="asl_seo_keywords_ar" value="<?php echo esc_attr(get_theme_mod('asl_seo_keywords_ar','')); ?>" class="large-text" dir="rtl"></td></tr>
+    </table>
+    <?php
+}
+
+function asl_render_seo_opengraph_tab() {
+    ?>
+    <h2>Open Graph Tags (Facebook / Social Media)</h2>
+    <p class="description" style="margin-bottom:15px;">These tags control how your site appears when shared on Facebook, LinkedIn, WhatsApp, and other platforms that support Open Graph.</p>
+    <table class="form-table">
+        <tr><th>OG Title (EN)</th><td><input type="text" name="asl_seo_og_title" value="<?php echo esc_attr(get_theme_mod('asl_seo_og_title','')); ?>" class="large-text"><p class="description">Leave empty to use Meta Title.</p></td></tr>
+        <tr><th>OG Title (AR)</th><td><input type="text" name="asl_seo_og_title_ar" value="<?php echo esc_attr(get_theme_mod('asl_seo_og_title_ar','')); ?>" class="large-text" dir="rtl"></td></tr>
+        <tr><th>OG Description (EN)</th><td><textarea name="asl_seo_og_description" class="large-text" rows="3"><?php echo esc_textarea(get_theme_mod('asl_seo_og_description','')); ?></textarea><p class="description">Leave empty to use Meta Description.</p></td></tr>
+        <tr><th>OG Description (AR)</th><td><textarea name="asl_seo_og_description_ar" class="large-text" rows="3" dir="rtl"><?php echo esc_textarea(get_theme_mod('asl_seo_og_description_ar','')); ?></textarea></td></tr>
+        <tr><th>OG Image</th><td><?php asl_image_field('asl_seo_og_image',get_theme_mod('asl_seo_og_image','')); ?><p class="description">Recommended: 1200x630 pixels. Used when sharing on Facebook, WhatsApp, LinkedIn, etc.</p></td></tr>
+        <tr><th>OG Type</th><td><select name="asl_seo_og_type"><option value="website" <?php selected(get_theme_mod('asl_seo_og_type','website'),'website'); ?>>Website</option><option value="article" <?php selected(get_theme_mod('asl_seo_og_type','website'),'article'); ?>>Article</option><option value="product" <?php selected(get_theme_mod('asl_seo_og_type','website'),'product'); ?>>Product</option><option value="business.business" <?php selected(get_theme_mod('asl_seo_og_type','website'),'business.business'); ?>>Business</option></select></td></tr>
+        <tr><th>OG Site Name</th><td><input type="text" name="asl_seo_og_site_name" value="<?php echo esc_attr(get_theme_mod('asl_seo_og_site_name','')); ?>" class="regular-text"><p class="description">Leave empty to use Site Title.</p></td></tr>
+        <tr><th>Facebook App ID</th><td><input type="text" name="asl_seo_fb_app_id" value="<?php echo esc_attr(get_theme_mod('asl_seo_fb_app_id','')); ?>" class="regular-text"><p class="description">Optional. For Facebook Insights integration.</p></td></tr>
+    </table>
+    <?php
+}
+
+function asl_render_seo_twitter_tab() {
+    ?>
+    <h2>Twitter Card Tags</h2>
+    <p class="description" style="margin-bottom:15px;">These tags control how your site appears when shared on Twitter/X.</p>
+    <table class="form-table">
+        <tr><th>Card Type</th><td><select name="asl_seo_twitter_card"><option value="summary_large_image" <?php selected(get_theme_mod('asl_seo_twitter_card','summary_large_image'),'summary_large_image'); ?>>Summary Large Image</option><option value="summary" <?php selected(get_theme_mod('asl_seo_twitter_card','summary_large_image'),'summary'); ?>>Summary</option><option value="app" <?php selected(get_theme_mod('asl_seo_twitter_card','summary_large_image'),'app'); ?>>App</option></select></td></tr>
+        <tr><th>Twitter Site (@handle)</th><td><input type="text" name="asl_seo_twitter_site" value="<?php echo esc_attr(get_theme_mod('asl_seo_twitter_site','')); ?>" class="regular-text" placeholder="@yourbrand"><p class="description">Your brand's Twitter/X handle.</p></td></tr>
+        <tr><th>Twitter Creator</th><td><input type="text" name="asl_seo_twitter_creator" value="<?php echo esc_attr(get_theme_mod('asl_seo_twitter_creator','')); ?>" class="regular-text" placeholder="@creatorhandle"><p class="description">Content creator's Twitter/X handle (optional).</p></td></tr>
+        <tr><th>Twitter Title (EN)</th><td><input type="text" name="asl_seo_twitter_title" value="<?php echo esc_attr(get_theme_mod('asl_seo_twitter_title','')); ?>" class="large-text"><p class="description">Leave empty to use Meta Title.</p></td></tr>
+        <tr><th>Twitter Title (AR)</th><td><input type="text" name="asl_seo_twitter_title_ar" value="<?php echo esc_attr(get_theme_mod('asl_seo_twitter_title_ar','')); ?>" class="large-text" dir="rtl"></td></tr>
+        <tr><th>Twitter Description (EN)</th><td><textarea name="asl_seo_twitter_description" class="large-text" rows="3"><?php echo esc_textarea(get_theme_mod('asl_seo_twitter_description','')); ?></textarea><p class="description">Leave empty to use Meta Description.</p></td></tr>
+        <tr><th>Twitter Description (AR)</th><td><textarea name="asl_seo_twitter_description_ar" class="large-text" rows="3" dir="rtl"><?php echo esc_textarea(get_theme_mod('asl_seo_twitter_description_ar','')); ?></textarea></td></tr>
+        <tr><th>Twitter Image</th><td><?php asl_image_field('asl_seo_twitter_image',get_theme_mod('asl_seo_twitter_image','')); ?><p class="description">Leave empty to use OG Image. Recommended: 1200x600 pixels.</p></td></tr>
+    </table>
+    <?php
+}
+
+function asl_render_seo_google_tab() {
+    ?>
+    <h2>Google & Analytics</h2>
+    <p class="description" style="margin-bottom:15px;">Verification codes and analytics tracking IDs for search engines and analytics platforms.</p>
+    <table class="form-table">
+        <tr><th>Google Site Verification</th><td><input type="text" name="asl_seo_google_verification" value="<?php echo esc_attr(get_theme_mod('asl_seo_google_verification','')); ?>" class="large-text"><p class="description">The content value from Google Search Console verification meta tag.</p></td></tr>
+        <tr><th>Bing Site Verification</th><td><input type="text" name="asl_seo_bing_verification" value="<?php echo esc_attr(get_theme_mod('asl_seo_bing_verification','')); ?>" class="large-text"><p class="description">The content value from Bing Webmaster Tools verification meta tag.</p></td></tr>
+        <tr><th>Google Analytics ID</th><td><input type="text" name="asl_seo_ga_id" value="<?php echo esc_attr(get_theme_mod('asl_seo_ga_id','')); ?>" class="regular-text" placeholder="G-XXXXXXXXXX"><p class="description">Google Analytics 4 Measurement ID.</p></td></tr>
+        <tr><th>Google Tag Manager ID</th><td><input type="text" name="asl_seo_gtm_id" value="<?php echo esc_attr(get_theme_mod('asl_seo_gtm_id','')); ?>" class="regular-text" placeholder="GTM-XXXXXXX"><p class="description">Google Tag Manager Container ID.</p></td></tr>
+        <tr><th>Facebook Pixel ID</th><td><input type="text" name="asl_seo_fb_pixel_id" value="<?php echo esc_attr(get_theme_mod('asl_seo_fb_pixel_id','')); ?>" class="regular-text"><p class="description">Facebook/Meta Pixel tracking ID.</p></td></tr>
+        <tr><th>Snapchat Pixel ID</th><td><input type="text" name="asl_seo_snap_pixel_id" value="<?php echo esc_attr(get_theme_mod('asl_seo_snap_pixel_id','')); ?>" class="regular-text"><p class="description">Snapchat Pixel tracking ID.</p></td></tr>
+        <tr><th>TikTok Pixel ID</th><td><input type="text" name="asl_seo_tiktok_pixel_id" value="<?php echo esc_attr(get_theme_mod('asl_seo_tiktok_pixel_id','')); ?>" class="regular-text"><p class="description">TikTok Pixel tracking ID.</p></td></tr>
+    </table>
+    <?php
+}
+
+function asl_render_seo_advanced_tab() {
+    ?>
+    <h2>Advanced SEO</h2>
+    <table class="form-table">
+        <tr><th>Canonical URL</th><td><input type="url" name="asl_seo_canonical_url" value="<?php echo esc_attr(get_theme_mod('asl_seo_canonical_url','')); ?>" class="large-text" placeholder="https://yourdomain.com"><p class="description">Override the default canonical URL for the homepage. Leave empty to use the site URL.</p></td></tr>
+        <tr><th>Robots</th><td><select name="asl_seo_robots"><option value="index,follow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'index,follow'); ?>>Index, Follow</option><option value="noindex,follow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'noindex,follow'); ?>>No Index, Follow</option><option value="index,nofollow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'index,nofollow'); ?>>Index, No Follow</option><option value="noindex,nofollow" <?php selected(get_theme_mod('asl_seo_robots','index,follow'),'noindex,nofollow'); ?>>No Index, No Follow</option></select></td></tr>
+        <tr><th>Schema.org Type</th><td><select name="asl_seo_schema_type"><option value="Organization" <?php selected(get_theme_mod('asl_seo_schema_type','Organization'),'Organization'); ?>>Organization</option><option value="LocalBusiness" <?php selected(get_theme_mod('asl_seo_schema_type','Organization'),'LocalBusiness'); ?>>Local Business</option><option value="Store" <?php selected(get_theme_mod('asl_seo_schema_type','Organization'),'Store'); ?>>Store</option><option value="OnlineStore" <?php selected(get_theme_mod('asl_seo_schema_type','Organization'),'OnlineStore'); ?>>Online Store</option></select><p class="description">Schema.org structured data type for your business.</p></td></tr>
+        <tr><th>Custom Head Code</th><td><textarea name="asl_seo_custom_head" class="large-text code" rows="6"><?php echo esc_textarea(get_theme_mod('asl_seo_custom_head','')); ?></textarea><p class="description">Custom HTML/scripts to inject in the &lt;head&gt; section. Use for additional tracking codes or meta tags.</p></td></tr>
+    </table>
+    <?php
+}
+
+/**
+ * Render Mobile Settings page
+ */
 function asl_render_mobile_page() {
     if (!current_user_can('manage_options')) return;
     if (isset($_POST['asl_save_mobile_settings']) && check_admin_referer('asl_mobile_settings_nonce')) {
@@ -343,6 +496,9 @@ function asl_render_mobile_page() {
     <?php
 }
 
+/**
+ * Save Home Settings
+ */
 function asl_save_home_settings() {
     $tab = isset($_POST['asl_current_tab']) ? sanitize_text_field($_POST['asl_current_tab']) : '';
     
@@ -425,6 +581,9 @@ function asl_save_home_settings() {
     }
 }
 
+/**
+ * Save Products Section settings
+ */
 function asl_save_products_section($key) {
     set_theme_mod("asl_{$key}_enabled", isset($_POST["asl_{$key}_enabled"]));
     set_theme_mod("asl_{$key}_hide_mobile", isset($_POST["asl_{$key}_hide_mobile"]));
@@ -441,10 +600,13 @@ function asl_save_products_section($key) {
     set_theme_mod("asl_{$key}_cols_mobile", absint($_POST["asl_{$key}_cols_mobile"]??2));
 }
 
+/**
+ * Save Header Settings
+ */
 function asl_save_header_settings() {
+    $logo_id = absint($_POST['asl_site_logo'] ?? 0);
+    set_theme_mod('custom_logo', $logo_id ? $logo_id : 0);
     set_theme_mod('asl_header_sticky', isset($_POST['asl_header_sticky']));
-    set_theme_mod('asl_sticky_logo', esc_url_raw($_POST['asl_sticky_logo']??''));
-    set_theme_mod('asl_logo_dark', esc_url_raw($_POST['asl_logo_dark']??''));
     set_theme_mod('asl_topbar_enabled', isset($_POST['asl_topbar_enabled']));
     set_theme_mod('asl_topbar_text', sanitize_text_field($_POST['asl_topbar_text']??''));
     set_theme_mod('asl_topbar_text_ar', sanitize_text_field($_POST['asl_topbar_text_ar']??''));
@@ -454,15 +616,70 @@ function asl_save_header_settings() {
     set_theme_mod('asl_topbar_dismissible', isset($_POST['asl_topbar_dismissible']));
 }
 
+/**
+ * Save SEO Settings
+ */
 function asl_save_seo_settings() {
-    set_theme_mod('asl_seo_title', sanitize_text_field($_POST['asl_seo_title']??''));
-    set_theme_mod('asl_seo_title_ar', sanitize_text_field($_POST['asl_seo_title_ar']??''));
-    set_theme_mod('asl_seo_description', sanitize_textarea_field($_POST['asl_seo_description']??''));
-    set_theme_mod('asl_seo_description_ar', sanitize_textarea_field($_POST['asl_seo_description_ar']??''));
-    set_theme_mod('asl_seo_og_image', esc_url_raw($_POST['asl_seo_og_image']??''));
-    set_theme_mod('asl_seo_robots', sanitize_text_field($_POST['asl_seo_robots']??'index,follow'));
+    $tab = sanitize_text_field($_POST['asl_seo_current_tab']??'general');
+
+    switch($tab) {
+        case 'general':
+            $title = sanitize_text_field($_POST['asl_seo_title']??'');
+            $description = sanitize_textarea_field($_POST['asl_seo_description']??'');
+            set_theme_mod('asl_seo_title', $title);
+            set_theme_mod('asl_seo_title_ar', sanitize_text_field($_POST['asl_seo_title_ar']??''));
+            set_theme_mod('asl_seo_description', $description);
+            set_theme_mod('asl_seo_description_ar', sanitize_textarea_field($_POST['asl_seo_description_ar']??''));
+            set_theme_mod('asl_seo_keywords', sanitize_text_field($_POST['asl_seo_keywords']??''));
+            set_theme_mod('asl_seo_keywords_ar', sanitize_text_field($_POST['asl_seo_keywords_ar']??''));
+            if (!empty($title)) update_option('blogname', $title);
+            if (!empty($description)) update_option('blogdescription', $description);
+            break;
+
+        case 'opengraph':
+            set_theme_mod('asl_seo_og_title', sanitize_text_field($_POST['asl_seo_og_title']??''));
+            set_theme_mod('asl_seo_og_title_ar', sanitize_text_field($_POST['asl_seo_og_title_ar']??''));
+            set_theme_mod('asl_seo_og_description', sanitize_textarea_field($_POST['asl_seo_og_description']??''));
+            set_theme_mod('asl_seo_og_description_ar', sanitize_textarea_field($_POST['asl_seo_og_description_ar']??''));
+            set_theme_mod('asl_seo_og_image', esc_url_raw($_POST['asl_seo_og_image']??''));
+            set_theme_mod('asl_seo_og_type', sanitize_text_field($_POST['asl_seo_og_type']??'website'));
+            set_theme_mod('asl_seo_og_site_name', sanitize_text_field($_POST['asl_seo_og_site_name']??''));
+            set_theme_mod('asl_seo_fb_app_id', sanitize_text_field($_POST['asl_seo_fb_app_id']??''));
+            break;
+
+        case 'twitter':
+            set_theme_mod('asl_seo_twitter_card', sanitize_text_field($_POST['asl_seo_twitter_card']??'summary_large_image'));
+            set_theme_mod('asl_seo_twitter_site', sanitize_text_field($_POST['asl_seo_twitter_site']??''));
+            set_theme_mod('asl_seo_twitter_creator', sanitize_text_field($_POST['asl_seo_twitter_creator']??''));
+            set_theme_mod('asl_seo_twitter_title', sanitize_text_field($_POST['asl_seo_twitter_title']??''));
+            set_theme_mod('asl_seo_twitter_title_ar', sanitize_text_field($_POST['asl_seo_twitter_title_ar']??''));
+            set_theme_mod('asl_seo_twitter_description', sanitize_textarea_field($_POST['asl_seo_twitter_description']??''));
+            set_theme_mod('asl_seo_twitter_description_ar', sanitize_textarea_field($_POST['asl_seo_twitter_description_ar']??''));
+            set_theme_mod('asl_seo_twitter_image', esc_url_raw($_POST['asl_seo_twitter_image']??''));
+            break;
+
+        case 'google':
+            set_theme_mod('asl_seo_google_verification', sanitize_text_field($_POST['asl_seo_google_verification']??''));
+            set_theme_mod('asl_seo_bing_verification', sanitize_text_field($_POST['asl_seo_bing_verification']??''));
+            set_theme_mod('asl_seo_ga_id', sanitize_text_field($_POST['asl_seo_ga_id']??''));
+            set_theme_mod('asl_seo_gtm_id', sanitize_text_field($_POST['asl_seo_gtm_id']??''));
+            set_theme_mod('asl_seo_fb_pixel_id', sanitize_text_field($_POST['asl_seo_fb_pixel_id']??''));
+            set_theme_mod('asl_seo_snap_pixel_id', sanitize_text_field($_POST['asl_seo_snap_pixel_id']??''));
+            set_theme_mod('asl_seo_tiktok_pixel_id', sanitize_text_field($_POST['asl_seo_tiktok_pixel_id']??''));
+            break;
+
+        case 'advanced':
+            set_theme_mod('asl_seo_canonical_url', esc_url_raw($_POST['asl_seo_canonical_url']??''));
+            set_theme_mod('asl_seo_robots', sanitize_text_field($_POST['asl_seo_robots']??'index,follow'));
+            set_theme_mod('asl_seo_schema_type', sanitize_text_field($_POST['asl_seo_schema_type']??'Organization'));
+            set_theme_mod('asl_seo_custom_head', wp_kses($_POST['asl_seo_custom_head']??'', array('meta'=>array('name'=>true,'content'=>true,'property'=>true,'charset'=>true,'http-equiv'=>true),'link'=>array('rel'=>true,'href'=>true,'type'=>true,'hreflang'=>true),'script'=>array('type'=>true,'src'=>true,'async'=>true,'defer'=>true))));
+            break;
+    }
 }
 
+/**
+ * Save Mobile Settings
+ */
 function asl_save_mobile_settings() {
     set_theme_mod('asl_mobile_bar_enabled', isset($_POST['asl_mobile_bar_enabled']));
     for ($i=1; $i<=5; $i++) {
@@ -474,7 +691,10 @@ function asl_save_mobile_settings() {
     }
 }
 
-add_action('rest_api_init', function() {
+/**
+ * Register REST API routes
+ */
+function asl_settings_register_rest_routes() {
     register_rest_route('asl/v1', '/customizer', array('methods'=>'GET','callback'=>'asl_get_customizer_settings','permission_callback'=>'__return_true'));
     register_rest_route('asl/v1', '/home-settings', array('methods'=>'GET','callback'=>'asl_get_home_settings','permission_callback'=>'__return_true'));
     register_rest_route('asl/v1', '/site-settings', array('methods'=>'GET','callback'=>'asl_get_site_settings','permission_callback'=>'__return_true'));
@@ -483,35 +703,91 @@ add_action('rest_api_init', function() {
     register_rest_route('asl/v1', '/mobile-bar', array('methods'=>'GET','callback'=>'asl_get_mobile_bar_settings','permission_callback'=>'__return_true'));
     register_rest_route('asl/v1', '/topbar', array('methods'=>'GET','callback'=>'asl_get_topbar_settings','permission_callback'=>'__return_true'));
     register_rest_route('asl/v1', '/menu/(?P<location>[a-zA-Z0-9_-]+)', array('methods'=>'GET','callback'=>'asl_get_menu','permission_callback'=>'__return_true'));
-});
+}
 
+/**
+ * Get all customizer settings
+ */
 function asl_get_customizer_settings() {
     return array('site'=>asl_get_site_settings(),'header'=>asl_get_header_settings(),'topBar'=>asl_get_topbar_settings(),'seo'=>asl_get_seo_settings(),'mobileBar'=>asl_get_mobile_bar_settings(),'hero'=>asl_get_hero_settings(),'newProducts'=>asl_get_products_settings('new_products'),'bestseller'=>asl_get_products_settings('bestseller'),'categories'=>asl_get_categories_settings(),'featured'=>asl_get_products_settings('featured'),'collections'=>asl_get_collections_settings(),'banners'=>asl_get_banners_settings());
 }
 
+/**
+ * Get home settings
+ */
 function asl_get_home_settings() {
     return array('hero'=>asl_get_hero_settings(),'newProducts'=>asl_get_products_settings('new_products'),'bestseller'=>asl_get_products_settings('bestseller'),'categories'=>asl_get_categories_settings(),'featured'=>asl_get_products_settings('featured'),'collections'=>asl_get_collections_settings(),'banners'=>asl_get_banners_settings());
 }
 
+/**
+ * Get site settings
+ */
 function asl_get_site_settings() {
     $logo_id = get_theme_mod('custom_logo');
     $icon_id = get_option('site_icon');
     return array('name'=>get_bloginfo('name'),'description'=>get_bloginfo('description'),'url'=>get_bloginfo('url'),'logo'=>array('id'=>$logo_id,'url'=>$logo_id?wp_get_attachment_image_url($logo_id,'full'):''),'favicon'=>array('id'=>$icon_id,'url'=>$icon_id?wp_get_attachment_image_url($icon_id,'full'):''));
 }
 
+/**
+ * Get header settings
+ */
 function asl_get_header_settings() {
     $logo_id = get_theme_mod('custom_logo');
-    return array('sticky'=>get_theme_mod('asl_header_sticky',true),'logo'=>$logo_id?wp_get_attachment_image_url($logo_id,'full'):'','stickyLogo'=>get_theme_mod('asl_sticky_logo',''),'logoDark'=>get_theme_mod('asl_logo_dark',''));
+    $logo_url = $logo_id ? wp_get_attachment_image_url($logo_id, 'full') : '';
+    return array('sticky'=>get_theme_mod('asl_header_sticky',true),'logo'=>$logo_url,'stickyLogo'=>$logo_url,'logoDark'=>$logo_url);
 }
 
+/**
+ * Get topbar settings
+ */
 function asl_get_topbar_settings() {
     return array('enabled'=>get_theme_mod('asl_topbar_enabled',true),'text'=>get_theme_mod('asl_topbar_text','Free shipping on orders over 200 SAR'),'textAr'=>get_theme_mod('asl_topbar_text_ar',''),'link'=>get_theme_mod('asl_topbar_link',''),'bgColor'=>get_theme_mod('asl_topbar_bg_color','#f3f4f6'),'textColor'=>get_theme_mod('asl_topbar_text_color','#4b5563'),'dismissible'=>get_theme_mod('asl_topbar_dismissible',false));
 }
 
+/**
+ * Get SEO settings
+ */
 function asl_get_seo_settings() {
-    return array('title'=>get_theme_mod('asl_seo_title',''),'titleAr'=>get_theme_mod('asl_seo_title_ar',''),'description'=>get_theme_mod('asl_seo_description',''),'descriptionAr'=>get_theme_mod('asl_seo_description_ar',''),'ogImage'=>get_theme_mod('asl_seo_og_image',''),'robots'=>get_theme_mod('asl_seo_robots','index,follow'));
+    return array(
+        'title'=>get_theme_mod('asl_seo_title',get_bloginfo('name')),
+        'titleAr'=>get_theme_mod('asl_seo_title_ar',''),
+        'description'=>get_theme_mod('asl_seo_description',get_bloginfo('description')),
+        'descriptionAr'=>get_theme_mod('asl_seo_description_ar',''),
+        'keywords'=>get_theme_mod('asl_seo_keywords',''),
+        'keywordsAr'=>get_theme_mod('asl_seo_keywords_ar',''),
+        'ogTitle'=>get_theme_mod('asl_seo_og_title',''),
+        'ogTitleAr'=>get_theme_mod('asl_seo_og_title_ar',''),
+        'ogDescription'=>get_theme_mod('asl_seo_og_description',''),
+        'ogDescriptionAr'=>get_theme_mod('asl_seo_og_description_ar',''),
+        'ogImage'=>get_theme_mod('asl_seo_og_image',''),
+        'ogType'=>get_theme_mod('asl_seo_og_type','website'),
+        'ogSiteName'=>get_theme_mod('asl_seo_og_site_name',''),
+        'fbAppId'=>get_theme_mod('asl_seo_fb_app_id',''),
+        'twitterCard'=>get_theme_mod('asl_seo_twitter_card','summary_large_image'),
+        'twitterSite'=>get_theme_mod('asl_seo_twitter_site',''),
+        'twitterCreator'=>get_theme_mod('asl_seo_twitter_creator',''),
+        'twitterTitle'=>get_theme_mod('asl_seo_twitter_title',''),
+        'twitterTitleAr'=>get_theme_mod('asl_seo_twitter_title_ar',''),
+        'twitterDescription'=>get_theme_mod('asl_seo_twitter_description',''),
+        'twitterDescriptionAr'=>get_theme_mod('asl_seo_twitter_description_ar',''),
+        'twitterImage'=>get_theme_mod('asl_seo_twitter_image',''),
+        'googleVerification'=>get_theme_mod('asl_seo_google_verification',''),
+        'bingVerification'=>get_theme_mod('asl_seo_bing_verification',''),
+        'gaId'=>get_theme_mod('asl_seo_ga_id',''),
+        'gtmId'=>get_theme_mod('asl_seo_gtm_id',''),
+        'fbPixelId'=>get_theme_mod('asl_seo_fb_pixel_id',''),
+        'snapPixelId'=>get_theme_mod('asl_seo_snap_pixel_id',''),
+        'tiktokPixelId'=>get_theme_mod('asl_seo_tiktok_pixel_id',''),
+        'robots'=>get_theme_mod('asl_seo_robots','index,follow'),
+        'canonicalUrl'=>get_theme_mod('asl_seo_canonical_url',''),
+        'schemaType'=>get_theme_mod('asl_seo_schema_type','Organization'),
+        'customHead'=>get_theme_mod('asl_seo_custom_head',''),
+    );
 }
 
+/**
+ * Get mobile bar settings
+ */
 function asl_get_mobile_bar_settings() {
     $items = array();
     for ($i=1; $i<=5; $i++) {
@@ -522,6 +798,9 @@ function asl_get_mobile_bar_settings() {
     return array('enabled'=>get_theme_mod('asl_mobile_bar_enabled',true),'items'=>$items);
 }
 
+/**
+ * Get hero settings
+ */
 function asl_get_hero_settings() {
     $slides = get_theme_mod('asl_hero_slides', array());
     if (empty($slides)) {
@@ -535,14 +814,23 @@ function asl_get_hero_settings() {
     return array('enabled'=>get_theme_mod('asl_hero_enabled',true),'hideOnMobile'=>get_theme_mod('asl_hero_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_hero_hide_desktop',false),'autoplay'=>get_theme_mod('asl_hero_autoplay',true),'autoplayDelay'=>get_theme_mod('asl_hero_autoplay_delay',5000),'loop'=>get_theme_mod('asl_hero_loop',true),'slides'=>$slides);
 }
 
+/**
+ * Get products settings
+ */
 function asl_get_products_settings($key) {
     return array('enabled'=>get_theme_mod("asl_{$key}_enabled",true),'hideOnMobile'=>get_theme_mod("asl_{$key}_hide_mobile",false),'hideOnDesktop'=>get_theme_mod("asl_{$key}_hide_desktop",false),'title'=>get_theme_mod("asl_{$key}_title",''),'titleAr'=>get_theme_mod("asl_{$key}_title_ar",''),'subtitle'=>get_theme_mod("asl_{$key}_subtitle",''),'subtitleAr'=>get_theme_mod("asl_{$key}_subtitle_ar",''),'count'=>get_theme_mod("asl_{$key}_count",8),'display'=>get_theme_mod("asl_{$key}_display",'slider'),'autoplay'=>get_theme_mod("asl_{$key}_autoplay",true),'responsive'=>array('desktop'=>get_theme_mod("asl_{$key}_cols_desktop",4),'tablet'=>get_theme_mod("asl_{$key}_cols_tablet",3),'mobile'=>get_theme_mod("asl_{$key}_cols_mobile",2)));
 }
 
+/**
+ * Get categories settings
+ */
 function asl_get_categories_settings() {
     return array('enabled'=>get_theme_mod('asl_categories_enabled',true),'hideOnMobile'=>get_theme_mod('asl_categories_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_categories_hide_desktop',false),'title'=>get_theme_mod('asl_categories_title','Shop by Category'),'titleAr'=>get_theme_mod('asl_categories_title_ar',''),'subtitle'=>get_theme_mod('asl_categories_subtitle',''),'subtitleAr'=>get_theme_mod('asl_categories_subtitle_ar',''),'count'=>get_theme_mod('asl_categories_count',6),'responsive'=>array('desktop'=>get_theme_mod('asl_categories_cols_desktop',6),'tablet'=>get_theme_mod('asl_categories_cols_tablet',4),'mobile'=>get_theme_mod('asl_categories_cols_mobile',3)));
 }
 
+/**
+ * Get collections settings
+ */
 function asl_get_collections_settings() {
     $items = get_theme_mod('asl_collections_items', array());
     if (empty($items)) {
@@ -557,6 +845,9 @@ function asl_get_collections_settings() {
     return array('enabled'=>get_theme_mod('asl_collections_enabled',true),'hideOnMobile'=>get_theme_mod('asl_collections_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_collections_hide_desktop',false),'title'=>get_theme_mod('asl_collections_title','Our Collections'),'titleAr'=>get_theme_mod('asl_collections_title_ar',''),'subtitle'=>get_theme_mod('asl_collections_subtitle',''),'subtitleAr'=>get_theme_mod('asl_collections_subtitle_ar',''),'layout'=>get_theme_mod('asl_collections_layout','grid'),'responsive'=>array('desktop'=>get_theme_mod('asl_collections_cols_desktop',3),'tablet'=>get_theme_mod('asl_collections_cols_tablet',2),'mobile'=>get_theme_mod('asl_collections_cols_mobile',1)),'items'=>$items);
 }
 
+/**
+ * Get banners settings
+ */
 function asl_get_banners_settings() {
     $items = get_theme_mod('asl_banners_items', array());
     if (empty($items)) {
@@ -570,6 +861,9 @@ function asl_get_banners_settings() {
     return array('enabled'=>get_theme_mod('asl_banners_enabled',true),'hideOnMobile'=>get_theme_mod('asl_banners_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_banners_hide_desktop',false),'layout'=>get_theme_mod('asl_banners_layout','grid'),'responsive'=>array('desktop'=>get_theme_mod('asl_banners_cols_desktop',2),'tablet'=>get_theme_mod('asl_banners_cols_tablet',2),'mobile'=>get_theme_mod('asl_banners_cols_mobile',1)),'items'=>$items);
 }
 
+/**
+ * Get menu
+ */
 function asl_get_menu($request) {
     $location = $request['location'];
     $locations = get_nav_menu_locations();
@@ -589,12 +883,38 @@ function asl_get_menu($request) {
     return array('id'=>$menu_id,'name'=>wp_get_nav_menu_object($menu_id)->name,'items'=>$items);
 }
 
-add_action('after_setup_theme', function() {
+/**
+ * Theme support
+ */
+function asl_settings_theme_support() {
     register_nav_menus(array('primary'=>'Primary Menu','footer'=>'Footer Menu'));
     add_theme_support('custom-logo',array('height'=>100,'width'=>400,'flex-height'=>true,'flex-width'=>true));
-});
+}
 
-add_action('rest_api_init', function() {
+/**
+ * Register Customizer sections for site logo
+ */
+function asl_settings_customize_register($wp_customize) {
+    $wp_customize->add_section('asl_logo_section', array(
+        'title' => 'Site Logo',
+        'priority' => 30,
+    ));
+    $wp_customize->add_setting('custom_logo', array(
+        'transport' => 'refresh',
+    ));
+    $wp_customize->add_control(new WP_Customize_Media_Control($wp_customize, 'custom_logo', array(
+        'label' => 'Site Logo',
+        'description' => 'Upload your site logo. This logo is used across the entire site.',
+        'section' => 'asl_logo_section',
+        'mime_type' => 'image',
+    )));
+}
+add_action('customize_register', 'asl_settings_customize_register');
+
+/**
+ * CORS handling
+ */
+function asl_settings_cors_handling() {
     remove_filter('rest_pre_serve_request','rest_send_cors_headers');
     add_filter('rest_pre_serve_request', function($value) {
         $origin = get_http_origin();
@@ -605,787 +925,15 @@ add_action('rest_api_init', function() {
         header('Access-Control-Allow-Headers: Authorization, Content-Type');
         return $value;
     });
-}, 15);
+}
 
-add_action('admin_head', function() {
+/**
+ * Admin styles
+ */
+function asl_settings_admin_styles() {
     if (strpos(get_current_screen()->id,'asl-settings')===false) return;
     echo '<style>.nav-tab-wrapper{margin-bottom:0}.tab-content{margin-top:0}.form-table th{width:200px}.asl-image-field{display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px}.asl-preview{flex-basis:100%}</style>';
-});
-
-// ============================================================================
-// ASL BUNDLES CREATOR - REST API ENDPOINTS
-// ============================================================================
-
-add_action('rest_api_init', function() {
-    // Get bundle config by product slug (for frontend detection)
-    register_rest_route('asl-bundles/v1', '/config', array(
-        'methods' => 'GET',
-        'callback' => 'asl_bundles_get_config_by_slug',
-        'permission_callback' => '__return_true',
-    ));
-
-    // Get all bundles or filter by product_id
-    register_rest_route('asl-bundles/v1', '/bundles', array(
-        'methods' => 'GET',
-        'callback' => 'asl_bundles_get_all',
-        'permission_callback' => '__return_true',
-    ));
-
-    // Get single bundle by ID
-    register_rest_route('asl-bundles/v1', '/bundles/(?P<id>[a-zA-Z0-9-]+)', array(
-        'methods' => 'GET',
-        'callback' => 'asl_bundles_get_single',
-        'permission_callback' => '__return_true',
-    ));
-
-    // Create new bundle
-    register_rest_route('asl-bundles/v1', '/bundles', array(
-        'methods' => 'POST',
-        'callback' => 'asl_bundles_create',
-        'permission_callback' => 'asl_bundles_check_permission',
-    ));
-
-    // Update bundle
-    register_rest_route('asl-bundles/v1', '/bundles/(?P<id>[a-zA-Z0-9-]+)', array(
-        'methods' => 'PUT',
-        'callback' => 'asl_bundles_update',
-        'permission_callback' => 'asl_bundles_check_permission',
-    ));
-
-    // Delete bundle
-    register_rest_route('asl-bundles/v1', '/bundles/(?P<id>[a-zA-Z0-9-]+)', array(
-        'methods' => 'DELETE',
-        'callback' => 'asl_bundles_delete',
-        'permission_callback' => 'asl_bundles_check_permission',
-    ));
-});
-
-// Get bundle configuration by product slug
-function asl_bundles_get_config_by_slug($request) {
-    $slug = $request->get_param('slug');
-    
-    if (empty($slug)) {
-        return new WP_Error('missing_slug', 'Product slug is required', array('status' => 400));
-    }
-    
-    // Find product by slug
-    $args = array(
-        'post_type' => 'product',
-        'name' => $slug,
-        'posts_per_page' => 1,
-    );
-    $products = get_posts($args);
-    
-    if (empty($products)) {
-        return new WP_Error('product_not_found', 'Product not found', array('status' => 404));
-    }
-    
-    $product_id = $products[0]->ID;
-    
-    // Check if bundle is enabled for this product via post meta
-    $bundle_enabled = get_post_meta($product_id, '_asl_bundle_enabled', true);
-    
-    if ($bundle_enabled !== 'yes') {
-        return null;
-    }
-    
-    // Get bundle configuration from bundles data
-    $bundles = get_option('asl_bundles_data', array());
-    $product_bundle = null;
-    
-    foreach ($bundles as $bundle) {
-        if (isset($bundle['product_id']) && intval($bundle['product_id']) === $product_id && !empty($bundle['is_enabled'])) {
-            $product_bundle = $bundle;
-            break;
-        }
-    }
-    
-    if (!$product_bundle) {
-        // Return basic config if bundle is enabled but no detailed config exists
-        return array(
-            'product_id' => $product_id,
-            'enabled' => true,
-            'eligible_products' => array(),
-            'unique_products' => array(),
-            'total_slots' => 5,
-            'required_slots' => 3,
-        );
-    }
-    
-    // Transform bundle data to config format expected by frontend
-    $eligible_products = array();
-    $eligible_categories = array();
-    
-    if (!empty($product_bundle['items'])) {
-        foreach ($product_bundle['items'] as $item) {
-            if (!empty($item['rule']['products'])) {
-                $eligible_products = array_merge($eligible_products, $item['rule']['products']);
-            }
-            if (!empty($item['rule']['categories'])) {
-                $eligible_categories = array_merge($eligible_categories, $item['rule']['categories']);
-            }
-        }
-    }
-    
-    return array(
-        'product_id' => $product_id,
-        'bundle_id' => $product_bundle['id'] ?? null,
-        'bundle_type' => $product_bundle['bundle_type'] ?? 'custom',
-        'eligible_categories' => array_unique($eligible_categories),
-        'eligible_products' => array_unique($eligible_products),
-        'unique_products' => array(),
-        'total_slots' => count($product_bundle['items'] ?? array()) ?: 5,
-        'required_slots' => 3,
-        'shipping_fee' => $product_bundle['shipping_fee'] ?? 'apply_to_each_bundled_product',
-        'enabled' => true,
-        'title' => $product_bundle['title'] ?? '',
-        'pricing' => $product_bundle['pricing'] ?? null,
-    );
 }
 
-function asl_bundles_check_permission() {
-    return current_user_can('manage_options') || current_user_can('manage_woocommerce');
-}
-
-function asl_bundles_get_all($request) {
-    $bundles = get_option('asl_bundles_data', array());
-    $product_id = $request->get_param('product_id');
-    
-    if ($product_id) {
-        $product_id = intval($product_id);
-        $filtered = array_filter($bundles, function($bundle) use ($product_id) {
-            return isset($bundle['product_id']) && intval($bundle['product_id']) === $product_id;
-        });
-        return array_values($filtered);
-    }
-    
-    return array_values($bundles);
-}
-
-function asl_bundles_get_single($request) {
-    $id = $request->get_param('id');
-    $bundles = get_option('asl_bundles_data', array());
-    
-    if (isset($bundles[$id])) {
-        return $bundles[$id];
-    }
-    
-    return new WP_Error('not_found', 'Bundle not found', array('status' => 404));
-}
-
-function asl_bundles_create($request) {
-    $data = $request->get_json_params();
-    
-    if (empty($data['id'])) {
-        $data['id'] = wp_generate_uuid4();
-    }
-    
-    $bundle = asl_bundles_sanitize_bundle($data);
-    $bundle['created_at'] = $data['created_at'] ?? current_time('c');
-    $bundle['updated_at'] = current_time('c');
-    
-    $bundles = get_option('asl_bundles_data', array());
-    $bundles[$bundle['id']] = $bundle;
-    update_option('asl_bundles_data', $bundles);
-    
-    return $bundle;
-}
-
-function asl_bundles_update($request) {
-    $id = $request->get_param('id');
-    $data = $request->get_json_params();
-    
-    $bundles = get_option('asl_bundles_data', array());
-    
-    if (!isset($bundles[$id])) {
-        return new WP_Error('not_found', 'Bundle not found', array('status' => 404));
-    }
-    
-    $bundle = asl_bundles_sanitize_bundle($data);
-    $bundle['id'] = $id;
-    $bundle['created_at'] = $bundles[$id]['created_at'] ?? current_time('c');
-    $bundle['updated_at'] = current_time('c');
-    
-    $bundles[$id] = $bundle;
-    update_option('asl_bundles_data', $bundles);
-    
-    return $bundle;
-}
-
-function asl_bundles_delete($request) {
-    $id = $request->get_param('id');
-    $bundles = get_option('asl_bundles_data', array());
-    
-    if (!isset($bundles[$id])) {
-        return new WP_Error('not_found', 'Bundle not found', array('status' => 404));
-    }
-    
-    unset($bundles[$id]);
-    update_option('asl_bundles_data', $bundles);
-    
-    return array('success' => true, 'message' => 'Bundle deleted successfully');
-}
-
-function asl_bundles_sanitize_bundle($data) {
-    $bundle = array(
-        'id' => sanitize_text_field($data['id'] ?? ''),
-        'product_id' => isset($data['product_id']) ? intval($data['product_id']) : null,
-        'title' => sanitize_text_field($data['title'] ?? ''),
-        'bundle_type' => sanitize_text_field($data['bundle_type'] ?? 'custom'),
-        'shipping_fee' => sanitize_text_field($data['shipping_fee'] ?? 'apply_to_each_bundled_product'),
-        'is_enabled' => !empty($data['is_enabled']),
-        'pricing' => array(
-            'mode' => sanitize_text_field($data['pricing']['mode'] ?? 'box_fixed_price'),
-            'box_price' => floatval($data['pricing']['box_price'] ?? 0),
-            'included_items_count' => intval($data['pricing']['included_items_count'] ?? 3),
-            'extra_item_charging_method' => sanitize_text_field($data['pricing']['extra_item_charging_method'] ?? 'cheapest_first'),
-            'show_product_prices' => !empty($data['pricing']['show_product_prices']),
-        ),
-        'items' => array(),
-    );
-    
-    if (!empty($data['items']) && is_array($data['items'])) {
-        foreach ($data['items'] as $item) {
-            $bundle['items'][] = array(
-                'id' => sanitize_text_field($item['id'] ?? ''),
-                'title' => sanitize_text_field($item['title'] ?? ''),
-                'is_expanded' => !empty($item['is_expanded']),
-                'rule' => array(
-                    'categories' => array_map('intval', $item['rule']['categories'] ?? array()),
-                    'exclude_categories' => array_map('intval', $item['rule']['exclude_categories'] ?? array()),
-                    'tags' => array_map('intval', $item['rule']['tags'] ?? array()),
-                    'exclude_tags' => array_map('intval', $item['rule']['exclude_tags'] ?? array()),
-                    'products' => array_map('intval', $item['rule']['products'] ?? array()),
-                    'product_variations' => array_map('intval', $item['rule']['product_variations'] ?? array()),
-                    'exclude_products' => array_map('intval', $item['rule']['exclude_products'] ?? array()),
-                    'exclude_product_variations' => array_map('intval', $item['rule']['exclude_product_variations'] ?? array()),
-                ),
-                'display' => array(
-                    'custom_title' => sanitize_text_field($item['display']['custom_title'] ?? ''),
-                    'sort_by' => sanitize_text_field($item['display']['sort_by'] ?? 'price'),
-                    'sort_order' => sanitize_text_field($item['display']['sort_order'] ?? 'asc'),
-                    'is_default' => !empty($item['display']['is_default']),
-                    'default_product_id' => isset($item['display']['default_product_id']) ? intval($item['display']['default_product_id']) : null,
-                    'quantity' => intval($item['display']['quantity'] ?? 1),
-                    'quantity_min' => intval($item['display']['quantity_min'] ?? 1),
-                    'quantity_max' => intval($item['display']['quantity_max'] ?? 10),
-                    'discount_type' => sanitize_text_field($item['display']['discount_type'] ?? 'percent'),
-                    'discount_value' => floatval($item['display']['discount_value'] ?? 0),
-                    'is_optional' => !empty($item['display']['is_optional']),
-                    'show_price' => isset($item['display']['show_price']) ? !empty($item['display']['show_price']) : true,
-                ),
-            );
-        }
-    }
-    
-    return $bundle;
-}
-
-// ============================================================================
-// ASL BUNDLES - PRODUCT METABOX FOR ENABLING BUNDLES
-// ============================================================================
-
-// Add metabox to product edit page
-add_action('add_meta_boxes', function() {
-    add_meta_box(
-        'asl_bundle_settings',
-        'ASL Bundle Settings',
-        'asl_bundle_metabox_render',
-        'product',
-        'side',
-        'high'
-    );
-});
-
-// Render the bundle metabox
-function asl_bundle_metabox_render($post) {
-    wp_nonce_field('asl_bundle_metabox', 'asl_bundle_metabox_nonce');
-    
-    $bundle_enabled = get_post_meta($post->ID, '_asl_bundle_enabled', true);
-    $bundles = get_option('asl_bundles_data', array());
-    
-    // Find existing bundle config for this product
-    $product_bundle = null;
-    foreach ($bundles as $bundle) {
-        if (isset($bundle['product_id']) && intval($bundle['product_id']) === $post->ID) {
-            $product_bundle = $bundle;
-            break;
-        }
-    }
-    
-    // Get frontend URL from options or use default
-    $frontend_url = get_option('asl_frontend_url', 'https://staging.aromaticscentslab.com');
-    ?>
-    <div class="asl-bundle-metabox">
-        <p>
-            <label>
-                <input type="checkbox" name="asl_bundle_enabled" value="yes" <?php checked($bundle_enabled, 'yes'); ?>>
-                <strong>Enable Bundle Builder</strong>
-            </label>
-        </p>
-        <p class="description">
-            When enabled, customers visiting this product will be redirected to the bundle builder page where they can select products to include in their bundle.
-        </p>
-        
-        <?php if ($bundle_enabled === 'yes'): ?>
-            <hr style="margin: 15px 0;">
-            <p><strong>Bundle Status:</strong></p>
-            <?php if ($product_bundle && !empty($product_bundle['is_enabled'])): ?>
-                <p style="color: green;">Bundle configuration is active.</p>
-                <p>
-                    <a href="<?php echo esc_url($frontend_url . '/en/bundle-manager?productId=' . $post->ID); ?>" 
-                       target="_blank" 
-                       class="button button-secondary">
-                        Edit Bundle Configuration
-                    </a>
-                </p>
-            <?php else: ?>
-                <p style="color: orange;">Bundle is enabled but no configuration exists yet.</p>
-                <p>
-                    <a href="<?php echo esc_url($frontend_url . '/en/bundle-manager?productId=' . $post->ID); ?>" 
-                       target="_blank" 
-                       class="button button-primary">
-                        Create Bundle Configuration
-                    </a>
-                </p>
-            <?php endif; ?>
-        <?php endif; ?>
-    </div>
-    <style>
-        .asl-bundle-metabox .description {
-            color: #666;
-            font-style: italic;
-            margin-top: 5px;
-        }
-    </style>
-    <?php
-}
-
-// Save the bundle metabox data
-add_action('save_post_product', function($post_id) {
-    // Check nonce
-    if (!isset($_POST['asl_bundle_metabox_nonce']) || 
-        !wp_verify_nonce($_POST['asl_bundle_metabox_nonce'], 'asl_bundle_metabox')) {
-        return;
-    }
-    
-    // Check autosave
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-        return;
-    }
-    
-    // Check permissions
-    if (!current_user_can('edit_post', $post_id)) {
-        return;
-    }
-    
-    // Save bundle enabled status
-    $bundle_enabled = isset($_POST['asl_bundle_enabled']) ? 'yes' : 'no';
-    update_post_meta($post_id, '_asl_bundle_enabled', $bundle_enabled);
-});
-
-// ============================================================================
-// ASL FREE GIFTS - REST API ENDPOINTS & ADMIN PAGE
-// ============================================================================
-
-// Add Free Gifts submenu under WooCommerce
-add_action('admin_menu', function() {
-    add_submenu_page(
-        'woocommerce',
-        'Free Gifts',
-        'Free Gifts',
-        'manage_woocommerce',
-        'asl-free-gifts',
-        'asl_free_gifts_render_admin_page'
-    );
-}, 99);
-
-// Enqueue admin scripts for Free Gifts page
-add_action('admin_enqueue_scripts', function($hook) {
-    if ($hook !== 'woocommerce_page_asl-free-gifts') return;
-    wp_enqueue_script('jquery');
-    wp_enqueue_style('woocommerce_admin_styles');
-});
-
-// Render Free Gifts admin page
-function asl_free_gifts_render_admin_page() {
-    if (!current_user_can('manage_woocommerce')) {
-        wp_die('You do not have sufficient permissions to access this page.');
-    }
-
-    // Handle form submission
-    if (isset($_POST['asl_free_gifts_save']) && check_admin_referer('asl_free_gifts_nonce')) {
-        asl_free_gifts_save_rules();
-        echo '<div class="notice notice-success is-dismissible"><p>Free gift rules saved successfully!</p></div>';
-    }
-
-    // Handle delete action
-    if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['rule_id'])) {
-        if (check_admin_referer('asl_delete_free_gift_' . $_GET['rule_id'])) {
-            asl_free_gifts_delete_rule(sanitize_text_field($_GET['rule_id']));
-            echo '<div class="notice notice-success is-dismissible"><p>Rule deleted successfully!</p></div>';
-        }
-    }
-
-    $rules = get_option('asl_free_gifts_rules', array());
-    $products = asl_free_gifts_get_products_list();
-    $currencies = array('AED', 'SAR', 'KWD', 'BHD', 'OMR', 'QAR', 'USD');
-    
-    ?>
-    <div class="wrap">
-        <h1>Free Gift Rules</h1>
-        <p>Configure automatic free gifts based on cart value thresholds. When a customer's cart reaches the minimum value, the free gift product will be automatically added to their cart.</p>
-        
-        <form method="post" id="asl-free-gifts-form">
-            <?php wp_nonce_field('asl_free_gifts_nonce'); ?>
-            
-            <h2>Global Settings</h2>
-            <table class="form-table">
-                <tr>
-                    <th scope="row">Hide Free Gift Products from Shop</th>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="asl_free_gifts_hide_from_shop" value="1" <?php checked(get_option('asl_free_gifts_hide_from_shop', true)); ?>>
-                            Hide products marked as free gifts from shop listing and search results
-                        </label>
-                    </td>
-                </tr>
-            </table>
-            
-            <h2>Free Gift Rules <button type="button" class="button" id="asl-add-free-gift-rule">+ Add New Rule</button></h2>
-            
-            <div id="asl-free-gifts-rules">
-                <?php if (empty($rules)): ?>
-                    <?php asl_free_gifts_render_rule_row(0, array(), $products, $currencies); ?>
-                <?php else: ?>
-                    <?php foreach ($rules as $index => $rule): ?>
-                        <?php asl_free_gifts_render_rule_row($index, $rule, $products, $currencies); ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-            
-            <p class="submit">
-                <input type="submit" name="asl_free_gifts_save" class="button button-primary" value="Save All Rules">
-            </p>
-        </form>
-        
-        <script>
-        jQuery(document).ready(function($) {
-            var ruleIndex = <?php echo max(0, count($rules) - 1); ?>;
-            
-            $('#asl-add-free-gift-rule').on('click', function() {
-                ruleIndex++;
-                var template = `
-                <div class="asl-free-gift-rule" style="background:#fff;border:1px solid #ccd0d4;padding:20px;margin-bottom:20px;">
-                    <h3>Rule #${ruleIndex + 1} <button type="button" class="button asl-remove-rule" style="float:right;color:#a00;">Remove Rule</button></h3>
-                    <table class="form-table">
-                        <tr>
-                            <th>Enabled</th>
-                            <td><label><input type="checkbox" name="asl_free_gifts_rules[${ruleIndex}][enabled]" value="1" checked> Active</label></td>
-                        </tr>
-                        <tr>
-                            <th>Rule Name</th>
-                            <td><input type="text" name="asl_free_gifts_rules[${ruleIndex}][name]" class="regular-text" placeholder="e.g., Free Gift for orders over 750 AED"></td>
-                        </tr>
-                        <tr>
-                            <th>Minimum Cart Value</th>
-                            <td><input type="number" name="asl_free_gifts_rules[${ruleIndex}][min_cart_value]" class="small-text" min="0" step="0.01" value="0"></td>
-                        </tr>
-                        <tr>
-                            <th>Currency</th>
-                            <td>
-                                <select name="asl_free_gifts_rules[${ruleIndex}][currency]">
-                                    <?php foreach ($currencies as $curr): ?>
-                                    <option value="<?php echo esc_attr($curr); ?>"><?php echo esc_html($curr); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Free Gift Product</th>
-                            <td>
-                                <select name="asl_free_gifts_rules[${ruleIndex}][product_id]" class="regular-text">
-                                    <option value="">-- Select Product --</option>
-                                    <?php foreach ($products as $product): ?>
-                                    <option value="<?php echo esc_attr($product['id']); ?>"><?php echo esc_html($product['name']); ?> (ID: <?php echo esc_html($product['id']); ?>)</option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Priority</th>
-                            <td>
-                                <input type="number" name="asl_free_gifts_rules[${ruleIndex}][priority]" class="small-text" min="1" value="10">
-                                <p class="description">Lower number = higher priority. If multiple rules match, only the highest priority gift is added.</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Message (EN)</th>
-                            <td><input type="text" name="asl_free_gifts_rules[${ruleIndex}][message_en]" class="large-text" placeholder="Congratulations! You've earned a free gift!"></td>
-                        </tr>
-                        <tr>
-                            <th>Message (AR)</th>
-                            <td><input type="text" name="asl_free_gifts_rules[${ruleIndex}][message_ar]" class="large-text" dir="rtl" placeholder="تهانينا! لقد حصلت على هدية مجانية!"></td>
-                        </tr>
-                    </table>
-                </div>`;
-                $('#asl-free-gifts-rules').append(template);
-            });
-            
-            $(document).on('click', '.asl-remove-rule', function() {
-                if (confirm('Are you sure you want to remove this rule?')) {
-                    $(this).closest('.asl-free-gift-rule').remove();
-                }
-            });
-        });
-        </script>
-    </div>
-    <?php
-}
-
-// Render a single rule row
-function asl_free_gifts_render_rule_row($index, $rule, $products, $currencies) {
-    $enabled = isset($rule['enabled']) ? $rule['enabled'] : true;
-    $name = isset($rule['name']) ? $rule['name'] : '';
-    $min_cart_value = isset($rule['min_cart_value']) ? $rule['min_cart_value'] : 0;
-    $currency = isset($rule['currency']) ? $rule['currency'] : 'AED';
-    $product_id = isset($rule['product_id']) ? $rule['product_id'] : '';
-    $priority = isset($rule['priority']) ? $rule['priority'] : 10;
-    $message_en = isset($rule['message_en']) ? $rule['message_en'] : '';
-    $message_ar = isset($rule['message_ar']) ? $rule['message_ar'] : '';
-    ?>
-    <div class="asl-free-gift-rule" style="background:#fff;border:1px solid #ccd0d4;padding:20px;margin-bottom:20px;">
-        <h3>Rule #<?php echo $index + 1; ?> <button type="button" class="button asl-remove-rule" style="float:right;color:#a00;">Remove Rule</button></h3>
-        <table class="form-table">
-            <tr>
-                <th>Enabled</th>
-                <td><label><input type="checkbox" name="asl_free_gifts_rules[<?php echo $index; ?>][enabled]" value="1" <?php checked($enabled); ?>> Active</label></td>
-            </tr>
-            <tr>
-                <th>Rule Name</th>
-                <td><input type="text" name="asl_free_gifts_rules[<?php echo $index; ?>][name]" value="<?php echo esc_attr($name); ?>" class="regular-text" placeholder="e.g., Free Gift for orders over 750 AED"></td>
-            </tr>
-            <tr>
-                <th>Minimum Cart Value</th>
-                <td><input type="number" name="asl_free_gifts_rules[<?php echo $index; ?>][min_cart_value]" value="<?php echo esc_attr($min_cart_value); ?>" class="small-text" min="0" step="0.01"></td>
-            </tr>
-            <tr>
-                <th>Currency</th>
-                <td>
-                    <select name="asl_free_gifts_rules[<?php echo $index; ?>][currency]">
-                        <?php foreach ($currencies as $curr): ?>
-                        <option value="<?php echo esc_attr($curr); ?>" <?php selected($currency, $curr); ?>><?php echo esc_html($curr); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th>Free Gift Product</th>
-                <td>
-                    <select name="asl_free_gifts_rules[<?php echo $index; ?>][product_id]" class="regular-text">
-                        <option value="">-- Select Product --</option>
-                        <?php foreach ($products as $product): ?>
-                        <option value="<?php echo esc_attr($product['id']); ?>" <?php selected($product_id, $product['id']); ?>><?php echo esc_html($product['name']); ?> (ID: <?php echo esc_html($product['id']); ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th>Priority</th>
-                <td>
-                    <input type="number" name="asl_free_gifts_rules[<?php echo $index; ?>][priority]" value="<?php echo esc_attr($priority); ?>" class="small-text" min="1">
-                    <p class="description">Lower number = higher priority. If multiple rules match, only the highest priority gift is added.</p>
-                </td>
-            </tr>
-            <tr>
-                <th>Message (EN)</th>
-                <td><input type="text" name="asl_free_gifts_rules[<?php echo $index; ?>][message_en]" value="<?php echo esc_attr($message_en); ?>" class="large-text" placeholder="Congratulations! You've earned a free gift!"></td>
-            </tr>
-            <tr>
-                <th>Message (AR)</th>
-                <td><input type="text" name="asl_free_gifts_rules[<?php echo $index; ?>][message_ar]" value="<?php echo esc_attr($message_ar); ?>" class="large-text" dir="rtl" placeholder="تهانينا! لقد حصلت على هدية مجانية!"></td>
-            </tr>
-        </table>
-    </div>
-    <?php
-}
-
-// Save free gift rules
-function asl_free_gifts_save_rules() {
-    $hide_from_shop = isset($_POST['asl_free_gifts_hide_from_shop']) ? true : false;
-    update_option('asl_free_gifts_hide_from_shop', $hide_from_shop);
-    
-    $rules = array();
-    if (isset($_POST['asl_free_gifts_rules']) && is_array($_POST['asl_free_gifts_rules'])) {
-        foreach ($_POST['asl_free_gifts_rules'] as $rule) {
-            if (empty($rule['product_id'])) continue; // Skip rules without a product
-            
-            $rules[] = array(
-                'id' => isset($rule['id']) ? sanitize_text_field($rule['id']) : wp_generate_uuid4(),
-                'enabled' => isset($rule['enabled']) ? true : false,
-                'name' => sanitize_text_field($rule['name'] ?? ''),
-                'min_cart_value' => floatval($rule['min_cart_value'] ?? 0),
-                'currency' => sanitize_text_field($rule['currency'] ?? 'AED'),
-                'product_id' => intval($rule['product_id']),
-                'priority' => intval($rule['priority'] ?? 10),
-                'message_en' => sanitize_text_field($rule['message_en'] ?? ''),
-                'message_ar' => sanitize_text_field($rule['message_ar'] ?? ''),
-            );
-        }
-    }
-    
-    // Sort by priority
-    usort($rules, function($a, $b) {
-        return $a['priority'] - $b['priority'];
-    });
-    
-    update_option('asl_free_gifts_rules', $rules);
-}
-
-// Delete a single rule
-function asl_free_gifts_delete_rule($rule_id) {
-    $rules = get_option('asl_free_gifts_rules', array());
-    $rules = array_filter($rules, function($rule) use ($rule_id) {
-        return $rule['id'] !== $rule_id;
-    });
-    update_option('asl_free_gifts_rules', array_values($rules));
-}
-
-// Get list of products for dropdown
-function asl_free_gifts_get_products_list() {
-    $products = array();
-    
-    $args = array(
-        'post_type' => 'product',
-        'posts_per_page' => -1,
-        'post_status' => 'publish',
-        'orderby' => 'title',
-        'order' => 'ASC',
-    );
-    
-    $query = new WP_Query($args);
-    
-    if ($query->have_posts()) {
-        while ($query->have_posts()) {
-            $query->the_post();
-            $products[] = array(
-                'id' => get_the_ID(),
-                'name' => get_the_title(),
-            );
-        }
-        wp_reset_postdata();
-    }
-    
-    return $products;
-}
-
-// REST API endpoint to get free gift rules
-add_action('rest_api_init', function() {
-    register_rest_route('asl-free-gifts/v1', '/rules', array(
-        'methods' => 'GET',
-        'callback' => 'asl_free_gifts_api_get_rules',
-        'permission_callback' => '__return_true',
-    ));
-    
-    register_rest_route('asl-free-gifts/v1', '/settings', array(
-        'methods' => 'GET',
-        'callback' => 'asl_free_gifts_api_get_settings',
-        'permission_callback' => '__return_true',
-    ));
-});
-
-function asl_free_gifts_api_get_rules($request) {
-    $rules = get_option('asl_free_gifts_rules', array());
-    $currency = $request->get_param('currency');
-    
-    // Filter only enabled rules
-    $active_rules = array_filter($rules, function($rule) {
-        return !empty($rule['enabled']);
-    });
-    
-    // Filter by currency if specified
-    if ($currency) {
-        $active_rules = array_filter($active_rules, function($rule) use ($currency) {
-            return $rule['currency'] === $currency;
-        });
-    }
-    
-    // Enrich with product data
-    $enriched_rules = array();
-    foreach ($active_rules as $rule) {
-        $product = wc_get_product($rule['product_id']);
-        if ($product) {
-            $rule['product'] = array(
-                'id' => $product->get_id(),
-                'name' => $product->get_name(),
-                'slug' => $product->get_slug(),
-                'price' => $product->get_price(),
-                'image' => wp_get_attachment_url($product->get_image_id()),
-            );
-        }
-        $enriched_rules[] = $rule;
-    }
-    
-    return array(
-        'success' => true,
-        'rules' => array_values($enriched_rules),
-    );
-}
-
-function asl_free_gifts_api_get_settings() {
-    return array(
-        'success' => true,
-        'hide_from_shop' => get_option('asl_free_gifts_hide_from_shop', true),
-    );
-}
-
-// Get array of free gift product IDs (for hiding from shop)
-function asl_free_gifts_get_product_ids() {
-    $rules = get_option('asl_free_gifts_rules', array());
-    $product_ids = array();
-    
-    foreach ($rules as $rule) {
-        if (!empty($rule['product_id'])) {
-            $product_ids[] = intval($rule['product_id']);
-        }
-    }
-    
-    return array_unique($product_ids);
-}
-
-// Hide free gift products from shop if setting is enabled
-add_action('woocommerce_product_query', function($query) {
-    if (is_admin()) return;
-    if (!get_option('asl_free_gifts_hide_from_shop', true)) return;
-    
-    $free_gift_ids = asl_free_gifts_get_product_ids();
-    if (empty($free_gift_ids)) return;
-    
-    $query->set('post__not_in', array_merge(
-        $query->get('post__not_in') ?: array(),
-        $free_gift_ids
-    ));
-});
-
-// Also hide from WooCommerce Store API (for headless/Next.js frontend)
-add_filter('woocommerce_rest_product_object_query', function($args, $request) {
-    if (!get_option('asl_free_gifts_hide_from_shop', true)) return $args;
-    
-    $free_gift_ids = asl_free_gifts_get_product_ids();
-    if (empty($free_gift_ids)) return $args;
-    
-    $existing_exclude = isset($args['post__not_in']) ? $args['post__not_in'] : array();
-    $args['post__not_in'] = array_merge($existing_exclude, $free_gift_ids);
-    
-    return $args;
-}, 10, 2);
-
-// Hide from search results
-add_filter('woocommerce_product_search_results', function($product_ids) {
-    if (!get_option('asl_free_gifts_hide_from_shop', true)) return $product_ids;
-    
-    $free_gift_ids = asl_free_gifts_get_product_ids();
-    if (empty($free_gift_ids)) return $product_ids;
-    
-    return array_diff($product_ids, $free_gift_ids);
-});
+// Initialize ASL Settings
+asl_settings_init();

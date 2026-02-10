@@ -1,13 +1,76 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from "react";
 import useSWR, { mutate } from "swr";
 import type { CoCartResponse, CoCartItem } from "@/lib/api/cocart";
 import { getAuthToken } from "@/lib/api/auth";
 import { useNotification } from "./NotificationContext";
+import { useAuth } from "./AuthContext";
+import { getBundleItems, getBundleItemsTotal } from "@/components/cart/BundleItemsList";
+import { getBundleData } from "@/lib/utils/bundleStorage";
 
 // Cache key now includes locale for proper multilingual support
 const getCartCacheKey = (locale: string) => `/api/cart?locale=${locale}`;
+
+// LocalStorage cache key for cart data (temporary caching strategy)
+const CART_STORAGE_KEY = "asl_cart_cache";
+const CART_CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL for localStorage cache
+
+interface CachedCartData {
+  cart: CoCartResponse;
+  locale: string;
+  timestamp: number;
+}
+
+// Get cached cart from localStorage
+function getCachedCart(locale: string): CoCartResponse | null {
+  if (typeof window === "undefined") return null;
+  
+  try {
+    const cached = localStorage.getItem(CART_STORAGE_KEY);
+    if (!cached) return null;
+    
+    const data: CachedCartData = JSON.parse(cached);
+    
+    // Check if cache is for the same locale and not expired
+    if (data.locale !== locale) return null;
+    if (Date.now() - data.timestamp > CART_CACHE_TTL) {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      return null;
+    }
+    
+    return data.cart;
+  } catch {
+    return null;
+  }
+}
+
+// Save cart to localStorage cache
+function setCachedCart(cart: CoCartResponse, locale: string): void {
+  if (typeof window === "undefined") return;
+  
+  try {
+    const data: CachedCartData = {
+      cart,
+      locale,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // Ignore storage errors (quota exceeded, etc.)
+  }
+}
+
+// Clear cart cache from localStorage
+function clearCachedCart(): void {
+  if (typeof window === "undefined") return;
+  
+  try {
+    localStorage.removeItem(CART_STORAGE_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 function getHeaders(): HeadersInit {
   const headers: HeadersInit = {
@@ -85,18 +148,65 @@ export function CartProvider({ children, locale }: CartProviderProps) {
   // Use locale-aware cache key for proper multilingual support
   const cacheKey = getCartCacheKey(locale);
   
-  // Use SWR for cart data with automatic caching and deduplication
-  const { data: cart, isLoading: swrLoading, isValidating } = useSWR<CoCartResponse | null>(
+  // Get authentication state to refresh cart after login
+  const { isAuthenticated, user } = useAuth();
+  const wasAuthenticatedRef = useRef(isAuthenticated);
+  
+  // Get cached cart from localStorage for faster initial load
+  const cachedCart = useMemo(() => getCachedCart(locale), [locale]);
+  
+  // Use SWR for cart data with caching strategy optimized for cart/checkout load
+  // - Uses localStorage cache as fallback data for instant initial render
+  // - Increased dedupingInterval to reduce redundant requests during checkout
+  // - keepPreviousData: false to prevent showing wrong locale data when switching locales
+  const { data: cart, isLoading: swrLoading, isValidating, mutate: mutateCart } = useSWR<CoCartResponse | null>(
     cacheKey,
     cartFetcher,
     {
-      revalidateOnFocus: false,
+      fallbackData: cachedCart, // Use localStorage cache for instant initial render
+      revalidateOnFocus: true, // Refresh cart when user returns to tab
       revalidateOnReconnect: true,
-      dedupingInterval: 5000, // Dedupe requests within 5 seconds
+      revalidateIfStale: true, // Revalidate stale data in background
+      revalidateOnMount: !cachedCart, // Skip initial fetch if we have cached data (will revalidate in background)
+      dedupingInterval: 5000, // 5 seconds deduplication to reduce requests during checkout flow
       errorRetryCount: 2,
       keepPreviousData: false, // Don't keep previous data when locale changes
     }
   );
+
+  // Update localStorage cache whenever cart data changes
+  useEffect(() => {
+    if (cart) {
+      setCachedCart(cart, locale);
+    }
+  }, [cart, locale]);
+
+  // Ensure cart is fetched on initial mount - this handles cases where
+  // the user returns to the site after closing the browser
+  useEffect(() => {
+    // Small delay to ensure cookies are available after page load
+    const timer = setTimeout(() => {
+      mutateCart();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [mutateCart]);
+
+  // Refresh cart when user logs in - this ensures the authenticated user's
+  // cart is loaded immediately after login
+  useEffect(() => {
+    // Check if user just logged in (transition from not authenticated to authenticated)
+    if (isAuthenticated && !wasAuthenticatedRef.current) {
+      // Clear cached cart on login to ensure fresh data for authenticated user
+      clearCachedCart();
+      // Small delay to ensure auth cookies are set before fetching cart
+      const timer = setTimeout(() => {
+        mutateCart();
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+    // Update the ref to track current auth state
+    wasAuthenticatedRef.current = isAuthenticated;
+  }, [isAuthenticated, user, mutateCart]);
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedCoupons, setSelectedCoupons] = useState<SelectedCoupon[]>([]);
@@ -168,6 +278,8 @@ export function CartProvider({ children, locale }: CartProviderProps) {
         // Update cache with actual data
         await mutate(cacheKey, data.cart, false);
         notify("cart", "Item added to cart");
+        // Open cart drawer after successfully adding item
+        setIsCartOpen(true);
       } catch (error) {
         // Rollback on error
         await mutate(cacheKey);
@@ -276,6 +388,9 @@ export function CartProvider({ children, locale }: CartProviderProps) {
   const clearCart = useCallback(async () => {
     setIsOperationLoading(true);
 
+    // Clear localStorage cache immediately
+    clearCachedCart();
+
     // Optimistically clear the cart
     await mutate(
       cacheKey,
@@ -377,22 +492,85 @@ export function CartProvider({ children, locale }: CartProviderProps) {
     setSelectedCoupons([]);
   }, []);
 
-  const cartItems = cart?.items || [];
+  const cartItems = useMemo(() => cart?.items || [], [cart?.items]);
   const cartItemsCount = cart?.item_count || 0;
-  const cartSubtotal = cart?.totals?.subtotal || "0";
-  const cartTotal = cart?.totals?.total || "0";
+  const rawCartSubtotal = cart?.totals?.subtotal || "0";
+  const rawCartTotal = cart?.totals?.total || "0";
 
-  const couponDiscount = selectedCoupons.reduce((total, coupon) => {
-    const subtotal = parseFloat(cartSubtotal);
-    const amount = parseFloat(coupon.amount);
+  // Calculate the total bundle items price across all cart items
+  // This is needed because CoCart only knows about the base product price, not the bundle items
+  // However, if pricing_mode is set (from PHP backend), the cart item price is already correct
+  // and we should NOT add any adjustment to avoid double-counting
+  const bundleItemsAdjustment = useMemo(() => {
+    if (!cartItems || cartItems.length === 0) return 0;
     
-    if (coupon.discount_type === "percent") {
-      return total + (subtotal * amount / 100);
-    } else if (coupon.discount_type === "fixed_cart") {
-      return total + amount;
-    }
-    return total;
-  }, 0);
+    const currencyMinorUnit = cart?.currency?.currency_minor_unit ?? 2;
+    const divisor = Math.pow(10, currencyMinorUnit);
+    
+    return cartItems.reduce((total, item) => {
+      const bundleItems = getBundleItems(item);
+      if (bundleItems && bundleItems.length > 0) {
+        // Check if pricing_mode was explicitly set (not just defaulting to "sum")
+        // We check both cart_item_data (from PHP) and localStorage (from bundle builder)
+        // The localStorage uses the bundleStorage utility which stores data under "asl_bundle_cart_data"
+        // with product IDs as keys
+        const storedBundleData = getBundleData(item.id);
+        const hasExplicitPricingMode = 
+          item.cart_item_data?.pricing_mode !== undefined ||
+          storedBundleData?.pricing_mode !== undefined;
+        
+        // If pricing_mode is explicitly set, skip adjustment - the bundle builder
+        // has already calculated the correct total (either fixed price or sum)
+        // and the cart item price reflects this
+        if (hasExplicitPricingMode) {
+          return total;
+        }
+        
+        // Legacy fallback: if no pricing_mode anywhere, add bundle items total (old behavior)
+        const bundleItemsTotal = getBundleItemsTotal(bundleItems);
+        const quantity = item.quantity?.value || 1;
+        // Convert to minor units (same format as CoCart subtotal)
+        return total + (bundleItemsTotal * quantity * divisor);
+      }
+      return total;
+    }, 0);
+  }, [cartItems, cart?.currency?.currency_minor_unit]);
+
+  // Adjusted cart subtotal that includes bundle items price
+  // Round to avoid floating-point precision errors
+  const cartSubtotal = useMemo(() => {
+    const rawSubtotal = parseFloat(rawCartSubtotal) || 0;
+    const total = rawSubtotal + bundleItemsAdjustment;
+    // Round to nearest integer (minor units are already integers)
+    return Math.round(total).toString();
+  }, [rawCartSubtotal, bundleItemsAdjustment]);
+
+  // Adjusted cart total that includes bundle items price
+  // The total from CoCart doesn't include bundle items, so we need to add the adjustment
+  // Round to avoid floating-point precision errors
+  const cartTotal = useMemo(() => {
+    const rawTotal = parseFloat(rawCartTotal) || 0;
+    const total = rawTotal + bundleItemsAdjustment;
+    // Round to nearest integer (minor units are already integers)
+    return Math.round(total).toString();
+  }, [rawCartTotal, bundleItemsAdjustment]);
+
+  // Calculate coupon discount with proper rounding to avoid floating-point errors
+  const couponDiscount = useMemo(() => {
+    return selectedCoupons.reduce((total, coupon) => {
+      const subtotal = parseFloat(cartSubtotal);
+      const amount = parseFloat(coupon.amount);
+      
+      if (coupon.discount_type === "percent") {
+        // Round percent discount to avoid floating-point precision errors
+        const discount = Math.round(subtotal * amount / 100);
+        return total + discount;
+      } else if (coupon.discount_type === "fixed_cart") {
+        return total + amount;
+      }
+      return total;
+    }, 0);
+  }, [selectedCoupons, cartSubtotal]);
 
   // Normalize cart to null if undefined (SWR returns undefined before first fetch)
   const normalizedCart = cart ?? null;

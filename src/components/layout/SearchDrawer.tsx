@@ -14,7 +14,8 @@ import type { Locale } from "@/config/site";
 import type { WCProduct } from "@/types/woocommerce";
 import { getProducts } from "@/lib/api/woocommerce";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
-import { getProductSlugFromPermalink } from "@/lib/utils";
+import { getProductSlugFromPermalink, decodeHtmlEntities } from "@/lib/utils";
+import { useFreeGift } from "@/contexts/FreeGiftContext";
 
 interface SearchDrawerProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export function SearchDrawer({
   dictionary,
 }: SearchDrawerProps) {
   const router = useRouter();
+  const { getFreeGiftProductIds } = useFreeGift();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<WCProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,14 +53,19 @@ export function SearchDrawer({
         per_page: 6,
         locale,
       });
-      setResults(response.products);
+      // Filter out free gift products from search results
+      const freeGiftIds = getFreeGiftProductIds();
+      const filteredProducts = response.products.filter(
+        (product) => !freeGiftIds.includes(product.id)
+      );
+      setResults(filteredProducts);
     } catch (error) {
       console.error("Search error:", error);
       setResults([]);
     } finally {
       setLoading(false);
     }
-  }, [locale]);
+  }, [locale, getFreeGiftProductIds]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,12 +86,15 @@ export function SearchDrawer({
     return () => clearTimeout(timeoutId);
   };
 
-  const handleClose = () => {
-    setQuery("");
-    setResults([]);
-    setHasSearched(false);
-    onClose();
-  };
+    const handleClose = useCallback(() => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      setQuery("");
+      setResults([]);
+      setHasSearched(false);
+      onClose();
+    }, [onClose]);
 
   return (
     <MuiDrawer
@@ -189,12 +199,24 @@ export function SearchDrawer({
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
+                      {product.categories?.[0] && (
+                        <p className="text-[10px] font-medium uppercase tracking-wider text-amber-600 truncate">
+                          {decodeHtmlEntities(product.categories[0].name)}
+                        </p>
+                      )}
                       <h3 className="font-medium text-gray-900 truncate uppercase">{product.name}</h3>
                       <FormattedPrice
                         price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
                         className="text-sm font-semibold text-gray-700"
                         iconSize="xs"
                       />
+                      {product.attributes && product.attributes.length > 0 && (
+                        <p className="text-[10px] text-gray-500 truncate mt-0.5">
+                          {product.attributes.slice(0, 2).map((attr) => 
+                            `${attr.name}: ${attr.terms?.map(t => t.name).join(", ")}`
+                          ).join(" | ")}
+                        </p>
+                      )}
                     </div>
                   </Link>
                 );

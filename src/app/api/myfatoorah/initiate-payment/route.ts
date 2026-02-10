@@ -1,8 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getEnvVar } from "@/lib/utils/loadEnv";
 
-const MYFATOORAH_API_URL = process.env.MYFATOORAH_TEST_MODE === "true"
-  ? "https://apitest.myfatoorah.com/v2/SendPayment"
-  : "https://api.myfatoorah.com/v2/SendPayment";
+function parsePhoneForMyFatoorah(phone: string | undefined): { localNumber: string; countryCode: string } {
+  if (!phone) return { localNumber: "", countryCode: "" };
+  
+  let normalized = phone.replace(/[\s\-\(\)]/g, "");
+  
+  if (normalized.startsWith("+")) {
+    normalized = normalized.substring(1);
+  }
+  
+  const countryCodePrefixes = [
+    "00971", "00966", "00965", "00973", "00968", "00974", "00962", "0020",
+    "971", "966", "965", "973", "968", "974", "962", "20"
+  ];
+  
+  let detectedCode = "";
+  for (const prefix of countryCodePrefixes) {
+    if (normalized.startsWith(prefix)) {
+      detectedCode = prefix.startsWith("00") ? prefix.substring(2) : prefix;
+      normalized = normalized.substring(prefix.length);
+      break;
+    }
+  }
+  
+  if (normalized.startsWith("0")) {
+    normalized = normalized.substring(1);
+  }
+  
+  return {
+    localNumber: normalized.substring(0, 11),
+    countryCode: detectedCode ? `+${detectedCode}` : "",
+  };
+}
+
+function getMyFatoorahApiBaseUrl(): string {
+  if (getEnvVar("MYFATOORAH_TEST_MODE") === "true") {
+    return "https://apitest.myfatoorah.com";
+  }
+  
+  const country = (getEnvVar("MYFATOORAH_COUNTRY") || "KWT").toUpperCase();
+  
+  switch (country) {
+    case "AE":
+    case "UAE":
+      return "https://api-ae.myfatoorah.com";
+    case "SA":
+    case "SAU":
+      return "https://api-sa.myfatoorah.com";
+    case "QA":
+    case "QAT":
+      return "https://api-qa.myfatoorah.com";
+    case "EG":
+    case "EGY":
+      return "https://api-eg.myfatoorah.com";
+    case "PORTAL":
+    case "MAIN":
+    case "KW":
+    case "KWT":
+    case "BH":
+    case "BHR":
+    case "JO":
+    case "JOR":
+    case "OM":
+    case "OMN":
+    default:
+      return "https://api.myfatoorah.com";
+  }
+}
 
 interface InitiatePaymentRequest {
   order_id: number;
@@ -19,9 +84,10 @@ interface InitiatePaymentRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.MYFATOORAH_API_KEY;
+    const apiKey = getEnvVar("MYFATOORAH_API_KEY");
     
     if (!apiKey) {
+      console.error("MyFatoorah API Error: MYFATOORAH_API_KEY environment variable is not configured");
       return NextResponse.json(
         {
           success: false,
@@ -35,6 +101,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body: InitiatePaymentRequest = await request.json();
+    
+    console.log("MyFatoorah initiate-payment request:", {
+      order_id: body.order_id,
+      invoice_value: body.invoice_value,
+      currency_iso: body.currency_iso,
+    });
     
     const {
       order_id,
@@ -62,13 +134,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const paymentData = {
+    const parsedPhone = parsePhoneForMyFatoorah(customer_phone);
+
+    const paymentData: Record<string, unknown> = {
       NotificationOption: "LNK",
       InvoiceValue: invoice_value,
+      DisplayCurrencyIso: currency_iso,
       CustomerName: customer_name,
       CustomerEmail: customer_email || "",
-      CustomerMobile: customer_phone || "",
-      DisplayCurrencyIso: currency_iso,
+      CustomerMobile: parsedPhone.localNumber,
+      ...(parsedPhone.countryCode && { MobileCountryCode: parsedPhone.countryCode }),
       CallBackUrl: `${callback_url}?order_id=${order_id}&order_key=${order_key}`,
       ErrorUrl: `${error_url}?order_id=${order_id}&order_key=${order_key}`,
       Language: language,
@@ -76,7 +151,7 @@ export async function POST(request: NextRequest) {
       UserDefinedField: order_key,
     };
 
-    const response = await fetch(MYFATOORAH_API_URL, {
+    const response = await fetch(`${getMyFatoorahApiBaseUrl()}/v2/SendPayment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,6 +181,7 @@ export async function POST(request: NextRequest) {
       invoice_id: data.Data?.InvoiceId,
     });
   } catch (error) {
+    console.error("MyFatoorah initiate-payment error:", error);
     return NextResponse.json(
       {
         success: false,

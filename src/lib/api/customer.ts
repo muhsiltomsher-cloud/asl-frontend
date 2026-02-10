@@ -1,3 +1,6 @@
+import { getCountryTimezone } from "@/lib/utils";
+import { countries } from "@/components/common/CountrySelect";
+
 export interface CustomerAddress {
   first_name: string;
   last_name: string;
@@ -10,6 +13,18 @@ export interface CustomerAddress {
   country: string;
   email?: string;
   phone?: string;
+}
+
+export interface SavedAddress extends CustomerAddress {
+  id: string;
+  label: string;
+  is_default: boolean;
+}
+
+export interface CustomerMetaData {
+  id?: number;
+  key: string;
+  value: string | SavedAddress[];
 }
 
 export interface Customer {
@@ -25,6 +40,15 @@ export interface Customer {
   shipping: CustomerAddress;
   is_paying_customer: boolean;
   avatar_url: string;
+  meta_data?: CustomerMetaData[];
+}
+
+export interface OrderLineItemMetaData {
+  id: number;
+  key: string;
+  value: string | number | boolean | Record<string, unknown> | Array<unknown>;
+  display_key?: string;
+  display_value?: string;
 }
 
 export interface OrderLineItem {
@@ -39,13 +63,22 @@ export interface OrderLineItem {
   total: string;
   total_tax: string;
   taxes: Array<{ id: number; total: string; subtotal: string }>;
-  meta_data: Array<{ id: number; key: string; value: string }>;
+  meta_data: OrderLineItemMetaData[];
   sku: string;
   price: number;
   image: {
     id: number;
     src: string;
   };
+}
+
+export interface OrderNote {
+  id: number;
+  author: string;
+  date_created: string;
+  date_created_gmt: string;
+  note: string;
+  customer_note: boolean;
 }
 
 export interface Order {
@@ -306,6 +339,45 @@ export async function getOrder(
   }
 }
 
+export async function getOrderNotes(
+  orderId: number
+): Promise<CustomerOperationResponse<OrderNote[]>> {
+  try {
+    const response = await fetch(`/api/orders/notes?orderId=${orderId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || {
+          code: "notes_error",
+          message: "Failed to get order notes.",
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "network_error",
+        message:
+          error instanceof Error ? error.message : "Network error occurred",
+      },
+    };
+  }
+}
+
 export async function updateCustomerAddress(
   customerId: number,
   addressType: "billing" | "shipping",
@@ -384,11 +456,309 @@ export function formatPrice(
   return `${currencySymbol} ${numPrice.toFixed(2)}`;
 }
 
-export function formatDate(dateString: string, locale: string = "en"): string {
+export function formatDate(dateString: string, locale: string = "en", country?: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+  const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",
     day: "numeric",
+  };
+  if (country) {
+    const tz = getCountryTimezone(country);
+    if (tz) options.timeZone = tz;
+  }
+  return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", options);
+}
+
+const SAVED_ADDRESSES_KEY = "asl_saved_addresses";
+
+function isAddressPopulated(address: CustomerAddress | undefined): boolean {
+  if (!address) return false;
+  return !!(address.address_1 || address.city || address.first_name);
+}
+
+export function resolveCountryCode(country: string): string {
+  if (!country) return "AE";
+  if (country.length === 2) return country.toUpperCase();
+  const found = countries.find(
+    (c) =>
+      c.label.toLowerCase() === country.toLowerCase() ||
+      c.labelAr === country
+  );
+  return found?.value || "AE";
+}
+
+function customerAddressToSavedAddress(
+  address: CustomerAddress,
+  type: "billing" | "shipping"
+): SavedAddress {
+  return {
+    id: `wc_${type}`,
+    label: type === "billing" ? "Billing Address" : "Shipping Address",
+    first_name: address.first_name || "",
+    last_name: address.last_name || "",
+    company: address.company || "",
+    address_1: address.address_1 || "",
+    address_2: address.address_2 || "",
+    city: address.city || "",
+    state: address.state || "",
+    postcode: address.postcode || "",
+    country: resolveCountryCode(address.country),
+    phone: address.phone || "",
+    email: address.email || "",
+    is_default: type === "billing",
+  };
+}
+
+export function getSavedAddressesFromCustomer(customer: Customer): SavedAddress[] {
+  let addresses: SavedAddress[] = [];
+
+  if (customer.meta_data) {
+    const addressesMeta = customer.meta_data.find(
+      (meta) => meta.key === SAVED_ADDRESSES_KEY
+    );
+
+    if (addressesMeta) {
+      if (typeof addressesMeta.value === "string") {
+        try {
+          addresses = JSON.parse(addressesMeta.value) as SavedAddress[];
+        } catch {
+          addresses = [];
+        }
+      } else {
+        addresses = addressesMeta.value as SavedAddress[];
+      }
+    }
+  }
+
+  if (addresses.length === 0) {
+    if (isAddressPopulated(customer.billing)) {
+      addresses.push(customerAddressToSavedAddress(customer.billing, "billing"));
+    }
+    if (
+      isAddressPopulated(customer.shipping) &&
+      customer.shipping.address_1 !== customer.billing?.address_1
+    ) {
+      addresses.push(customerAddressToSavedAddress(customer.shipping, "shipping"));
+    }
+  }
+
+  return addresses;
+}
+
+export function getDefaultAddress(addresses: SavedAddress[]): SavedAddress | null {
+  return addresses.find((addr) => addr.is_default) || addresses[0] || null;
+}
+
+export async function getSavedAddresses(
+  customerId: number
+): Promise<CustomerOperationResponse<SavedAddress[]>> {
+  try {
+    const customerResponse = await getCustomer(customerId);
+    if (!customerResponse.success || !customerResponse.data) {
+      return {
+        success: false,
+        error: customerResponse.error || {
+          code: "customer_error",
+          message: "Failed to get customer.",
+        },
+      };
+    }
+
+    const addresses = getSavedAddressesFromCustomer(customerResponse.data);
+    return { success: true, data: addresses };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "network_error",
+        message: error instanceof Error ? error.message : "Network error occurred",
+      },
+    };
+  }
+}
+
+export async function saveSavedAddresses(
+  customerId: number,
+  addresses: SavedAddress[]
+): Promise<CustomerOperationResponse<Customer>> {
+  try {
+    const response = await fetch(`/api/customer?customerId=${customerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        meta_data: [
+          {
+            key: SAVED_ADDRESSES_KEY,
+            value: JSON.stringify(addresses),
+          },
+        ],
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || {
+          code: "address_save_error",
+          message: "Failed to save addresses.",
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "network_error",
+        message: error instanceof Error ? error.message : "Network error occurred",
+      },
+    };
+  }
+}
+
+export async function addSavedAddress(
+  customerId: number,
+  address: Omit<SavedAddress, "id">,
+  existingAddresses: SavedAddress[]
+): Promise<CustomerOperationResponse<Customer>> {
+  const newAddress: SavedAddress = {
+    ...address,
+    id: `addr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+  };
+
+  let updatedAddresses = [...existingAddresses];
+  
+  if (newAddress.is_default) {
+    updatedAddresses = updatedAddresses.map((addr) => ({
+      ...addr,
+      is_default: false,
+    }));
+  }
+  
+  updatedAddresses.push(newAddress);
+
+  return saveSavedAddresses(customerId, updatedAddresses);
+}
+
+export async function updateSavedAddress(
+  customerId: number,
+  addressId: string,
+  updates: Partial<SavedAddress>,
+  existingAddresses: SavedAddress[]
+): Promise<CustomerOperationResponse<Customer>> {
+  let updatedAddresses = existingAddresses.map((addr) => {
+    if (addr.id === addressId) {
+      return { ...addr, ...updates };
+    }
+    return addr;
   });
+
+  if (updates.is_default) {
+    updatedAddresses = updatedAddresses.map((addr) => ({
+      ...addr,
+      is_default: addr.id === addressId,
+    }));
+  }
+
+  return saveSavedAddresses(customerId, updatedAddresses);
+}
+
+export async function deleteSavedAddress(
+  customerId: number,
+  addressId: string,
+  existingAddresses: SavedAddress[]
+): Promise<CustomerOperationResponse<Customer>> {
+  const updatedAddresses = existingAddresses.filter((addr) => addr.id !== addressId);
+  
+  if (updatedAddresses.length > 0 && !updatedAddresses.some((addr) => addr.is_default)) {
+    updatedAddresses[0].is_default = true;
+  }
+
+  return saveSavedAddresses(customerId, updatedAddresses);
+}
+
+export async function setDefaultAddress(
+  customerId: number,
+  addressId: string,
+  existingAddresses: SavedAddress[]
+): Promise<CustomerOperationResponse<Customer>> {
+  const updatedAddresses = existingAddresses.map((addr) => ({
+    ...addr,
+    is_default: addr.id === addressId,
+  }));
+
+  return saveSavedAddresses(customerId, updatedAddresses);
+}
+
+export function generateAddressId(): string {
+  return `addr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
+export const CANCELLABLE_ORDER_STATUSES = ["pending", "processing", "on-hold"];
+
+export function canCancelOrder(status: string): boolean {
+  return CANCELLABLE_ORDER_STATUSES.includes(status);
+}
+
+export interface CancelOrderResponse {
+  success: boolean;
+  message?: string;
+  order?: {
+    id: number;
+    status: string;
+  };
+  error?: CustomerError;
+}
+
+export async function cancelOrder(
+  orderId: number,
+  reason?: string
+): Promise<CancelOrderResponse> {
+  try {
+    const response = await fetch("/api/orders/cancel", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        reason: reason,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || {
+          code: "cancel_error",
+          message: "Failed to cancel order.",
+        },
+      };
+    }
+
+    return {
+      success: true,
+      message: result.message,
+      order: result.order,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: {
+        code: "network_error",
+        message: error instanceof Error ? error.message : "Network error occurred",
+      },
+    };
+  }
 }

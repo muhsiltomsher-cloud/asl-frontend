@@ -6,11 +6,13 @@ A modern, bilingual (English/Arabic) headless e-commerce frontend built with Nex
 
 - **Next.js 15 App Router** - Server-side rendering for SEO and performance
 - **Bilingual Support** - English and Arabic (RTL) with seamless language switching
-- **Multi-Currency** - Support for BHD, KWD, OMR, QAR, SAR, USD with persistent selection
-- **WordPress/WooCommerce Backend** - Headless CMS via WPGraphQL
+- **Multi-Currency** - Support for AED, BHD, KWD, OMR, QAR, SAR, USD with persistent selection
+- **WordPress/WooCommerce Backend** - Headless CMS via REST API and Store API
 - **Tailwind CSS** - Utility-first styling with RTL support
 - **TypeScript** - Full type safety throughout the codebase
-- **SEO Optimized** - Metadata, hreflang, structured data (JSON-LD), sitemaps
+- **SEO Optimized** - Metadata, hreflang, structured data (Product, Offer, BreadcrumbList, Organization)
+- **Image Optimization** - Blur placeholders, lazy loading, error handling with logo fallback
+- **Payment Integration** - MyFatoorah, Tabby, Tamara, Cash on Delivery
 
 ## Project Structure
 
@@ -127,6 +129,51 @@ The project can be deployed to any platform that supports Next.js:
 - AWS Amplify
 - Self-hosted with Node.js
 
+## Caching Strategy
+
+This app uses a multi-layer caching strategy optimized for SSR with Cloudflare CDN.
+
+### Next.js ISR (Incremental Static Regeneration)
+
+Pages use `revalidate` for time-based cache invalidation:
+- Home page: 60 seconds
+- Product pages: 300 seconds (5 minutes)
+- Categories: 600 seconds (10 minutes)
+
+### Cloudflare Cache Rules
+
+When using Cloudflare as CDN, configure these cache rules:
+
+| Route Pattern | Cache Behavior | Reason |
+|---------------|----------------|--------|
+| `/cart`, `/checkout`, `/account/*`, `/api/*` | **Bypass** | User-specific, session-dependent |
+| `/_next/static/*`, images, fonts | **Cache 1 month** | Content-hashed, safe to cache |
+| All other HTML | **Default (ISR)** | Let Next.js control freshness |
+
+**Important:** Never enable "Cache Everything" for HTML pages - this breaks cart, checkout, and authentication flows.
+
+See `TODO-LIVE.md` for detailed Cloudflare rule expressions and verification checklist.
+
+## Recent Updates (January 2026)
+
+### PR #536 - Minor Issues Fix
+- Fixed SEO title duplication (was showing site name twice)
+- Fixed Next.js Image warning for flag icons in currency switcher
+- Added blur placeholders to all product images for better loading UX
+
+### PR #537 - Image Error Handling
+- Added graceful fallback when product images fail to load
+- Displays ASL logo on amber gradient background instead of broken images
+
+### Testing Status
+All 7 testing criteria passed in both English and Arabic:
+- Functional, Data Correctness, UI/UX, Performance, Security, SEO: PASS
+- Payment: PARTIAL (forms work, full flow needs real payment testing)
+
+See `TODO-LIVE.md` for detailed testing results and remaining backend issues.
+
 ## License
 
 This project is proprietary software for Aromatic Scents Lab.
+
+<!-- Test PR access verification -->

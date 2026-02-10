@@ -4,14 +4,16 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { getCookie, setCookie } from "cookies-next";
 import { siteConfig, API_BASE_CURRENCY, type Currency } from "@/config/site";
 
-// Minimal default currency (will be replaced by API data)
-const DEFAULT_CURRENCY: CurrencyData = {
-  code: "AED",
-  label: "UAE (AED)",
-  symbol: "د.إ",
-  decimals: 2,
-  rateFromAED: 1,
-};
+// Default currencies (will be replaced by API data)
+const DEFAULT_CURRENCIES: CurrencyData[] = [
+  { code: "AED", label: "UAE (AED)", symbol: "د.إ", decimals: 2, rateFromAED: 1 },
+  { code: "BHD", label: "Bahrain (BHD)", symbol: "BD", decimals: 3, rateFromAED: 0.103 },
+  { code: "KWD", label: "Kuwait (KWD)", symbol: "KD", decimals: 3, rateFromAED: 0.083 },
+  { code: "OMR", label: "Oman (OMR)", symbol: "ر.ع.", decimals: 3, rateFromAED: 0.105 },
+  { code: "QAR", label: "Qatar (QAR)", symbol: "QR", decimals: 2, rateFromAED: 0.99 },
+  { code: "SAR", label: "Saudi Arabia (SAR)", symbol: "ر.س", decimals: 2, rateFromAED: 1.02 },
+  { code: "USD", label: "United States (USD)", symbol: "$", decimals: 2, rateFromAED: 0.27 },
+];
 
 // Dynamic currency data type (matches API response)
 export interface CurrencyData {
@@ -37,15 +39,46 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 const CURRENCY_COOKIE_NAME = "wcml_currency";
+const CURRENCY_LOCALSTORAGE_KEY = "asl_currency";
+
+// Helper to safely get currency from localStorage (client-side only)
+const getStoredCurrency = (): Currency | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = localStorage.getItem(CURRENCY_LOCALSTORAGE_KEY);
+    if (stored) return stored as Currency;
+  } catch {
+    // Ignore localStorage errors (e.g., private browsing)
+  }
+  return null;
+};
+
+// Helper to safely set currency in localStorage
+const setStoredCurrency = (currency: Currency): void => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(CURRENCY_LOCALSTORAGE_KEY, currency);
+  } catch {
+    // Ignore localStorage errors
+  }
+};
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  // Always start with default currency to avoid hydration mismatch
-  // The actual currency from cookie will be loaded in useEffect after hydration
+  // Always initialize with default currency to match server-rendered HTML
+  // and avoid hydration mismatch (React error #418)
   const [currency, setCurrencyState] = useState<Currency>(siteConfig.defaultCurrency);
-  const [currencies, setCurrencies] = useState<CurrencyData[]>([DEFAULT_CURRENCY]);
+  const [currencies, setCurrencies] = useState<CurrencyData[]>(DEFAULT_CURRENCIES);
   const [isLoading, setIsLoading] = useState(true);
   const hasHydrated = useRef(false);
   const hasFetchedCurrencies = useRef(false);
+
+  // Restore currency from localStorage after hydration to avoid server/client mismatch
+  useEffect(() => {
+    const stored = getStoredCurrency();
+    if (stored && stored !== siteConfig.defaultCurrency) {
+      setCurrencyState(stored);
+    }
+  }, []);
 
   // Fetch currencies from API on mount
   useEffect(() => {
@@ -72,30 +105,30 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     fetchCurrencies();
   }, []);
 
-  // Load currency from cookie after hydration to avoid SSR/client mismatch
+  // Load currency from cookie after hydration and after currencies are loaded
   useEffect(() => {
+    if (isLoading) return;
     if (hasHydrated.current) return;
     hasHydrated.current = true;
     
     const savedCurrency = getCookie(CURRENCY_COOKIE_NAME) as Currency | undefined;
     if (savedCurrency && currencies.some((c) => c.code === savedCurrency)) {
-      // Use requestAnimationFrame to avoid synchronous setState in effect
-      requestAnimationFrame(() => {
-        setCurrencyState(savedCurrency);
-      });
+      setCurrencyState(savedCurrency);
     }
-  }, [currencies]);
+  }, [currencies, isLoading]);
 
   const setCurrency = useCallback((newCurrency: Currency) => {
     setCurrencyState(newCurrency);
+    // Save to both cookie (for SSR) and localStorage (for instant client-side reads)
     setCookie(CURRENCY_COOKIE_NAME, newCurrency, {
       maxAge: 60 * 60 * 24 * 365,
       path: "/",
     });
+    setStoredCurrency(newCurrency);
   }, []);
 
   const getCurrencyInfo = useCallback(() => {
-    return currencies.find((c) => c.code === currency) || currencies.find((c) => c.code === "QAR") || currencies[0];
+    return currencies.find((c) => c.code === currency) || currencies[0];
   }, [currency, currencies]);
 
     const getCurrencySymbol = useCallback(() => {
@@ -115,7 +148,9 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
         const priceInAED = price / fromCurrencyInfo.rateFromAED;
         const convertedPrice = priceInAED * toCurrencyInfo.rateFromAED;
       
-        return convertedPrice;
+        // Round to currency's decimal precision to avoid floating-point errors
+        const multiplier = Math.pow(10, toCurrencyInfo.decimals);
+        return Math.round(convertedPrice * multiplier) / multiplier;
       },
       [currency, currencies, getCurrencyInfo]
     );

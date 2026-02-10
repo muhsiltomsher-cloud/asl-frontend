@@ -1,8 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useCart } from "./CartContext";
 import { useCurrency } from "./CurrencyContext";
+
+// Event for notifying when a new gift is added (used by MiniCartDrawer)
+export const NEW_GIFT_ADDED_EVENT = "asl:new-gift-added";
 
 export interface FreeGiftRule {
   id: string;
@@ -12,6 +16,7 @@ export interface FreeGiftRule {
   max_cart_value?: number;
   currency: string;
   product_id: number;
+  product_id_ar?: number;
   priority: number;
   message_en: string;
   message_ar: string;
@@ -23,6 +28,43 @@ export interface FreeGiftRule {
     price: string;
     image: string;
   };
+  product_ar?: {
+    id: number;
+    name: string;
+    slug: string;
+    price: string;
+    image: string;
+  };
+}
+
+// Helper function to detect if a string contains Arabic characters
+export function containsArabic(text: string | undefined): boolean {
+  if (!text) return false;
+  // Arabic Unicode range: \u0600-\u06FF (Arabic), \u0750-\u077F (Arabic Supplement), \u08A0-\u08FF (Arabic Extended-A)
+  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+  return arabicPattern.test(text);
+}
+
+// Helper function to get the correct product_id based on locale
+export function getLocalizedProductId(rule: FreeGiftRule, locale: string): number {
+  if (locale === "ar" && rule.product_id_ar) {
+    return rule.product_id_ar;
+  }
+  return rule.product_id;
+}
+
+// Helper function to get the correct product data based on locale
+// For English locale, ensures we don't return Arabic product data
+export function getLocalizedProduct(rule: FreeGiftRule, locale: string): FreeGiftRule["product"] | undefined {
+  if (locale === "ar" && rule.product_ar) {
+    return rule.product_ar;
+  }
+  // For non-Arabic locales, check if the product name contains Arabic characters
+  // If so, return undefined to trigger the fallback text
+  if (locale !== "ar" && rule.product && containsArabic(rule.product.name)) {
+    return undefined;
+  }
+  return rule.product;
 }
 
 interface GiftProgress {
@@ -55,6 +97,8 @@ interface FreeGiftContextType {
 const FreeGiftContext = createContext<FreeGiftContextType | undefined>(undefined);
 
 const FREE_GIFT_ITEM_DATA_KEY = "_asl_free_gift";
+const FREE_GIFT_RULE_ID_KEY = "_asl_free_gift_rule_id";
+const FREE_GIFT_UNIQUE_KEY = "_asl_free_gift_unique_key";
 
 // Helper to generate a stable hash of cart state for comparison
 // Only include non-gift items in the hash to prevent re-processing when gifts are added
@@ -74,8 +118,9 @@ interface FreeGiftProviderProps {
 }
 
 export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
-  const { cart, cartItems, cartSubtotal, addToCart, removeCartItem, updateCartItem } = useCart();
+  const { cart, cartItems, cartSubtotal, addToCart, removeCartItem, updateCartItem, setIsCartOpen } = useCart();
   const { currency } = useCurrency();
+  const pathname = usePathname();
   const [rules, setRules] = useState<FreeGiftRule[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeGifts, setActiveGifts] = useState<FreeGiftRule[]>([]);
@@ -130,18 +175,46 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       return true;
     }
 
-    // Fallback check: product ID matches a gift rule
+    // Secondary check: product ID matches a gift rule (check both EN and AR product IDs)
     // This handles cases where CoCart doesn't preserve the flag
     // and where the gift product has a non-zero price
-    return rules.some((rule) => rule.product_id === item.id);
-  }, [cartItems, rules]);
+    const matchesRule = rules.some((rule) => {
+      const localizedProductId = getLocalizedProductId(rule, locale);
+      return localizedProductId === item.id || rule.product_id === item.id || rule.product_id_ar === item.id;
+    });
+    if (matchesRule) return true;
+
+    // Tertiary check: item has price 0 and slug is exactly "free-gift" or name is exactly "Free Gift"/"هدية مجانية"
+    // This handles edge cases where the product ID might not match due to WPML translation issues
+    // Note: Using exact matches to avoid false positives with products like "gift-set" or "gift-box"
+    const itemPrice = parseFloat(item.price);
+    const itemSlug = item.slug?.toLowerCase() || '';
+    const itemName = item.name?.toLowerCase() || '';
+    if (itemPrice === 0 && (itemSlug === 'free-gift' || itemName === 'free gift' || itemName === 'هدية مجانية')) {
+      return true;
+    }
+
+    return false;
+  }, [cartItems, rules, locale]);
 
   const isFreeGiftProduct = useCallback((productId: number): boolean => {
-    return rules.some((rule) => rule.product_id === productId);
-  }, [rules]);
+    // Check if the product ID matches any gift rule (both EN and AR product IDs)
+    return rules.some((rule) => {
+      const localizedProductId = getLocalizedProductId(rule, locale);
+      return localizedProductId === productId || rule.product_id === productId || rule.product_id_ar === productId;
+    });
+  }, [rules, locale]);
 
   const getFreeGiftProductIds = useCallback((): number[] => {
-    return rules.map((rule) => rule.product_id);
+    // Return all gift product IDs (both EN and AR) to ensure proper filtering
+    const ids: number[] = [];
+    for (const rule of rules) {
+      ids.push(rule.product_id);
+      if (rule.product_id_ar) {
+        ids.push(rule.product_id_ar);
+      }
+    }
+    return [...new Set(ids)];
   }, [rules]);
 
     const getGiftMessages = useCallback((locale: string): string[] => {
@@ -155,8 +228,14 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
     }, []);
 
   const getGiftProgress = useCallback((): GiftProgress => {
-    // Calculate subtotal without gift items
-    const giftProductIds = new Set(rules.map(r => r.product_id));
+    // Calculate subtotal without gift items (include both EN and AR product IDs)
+    const giftProductIds = new Set<number>();
+    for (const r of rules) {
+      giftProductIds.add(r.product_id);
+      if (r.product_id_ar) {
+        giftProductIds.add(r.product_id_ar);
+      }
+    }
     const subtotalValue = parseFloat(cartSubtotal) / divisor;
     
     // Calculate gift items total to subtract from subtotal
@@ -168,9 +247,9 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
     }
     const subtotalWithoutGifts = subtotalValue - giftsTotalValue;
 
-    // Find enabled rules for current currency, sorted by min_cart_value
+    // Find enabled rules for current currency (or ALL currencies), sorted by min_cart_value
     const eligibleRules = rules
-      .filter((rule) => rule.enabled && rule.currency === currency)
+      .filter((rule) => rule.enabled && (rule.currency === currency || rule.currency === "ALL"))
       .sort((a, b) => a.min_cart_value - b.min_cart_value);
 
     // Find the next gift rule that hasn't been unlocked yet
@@ -202,8 +281,14 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       if (rules.length === 0) return;
       if (!cart) return;
 
-      // Get all gift product IDs for hash calculation
-      const giftProductIds = new Set(rules.map(r => r.product_id));
+      // Get all gift product IDs for hash calculation (include both EN and AR product IDs)
+      const giftProductIds = new Set<number>();
+      for (const r of rules) {
+        giftProductIds.add(r.product_id);
+        if (r.product_id_ar) {
+          giftProductIds.add(r.product_id_ar);
+        }
+      }
       const currentStateHash = getCartStateHash(cartItems, cartSubtotal, giftProductIds);
 
       if (lastProcessedStateRef.current === currentStateHash) {
@@ -213,16 +298,30 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
       // Find existing gift items in cart
       // A gift item is identified by:
       // 1. Having the _asl_free_gift flag in cart_item_data (if CoCart preserves it)
-      // 2. OR having a product_id that matches a gift rule (regardless of price)
-      const existingFreeGifts: Array<{ item: typeof cartItems[0]; rule: FreeGiftRule | undefined }> = [];
+      // 2. OR having a product_id that matches a gift rule (check both EN and AR product IDs)
+      // We now also track the rule ID to support multiple rules with the same product
+      const existingFreeGifts: Array<{ item: typeof cartItems[0]; rule: FreeGiftRule | undefined; ruleId: string | undefined }> = [];
       for (const item of cartItems) {
         const isFreeGiftFlag = item.cart_item_data?.[FREE_GIFT_ITEM_DATA_KEY] === true;
-        const matchingRule = rules.find((rule) => rule.product_id === item.id);
+        const storedRuleId = item.cart_item_data?.[FREE_GIFT_RULE_ID_KEY] as string | undefined;
+        
+        // If we have a stored rule ID, find that specific rule
+        // Otherwise, find any matching rule by product ID (for backwards compatibility)
+        let matchingRule: FreeGiftRule | undefined;
+        if (storedRuleId) {
+          matchingRule = rules.find((rule) => rule.id === storedRuleId);
+        } else {
+          // Check if item matches any gift rule (both EN and AR product IDs)
+          matchingRule = rules.find((rule) => {
+            const localizedProductId = getLocalizedProductId(rule, locale);
+            return localizedProductId === item.id || rule.product_id === item.id || rule.product_id_ar === item.id;
+          });
+        }
         
         // If the product matches a gift rule, treat it as a gift
         // This handles cases where CoCart doesn't preserve the flag
         if (isFreeGiftFlag || matchingRule) {
-          existingFreeGifts.push({ item, rule: matchingRule });
+          existingFreeGifts.push({ item, rule: matchingRule, ruleId: storedRuleId || matchingRule?.id });
         }
       }
 
@@ -234,7 +333,8 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
 
       const matchingRules = rules.filter((rule) => {
         if (!rule.enabled) return false;
-        if (rule.currency !== currency) return false;
+        // Match rules with specific currency OR rules set to "ALL" currencies
+        if (rule.currency !== currency && rule.currency !== "ALL") return false;
         if (subtotalWithoutGifts < rule.min_cart_value) return false;
         if (rule.max_cart_value && subtotalWithoutGifts > rule.max_cart_value) return false;
         return true;
@@ -269,11 +369,14 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
         }
       }
 
-      const existingGiftProductIds = new Set(existingFreeGifts.map(({ item }) => item.id));
-      const matchingProductIds = new Set(matchingRules.map((r) => r.product_id));
+      // Track by rule ID to support multiple rules with the same product
+      const existingGiftRuleIds = new Set(existingFreeGifts.map(({ ruleId }) => ruleId).filter(Boolean));
+      const matchingRuleIds = new Set(matchingRules.map((r) => r.id));
 
-      const giftsToRemove = existingFreeGifts.filter(({ item }) => !matchingProductIds.has(item.id));
-      const rulesToAdd = matchingRules.filter((rule) => !existingGiftProductIds.has(rule.product_id));
+      // Remove gifts whose rules no longer match (by rule ID)
+      const giftsToRemove = existingFreeGifts.filter(({ ruleId }) => !ruleId || !matchingRuleIds.has(ruleId));
+      // Add gifts for rules that don't have a gift yet (by rule ID)
+      const rulesToAdd = matchingRules.filter((rule) => !existingGiftRuleIds.has(rule.id));
 
       if (giftsToRemove.length === 0 && rulesToAdd.length === 0) {
         // Only update the hash when no changes are needed
@@ -295,15 +398,38 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
 
         for (const rule of rulesToAdd) {
           try {
-            await addToCartRef.current(rule.product_id, 1, undefined, undefined, {
+            // Use locale-aware product ID when adding to cart
+            // Include rule ID and a unique key in cart_item_data to support multiple rules with the same product
+            // The unique key ensures CoCart creates separate line items even for the same product
+            const localizedProductId = getLocalizedProductId(rule, locale);
+            const uniqueKey = `${rule.id}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            await addToCartRef.current(localizedProductId, 1, undefined, undefined, {
               [FREE_GIFT_ITEM_DATA_KEY]: true,
+              [FREE_GIFT_RULE_ID_KEY]: rule.id,
+              [FREE_GIFT_UNIQUE_KEY]: uniqueKey,
             });
             
-            const giftName = rule.product?.name || rule.name;
-            setNewGiftCelebration({
-              isVisible: true,
-              giftName: giftName,
-            });
+            // Open mini cart and dispatch event for gift highlight effect
+            // Don't open cart on order confirmation page
+            const isOrderConfirmationPage = pathname?.includes("/order-confirmation");
+            if (!isOrderConfirmationPage) {
+              setIsCartOpen(true);
+            }
+            // Use locale-aware product data for gift name
+            // For non-Arabic locales, ensure we don't show Arabic text
+            const localizedProduct = getLocalizedProduct(rule, locale);
+            let giftName = localizedProduct?.name;
+            if (!giftName && locale !== "ar") {
+              // For English locale, use "Free Gift" as fallback if product name contains Arabic
+              giftName = (rule.product?.name && !containsArabic(rule.product.name)) ? rule.product.name : "Free Gift";
+            } else if (!giftName) {
+              giftName = rule.product?.name || rule.name;
+            }
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent(NEW_GIFT_ADDED_EVENT, { 
+                detail: { giftName, productId: localizedProductId } 
+              }));
+            }
           } catch (error) {
             console.error("Failed to add gift:", error);
           }
@@ -320,6 +446,7 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
 
     const timeoutId = setTimeout(processGiftLogic, 500);
     return () => clearTimeout(timeoutId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cart,
     cartItems,
@@ -327,6 +454,7 @@ export function FreeGiftProvider({ children, locale }: FreeGiftProviderProps) {
     rules,
     currency,
     divisor,
+    locale,
   ]);
 
   return (

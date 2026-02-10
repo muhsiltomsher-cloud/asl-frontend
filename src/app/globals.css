@@ -70,3 +70,56 @@ select:disabled,
 [disabled] {
   cursor: not-allowed;
 }
+
+/* Tabby and Tamara widget styling - beige backgrounds, smaller font, website font */
+#tabby-promo-widget,
+#tabby-promo-widget * {
+  background: #e7e2d6 !important;
+  background-color: #e7e2d6 !important;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+}
+
+tamara-widget,
+tamara-widget * {
+  background: #e7e2d6 !important;
+  background-color: #e7e2d6 !important;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+}
+
+/* Arabic font for payment widgets */
+[lang="ar"] #tabby-promo-widget,
+[lang="ar"] #tabby-promo-widget * {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif !important;
+}
+
+[lang="ar"] tamara-widget,
+[lang="ar"] tamara-widget * {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif !important;
+}
+
+/* Fix Safari showing dropdown/autofill icons on text input fields */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  right: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Mobile font size reduction - smaller text on screens below 1024px */
+/* Note: h1, h2, h3 font sizes are controlled by Tailwind classes for flexibility */
+@media (max-width: 1023px) {
+  body {
+    font-size: 14px;
+  }
+  
+  p, span, a, li, label, input, button, select, textarea {
+    font-size: 0.875rem;
+  }
+}
