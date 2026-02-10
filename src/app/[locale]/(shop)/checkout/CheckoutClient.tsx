@@ -7,7 +7,7 @@ import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Checkbox } from "@/components/common/Checkbox";
 import { Radio } from "@/components/common/Radio";
-import { CountrySelect } from "@/components/common/CountrySelect";
+import { CountrySelect, type CountryOption } from "@/components/common/CountrySelect";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { useCart } from "@/contexts/CartContext";
@@ -159,6 +159,7 @@ export default function CheckoutClient() {
         const [isLoadingShipping, setIsLoadingShipping] = useState(false);
         const [selectedShippingRate, setSelectedShippingRate] = useState<string | null>(null);
         const [shippingTotal, setShippingTotal] = useState<string>("0");
+        const [shippingCountries, setShippingCountries] = useState<CountryOption[] | undefined>(undefined);
         
         const [createAccount, setCreateAccount] = useState(false);
         const [accountPassword, setAccountPassword] = useState("");
@@ -302,6 +303,27 @@ export default function CheckoutClient() {
           };
                   fetchPaymentGateways();
                 }, []);
+
+        useEffect(() => {
+          const fetchShippingCountries = async () => {
+            try {
+              const response = await fetch("/api/shipping-countries");
+              const data = await response.json();
+              if (data.success && data.countries) {
+                const mapped: CountryOption[] = data.countries.map((c: { code: string; name: string }) => ({
+                  value: c.code,
+                  label: c.name,
+                }));
+                if (mapped.length > 0) {
+                  setShippingCountries(mapped);
+                }
+              }
+            } catch (err) {
+              console.error("Failed to fetch shipping countries:", err);
+            }
+          };
+          fetchShippingCountries();
+        }, []);
 
         const filteredPaymentGateways = useMemo(() => {
           const selectedCountry = formData.shipping.country;
@@ -1513,6 +1535,7 @@ export default function CheckoutClient() {
                   value={formData.shipping.country}
                   onChange={(value) => handleShippingChange("country", value)}
                   isRTL={isRTL}
+                  availableCountries={shippingCountries}
                 />
               </div>
             </div>
