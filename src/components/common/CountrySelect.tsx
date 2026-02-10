@@ -85,6 +85,7 @@ export interface CountrySelectProps {
   placeholder?: string;
   isRTL?: boolean;
   className?: string;
+  availableCountries?: CountryOption[];
 }
 
 export function CountrySelect({
@@ -96,20 +97,23 @@ export function CountrySelect({
   placeholder,
   isRTL = false,
   className,
+  availableCountries,
 }: CountrySelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedCountry = countries.find((c) => c.value === value);
+  const countryList = availableCountries || countries;
+
+  const selectedCountry = countryList.find((c) => c.value === value);
   const displayLabel = selectedCountry
     ? isRTL && selectedCountry.labelAr
       ? selectedCountry.labelAr
       : selectedCountry.label
     : "";
 
-  const filteredCountries = countries.filter((country) => {
+  const filteredCountries = countryList.filter((country) => {
     const searchLower = searchQuery.toLowerCase();
     return (
       country.label.toLowerCase().includes(searchLower) ||
