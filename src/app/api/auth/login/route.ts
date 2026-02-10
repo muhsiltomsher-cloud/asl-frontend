@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, rateLimitResponse, LOGIN_RATE_LIMIT } from "@/lib/security";
-import { API_BASE, backendHeaders, noCacheUrl, safeJsonResponse } from "@/lib/utils/backendFetch";
+import { API_BASE, backendPostHeaders, noCacheUrl, safeJsonResponse } from "@/lib/utils/backendFetch";
 
 export interface LoginRequest {
   username: string;
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
 
     const response = await fetch(noCacheUrl(`${API_BASE}/wp-json/cocart/v2/login`), {
       method: "POST",
-      headers: backendHeaders(),
+      headers: backendPostHeaders(),
       body: JSON.stringify({ username: username.trim(), password }),
     });
 
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     try {
       const wpResponse = await fetch(noCacheUrl(`${API_BASE}/wp-json/jwt-auth/v1/token`), {
         method: "POST",
-        headers: backendHeaders(),
+        headers: backendPostHeaders(),
         body: JSON.stringify({ username: username.trim(), password }),
       });
       if (wpResponse.ok) {

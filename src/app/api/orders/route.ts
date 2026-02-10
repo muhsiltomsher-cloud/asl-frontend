@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getEnvVar } from "@/lib/utils/loadEnv";
 import { verifyAuth, unauthorizedResponse, forbiddenResponse } from "@/lib/security";
-import { API_BASE as BASE_URL, backendHeaders, noCacheUrl } from "@/lib/utils/backendFetch";
+import { API_BASE as BASE_URL, backendHeaders, backendPostHeaders, noCacheUrl } from "@/lib/utils/backendFetch";
 
 const API_BASE = `${BASE_URL}/wp-json/wc/v3`;
 
@@ -245,7 +245,7 @@ export async function POST(request: NextRequest) {
     
     const response = await fetch(noCacheUrl(url), {
       method: "POST",
-      headers: backendHeaders(),
+      headers: backendPostHeaders(),
       body: JSON.stringify(orderData),
     });
 
@@ -440,7 +440,7 @@ export async function PUT(request: NextRequest) {
     
     const response = await fetch(noCacheUrl(url), {
       method: "PUT",
-      headers: backendHeaders(),
+      headers: backendPostHeaders(),
       body: JSON.stringify(updateData),
     });
 

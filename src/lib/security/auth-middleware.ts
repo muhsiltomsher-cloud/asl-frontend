@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { API_BASE, backendHeaders, noCacheUrl, safeJsonResponse } from "@/lib/utils/backendFetch";
+import { API_BASE, backendPostHeaders, noCacheUrl, safeJsonResponse } from "@/lib/utils/backendFetch";
 const AUTH_TOKEN_KEY = "asl_auth_token";
 const AUTH_USER_KEY = "asl_auth_user";
 const AUTH_REFRESH_TOKEN_KEY = "asl_refresh_token";
@@ -41,7 +41,7 @@ async function tryRefreshToken(refreshToken: string): Promise<string | null> {
   try {
     const response = await fetch(noCacheUrl(`${API_BASE}/wp-json/cocart/jwt/refresh-token`), {
       method: "POST",
-      headers: backendHeaders(),
+      headers: backendPostHeaders(),
       body: JSON.stringify({ refresh_token: refreshToken }),
     });
 
