@@ -1,4 +1,5 @@
 import { getCountryTimezone } from "@/lib/utils";
+import { countries } from "@/components/common/CountrySelect";
 
 export interface CustomerAddress {
   first_name: string;
@@ -476,6 +477,17 @@ function isAddressPopulated(address: CustomerAddress | undefined): boolean {
   return !!(address.address_1 || address.city || address.first_name);
 }
 
+export function resolveCountryCode(country: string): string {
+  if (!country) return "AE";
+  if (country.length === 2) return country.toUpperCase();
+  const found = countries.find(
+    (c) =>
+      c.label.toLowerCase() === country.toLowerCase() ||
+      c.labelAr === country
+  );
+  return found?.value || "AE";
+}
+
 function customerAddressToSavedAddress(
   address: CustomerAddress,
   type: "billing" | "shipping"
@@ -491,7 +503,7 @@ function customerAddressToSavedAddress(
     city: address.city || "",
     state: address.state || "",
     postcode: address.postcode || "",
-    country: address.country || "AE",
+    country: resolveCountryCode(address.country),
     phone: address.phone || "",
     email: address.email || "",
     is_default: type === "billing",

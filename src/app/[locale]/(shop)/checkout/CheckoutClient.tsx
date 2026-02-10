@@ -13,7 +13,7 @@ import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { getCustomer, getSavedAddressesFromCustomer, type Customer, type SavedAddress } from "@/lib/api/customer";
+import { getCustomer, getSavedAddressesFromCustomer, resolveCountryCode, type Customer, type SavedAddress } from "@/lib/api/customer";
 import { featureFlags, type Locale } from "@/config/site";
 import { MapPin, Check, ChevronDown, ChevronUp, Tag, X, Truck } from "lucide-react";
 import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getPricingMode, getFixedPrice, getBundleTotal } from "@/components/cart/BundleItemsList";
@@ -210,7 +210,7 @@ export default function CheckoutClient() {
                 city: defaultAddress.city || "",
                 state: defaultAddress.state || "",
                 postalCode: defaultAddress.postcode || "",
-                country: defaultAddress.country || "AE",
+                country: resolveCountryCode(defaultAddress.country),
                 phone: defaultAddress.phone || "",
                 email: defaultAddress.email || customer.email || "",
               };
@@ -229,7 +229,7 @@ export default function CheckoutClient() {
                 city: customer.shipping?.city || "",
                 state: customer.shipping?.state || "",
                 postalCode: customer.shipping?.postcode || "",
-                country: customer.shipping?.country || "AE",
+                country: resolveCountryCode(customer.shipping?.country || ""),
                 phone: customer.shipping?.phone || customer.billing?.phone || "",
                 email: customer.billing?.email || customer.email || "",
               };
@@ -242,7 +242,7 @@ export default function CheckoutClient() {
                 city: customer.billing?.city || "",
                 state: customer.billing?.state || "",
                 postalCode: customer.billing?.postcode || "",
-                country: customer.billing?.country || "AE",
+                country: resolveCountryCode(customer.billing?.country || ""),
                 phone: customer.billing?.phone || "",
                 email: customer.billing?.email || customer.email || "",
               };
@@ -641,7 +641,7 @@ export default function CheckoutClient() {
       city: address.city || "",
       state: address.state || "",
       postalCode: address.postcode || "",
-      country: address.country || "AE",
+      country: resolveCountryCode(address.country),
       phone: address.phone || "",
       email: address.email || customerData?.email || "",
     };
