@@ -215,7 +215,14 @@ function buildShippingRates(
   }
 
   if (rates.length > 0) {
-    rates[0].selected = true;
+    const firstSelectable = rates.find(
+      r => !(r.method_id === "free_shipping" && r.free_shipping_eligible === false)
+    );
+    if (firstSelectable) {
+      firstSelectable.selected = true;
+    } else {
+      rates[0].selected = true;
+    }
   }
 
   return rates;
