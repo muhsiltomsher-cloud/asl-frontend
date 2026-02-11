@@ -421,10 +421,10 @@ export async function PUT(request: NextRequest) {
       }
       // Paid currency details
       if (body.payment_details.paid_currency) {
-        metaData.push({ key: "_myfatoorah_paid_currency", value: body.payment_details.paid_currency });
+        metaData.push({ key: "myfatoorah_paid_currency", value: body.payment_details.paid_currency });
       }
       if (body.payment_details.paid_currency_value) {
-        metaData.push({ key: "_myfatoorah_paid_currency_value", value: body.payment_details.paid_currency_value });
+        metaData.push({ key: "myfatoorah_paid_currency_value", value: body.payment_details.paid_currency_value });
       }
       // Error details
       if (body.payment_details.error_code) {

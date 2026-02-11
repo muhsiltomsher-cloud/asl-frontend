@@ -532,8 +532,8 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
               : `Order number: #${order.id}`}
           </p>
           {order.currency && !isPaymentFailed && (() => {
-            const paidCurrencyMeta = order.meta_data?.find((m) => m.key === "_myfatoorah_paid_currency");
-            const paidCurrencyValueMeta = order.meta_data?.find((m) => m.key === "_myfatoorah_paid_currency_value");
+                        const paidCurrencyMeta = order.meta_data?.find((m) => m.key === "myfatoorah_paid_currency");
+                        const paidCurrencyValueMeta = order.meta_data?.find((m) => m.key === "myfatoorah_paid_currency_value");
             return (
               <div className="mt-3">
                 <OrderCurrencyBadge 
