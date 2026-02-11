@@ -28,6 +28,8 @@ export interface ShippingRate {
   currency_thousand_separator: string;
   currency_prefix: string;
   currency_suffix: string;
+  free_shipping_min_amount?: number;
+  free_shipping_eligible?: boolean;
 }
 
 export interface ShippingPackage {
@@ -153,17 +155,36 @@ function buildShippingRates(
       price = "0";
       const requires = method.settings?.requires?.value || "";
       const minAmount = parseFloat(method.settings?.min_amount?.value || "0");
+      let eligible = true;
 
-      if (requires === "min_amount" || requires === "both") {
+      if (requires === "min_amount" || requires === "both" || requires === "either") {
         if (minAmount > 0 && cartSubtotal < minAmount) {
-          continue;
+          eligible = false;
         }
       }
-      if (requires === "either") {
-        if (minAmount > 0 && cartSubtotal < minAmount) {
-          continue;
-        }
-      }
+
+      rates.push({
+        rate_id: `${method.method_id}:${method.instance_id}`,
+        name,
+        description: "",
+        delivery_time: "",
+        price,
+        taxes: "0",
+        instance_id: method.instance_id,
+        method_id: method.method_id,
+        meta_data: [],
+        selected: false,
+        currency_code: currencyCode,
+        currency_symbol: currencySymbol,
+        currency_minor_unit: 2,
+        currency_decimal_separator: ".",
+        currency_thousand_separator: ",",
+        currency_prefix: currencySymbol,
+        currency_suffix: "",
+        free_shipping_min_amount: minAmount > 0 ? minAmount : undefined,
+        free_shipping_eligible: eligible,
+      });
+      continue;
     } else if (method.method_id === "local_pickup") {
       const cost = method.settings?.cost?.value || "0";
       price = String(Math.round(parseFloat(cost) * 100));
@@ -194,7 +215,14 @@ function buildShippingRates(
   }
 
   if (rates.length > 0) {
-    rates[0].selected = true;
+    const firstSelectable = rates.find(
+      r => !(r.method_id === "free_shipping" && r.free_shipping_eligible === false)
+    );
+    if (firstSelectable) {
+      firstSelectable.selected = true;
+    } else {
+      rates[0].selected = true;
+    }
   }
 
   return rates;

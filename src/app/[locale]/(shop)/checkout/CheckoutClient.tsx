@@ -37,6 +37,8 @@ interface ShippingRate {
   currency_thousand_separator: string;
   currency_prefix: string;
   currency_suffix: string;
+  free_shipping_min_amount?: number;
+  free_shipping_eligible?: boolean;
 }
 
 interface ShippingPackage {
@@ -1574,12 +1576,17 @@ export default function CheckoutClient() {
                         return (
                           <div
                             key={rate.rate_id}
-                            className={`rounded-lg border p-4 transition-colors cursor-pointer ${
-                              isSelected
-                                ? "border-gray-900 bg-gray-50"
-                                : "border-black/10 hover:bg-gray-50"
+                            className={`rounded-lg border p-4 transition-colors ${
+                              rate.method_id === "free_shipping" && rate.free_shipping_eligible === false
+                                ? "border-black/5 bg-gray-50/50 opacity-60"
+                                : isSelected
+                                  ? "border-gray-900 bg-gray-50 cursor-pointer"
+                                  : "border-black/10 hover:bg-gray-50 cursor-pointer"
                             }`}
-                            onClick={() => handleSelectShippingRate(rate.rate_id, pkg.package_id)}
+                            onClick={() => {
+                              if (rate.method_id === "free_shipping" && rate.free_shipping_eligible === false) return;
+                              handleSelectShippingRate(rate.rate_id, pkg.package_id);
+                            }}
                           >
                             <div className="flex items-center gap-3">
                               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
@@ -1590,14 +1597,35 @@ export default function CheckoutClient() {
                                   name="shipping_method"
                                   value={rate.rate_id}
                                   checked={isSelected}
-                                  onChange={() => handleSelectShippingRate(rate.rate_id, pkg.package_id)}
+                                  onChange={() => {
+                                    if (rate.method_id === "free_shipping" && rate.free_shipping_eligible === false) return;
+                                    handleSelectShippingRate(rate.rate_id, pkg.package_id);
+                                  }}
                                   label={rate.name}
                                   description={rate.delivery_time || rate.description || ""}
+                                  disabled={rate.method_id === "free_shipping" && rate.free_shipping_eligible === false}
                                 />
+                                {rate.method_id === "free_shipping" && rate.free_shipping_min_amount && rate.free_shipping_min_amount > 0 && (
+                                  <p className={`mt-1 text-xs ${
+                                    rate.free_shipping_eligible === false ? "text-amber-600" : "text-green-600"
+                                  }`}>
+                                    {rate.free_shipping_eligible === false
+                                      ? (isRTL
+                                          ? `الحد الأدنى للشراء ${rate.free_shipping_min_amount} ${rate.currency_code}`
+                                          : `Minimum purchase of ${rate.free_shipping_min_amount} ${rate.currency_code} required`)
+                                      : (isRTL
+                                          ? `الحد الأدنى للشراء ${rate.free_shipping_min_amount} ${rate.currency_code} - تم الاستيفاء!`
+                                          : `Minimum purchase of ${rate.free_shipping_min_amount} ${rate.currency_code} met!`)}
+                                  </p>
+                                )}
                               </div>
                               <div className="text-right">
                                 {ratePrice === 0 ? (
-                                  <span className="font-semibold text-green-600">
+                                  <span className={`font-semibold ${
+                                    rate.method_id === "free_shipping" && rate.free_shipping_eligible === false
+                                      ? "text-gray-400"
+                                      : "text-green-600"
+                                  }`}>
                                     {isRTL ? "مجاني" : "Free"}
                                   </span>
                                 ) : (
