@@ -76,6 +76,16 @@ interface PaymentGateway {
   method_title: string;
 }
 
+const CURRENCY_TO_COUNTRY: Record<string, string> = {
+  AED: "AE",
+  BHD: "BH",
+  KWD: "KW",
+  OMR: "OM",
+  QAR: "QA",
+  SAR: "SA",
+  USD: "US",
+};
+
 const PAYMENT_METHOD_COUNTRY_AVAILABILITY: Record<string, { type: "include" | "exclude"; countries: string[] }> = {
   tabby_installments: { type: "include", countries: ["AE", "SA", "KW", "BH", "QA"] },
   tabby_checkout: { type: "include", countries: ["AE", "SA", "KW", "BH", "QA"] },
@@ -326,6 +336,19 @@ export default function CheckoutClient() {
           };
           fetchShippingCountries();
         }, []);
+
+        useEffect(() => {
+          if (!currency) return;
+          const mappedCountry = CURRENCY_TO_COUNTRY[currency];
+          if (mappedCountry && mappedCountry !== formData.shipping.country) {
+            setFormData((prev) => ({
+              ...prev,
+              shipping: { ...prev.shipping, country: mappedCountry },
+              billing: prev.sameAsShipping ? { ...prev.shipping, country: mappedCountry } : prev.billing,
+            }));
+          }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [currency]);
 
         const filteredPaymentGateways = useMemo(() => {
           const selectedCountry = formData.shipping.country;
