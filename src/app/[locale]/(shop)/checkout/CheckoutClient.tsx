@@ -880,6 +880,8 @@ export default function CheckoutClient() {
             correctBundleTotal = cartItemPriceAED > 0 ? cartItemPriceAED : bundleItemsTotal + (boxPrice || 0);
           }
           
+          correctBundleTotal = convertPrice(correctBundleTotal);
+          
           // Multiply by quantity for the line item total
           const quantity = item.quantity?.value || 1;
           const lineItemTotal = correctBundleTotal * quantity;
@@ -956,7 +958,7 @@ export default function CheckoutClient() {
         }
 
         if (!lineItem.subtotal) {
-          const unitPrice = parseFloat(item.price) / divisor;
+          const unitPrice = convertPrice(parseFloat(item.price) / divisor);
           const qty = item.quantity?.value || 1;
           const lineTotal = unitPrice * qty;
           lineItem.subtotal = lineTotal.toFixed(getCurrencyInfo().decimals);
