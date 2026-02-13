@@ -49,6 +49,7 @@ export interface BundleItemTranslations {
   details: string;
   discount: string;
   optionalItem: string;
+  freeItem: string;
   showPrice: string;
   pleaseSelectCategory: string;
   pleaseSelectTag: string;

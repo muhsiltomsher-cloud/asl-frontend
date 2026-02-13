@@ -326,19 +326,27 @@ export function BuildYourOwnSetClient({
     ? fixedPrice 
     : (bundleConfig?.with_box_price || bundleProductPrice);
 
-  // Calculate required products total (first requiredSlots items)
-  const requiredProductsTotal = useMemo(() => {
-    return selections.slice(0, requiredSlots).reduce((sum, selection) => {
-      return sum + (selection?.price || 0);
-    }, 0);
-  }, [selections, requiredSlots]);
+  const isSlotFree = (index: number): boolean => {
+    return bundleConfig?.slots?.[index]?.is_free === true;
+  };
 
-  // Calculate add-on products total (items after requiredSlots)
-  const addOnProductsTotal = useMemo(() => {
-    return selections.slice(requiredSlots).reduce((sum, selection) => {
+  // Calculate required products total (first requiredSlots items), excluding free slots
+  const requiredProductsTotal = useMemo(() => {
+    return selections.slice(0, requiredSlots).reduce((sum, selection, index) => {
+      if (isSlotFree(index)) return sum;
       return sum + (selection?.price || 0);
     }, 0);
-  }, [selections, requiredSlots]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selections, requiredSlots, bundleConfig]);
+
+  // Calculate add-on products total (items after requiredSlots), excluding free slots
+  const addOnProductsTotal = useMemo(() => {
+    return selections.slice(requiredSlots).reduce((sum, selection, index) => {
+      if (isSlotFree(requiredSlots + index)) return sum;
+      return sum + (selection?.price || 0);
+    }, 0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selections, requiredSlots, bundleConfig]);
 
   // Total products price (required + add-ons)
   const productsTotal = requiredProductsTotal + addOnProductsTotal;
@@ -400,12 +408,14 @@ export function BuildYourOwnSetClient({
     setIsAddingToCart(true);
     try {
       const selectedProducts = selections
-        .filter((s): s is ProductOption => s !== null)
-        .map((product, index) => ({
-          product_id: product.id,
-          name: product.name,
-          price: product.price,
-          is_addon: index >= requiredSlots,
+        .map((s, idx) => s ? { product: s, slotIndex: idx } : null)
+        .filter((entry): entry is { product: ProductOption; slotIndex: number } => entry !== null)
+        .map((entry) => ({
+          product_id: entry.product.id,
+          name: entry.product.name,
+          price: isSlotFree(entry.slotIndex) ? 0 : entry.product.price,
+          is_addon: entry.slotIndex >= requiredSlots,
+          is_free: isSlotFree(entry.slotIndex),
         }));
 
       const bundleData = {
@@ -448,6 +458,7 @@ export function BuildYourOwnSetClient({
       chooseItem: "Choose item",
       addExtra: "Add extra",
       addExtraWithPrice: "Add extra (with price)",
+      free: "FREE",
       change: "Change",
       total: "Total",
       boxPrice: "Box",
@@ -489,6 +500,7 @@ export function BuildYourOwnSetClient({
       chooseItem: "اختر منتج",
       addExtra: "أضف إضافي",
       addExtraWithPrice: "أضف إضافي (بسعر)",
+      free: "مجاناً",
       change: "تغيير",
       total: "المجموع",
       boxPrice: "الصندوق",
@@ -607,8 +619,8 @@ export function BuildYourOwnSetClient({
                                               <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
                                                 {selections[index]!.name}
                                               </p>
-                                              <p className="text-xs sm:text-sm text-amber-700">
-                                                <FormattedPrice price={selections[index]!.price} iconSize="sm" />
+                                              <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
+                                                {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
                                               </p>
                                             </div>
                       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -676,8 +688,8 @@ export function BuildYourOwnSetClient({
                                               <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
                                                 {selections[index]!.name}
                                               </p>
-                                              <p className="text-xs sm:text-sm text-amber-700">
-                                                <FormattedPrice price={selections[index]!.price} iconSize="sm" />
+                                              <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
+                                                {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
                                               </p>
                                             </div>
                       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
@@ -705,7 +717,7 @@ export function BuildYourOwnSetClient({
                       </div>
                       <div>
                         <p className="font-medium text-gray-400">{getSlotLabel(index, true)}</p>
-                        <p className="text-xs text-gray-400">{t.optional}</p>
+                        <p className={`text-xs ${isSlotFree(index) ? "text-green-600" : "text-gray-400"}`}>{isSlotFree(index) ? t.free : t.optional}</p>
                       </div>
                     </button>
                   )}

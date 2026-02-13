@@ -95,6 +95,7 @@ export async function POST(request: NextRequest) {
             discount_type: item.display.discountType,
             discount_value: item.display.discountValue,
             is_optional: item.display.isOptional,
+            is_free: item.display.isFree,
             show_price: item.display.showPrice,
           },
         })),
@@ -169,6 +170,7 @@ export async function PUT(request: NextRequest) {
             discount_type: item.display.discountType,
             discount_value: item.display.discountValue,
             is_optional: item.display.isOptional,
+            is_free: item.display.isFree,
             show_price: item.display.showPrice,
           },
         })),
@@ -249,6 +251,7 @@ interface ApiItem {
     discount_type: string;
     discount_value: number;
     is_optional: boolean;
+    is_free: boolean;
     show_price: boolean;
   };
 }
@@ -317,6 +320,7 @@ function transformApiResponse(apiResponse: ApiResponse): BundleConfiguration {
         discountType: item.display.discount_type as BundleConfiguration["items"][0]["display"]["discountType"],
         discountValue: item.display.discount_value,
         isOptional: item.display.is_optional,
+        isFree: item.display.is_free ?? false,
         showPrice: item.display.show_price,
       },
     })),

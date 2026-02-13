@@ -662,6 +662,7 @@ export interface SlotConfig {
   id: string | number;
   title?: string;
   is_optional?: boolean;
+  is_free?: boolean;
   eligible_categories?: number[];
   eligible_products?: number[];
   exclude_categories?: number[];
