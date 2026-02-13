@@ -13,16 +13,15 @@ export const siteConfig = {
   
   // Frontend URL - update this when deploying to production
   // Local: http://localhost:3000
-  // Production: https://app.aromaticscentslab.com
-  url: "https://app.aromaticscentslab.com",
+  // Production: https://aromaticscentslab.com
+  url: "https://aromaticscentslab.com",
   
   // Open Graph image URL - used for social media sharing
-  ogImage: "https://app.aromaticscentslab.com/og.jpg",
+  ogImage: "https://aromaticscentslab.com/og.jpg",
   
   // WordPress/WooCommerce Backend API URL
-  // Staging: https://staging.aromaticscentslab.com
-  // Production: https://aromaticscentslab.com (or your production backend)
-  apiUrl: "https://staging.aromaticscentslab.com",
+  // Production: https://cms.aromaticscentslab.com
+  apiUrl: "https://cms.aromaticscentslab.com",
   
   // Social media links
   links: {
