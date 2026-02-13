@@ -53,13 +53,21 @@ interface FeeLine {
   tax_class?: string;
 }
 
+interface ShippingLine {
+  method_id: string;
+  method_title: string;
+  total: string;
+}
+
 interface CreateOrderRequest {
   payment_method: string;
   payment_method_title: string;
   set_paid: boolean;
+  currency?: string;
   billing: OrderAddress;
   shipping: OrderAddress;
   line_items: OrderLineItem[];
+  shipping_lines?: ShippingLine[];
   coupon_lines?: CouponLine[];
   fee_lines?: FeeLine[];
   customer_note?: string;
@@ -205,6 +213,7 @@ export async function POST(request: NextRequest) {
       payment_method: body.payment_method || "cod",
       payment_method_title: body.payment_method === "cod" ? "Cash on Delivery" : "Credit Card",
       set_paid: false,
+      ...(body.currency ? { currency: body.currency } : {}),
       billing: {
         first_name: body.billing.first_name,
         last_name: body.billing.last_name,
@@ -228,6 +237,10 @@ export async function POST(request: NextRequest) {
       line_items: body.line_items,
       customer_note: body.customer_note || "",
     };
+
+    if (body.shipping_lines && body.shipping_lines.length > 0) {
+      orderData.shipping_lines = body.shipping_lines;
+    }
 
     if (body.coupon_lines && body.coupon_lines.length > 0) {
       orderData.coupon_lines = body.coupon_lines;
