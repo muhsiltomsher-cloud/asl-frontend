@@ -61,6 +61,7 @@ export interface BundleItemDisplay {
   discountType: DiscountType;
   discountValue: number;
   isOptional: boolean;
+  isFree: boolean;
   showPrice: boolean;
 }
 
@@ -198,6 +199,7 @@ export function createDefaultBundleItem(id: string): BundleItem {
       discountType: "percent",
       discountValue: 0,
       isOptional: false,
+      isFree: false,
       showPrice: true,
     },
   };

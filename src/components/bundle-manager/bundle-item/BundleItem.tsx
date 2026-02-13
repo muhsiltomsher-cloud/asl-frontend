@@ -312,6 +312,19 @@ export function BundleItem({
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
+                  id={`free-${item.id}`}
+                  checked={item.display.isFree}
+                  onChange={(e) => updateDisplay("isFree", e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                />
+                <label htmlFor={`free-${item.id}`} className="text-sm font-medium text-gray-700">
+                  {t.freeItem}
+                </label>
+                <HelpCircle className="h-4 w-4 text-gray-400" />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
                   id={`showPrice-${item.id}`}
                   checked={item.display.showPrice}
                   onChange={(e) => updateDisplay("showPrice", e.target.checked)}
