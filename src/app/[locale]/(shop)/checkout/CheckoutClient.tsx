@@ -145,7 +145,7 @@ export default function CheckoutClient() {
   const searchParams = useSearchParams();
         const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, isLoading: isCartLoading } = useCart();
         const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
-        const { currency, convertPrice } = useCurrency();
+        const { currency, convertPrice, getCurrencyInfo } = useCurrency();
     const isRTL = locale === "ar";
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -880,17 +880,12 @@ export default function CheckoutClient() {
             correctBundleTotal = cartItemPriceAED > 0 ? cartItemPriceAED : bundleItemsTotal + (boxPrice || 0);
           }
           
-          // CoCart and WooCommerce prices are in AED (base currency).
-          // Convert to the order's display currency so the WooCommerce order
-          // and payment gateway receive the correct amount.
-          correctBundleTotal = convertPrice(correctBundleTotal);
-          
           // Multiply by quantity for the line item total
           const quantity = item.quantity?.value || 1;
           const lineItemTotal = correctBundleTotal * quantity;
           
-          lineItem.subtotal = lineItemTotal.toFixed(2);
-          lineItem.total = lineItemTotal.toFixed(2);
+          lineItem.subtotal = lineItemTotal.toFixed(getCurrencyInfo().decimals);
+          lineItem.total = lineItemTotal.toFixed(getCurrencyInfo().decimals);
           
           const metaData: Array<{ key: string; value: string }> = [];
           
@@ -960,10 +955,18 @@ export default function CheckoutClient() {
           lineItem.meta_data = metaData;
         }
 
+        if (!lineItem.subtotal) {
+          const unitPrice = parseFloat(item.price) / divisor;
+          const qty = item.quantity?.value || 1;
+          const lineTotal = unitPrice * qty;
+          lineItem.subtotal = lineTotal.toFixed(getCurrencyInfo().decimals);
+          lineItem.total = lineTotal.toFixed(getCurrencyInfo().decimals);
+        }
+
         return lineItem;
       });
 
-      const billingData = formData.sameAsShipping ? formData.shipping : formData.billing;
+      const billingData= formData.sameAsShipping ? formData.shipping : formData.billing;
 
       const couponLines = selectedCoupons.map(coupon => ({ code: coupon.code }));
 
@@ -975,7 +978,7 @@ export default function CheckoutClient() {
           shippingLines.push({
             method_id: selectedRate.method_id,
             method_title: selectedRate.name,
-            total: convertPrice(parseFloat(shippingTotal) / divisor).toFixed(2),
+            total: convertPrice(parseFloat(shippingTotal) / 100).toFixed(getCurrencyInfo().decimals),
           });
         }
       }
