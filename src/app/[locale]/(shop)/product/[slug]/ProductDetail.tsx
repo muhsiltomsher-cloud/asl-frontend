@@ -1027,8 +1027,8 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 </p>
                 <p>
                   {isRTL
-                    ? "شحن مجاني للطلبات التي تزيد عن 300 درهم. التوصيل خلال 2-5 أيام عمل."
-                    : "Free shipping on orders over 300 AED. Delivery within 2-5 business days."}
+                    ? "شحن مجاني للطلبات التي تزيد عن 500 درهم. التوصيل خلال 2-5 أيام عمل."
+                    : "Free shipping on orders over 500 AED. Delivery within 2-5 business days."}
                 </p>
               </div>
             </AccordionSection>
