@@ -966,8 +966,22 @@ export default function CheckoutClient() {
 
       const couponLines = selectedCoupons.map(coupon => ({ code: coupon.code }));
 
+      const shippingLines: Array<{ method_id: string; method_title: string; total: string }> = [];
+      if (selectedShippingRate && shippingPackages.length > 0) {
+        const allRates = shippingPackages.flatMap((pkg) => pkg.shipping_rates || []);
+        const selectedRate = allRates.find((rate) => rate.rate_id === selectedShippingRate);
+        if (selectedRate) {
+          shippingLines.push({
+            method_id: selectedRate.method_id,
+            method_title: selectedRate.name,
+            total: shippingTotal,
+          });
+        }
+      }
+
       const orderPayload = {
         payment_method: formData.paymentMethod,
+        currency: currency || "AED",
         billing: {
           first_name: billingData.firstName,
           last_name: billingData.lastName,
@@ -992,6 +1006,7 @@ export default function CheckoutClient() {
           phone: formData.shipping.phone,
         },
         line_items: lineItems,
+        shipping_lines: shippingLines,
         coupon_lines: couponLines,
         customer_note: formData.orderNotes,
         ...(isAuthenticated && user?.user_id ? { customer_id: user.user_id } : newCustomerId ? { customer_id: newCustomerId } : {}),
