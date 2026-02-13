@@ -317,11 +317,13 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
   const [showStickyBar, setShowStickyBar] = useState(false);
   const addToCartRef = useRef<HTMLDivElement>(null);
     const { addToCart } = useCart();
-    const { currency } = useCurrency();
+    const { currency, convertPrice, getCurrencyInfo } = useCurrency();
     const { addToWishlist, removeFromWishlist, isInWishlist, getWishlistItemId } = useWishlist();
     const { isAuthenticated } = useAuth();
     const router = useRouter();
     const isRTL = locale === "ar";
+    const currencyInfo = getCurrencyInfo();
+    const convertedShippingThreshold = freeShippingThreshold ? Math.ceil(convertPrice(freeShippingThreshold)) : null;
 
   const toggleAccordion = (section: string) => {
     setOpenAccordion(openAccordion === section ? null : section);
@@ -1026,11 +1028,11 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                     ? "نقبل جميع بطاقات الائتمان الرئيسية والدفع عند الاستلام."
                     : "We accept all major credit cards and cash on delivery."}
                 </p>
-                {freeShippingThreshold ? (
+                {convertedShippingThreshold ? (
                   <p>
                     {isRTL
-                      ? `شحن مجاني للطلبات التي تزيد عن ${freeShippingThreshold} درهم. التوصيل خلال 2-5 أيام عمل.`
-                      : `Free shipping on orders over ${freeShippingThreshold} AED. Delivery within 2-5 business days.`}
+                      ? `شحن مجاني للطلبات التي تزيد عن ${convertedShippingThreshold} ${currencyInfo.code}. التوصيل خلال 2-5 أيام عمل.`
+                      : `Free shipping on orders over ${convertedShippingThreshold} ${currencyInfo.code}. Delivery within 2-5 business days.`}
                   </p>
                 ) : (
                   <p>

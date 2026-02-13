@@ -95,7 +95,9 @@ export function BuildYourOwnSetClient({
   const { addToCart } = useCart();
   const { notify } = useNotification();
   const { getFreeGiftProductIds } = useFreeGift();
-  const { currency } = useCurrency();
+  const { currency, convertPrice, getCurrencyInfo } = useCurrency();
+  const currencyInfo = getCurrencyInfo();
+  const convertedShippingThreshold = freeShippingThreshold ? Math.ceil(convertPrice(freeShippingThreshold)) : null;
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
@@ -488,8 +490,8 @@ export function BuildYourOwnSetClient({
               sku: "SKU",
               noDescription: "No description available",
               paymentInfo: "We accept all major credit cards and cash on delivery.",
-              deliveryInfo: freeShippingThreshold
-                ? `Free shipping on orders over ${freeShippingThreshold} AED. Delivery within 2-5 business days.`
+              deliveryInfo: convertedShippingThreshold
+                ? `Free shipping on orders over ${convertedShippingThreshold} ${currencyInfo.code}. Delivery within 2-5 business days.`
                 : "Delivery within 2-5 business days.",
             },
             ar:{
@@ -532,8 +534,8 @@ export function BuildYourOwnSetClient({
           sku: "رمز المنتج",
           noDescription: "لا يوجد وصف متاح",
           paymentInfo: "نقبل جميع بطاقات الائتمان الرئيسية والدفع عند الاستلام.",
-          deliveryInfo: freeShippingThreshold
-            ? `شحن مجاني للطلبات التي تزيد عن ${freeShippingThreshold} درهم. التوصيل خلال 2-5 أيام عمل.`
+          deliveryInfo: convertedShippingThreshold
+            ? `شحن مجاني للطلبات التي تزيد عن ${convertedShippingThreshold} ${currencyInfo.code}. التوصيل خلال 2-5 أيام عمل.`
             : "التوصيل خلال 2-5 أيام عمل.",
         },
       };
