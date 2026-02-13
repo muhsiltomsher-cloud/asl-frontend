@@ -90,7 +90,7 @@ export function WCProductCard({
   return (
     <article className={cn("group relative", className)}>
       <Link href={`/${locale}/product/${productSlug}`} className="block">
-        <div className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 shadow-sm transition-all duration-500 ease-out group-hover:shadow-[0_20px_50px_rgba(180,83,9,0.15)] group-hover:-translate-y-1">
+        <div className="relative aspect-square overflow-hidden rounded-xl bg-gray-100 shadow-sm transition-all duration-500 ease-out group-hover:shadow-[0_20px_50px_rgba(180,83,9,0.15)] group-hover:-translate-y-1">
           {mainImage && !imageError ? (
             <Image
               src={mainImage.src}
@@ -104,7 +104,7 @@ export function WCProductCard({
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100">
+            <div className="flex h-full items-center justify-center bg-gray-100">
               <Image
                 src="https://staging.aromaticscentslab.com/wp-content/uploads/2024/12/ASL-Logo-1.png"
                 alt="Aromatic Scents Lab"
