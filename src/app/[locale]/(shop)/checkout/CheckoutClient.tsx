@@ -577,34 +577,15 @@ export default function CheckoutClient() {
           return `${coupon.amount} ${currency}`;
         };
 
-    const taxRate = useMemo(() => {
-      const coCartSubtotal = parseFloat(cart?.totals?.subtotal || "0") || 0;
-      const coCartShipping = parseFloat(cart?.totals?.shipping_total || "0") || 0;
-      const coCartTotalTax = parseFloat(cart?.totals?.total_tax || "0") || 0;
-      const taxableBase = coCartSubtotal + coCartShipping;
-      return taxableBase > 0 ? coCartTotalTax / taxableBase : 0;
-    }, [cart?.totals?.subtotal, cart?.totals?.shipping_total, cart?.totals?.total_tax]);
-
-    const displayTax = useMemo(() => {
-      if (shippingPackages.length > 0) {
-        const subtotal = parseFloat(cartSubtotal) || 0;
-        const shipping = parseFloat(shippingTotal) || 0;
-        const discount = couponDiscount || 0;
-        const newTaxableBase = subtotal - discount + shipping;
-        return Math.round(newTaxableBase * taxRate);
-      }
-      return parseFloat(cart?.totals?.total_tax || "0") || 0;
-    }, [cartSubtotal, shippingTotal, couponDiscount, taxRate, shippingPackages, cart?.totals?.total_tax]);
-
     const checkoutTotal = useMemo(() => {
       if (shippingPackages.length > 0) {
         const subtotal = parseFloat(cartSubtotal) || 0;
         const shipping = parseFloat(shippingTotal) || 0;
         const discount = couponDiscount || 0;
-        return subtotal - discount + shipping + displayTax;
+        return subtotal - discount + shipping;
       }
       return parseFloat(cartTotal) || 0;
-    }, [cartSubtotal, shippingTotal, couponDiscount, displayTax, shippingPackages, cartTotal]);
+    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal]);
 
     const breadcrumbItems = [
     { name: isRTL ? "السلة" : "Cart", href: `/${locale}/cart` },
@@ -2194,16 +2175,6 @@ export default function CheckoutClient() {
                                   <span className="text-green-600 font-medium">{isRTL ? "مجاني" : "Free"}</span>
                                 )}
                               </div>
-                              {/* VAT/Tax */}
-                              {displayTax > 0 && (
-                                <div className="flex justify-between text-sm text-gray-600">
-                                  <span>{isRTL ? "ضريبة القيمة المضافة" : "VAT"}</span>
-                                  <FormattedPrice
-                                    price={displayTax / divisor}
-                                    iconSize="xs"
-                                  />
-                                </div>
-                              )}
                             </div>
 
               <div className="hidden py-4 text-lg font-bold text-gray-900 lg:flex lg:justify-between">
@@ -2223,6 +2194,10 @@ export default function CheckoutClient() {
               >
                 {isRTL ? "تأكيد الطلب" : "Place Order"}
               </Button>
+
+              <p className="mt-2 hidden text-center text-xs text-gray-500 lg:block">
+                {isRTL ? "جميع الأسعار شاملة ضريبة القيمة المضافة" : "All prices are inclusive of VAT"}
+              </p>
 
               <p className="mt-4 hidden text-center text-xs text-gray-500 lg:block">
                 {isRTL
