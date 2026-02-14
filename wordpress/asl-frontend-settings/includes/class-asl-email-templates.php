@@ -29,6 +29,8 @@ class ASL_Email_Templates {
 		add_filter( 'woocommerce_email_footer_text', array( $this, 'remove_app_promo_from_footer' ), 999 );
 		add_filter( 'woocommerce_email_mobile_messaging', '__return_empty_string' );
 		add_action( 'init', array( $this, 'remove_mobile_app_banner' ) );
+		add_filter( 'woocommerce_email_from_name', array( $this, 'override_email_from_name' ), 999 );
+		add_filter( 'woocommerce_email_from_address', array( $this, 'override_email_from_address' ), 999 );
 	}
 
 	public function remove_app_promo_from_footer( $footer_text ) {
@@ -47,6 +49,14 @@ class ASL_Email_Templates {
 			return 'AED';
 		}
 		return $currency_symbol;
+	}
+
+	public function override_email_from_name( $from_name ) {
+		return 'Aromatic Scents Lab';
+	}
+
+	public function override_email_from_address( $from_address ) {
+		return 'info@aromaticscentslab.com';
 	}
 
 	public function override_woocommerce_template( $template, $template_name, $template_path ) {
