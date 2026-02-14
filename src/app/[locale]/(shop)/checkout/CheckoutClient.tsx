@@ -269,6 +269,24 @@ export default function CheckoutClient() {
           }
         } catch (err) {
           console.error("Failed to fetch customer data:", err);
+          if (user) {
+            const nameParts = user.user_display_name?.split(" ") || ["", ""];
+            setFormData(prev => ({
+              ...prev,
+              shipping: {
+                ...prev.shipping,
+                firstName: prev.shipping.firstName || nameParts[0] || "",
+                lastName: prev.shipping.lastName || nameParts.slice(1).join(" ") || "",
+                email: prev.shipping.email || user.user_email || "",
+              },
+              billing: prev.sameAsShipping ? {
+                ...prev.shipping,
+                firstName: prev.shipping.firstName || nameParts[0] || "",
+                lastName: prev.shipping.lastName || nameParts.slice(1).join(" ") || "",
+                email: prev.shipping.email || user.user_email || "",
+              } : prev.billing,
+            }));
+          }
         } finally {
           setIsLoadingCustomer(false);
         }
@@ -985,6 +1003,8 @@ export default function CheckoutClient() {
         }
       }
 
+      const billingEmail = billingData.email || formData.shipping.email || (isAuthenticated && user?.user_email ? user.user_email : "");
+
       const orderPayload = {
         payment_method: formData.paymentMethod,
         currency: currency || "AED",
@@ -997,7 +1017,7 @@ export default function CheckoutClient() {
           state: billingData.state,
           postcode: billingData.postalCode,
           country: billingData.country,
-          email: billingData.email || formData.shipping.email,
+          email: billingEmail,
           phone: billingData.phone || formData.shipping.phone,
         },
         shipping: {
