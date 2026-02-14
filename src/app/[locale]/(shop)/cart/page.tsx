@@ -652,15 +652,6 @@ export default function CartPage() {
                                     : texts.calculatedAtCheckout}
                                 </span>
                               </div>
-                              {cart?.totals?.total_tax && parseFloat(cart.totals.total_tax) > 0 && (
-                                <div className="flex justify-between text-gray-600">
-                                  <span>{texts.vat}</span>
-                                  <FormattedPrice
-                                    price={parseFloat(cart.totals.total_tax) / divisor}
-                                    iconSize="xs"
-                                  />
-                                </div>
-                              )}
                             </div>
 
                             <div className="flex justify-between py-4 text-lg font-semibold text-gray-900">
@@ -670,6 +661,10 @@ export default function CartPage() {
                   iconSize="sm"
                 />
               </div>
+
+              <p className="text-xs text-gray-500 text-center mb-3">
+                {isRTL ? "جميع الأسعار شاملة ضريبة القيمة المضافة" : "All prices are inclusive of VAT"}
+              </p>
 
               <Button className="w-full" size="lg" asChild>
                 <Link href={`/${locale}/checkout`}>{texts.checkout}</Link>

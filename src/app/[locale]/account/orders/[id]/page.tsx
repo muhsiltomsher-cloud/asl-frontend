@@ -336,7 +336,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
 
   const renderOrderDetails = () => {
     if (!order) return null;
-    const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) - parseFloat(order.total_tax) + parseFloat(order.discount_total);
+    const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) + parseFloat(order.discount_total);
 
     return (
       <div className="container mx-auto px-4 py-8" dir={isRTL ? "rtl" : "ltr"}>
@@ -495,16 +495,13 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                 </span>
               </div>
             )}
-            {parseFloat(order.total_tax) > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">{t.vat}</span>
-                <OrderPrice price={order.total_tax} orderCurrency={order.currency} orderCurrencySymbol={order.currency_symbol} className="text-gray-900" iconSize="xs" />
-              </div>
-            )}
             <div className="flex justify-between border-t pt-2 text-base font-semibold">
               <span className="text-gray-900">{t.total}</span>
               <OrderPrice price={order.total} orderCurrency={order.currency} orderCurrencySymbol={order.currency_symbol} className="text-gray-900" iconSize="sm" showConversion={true} isRTL={isRTL} />
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {isRTL ? "جميع الأسعار شاملة ضريبة القيمة المضافة" : "All prices are inclusive of VAT"}
+            </p>
           </div>
         </div>
 

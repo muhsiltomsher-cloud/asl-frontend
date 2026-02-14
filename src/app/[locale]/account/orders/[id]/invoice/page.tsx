@@ -162,7 +162,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
 
   const renderInvoice = () => {
     if (!order) return null;
-    const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) - parseFloat(order.total_tax) + parseFloat(order.discount_total);
+    const subtotal = parseFloat(order.total) - parseFloat(order.shipping_total) + parseFloat(order.discount_total);
 
     return (
       <div className="min-h-screen bg-gray-50" dir={isRTL ? "rtl" : "ltr"}>
@@ -224,6 +224,9 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                   <h2 className="text-xl font-bold text-gray-900 mb-1">Aromatic Scents Lab</h2>
                 )}
                 <p className="text-sm text-gray-600">www.aromaticscentslab.com</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {isRTL ? "رقم التسجيل الضريبي" : "TRN"}: 100580322400003
+                </p>
               </div>
             </div>
 
@@ -391,18 +394,6 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                       </span>
                     </div>
                   )}
-                  {parseFloat(order.total_tax) > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">{t.tax}</span>
-                      <OrderPrice 
-                        price={order.total_tax} 
-                        orderCurrency={order.currency} 
-                        orderCurrencySymbol={order.currency_symbol}
-                        className="text-gray-900"
-                        iconSize="xs"
-                      />
-                    </div>
-                  )}
                   <div className="flex justify-between border-t-2 border-gray-200 pt-2 text-base font-semibold">
                     <span className="text-gray-900">{t.grandTotal}</span>
                     <OrderPrice 
@@ -413,6 +404,9 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                       iconSize="sm"
                     />
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {isRTL ? "جميع الأسعار شاملة ضريبة القيمة المضافة" : "All prices are inclusive of VAT"}
+                  </p>
                 </div>
 
                 {order.payment_method_title && (
