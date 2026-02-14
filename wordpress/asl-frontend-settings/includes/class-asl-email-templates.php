@@ -56,7 +56,7 @@ class ASL_Email_Templates {
 	}
 
 	public function override_email_from_address( $from_address ) {
-		return 'info@aromaticscentslab.com';
+		return 'customerservice@aromaticscentslab.com';
 	}
 
 	public function override_woocommerce_template( $template, $template_name, $template_path ) {
