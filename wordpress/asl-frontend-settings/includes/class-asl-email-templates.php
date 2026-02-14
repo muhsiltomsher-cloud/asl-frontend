@@ -31,6 +31,7 @@ class ASL_Email_Templates {
 		add_action( 'init', array( $this, 'remove_mobile_app_banner' ) );
 		add_filter( 'woocommerce_email_from_name', array( $this, 'override_email_from_name' ), 999 );
 		add_filter( 'woocommerce_email_from_address', array( $this, 'override_email_from_address' ), 999 );
+		add_filter( 'woocommerce_mail_content', array( $this, 'replace_old_urls_in_email_content' ), 999 );
 	}
 
 	public function remove_app_promo_from_footer( $footer_text ) {
@@ -57,6 +58,12 @@ class ASL_Email_Templates {
 
 	public function override_email_from_address( $from_address ) {
 		return 'customerservice@aromaticscentslab.com';
+	}
+
+	public function replace_old_urls_in_email_content( $content ) {
+		$content = str_replace( 'https://app.aromaticscentslab.com', 'https://aromaticscentslab.com', $content );
+		$content = str_replace( 'http://app.aromaticscentslab.com', 'https://aromaticscentslab.com', $content );
+		return $content;
 	}
 
 	public function override_woocommerce_template( $template, $template_name, $template_path ) {
