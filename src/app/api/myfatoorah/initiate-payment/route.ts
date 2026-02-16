@@ -6,21 +6,43 @@ function parsePhoneForMyFatoorah(phone: string | undefined): { localNumber: stri
   
   let normalized = phone.replace(/[\s\-\(\)]/g, "");
   
+  let hasInternationalPrefix = false;
   if (normalized.startsWith("+")) {
+    hasInternationalPrefix = true;
     normalized = normalized.substring(1);
+  } else if (normalized.startsWith("00")) {
+    hasInternationalPrefix = true;
+    normalized = normalized.substring(2);
   }
   
-  const countryCodePrefixes = [
-    "00971", "00966", "00965", "00973", "00968", "00974", "00962", "0020",
-    "971", "966", "965", "973", "968", "974", "962", "20"
+  const countryCodes = [
+    "971", "966", "965", "973", "968", "974", "962", "972",
+    "963", "964", "967", "970", "961", "960",
+    "880", "886", "852", "853", "855", "856",
+    "212", "213", "216", "218",
+    "351", "352", "353", "354", "355", "356", "357", "358", "359",
+    "370", "371", "372", "373", "374", "375", "380", "381",
+    "385", "386", "389",
+    "420", "421",
+    "992", "993", "994", "995", "996", "998",
+    "20", "27",
+    "30", "31", "32", "33", "34", "36", "39",
+    "40", "41", "43", "44", "45", "46", "47", "48", "49",
+    "51", "52", "53", "54", "55", "56", "57", "58",
+    "60", "61", "62", "63", "64", "65", "66",
+    "81", "82", "84", "86",
+    "90", "91", "92", "93", "94", "95", "98",
+    "1", "7"
   ];
   
   let detectedCode = "";
-  for (const prefix of countryCodePrefixes) {
-    if (normalized.startsWith(prefix)) {
-      detectedCode = prefix.startsWith("00") ? prefix.substring(2) : prefix;
-      normalized = normalized.substring(prefix.length);
-      break;
+  if (hasInternationalPrefix) {
+    for (const code of countryCodes) {
+      if (normalized.startsWith(code)) {
+        detectedCode = code;
+        normalized = normalized.substring(code.length);
+        break;
+      }
     }
   }
   
