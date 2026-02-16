@@ -57,11 +57,11 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 
 function SearchPageSkeleton() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f7f6f2]">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <div className="h-10 w-64 animate-pulse rounded-lg bg-gray-200" />
-          <div className="mt-2 h-5 w-48 animate-pulse rounded bg-gray-200" />
+          <div className="h-10 w-64 skeleton-shimmer rounded-lg" />
+          <div className="mt-2 h-5 w-48 skeleton-shimmer rounded" />
         </div>
         <ProductGridSkeleton count={12} />
       </div>

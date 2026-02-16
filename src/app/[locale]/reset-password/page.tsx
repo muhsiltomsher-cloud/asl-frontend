@@ -19,13 +19,13 @@ function LoadingFallback() {
       <div className="w-full max-w-md">
         <div className="rounded-lg border border-[#E8E0D5] bg-white p-8 shadow-sm">
           <div className="mb-8 text-center">
-            <div className="h-8 w-48 mx-auto bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-64 mx-auto mt-4 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-8 w-48 mx-auto skeleton-shimmer rounded"></div>
+            <div className="h-4 w-64 mx-auto mt-4 skeleton-shimmer rounded"></div>
           </div>
           <div className="space-y-5">
-            <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
+            <div className="h-12 skeleton-shimmer rounded"></div>
+            <div className="h-12 skeleton-shimmer rounded"></div>
+            <div className="h-12 skeleton-shimmer rounded"></div>
           </div>
         </div>
       </div>

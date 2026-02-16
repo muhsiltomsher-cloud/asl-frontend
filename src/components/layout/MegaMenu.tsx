@@ -297,7 +297,7 @@ export function MegaMenu({
                         onClick={onClose}
                         className="group block"
                       >
-                        <div className="relative aspect-square overflow-hidden rounded-lg bg-gradient-to-b from-[#e8e4dc] to-[#d4cfc5]">
+                        <div className="relative aspect-square overflow-hidden rounded-lg skeleton-shimmer">
                           {product.images?.[0]?.src ? (
                             <Image
                               src={product.images[0].src}
