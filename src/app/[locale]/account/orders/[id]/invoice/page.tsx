@@ -86,6 +86,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [productCategories, setProductCategories] = useState<Record<number, string[]>>({});
 
   const resolvedParams = use(params);
   const locale = resolvedParams.locale as "en" | "ar";
@@ -140,7 +141,33 @@ export default function InvoicePage({ params }: InvoicePageProps) {
     }
   }, [isAuthenticated, orderId]);
 
-  const handlePrint = () => {
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!order) return;
+      const productIds = [...new Set(order.line_items.map(item => item.product_id).filter(id => id > 0))];
+      if (productIds.length === 0) return;
+      try {
+        const response = await fetch(
+          `${siteConfig.apiUrl}/wp-json/wc/store/v1/products?include=${productIds.join(",")}&per_page=${productIds.length}`
+        );
+        if (response.ok) {
+          const products = await response.json();
+          const categoriesMap: Record<number, string[]> = {};
+          for (const product of products) {
+            categoriesMap[product.id] = (product.categories || []).map(
+              (cat: { id: number; name: string }) => cat.name
+            );
+          }
+          setProductCategories(categoriesMap);
+        }
+      } catch (err) {
+        console.error("Failed to fetch product categories:", err);
+      }
+    };
+    fetchCategories();
+  }, [order]);
+
+  const handlePrint= () => {
     window.print();
   };
 
@@ -315,6 +342,11 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                             )}
                             <div>
                               <p className="font-medium text-gray-900">{item.name}</p>
+                              {productCategories[item.product_id]?.length > 0 && (
+                                <p className="text-xs text-gray-500">
+                                  {productCategories[item.product_id].join(", ")}
+                                </p>
+                              )}
                               {isFreeGift && (
                                 <span className="inline-flex items-center gap-1 text-xs text-amber-600">
                                   <Gift className="h-3 w-3" />
