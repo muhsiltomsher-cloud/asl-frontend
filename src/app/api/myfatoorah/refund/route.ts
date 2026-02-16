@@ -77,10 +77,10 @@ async function updateOrderWithRefundDetails(
       },
       body: JSON.stringify({
         meta_data: [
-          { key: "_myfatoorah_refund_id", value: refundId.toString() },
-          { key: "_myfatoorah_refund_reference", value: refundReference },
-          { key: "_myfatoorah_refund_amount", value: amount.toString() },
-          { key: "_myfatoorah_refund_date", value: new Date().toISOString() },
+          { key: "myfatoorah_refund_id", value: refundId.toString() },
+          { key: "myfatoorah_refund_reference", value: refundReference },
+          { key: "myfatoorah_refund_amount", value: amount.toString() },
+          { key: "myfatoorah_refund_date", value: new Date().toISOString() },
         ],
       }),
     });

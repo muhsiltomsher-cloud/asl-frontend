@@ -388,77 +388,77 @@ export async function PUT(request: NextRequest) {
       
       // Invoice details
       if (body.payment_details.invoice_id) {
-        metaData.push({ key: "_myfatoorah_invoice_id", value: body.payment_details.invoice_id });
+        metaData.push({ key: "myfatoorah_invoice_id", value: body.payment_details.invoice_id });
       }
       if (body.payment_details.invoice_status) {
-        metaData.push({ key: "_myfatoorah_invoice_status", value: body.payment_details.invoice_status });
+        metaData.push({ key: "myfatoorah_invoice_status", value: body.payment_details.invoice_status });
       }
       if (body.payment_details.invoice_reference) {
-        metaData.push({ key: "_myfatoorah_invoice_reference", value: body.payment_details.invoice_reference });
+        metaData.push({ key: "myfatoorah_invoice_reference", value: body.payment_details.invoice_reference });
       }
       if (body.payment_details.invoice_value) {
-        metaData.push({ key: "_myfatoorah_invoice_value", value: body.payment_details.invoice_value });
+        metaData.push({ key: "myfatoorah_invoice_value", value: body.payment_details.invoice_value });
       }
       if (body.payment_details.created_date) {
-        metaData.push({ key: "_myfatoorah_created_date", value: body.payment_details.created_date });
+        metaData.push({ key: "myfatoorah_created_date", value: body.payment_details.created_date });
       }
       // Transaction details
       if (body.payment_details.transaction_id) {
-        metaData.push({ key: "_myfatoorah_transaction_id", value: body.payment_details.transaction_id });
+        metaData.push({ key: "myfatoorah_transaction_id", value: body.payment_details.transaction_id });
       }
       if (body.payment_details.transaction_status) {
-        metaData.push({ key: "_myfatoorah_transaction_status", value: body.payment_details.transaction_status });
+        metaData.push({ key: "myfatoorah_transaction_status", value: body.payment_details.transaction_status });
       }
       // Payment details
       if (body.payment_details.payment_id) {
-        metaData.push({ key: "_myfatoorah_payment_id", value: body.payment_details.payment_id });
+        metaData.push({ key: "myfatoorah_payment_id", value: body.payment_details.payment_id });
       }
       if (body.payment_details.payment_method) {
-        metaData.push({ key: "_myfatoorah_payment_method", value: body.payment_details.payment_method });
+        metaData.push({ key: "myfatoorah_payment_method", value: body.payment_details.payment_method });
       }
       if (body.payment_details.reference_id) {
-        metaData.push({ key: "_myfatoorah_reference_id", value: body.payment_details.reference_id });
+        metaData.push({ key: "myfatoorah_reference_id", value: body.payment_details.reference_id });
       }
       if (body.payment_details.track_id) {
-        metaData.push({ key: "_myfatoorah_track_id", value: body.payment_details.track_id });
+        metaData.push({ key: "myfatoorah_track_id", value: body.payment_details.track_id });
       }
       if (body.payment_details.authorization_id) {
-        metaData.push({ key: "_myfatoorah_authorization_id", value: body.payment_details.authorization_id });
+        metaData.push({ key: "myfatoorah_authorization_id", value: body.payment_details.authorization_id });
       }
       if (body.payment_details.transaction_date) {
-        metaData.push({ key: "_myfatoorah_transaction_date", value: body.payment_details.transaction_date });
+        metaData.push({ key: "myfatoorah_transaction_date", value: body.payment_details.transaction_date });
       }
       // Customer details
       if (body.payment_details.customer_ip) {
-        metaData.push({ key: "_myfatoorah_customer_ip", value: body.payment_details.customer_ip });
+        metaData.push({ key: "myfatoorah_customer_ip", value: body.payment_details.customer_ip });
       }
       if (body.payment_details.customer_country) {
-        metaData.push({ key: "_myfatoorah_customer_country", value: body.payment_details.customer_country });
+        metaData.push({ key: "myfatoorah_customer_country", value: body.payment_details.customer_country });
       }
       if (body.payment_details.customer_name) {
-        metaData.push({ key: "_myfatoorah_customer_name", value: body.payment_details.customer_name });
+        metaData.push({ key: "myfatoorah_customer_name", value: body.payment_details.customer_name });
       }
       if (body.payment_details.customer_email) {
-        metaData.push({ key: "_myfatoorah_customer_email", value: body.payment_details.customer_email });
+        metaData.push({ key: "myfatoorah_customer_email", value: body.payment_details.customer_email });
       }
       if (body.payment_details.customer_mobile) {
-        metaData.push({ key: "_myfatoorah_customer_mobile", value: body.payment_details.customer_mobile });
+        metaData.push({ key: "myfatoorah_customer_mobile", value: body.payment_details.customer_mobile });
       }
       // Card details
       if (body.payment_details.card_brand) {
-        metaData.push({ key: "_myfatoorah_card_brand", value: body.payment_details.card_brand });
+        metaData.push({ key: "myfatoorah_card_brand", value: body.payment_details.card_brand });
       }
       if (body.payment_details.card_number) {
-        metaData.push({ key: "_myfatoorah_card_number", value: body.payment_details.card_number });
+        metaData.push({ key: "myfatoorah_card_number", value: body.payment_details.card_number });
       }
       if (body.payment_details.card_issuer) {
-        metaData.push({ key: "_myfatoorah_card_issuer", value: body.payment_details.card_issuer });
+        metaData.push({ key: "myfatoorah_card_issuer", value: body.payment_details.card_issuer });
       }
       if (body.payment_details.card_issuer_country) {
-        metaData.push({ key: "_myfatoorah_card_issuer_country", value: body.payment_details.card_issuer_country });
+        metaData.push({ key: "myfatoorah_card_issuer_country", value: body.payment_details.card_issuer_country });
       }
       if (body.payment_details.card_funding_method) {
-        metaData.push({ key: "_myfatoorah_card_funding_method", value: body.payment_details.card_funding_method });
+        metaData.push({ key: "myfatoorah_card_funding_method", value: body.payment_details.card_funding_method });
       }
       // Paid currency details
       if (body.payment_details.paid_currency) {
@@ -469,20 +469,20 @@ export async function PUT(request: NextRequest) {
       }
       // Amount details
       if (body.payment_details.payable_amount) {
-        metaData.push({ key: "_myfatoorah_payable_amount", value: body.payment_details.payable_amount });
+        metaData.push({ key: "myfatoorah_payable_amount", value: body.payment_details.payable_amount });
       }
       if (body.payment_details.client_deduction) {
-        metaData.push({ key: "_myfatoorah_client_deduction", value: body.payment_details.client_deduction });
+        metaData.push({ key: "myfatoorah_client_deduction", value: body.payment_details.client_deduction });
       }
       if (body.payment_details.receivable_amount) {
-        metaData.push({ key: "_myfatoorah_receivable_amount", value: body.payment_details.receivable_amount });
+        metaData.push({ key: "myfatoorah_receivable_amount", value: body.payment_details.receivable_amount });
       }
       // Error details
       if (body.payment_details.error_code) {
-        metaData.push({ key: "_myfatoorah_error_code", value: body.payment_details.error_code });
+        metaData.push({ key: "myfatoorah_error_code", value: body.payment_details.error_code });
       }
       if (body.payment_details.error_message) {
-        metaData.push({ key: "_myfatoorah_error_message", value: body.payment_details.error_message });
+        metaData.push({ key: "myfatoorah_error_message", value: body.payment_details.error_message });
       }
       
       if (metaData.length > 0) {
