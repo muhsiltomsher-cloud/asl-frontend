@@ -44,6 +44,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="overflow-x-clip">
+      <head>
+        <link rel="dns-prefetch" href="https://cms.aromaticscentslab.com" />
+        <link rel="preconnect" href="https://cms.aromaticscentslab.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://connect.facebook.net" />
+        <link rel="dns-prefetch" href="https://www.clarity.ms" />
+      </head>
       <body
         suppressHydrationWarning
         className={`${inter.variable} ${notoSansArabic.variable} antialiased overflow-x-clip`}

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import dynamic from "next/dynamic";
 import NextTopLoader from "nextjs-toploader";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
-import { MiniCartDrawer } from "@/components/cart/MiniCartDrawer";
-import { AccountDrawer } from "@/components/account/AccountDrawer";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
@@ -16,12 +15,15 @@ import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { LocationCurrencyBanner } from "@/components/common/LocationCurrencyBanner";
-import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
-import { WhatsAppFloatingButton } from "@/components/common/WhatsAppFloatingButton";
-import { NetworkStatusBanner } from "@/components/common/NetworkStatusBanner";
 import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
+
+const MiniCartDrawer = dynamic(() => import("@/components/cart/MiniCartDrawer").then(mod => mod.MiniCartDrawer));
+const AccountDrawer = dynamic(() => import("@/components/account/AccountDrawer").then(mod => mod.AccountDrawer));
+const WhatsAppFloatingButton = dynamic(() => import("@/components/common/WhatsAppFloatingButton").then(mod => mod.WhatsAppFloatingButton));
+const LocationCurrencyBanner = dynamic(() => import("@/components/common/LocationCurrencyBanner").then(mod => mod.LocationCurrencyBanner));
+const CookieConsentBanner = dynamic(() => import("@/components/common/CookieConsentBanner").then(mod => mod.CookieConsentBanner));
+const NetworkStatusBanner = dynamic(() => import("@/components/common/NetworkStatusBanner").then(mod => mod.NetworkStatusBanner));
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
