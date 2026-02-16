@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 768, 1024, 1280, 1536],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 31536000,
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "cms.aromaticscentslab.com",
-        pathname: "/wp-content/uploads/**",
-      },
       {
         protocol: "https",
         hostname: "cms.aromaticscentslab.com",
@@ -28,11 +28,13 @@ const nextConfig: NextConfig = {
   // Increase static page generation timeout to handle slow API responses during build
   staticPageGenerationTimeout: 120,
   // Enable experimental features for better caching
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
+  },
   experimental: {
-    // Configure stale times for dynamic and static content
     staleTimes: {
-      dynamic: 30, // 30 seconds for dynamic routes
-      static: 180, // 3 minutes for static routes
+      dynamic: 30,
+      static: 180,
     },
   },
   async rewrites() {
@@ -73,6 +75,26 @@ const nextConfig: NextConfig = {
           {
             key: "Cache-Control",
             value: "public, s-maxage=600, stale-while-revalidate=1200",
+          },
+        ],
+      },
+      {
+        // Cache static assets (JS, CSS) with immutable headers
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        // Cache optimized images
+        source: "/_next/image/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
