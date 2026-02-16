@@ -94,6 +94,10 @@ export default function InvoicePage({ params }: InvoicePageProps) {
   const isRTL = locale === "ar";
 
   useEffect(() => {
+    document.title = isRTL ? "فاتورة - أروماتيك سنتس لاب" : "Invoice - Aromatic Scents Lab";
+  }, [isRTL]);
+
+  useEffect(() => {
     const fetchLogo = async () => {
       try {
         const response = await fetch(`${siteConfig.apiUrl}/wp-json/asl/v1/site-settings`);
