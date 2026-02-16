@@ -18,12 +18,12 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
 
-const MiniCartDrawer = dynamic(() => import("@/components/cart/MiniCartDrawer").then(mod => mod.MiniCartDrawer), { ssr: false });
-const AccountDrawer = dynamic(() => import("@/components/account/AccountDrawer").then(mod => mod.AccountDrawer), { ssr: false });
-const WhatsAppFloatingButton = dynamic(() => import("@/components/common/WhatsAppFloatingButton").then(mod => mod.WhatsAppFloatingButton), { ssr: false });
-const LocationCurrencyBanner = dynamic(() => import("@/components/common/LocationCurrencyBanner").then(mod => mod.LocationCurrencyBanner), { ssr: false });
-const CookieConsentBanner = dynamic(() => import("@/components/common/CookieConsentBanner").then(mod => mod.CookieConsentBanner), { ssr: false });
-const NetworkStatusBanner = dynamic(() => import("@/components/common/NetworkStatusBanner").then(mod => mod.NetworkStatusBanner), { ssr: false });
+const MiniCartDrawer = dynamic(() => import("@/components/cart/MiniCartDrawer").then(mod => mod.MiniCartDrawer));
+const AccountDrawer = dynamic(() => import("@/components/account/AccountDrawer").then(mod => mod.AccountDrawer));
+const WhatsAppFloatingButton = dynamic(() => import("@/components/common/WhatsAppFloatingButton").then(mod => mod.WhatsAppFloatingButton));
+const LocationCurrencyBanner = dynamic(() => import("@/components/common/LocationCurrencyBanner").then(mod => mod.LocationCurrencyBanner));
+const CookieConsentBanner = dynamic(() => import("@/components/common/CookieConsentBanner").then(mod => mod.CookieConsentBanner));
+const NetworkStatusBanner = dynamic(() => import("@/components/common/NetworkStatusBanner").then(mod => mod.NetworkStatusBanner));
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
