@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, Gift, XCircle } from "lucide-react";
+import { ArrowLeft, Package, Truck, CheckCircle, Clock, MapPin, Gift, XCircle, CreditCard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/common/Button";
 import { AccountAuthGuard } from "@/components/account/AccountAuthGuard";
@@ -60,6 +60,26 @@ const translations = {
     cancelError: "Failed to cancel order",
     cancel: "Cancel",
     confirm: "Confirm",
+    transactionDetails: "Transaction Details",
+    invoiceId: "Invoice ID",
+    invoiceRef: "Invoice Reference",
+    invoiceAmount: "Invoice Amount",
+    createdDate: "Created Date",
+    transactionStatus: "Status",
+    transactionDate: "Transaction Date",
+    paymentMethodLabel: "Method",
+    cardNumber: "Card",
+    paymentId: "Payment ID",
+    authCode: "Auth Code",
+    trackId: "Track ID",
+    payableAmount: "Payable Amount",
+    clientDeduction: "Client Deduction",
+    vatAmount: "VAT Amount",
+    receivableAmount: "Receivable Amount",
+    customerName: "Name",
+    customerEmail: "Email",
+    customerMobile: "Mobile",
+    errorDetails: "Error",
   },
   ar: {
     orderDetails: "تفاصيل الطلب",
@@ -101,6 +121,26 @@ const translations = {
     cancelError: "فشل في إلغاء الطلب",
     cancel: "إلغاء",
     confirm: "تأكيد",
+    transactionDetails: "تفاصيل المعاملة",
+    invoiceId: "رقم الفاتورة",
+    invoiceRef: "مرجع الفاتورة",
+    invoiceAmount: "مبلغ الفاتورة",
+    createdDate: "تاريخ الإنشاء",
+    transactionStatus: "الحالة",
+    transactionDate: "تاريخ المعاملة",
+    paymentMethodLabel: "الطريقة",
+    cardNumber: "البطاقة",
+    paymentId: "رقم الدفع",
+    authCode: "رمز التفويض",
+    trackId: "رقم التتبع",
+    payableAmount: "المبلغ المستحق",
+    clientDeduction: "خصم العميل",
+    vatAmount: "مبلغ الضريبة",
+    receivableAmount: "المبلغ المستلم",
+    customerName: "الاسم",
+    customerEmail: "البريد الإلكتروني",
+    customerMobile: "الهاتف",
+    errorDetails: "خطأ",
   },
 };
 
@@ -515,6 +555,88 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
             <p className="text-gray-600">{order.payment_method_title}</p>
           </div>
         )}
+
+        {order.meta_data && (() => {
+          const getMeta = (key: string) => order.meta_data?.find((m) => m.key === key)?.value;
+          const invoiceId = getMeta("_myfatoorah_invoice_id");
+          const invoiceRef = getMeta("_myfatoorah_invoice_reference");
+          const invoiceValue = getMeta("_myfatoorah_invoice_value");
+          const createdDate = getMeta("_myfatoorah_created_date");
+          const txnStatus = getMeta("_myfatoorah_transaction_status") || getMeta("_myfatoorah_invoice_status");
+          const txnDate = getMeta("_myfatoorah_transaction_date");
+          const method = getMeta("_myfatoorah_payment_method");
+          const cardNumber = getMeta("_myfatoorah_card_number");
+          const cardBrand = getMeta("_myfatoorah_card_brand");
+          const paymentIdVal = getMeta("_myfatoorah_payment_id");
+          const authCode = getMeta("_myfatoorah_authorization_id");
+          const trackId = getMeta("_myfatoorah_track_id");
+          const payableAmount = getMeta("_myfatoorah_payable_amount");
+          const clientDeduction = getMeta("_myfatoorah_client_deduction");
+          const receivableAmount = getMeta("_myfatoorah_receivable_amount");
+          const custName = getMeta("_myfatoorah_customer_name");
+          const custEmail = getMeta("_myfatoorah_customer_email");
+          const custMobile = getMeta("_myfatoorah_customer_mobile");
+          const errorCode = getMeta("_myfatoorah_error_code");
+          const errorMsg = getMeta("_myfatoorah_error_message");
+
+          const hasAnyData = invoiceId || paymentIdVal || txnStatus || method;
+          if (!hasAnyData) return null;
+
+          const isSuccess = txnStatus === "Succss" || txnStatus === "Success" || txnStatus === "SUCCESS";
+          const isFailed = txnStatus === "Failed" || txnStatus === "FAILED";
+          const statusColor = isSuccess ? "text-green-600 bg-green-50" : isFailed ? "text-red-600 bg-red-50" : "text-yellow-600 bg-yellow-50";
+
+          const vatAmount = payableAmount && receivableAmount && clientDeduction
+            ? (parseFloat(payableAmount) - parseFloat(receivableAmount) - parseFloat(clientDeduction)).toFixed(2)
+            : null;
+
+          const fields: Array<{ label: string; value: string | undefined | null; highlight?: string }> = [
+            { label: t.invoiceId, value: invoiceId && invoiceRef ? `${invoiceId} / ${invoiceRef}` : invoiceId },
+            { label: t.invoiceAmount, value: invoiceValue ? `${parseFloat(invoiceValue).toFixed(2)} ${order.currency}` : undefined },
+            { label: t.createdDate, value: createdDate },
+            { label: t.customerName, value: custName },
+            { label: t.customerEmail, value: custEmail },
+            { label: t.customerMobile, value: custMobile },
+            { label: t.transactionStatus, value: txnStatus, highlight: statusColor },
+            { label: t.transactionDate, value: txnDate },
+            { label: t.paymentMethodLabel, value: method },
+            { label: t.cardNumber, value: cardBrand && cardNumber ? `${cardBrand} ${cardNumber}` : cardNumber },
+            { label: t.paymentId, value: paymentIdVal },
+            { label: t.authCode, value: authCode },
+            { label: t.trackId, value: trackId },
+            { label: t.payableAmount, value: payableAmount ? `${parseFloat(payableAmount).toFixed(2)} ${order.currency}` : undefined },
+            { label: t.clientDeduction, value: clientDeduction ? `${parseFloat(clientDeduction).toFixed(2)} ${order.currency}` : undefined },
+            { label: t.vatAmount, value: vatAmount ? `${vatAmount} ${order.currency}` : undefined },
+            { label: t.receivableAmount, value: receivableAmount ? `${parseFloat(receivableAmount).toFixed(2)} ${order.currency}` : undefined },
+          ];
+
+          if (errorCode || errorMsg) {
+            fields.push({ label: t.errorDetails, value: errorCode ? `${errorCode} - ${errorMsg || ""}` : errorMsg, highlight: "text-red-600 bg-red-50" });
+          }
+
+          const activeFields = fields.filter((f) => f.value);
+
+          return (
+            <div className="rounded-xl border border-gray-200 bg-white p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <CreditCard className="h-5 w-5 text-gray-600" />
+                <h3 className="font-semibold text-gray-900">{t.transactionDetails}</h3>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {activeFields.map(({ label, value, highlight }) => (
+                  <div key={label} className="flex flex-col gap-0.5">
+                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
+                    {highlight ? (
+                      <span className={`text-sm font-medium inline-flex self-start px-2 py-0.5 rounded ${highlight}`}>{value}</span>
+                    ) : (
+                      <span className="text-sm text-gray-900 break-all">{value}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         <OrderNotes orderId={order.id} locale={locale} country={order.billing?.country} />
       </div>
