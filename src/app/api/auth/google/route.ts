@@ -21,6 +21,66 @@ interface GoogleTokenInfo {
   given_name?: string;
   family_name?: string;
   error_description?: string;
+  iss?: string;
+  exp?: number;
+}
+
+function decodeJwtPayload(token: string): GoogleTokenInfo | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const payload = Buffer.from(parts[1], "base64url").toString("utf-8");
+    return JSON.parse(payload) as GoogleTokenInfo;
+  } catch {
+    return null;
+  }
+}
+
+async function verifyGoogleToken(credential: string, clientId: string): Promise<{ valid: boolean; info: GoogleTokenInfo | null; error?: string }> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const tokenRes = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`,
+      { signal: controller.signal }
+    );
+    clearTimeout(timeout);
+
+    if (!tokenRes.ok) {
+      const errBody = await tokenRes.text().catch(() => "");
+      console.error(`[google-auth] tokeninfo returned ${tokenRes.status}: ${errBody.slice(0, 200)}`);
+      return { valid: false, info: null, error: "Token verification failed" };
+    }
+
+    const tokenInfo: GoogleTokenInfo = await tokenRes.json();
+    if (tokenInfo.error_description) {
+      return { valid: false, info: null, error: tokenInfo.error_description };
+    }
+    if (tokenInfo.aud !== clientId) {
+      return { valid: false, info: null, error: "Token audience mismatch" };
+    }
+    return { valid: true, info: tokenInfo };
+  } catch (fetchErr) {
+    console.warn(`[google-auth] tokeninfo fetch failed, using JWT decode fallback:`, fetchErr instanceof Error ? fetchErr.message : fetchErr);
+
+    const decoded = decodeJwtPayload(credential);
+    if (!decoded) {
+      return { valid: false, info: null, error: "Failed to decode token" };
+    }
+
+    const validIssuers = ["accounts.google.com", "https://accounts.google.com"];
+    if (!decoded.iss || !validIssuers.includes(decoded.iss)) {
+      return { valid: false, info: null, error: "Invalid token issuer" };
+    }
+    if (decoded.aud !== clientId) {
+      return { valid: false, info: null, error: "Token audience mismatch" };
+    }
+    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+      return { valid: false, info: null, error: "Token expired" };
+    }
+
+    return { valid: true, info: decoded };
+  }
 }
 
 interface WcCustomer {
@@ -74,16 +134,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const tokenRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
-    const tokenInfo: GoogleTokenInfo = await tokenRes.json();
-
-    if (tokenInfo.error_description || tokenInfo.aud !== GOOGLE_CLIENT_ID) {
+    const verification = await verifyGoogleToken(credential, GOOGLE_CLIENT_ID);
+    if (!verification.valid || !verification.info) {
       return NextResponse.json(
-        { success: false, error: { code: "invalid_token", message: "Invalid Google token" } },
+        { success: false, error: { code: "invalid_token", message: verification.error || "Invalid Google token" } },
         { status: 401 }
       );
     }
 
+    const tokenInfo = verification.info;
     const email = tokenInfo.email;
     const googleUserId = tokenInfo.sub;
     if (!email || !googleUserId) {
