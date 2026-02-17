@@ -190,6 +190,24 @@ export async function POST(request: NextRequest) {
       wcDiagnostics += `search_failed(${searchRes.status}); `;
     }
 
+    if (customers.length === 0 && !wcDiagnostics.includes("search_failed")) {
+      const roleSearchRes = await fetch(
+        wcApiUrl(`/customers?email=${encodeURIComponent(email)}&role=all`),
+        { headers: primaryHeaders }
+      );
+      if (roleSearchRes.ok) {
+        try {
+          const roleParsed = await roleSearchRes.json();
+          if (Array.isArray(roleParsed) && roleParsed.length > 0) {
+            customers = roleParsed;
+            console.warn(`[google-auth] Found user via role=all search (role=${roleParsed[0].role})`);
+          }
+        } catch {
+          // ignore parse errors
+        }
+      }
+    }
+
     if (customers.length > 0) {
       const customer = customers[0];
       for (const creds of allCreds) {
@@ -253,7 +271,7 @@ export async function POST(request: NextRequest) {
 
       if (!created && customerExists) {
         const retrySearch = await fetch(
-          wcApiUrl(`/customers?email=${encodeURIComponent(email)}`),
+          wcApiUrl(`/customers?email=${encodeURIComponent(email)}&role=all`),
           { headers: primaryHeaders }
         );
         if (retrySearch.ok) {
