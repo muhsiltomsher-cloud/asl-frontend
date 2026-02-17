@@ -21,14 +21,18 @@ export async function generateMetadata({
   
   return generateSeoMetadata({
     title: locale === "ar" 
-      ? query ? `نتائج البحث عن: ${query}` : "البحث"
-      : query ? `Search results for: ${query}` : "Search",
+      ? query ? `نتائج البحث عن: ${query}` : "البحث في العطور"
+      : query ? `Search results for: ${query}` : "Search Fragrances & Perfumes",
     description:
       locale === "ar"
-        ? "ابحث في مجموعتنا من العطور والمنتجات العطرية الفاخرة"
-        : "Search our collection of premium fragrances and aromatic products",
+        ? "ابحث في مجموعتنا الواسعة من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم ومعطرات المنزل"
+        : "Search our extensive collection of premium fragrances, aromatic oils, body care products, and home fragrances",
     locale: locale as Locale,
     pathname: "/search",
+    noIndex: true,
+    keywords: locale === "ar"
+      ? ["بحث عطور", "عطور فاخرة", "زيوت عطرية", "منتجات عطرية"]
+      : ["search perfumes", "find fragrances", "aromatic products", "perfume search"],
   });
 }
 

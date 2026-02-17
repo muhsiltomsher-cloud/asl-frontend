@@ -30,6 +30,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/about",
+    keywords: locale === "ar"
+      ? ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية"]
+      : ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances"],
   });
 }
 

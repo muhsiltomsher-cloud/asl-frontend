@@ -21,13 +21,16 @@ export async function generateMetadata({
 }: ShopPageProps): Promise<Metadata> {
   const { locale } = await params;
   return generateSeoMetadata({
-    title: locale === "ar" ? "المتجر" : "Shop",
+    title: locale === "ar" ? "تسوق العطور الفاخرة" : "Shop Premium Fragrances & Perfumes",
     description:
       locale === "ar"
-        ? "تصفح مجموعتنا الكاملة من العطور والمنتجات العطرية الفاخرة"
-        : "Browse our complete collection of premium fragrances and aromatic products",
+        ? "تصفح مجموعتنا الكاملة من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم ومعطرات المنزل. شحن مجاني للطلبات فوق 500 درهم"
+        : "Browse our complete collection of premium fragrances, aromatic oils, body care products, and home fragrances. Free shipping on orders over 500 AED",
     locale: locale as Locale,
     pathname: "/shop",
+    keywords: locale === "ar"
+      ? ["تسوق عطور", "عطور فاخرة", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "عطور عربية", "عطور إماراتية", "شراء عطور"]
+      : ["shop perfumes", "buy fragrances", "aromatic oils", "body care", "home fragrances", "Arabian perfume", "UAE perfume", "luxury perfume online"],
   });
 }
 

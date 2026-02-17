@@ -20,6 +20,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/returns",
+    keywords: locale === "ar"
+      ? ["سياسة الإرجاع", "استبدال عطور", "إرجاع منتجات", "ضمان الجودة"]
+      : ["return policy", "perfume exchange", "product returns", "quality guarantee"],
   });
 }
 

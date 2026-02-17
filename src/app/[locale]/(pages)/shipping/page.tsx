@@ -20,6 +20,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/shipping",
+    keywords: locale === "ar"
+      ? ["شحن عطور", "توصيل عطور", "شحن الإمارات", "توصيل مجاني", "سياسة الشحن"]
+      : ["perfume shipping", "fragrance delivery", "UAE shipping", "free delivery", "shipping policy"],
   });
 }
 

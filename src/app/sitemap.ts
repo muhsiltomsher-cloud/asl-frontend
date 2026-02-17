@@ -13,6 +13,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/about",
     "/contact",
     "/faq",
+    "/new-products",
+    "/featured-products",
+    "/build-your-own-set",
+    "/store-locator",
+    "/shipping",
+    "/returns",
+    "/privacy",
+    "/terms-and-conditions",
   ];
 
   // Generate static page entries for all locales

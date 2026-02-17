@@ -20,6 +20,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/privacy",
+    keywords: locale === "ar"
+      ? ["سياسة الخصوصية", "حماية البيانات", "أمان المعلومات"]
+      : ["privacy policy", "data protection", "information security"],
   });
 }
 

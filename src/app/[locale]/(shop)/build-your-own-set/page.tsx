@@ -20,12 +20,15 @@ export async function generateMetadata({
   const isRTL = locale === "ar";
 
   return generateSeoMetadata({
-    title: isRTL ? "اصنع مجموعتك الخاصة" : "Build Your Own Set",
+    title: isRTL ? "اصنع مجموعتك الخاصة من العطور" : "Build Your Own Fragrance Set - Custom Perfume Bundle",
     description: isRTL
-      ? "أنشئ مجموعة عطور فريدة من اختيارك. اختر 3 منتجات أو أكثر من العطور والزيوت واللوشن ومعطرات المنزل."
-      : "Create a unique fragrance set of your choice. Pick 3 or more products from perfumes, oils, lotions, or home fragrances.",
+      ? "أنشئ مجموعة عطور فريدة من اختيارك. اختر 3 منتجات أو أكثر من العطور والزيوت واللوشن ومعطرات المنزل من Aromatic Scents Lab"
+      : "Create a unique fragrance set of your choice. Pick 3 or more products from perfumes, oils, lotions, or home fragrances at Aromatic Scents Lab",
     locale: locale as Locale,
     pathname: "/build-your-own-set",
+    keywords: isRTL
+      ? ["مجموعة عطور", "هدايا عطور", "عطور مخصصة", "حزمة عطور", "طقم عطور", "هدية عطرية"]
+      : ["custom fragrance set", "perfume gift set", "build your own perfume", "fragrance bundle", "perfume collection", "gift set"],
   });
 }
 

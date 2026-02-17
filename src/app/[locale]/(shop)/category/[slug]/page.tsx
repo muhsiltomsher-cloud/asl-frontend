@@ -48,10 +48,13 @@ export async function generateMetadata({
     title: categoryName,
     description:
       locale === "ar"
-        ? `تصفح منتجات ${categoryName}`
-        : `Browse ${categoryName} products`,
+        ? `تصفح مجموعة ${categoryName} من العطور الفاخرة والمنتجات العطرية من Aromatic Scents Lab`
+        : `Browse our ${categoryName} collection of premium fragrances and aromatic products from Aromatic Scents Lab`,
     locale: locale as Locale,
     pathname: `/category/${slug}`,
+    keywords: locale === "ar"
+      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab"]
+      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab"],
   });
 }
 
