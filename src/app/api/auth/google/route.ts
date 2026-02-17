@@ -6,8 +6,8 @@ import { checkRateLimit, rateLimitResponse, API_RATE_LIMIT } from "@/lib/securit
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 function getWcCredentials(): { key: string; secret: string } | null {
-  const key = process.env.WC_CONSUMER_KEY;
-  const secret = process.env.WC_CONSUMER_SECRET;
+  const key = process.env.WC_CONSUMER_KEY || process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
+  const secret = process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
   if (key && secret) return { key, secret };
   return null;
 }
@@ -92,7 +92,7 @@ interface WcCustomer {
 }
 
 function getSocialPassword(googleUserId: string): string {
-  const secret = process.env.SOCIAL_LOGIN_SECRET || process.env.WC_CONSUMER_SECRET || "asl-social-default";
+  const secret = process.env.SOCIAL_LOGIN_SECRET || process.env.WC_CONSUMER_SECRET || process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || "asl-social-default";
   return crypto.createHmac("sha256", secret).update(`google:${googleUserId}`).digest("hex");
 }
 
