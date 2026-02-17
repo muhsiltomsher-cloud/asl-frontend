@@ -39,6 +39,9 @@ export async function generateMetadata({
     description: seoDescription,
     locale: validLocale,
     pathname: "",
+    keywords: isArabic
+      ? ["عطور فاخرة", "عطور عربية", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين"]
+      : ["premium perfumes", "Arabian fragrances", "aromatic oils", "body care", "home fragrances", "Aromatic Scents Lab", "UAE perfume", "buy perfume online"],
   });
 
   return {

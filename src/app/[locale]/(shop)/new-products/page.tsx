@@ -19,13 +19,16 @@ export async function generateMetadata({
 }: NewProductsPageProps): Promise<Metadata> {
   const { locale } = await params;
   return generateSeoMetadata({
-    title: locale === "ar" ? "منتجات جديدة" : "New Products",
+    title: locale === "ar" ? "منتجات جديدة - أحدث العطور" : "New Products - Latest Fragrances & Perfumes",
     description:
       locale === "ar"
-        ? "اكتشف أحدث منتجاتنا من العطور والمنتجات العطرية"
-        : "Discover our latest fragrances and aromatic products",
+        ? "اكتشف أحدث منتجاتنا من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم. تسوق أحدث الإصدارات من Aromatic Scents Lab"
+        : "Discover our latest premium fragrances, aromatic oils, and body care products. Shop the newest arrivals from Aromatic Scents Lab",
     locale: locale as Locale,
     pathname: "/new-products",
+    keywords: locale === "ar"
+      ? ["عطور جديدة", "أحدث العطور", "عطور فاخرة", "منتجات عطرية جديدة", "إصدارات جديدة", "عطور الإمارات"]
+      : ["new perfumes", "latest fragrances", "new arrivals perfume", "premium fragrance", "aromatic products", "UAE perfume"],
   });
 }
 

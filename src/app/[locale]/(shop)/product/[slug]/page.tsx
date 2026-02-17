@@ -79,12 +79,24 @@ export async function generateMetadata({
     });
   }
 
+  const productName = decodeHtmlEntities(product.name);
+  const categoryNames = product.categories?.map((c) => c.name) || [];
+  const tagNames = product.tags?.map((t) => t.name) || [];
+
   return generateSeoMetadata({
-    title: decodeHtmlEntities(product.name),
+    title: productName,
     description: decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 160),
     locale: locale as Locale,
     pathname: `/product/${slug}`,
     image: product.images[0]?.src,
+    keywords: [
+      productName,
+      ...categoryNames,
+      ...tagNames,
+      ...(locale === "ar"
+        ? ["عطور", "شراء عطور", "Aromatic Scents Lab"]
+        : ["perfume", "buy fragrance", "Aromatic Scents Lab"]),
+    ],
   });
 }
 

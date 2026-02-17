@@ -34,6 +34,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/contact",
+    keywords: locale === "ar"
+      ? ["تواصل معنا", "خدمة العملاء", "دعم العطور", "استفسارات", "Aromatic Scents Lab"]
+      : ["contact us", "customer service", "perfume support", "inquiries", "Aromatic Scents Lab"],
   });
 }
 

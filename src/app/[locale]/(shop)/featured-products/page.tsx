@@ -19,13 +19,16 @@ export async function generateMetadata({
 }: FeaturedProductsPageProps): Promise<Metadata> {
   const { locale } = await params;
   return generateSeoMetadata({
-    title: locale === "ar" ? "منتجات مميزة" : "Featured Products",
+    title: locale === "ar" ? "منتجات مميزة - الأكثر مبيعاً" : "Featured Products - Best Selling Fragrances",
     description:
       locale === "ar"
-        ? "اكتشف منتجاتنا المميزة من العطور والمنتجات العطرية"
-        : "Discover our featured fragrances and aromatic products",
+        ? "تسوق أفضل العطور المميزة والأكثر مبيعاً من Aromatic Scents Lab. عطور فاخرة وزيوت عطرية ومنتجات العناية بالجسم"
+        : "Shop our best-selling and featured premium fragrances from Aromatic Scents Lab. Luxury perfumes, aromatic oils, and body care products",
     locale: locale as Locale,
     pathname: "/featured-products",
+    keywords: locale === "ar"
+      ? ["عطور مميزة", "الأكثر مبيعاً", "أفضل العطور", "عطور فاخرة", "عطور عربية", "هدايا عطرية"]
+      : ["featured perfumes", "best sellers", "top fragrances", "luxury perfume", "Arabian perfume", "fragrance gifts"],
   });
 }
 

@@ -20,12 +20,15 @@ export async function generateMetadata({
   const isRTL = locale === "ar";
 
   return generateSeoMetadata({
-    title: isRTL ? "منشئ الحزم" : "Bundles Creator",
+    title: isRTL ? "منشئ حزم العطور" : "Fragrance Bundle Creator",
     description: isRTL
-      ? "إنشاء وإدارة حزم المنتجات مع خيارات التكوين المتقدمة"
-      : "Create and manage product bundles with advanced configuration options",
+      ? "أنشئ حزم عطور مخصصة واستمتع بتوفير أكبر. اختر من مجموعة واسعة من العطور الفاخرة والزيوت العطرية"
+      : "Create custom fragrance bundles and save more. Choose from a wide range of premium perfumes and aromatic oils",
     locale: locale as Locale,
     pathname: "/bundle-manager",
+    keywords: isRTL
+      ? ["حزم عطور", "عروض عطور", "توفير عطور", "مجموعة عطور", "عطور بالجملة"]
+      : ["perfume bundles", "fragrance deals", "perfume offers", "fragrance collection", "bulk perfume"],
   });
 }
 

@@ -20,6 +20,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/terms-and-conditions",
+    keywords: locale === "ar"
+      ? ["الشروط والأحكام", "شروط الاستخدام", "اتفاقية المستخدم"]
+      : ["terms and conditions", "terms of use", "user agreement"],
   });
 }
 

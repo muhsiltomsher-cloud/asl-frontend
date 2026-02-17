@@ -1,7 +1,8 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { FAQAccordion, type FAQItem } from "@/components/common/FAQAccordion";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getDictionary } from "@/i18n";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -21,6 +22,9 @@ export async function generateMetadata({
     description: pageContent.seo.description,
     locale: locale as Locale,
     pathname: "/faq",
+    keywords: locale === "ar"
+      ? ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع"]
+      : ["FAQ", "frequently asked questions", "perfume help", "shipping", "returns", "payment methods"],
   });
 }
 
@@ -39,8 +43,11 @@ export default async function FAQPage({ params }: FAQPageProps) {
     answer: item.answer,
   }));
 
+  const faqJsonLd = generateFAQJsonLd(faqItems);
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <JsonLd data={faqJsonLd} />
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <div className="mb-12 text-center">
