@@ -96,10 +96,16 @@ function getSocialPassword(googleUserId: string): string {
   return crypto.createHmac("sha256", secret).update(`google:${googleUserId}`).digest("hex");
 }
 
-function wcUrl(path: string, creds: { key: string; secret: string }): string {
-  const base = `${API_BASE}/wp-json/wc/v3${path}`;
-  const sep = base.includes("?") ? "&" : "?";
-  return `${base}${sep}consumer_key=${creds.key}&consumer_secret=${creds.secret}`;
+function wcApiUrl(path: string): string {
+  return `${API_BASE}/wp-json/wc/v3${path}`;
+}
+
+function wcAuthHeaders(creds: { key: string; secret: string }): HeadersInit {
+  const encoded = Buffer.from(`${creds.key}:${creds.secret}`).toString("base64");
+  return {
+    "Authorization": `Basic ${encoded}`,
+    "Content-Type": "application/json",
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -154,7 +160,13 @@ export async function POST(request: NextRequest) {
 
     const socialPassword = getSocialPassword(googleUserId);
 
-    const searchRes = await fetch(wcUrl(`/customers?email=${encodeURIComponent(email)}`, wcCreds));
+    const headers = wcAuthHeaders(wcCreds);
+    let passwordSet = false;
+
+    const searchRes = await fetch(
+      wcApiUrl(`/customers?email=${encodeURIComponent(email)}`),
+      { headers }
+    );
     let customers: WcCustomer[] = [];
 
     if (searchRes.ok) {
@@ -171,22 +183,24 @@ export async function POST(request: NextRequest) {
 
     if (customers.length > 0) {
       const customer = customers[0];
-      const updateRes = await fetch(wcUrl(`/customers/${customer.id}`, wcCreds), {
+      const updateRes = await fetch(wcApiUrl(`/customers/${customer.id}`), {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           password: socialPassword,
           meta_data: [{ key: "_google_social_login", value: "1" }],
         }),
       });
-      if (!updateRes.ok) {
+      if (updateRes.ok) {
+        passwordSet = true;
+      } else {
         console.error(`[google-auth] WC customer update failed (${updateRes.status})`);
       }
     } else {
       const displayName = tokenInfo.name || tokenInfo.given_name || email.split("@")[0];
-      const createRes = await fetch(wcUrl("/customers", wcCreds), {
+      const createRes = await fetch(wcApiUrl("/customers"), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           email,
           first_name: tokenInfo.given_name || displayName,
@@ -197,19 +211,43 @@ export async function POST(request: NextRequest) {
         }),
       });
 
-      if (!createRes.ok) {
+      if (createRes.ok) {
+        passwordSet = true;
+      } else {
         const errData = await safeJsonResponse(createRes);
-        return NextResponse.json(
-          {
-            success: false,
-            error: {
-              code: String(errData.code || "registration_failed"),
-              message: String(errData.message || "Failed to create account"),
-            },
-          },
-          { status: 400 }
-        );
+        const errCode = String(errData.code || "");
+        console.error(`[google-auth] WC customer create failed (${createRes.status}):`, errData);
+
+        if (errCode.includes("existing") || errCode === "registration-error-email-exists") {
+          const retrySearch = await fetch(
+            wcApiUrl(`/customers?email=${encodeURIComponent(email)}`),
+            { headers }
+          );
+          if (retrySearch.ok) {
+            try {
+              const retryParsed = await retrySearch.json();
+              if (Array.isArray(retryParsed) && retryParsed.length > 0) {
+                const existingCustomer = retryParsed[0] as WcCustomer;
+                const retryUpdate = await fetch(wcApiUrl(`/customers/${existingCustomer.id}`), {
+                  method: "PUT",
+                  headers,
+                  body: JSON.stringify({
+                    password: socialPassword,
+                    meta_data: [{ key: "_google_social_login", value: "1" }],
+                  }),
+                });
+                if (retryUpdate.ok) passwordSet = true;
+              }
+            } catch {
+              // ignore
+            }
+          }
+        }
       }
+    }
+
+    if (!passwordSet) {
+      console.warn("[google-auth] Could not set social password via WC API, attempting login anyway");
     }
 
     const loginRes = await fetch(noCacheUrl(`${API_BASE}/wp-json/cocart/v2/login`), {
