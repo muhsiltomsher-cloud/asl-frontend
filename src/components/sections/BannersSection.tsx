@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Skeleton } from "@/components/common/Skeleton";
+import { BLUR_DATA_URL } from "@/lib/utils";
 import type { BannersSettings } from "@/types/wordpress";
 
 interface BannersSectionProps {
@@ -86,6 +87,8 @@ export function BannersSection({
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="hidden object-cover transition-transform duration-300 group-hover:scale-105 md:block"
                         loading="lazy"
+                        placeholder="blur"
+                        blurDataURL={BLUR_DATA_URL}
                       />
                       <Image
                         src={banner.mobile_image?.url || banner.image.url}
@@ -94,6 +97,8 @@ export function BannersSection({
                         sizes="100vw"
                         className="object-cover transition-transform duration-300 group-hover:scale-105 md:hidden"
                         loading="lazy"
+                        placeholder="blur"
+                        blurDataURL={BLUR_DATA_URL}
                       />
                   </>
                 ) : (
