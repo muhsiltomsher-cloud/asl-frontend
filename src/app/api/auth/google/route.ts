@@ -36,51 +36,29 @@ function decodeJwtPayload(token: string): GoogleTokenInfo | null {
   }
 }
 
-async function verifyGoogleToken(credential: string, clientId: string): Promise<{ valid: boolean; info: GoogleTokenInfo | null; error?: string }> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const tokenRes = await fetch(
-      `https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`,
-      { signal: controller.signal }
-    );
-    clearTimeout(timeout);
-
-    if (!tokenRes.ok) {
-      const errBody = await tokenRes.text().catch(() => "");
-      console.error(`[google-auth] tokeninfo returned ${tokenRes.status}: ${errBody.slice(0, 200)}`);
-      return { valid: false, info: null, error: "Token verification failed" };
-    }
-
-    const tokenInfo: GoogleTokenInfo = await tokenRes.json();
-    if (tokenInfo.error_description) {
-      return { valid: false, info: null, error: tokenInfo.error_description };
-    }
-    if (tokenInfo.aud !== clientId) {
-      return { valid: false, info: null, error: "Token audience mismatch" };
-    }
-    return { valid: true, info: tokenInfo };
-  } catch (fetchErr) {
-    console.warn(`[google-auth] tokeninfo fetch failed, using JWT decode fallback:`, fetchErr instanceof Error ? fetchErr.message : fetchErr);
-
-    const decoded = decodeJwtPayload(credential);
-    if (!decoded) {
-      return { valid: false, info: null, error: "Failed to decode token" };
-    }
-
-    const validIssuers = ["accounts.google.com", "https://accounts.google.com"];
-    if (!decoded.iss || !validIssuers.includes(decoded.iss)) {
-      return { valid: false, info: null, error: "Invalid token issuer" };
-    }
-    if (decoded.aud !== clientId) {
-      return { valid: false, info: null, error: "Token audience mismatch" };
-    }
-    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
-      return { valid: false, info: null, error: "Token expired" };
-    }
-
-    return { valid: true, info: decoded };
+function verifyGoogleToken(credential: string, clientId: string): { valid: boolean; info: GoogleTokenInfo | null; error?: string } {
+  const decoded = decodeJwtPayload(credential);
+  if (!decoded) {
+    return { valid: false, info: null, error: "Failed to decode Google token" };
   }
+
+  const validIssuers = ["accounts.google.com", "https://accounts.google.com"];
+  if (!decoded.iss || !validIssuers.includes(decoded.iss)) {
+    console.error(`[google-auth] Invalid issuer: ${decoded.iss}`);
+    return { valid: false, info: null, error: "Invalid token issuer" };
+  }
+  if (decoded.aud !== clientId) {
+    console.error(`[google-auth] Audience mismatch: token=${decoded.aud}, expected=${clientId}`);
+    return { valid: false, info: null, error: "Token audience mismatch" };
+  }
+  if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+    return { valid: false, info: null, error: "Token expired" };
+  }
+  if (!decoded.email || !decoded.sub) {
+    return { valid: false, info: null, error: "Token missing required fields" };
+  }
+
+  return { valid: true, info: decoded };
 }
 
 interface WcCustomer {
