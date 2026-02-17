@@ -293,6 +293,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   src="https://cms.aromaticscentslab.com/wp-content/uploads/2025/12/ASL-Website-Images-Patchouli-Glow-06.webp"
                   alt={isRTL ? "قصتنا" : "Our Story"}
                   fill
+                  loading="lazy"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-cover"
                 />

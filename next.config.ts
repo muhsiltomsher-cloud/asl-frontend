@@ -36,6 +36,7 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
+    optimizePackageImports: ["lucide-react", "swiper", "@mui/material"],
   },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_WC_API_URL || "https://cms.aromaticscentslab.com";
@@ -121,6 +122,24 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/_next/image/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/cms-media/:path*",
         headers: [
           {
             key: "Cache-Control",
