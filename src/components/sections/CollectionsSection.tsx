@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Skeleton } from "@/components/common/Skeleton";
+import { BLUR_DATA_URL } from "@/lib/utils";
 import type { CollectionsSettings } from "@/types/wordpress";
 
 interface CollectionsSectionProps {
@@ -96,6 +97,8 @@ export function CollectionsSection({
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
                 />
               ) : (
                 <div className="absolute inset-0 bg-stone-200" />

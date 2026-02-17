@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/common/Skeleton";
 import type { WCCategory } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 import type { CategorySectionSettings } from "@/types/wordpress";
-import { decodeHtmlEntities } from "@/lib/utils";
+import { decodeHtmlEntities, BLUR_DATA_URL } from "@/lib/utils";
 
 interface ExtraCategoryItem {
   id: string;
@@ -149,6 +149,8 @@ export function CategorySection({
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                         className="object-contain transition-transform duration-300 group-hover:scale-105"
                         loading="lazy"
+                        placeholder="blur"
+                        blurDataURL={BLUR_DATA_URL}
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center bg-stone-200">
@@ -179,6 +181,8 @@ export function CategorySection({
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                     className="object-contain transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={BLUR_DATA_URL}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-stone-200">

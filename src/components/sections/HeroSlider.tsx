@@ -43,7 +43,8 @@ export function HeroSlider({ settings }: HeroSliderProps) {
               alt={slide.image.alt || `Slide ${index + 1}`}
               fill
               priority={index === 0}
-              fetchPriority={index === 0 ? "high" : "auto"}
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "low"}
               sizes="100vw"
               className="hidden object-cover md:block"
               placeholder="blur"
@@ -54,7 +55,8 @@ export function HeroSlider({ settings }: HeroSliderProps) {
               alt={slide.mobile_image?.alt || slide.image.alt || `Slide ${index + 1}`}
               fill
               priority={index === 0}
-              fetchPriority={index === 0 ? "high" : "auto"}
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "low"}
               sizes="100vw"
               className="object-cover md:hidden"
               placeholder="blur"

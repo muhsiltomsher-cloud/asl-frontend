@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
       dynamic: 30,
       static: 180,
     },
-    optimizePackageImports: ["lucide-react", "swiper", "@mui/material"],
+    optimizePackageImports: ["lucide-react", "swiper", "@mui/material", "@apollo/client", "@emotion/react", "@emotion/styled", "class-variance-authority", "clsx", "swr", "cookies-next"],
   },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_WC_API_URL || "https://cms.aromaticscentslab.com";
