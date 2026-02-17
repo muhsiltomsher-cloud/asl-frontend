@@ -13,52 +13,68 @@ function getWcCredentials(): { key: string; secret: string } | null {
 }
 
 interface GoogleTokenInfo {
-  aud?: string;
+  aud?: string | string[];
   sub?: string;
   email?: string;
-  email_verified?: string;
+  email_verified?: string | boolean;
   name?: string;
   given_name?: string;
   family_name?: string;
   error_description?: string;
   iss?: string;
-  exp?: number;
+  exp?: number | string;
+  azp?: string;
 }
 
 function decodeJwtPayload(token: string): GoogleTokenInfo | null {
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
-    const payload = Buffer.from(parts[1], "base64url").toString("utf-8");
+    let b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    while (b64.length % 4) b64 += "=";
+    const payload = Buffer.from(b64, "base64").toString("utf-8");
     return JSON.parse(payload) as GoogleTokenInfo;
   } catch {
     return null;
   }
 }
 
+function audienceMatches(aud: string | string[] | undefined, clientId: string): boolean {
+  if (!aud) return false;
+  if (Array.isArray(aud)) return aud.includes(clientId);
+  return aud === clientId;
+}
+
 function verifyGoogleToken(credential: string, clientId: string): { valid: boolean; info: GoogleTokenInfo | null; error?: string } {
   const decoded = decodeJwtPayload(credential);
   if (!decoded) {
+    console.error(`[google-auth] Failed to decode JWT. Token length=${credential.length}, parts=${credential.split(".").length}`);
     return { valid: false, info: null, error: "Failed to decode Google token" };
   }
+
+  console.warn(`[google-auth] Token decoded: iss=${decoded.iss}, aud=${JSON.stringify(decoded.aud)}, azp=${decoded.azp}, sub=${decoded.sub ? "present" : "missing"}, email=${decoded.email ? "present" : "missing"}, exp=${decoded.exp}`);
 
   const validIssuers = ["accounts.google.com", "https://accounts.google.com"];
   if (!decoded.iss || !validIssuers.includes(decoded.iss)) {
     console.error(`[google-auth] Invalid issuer: ${decoded.iss}`);
     return { valid: false, info: null, error: "Invalid token issuer" };
   }
-  if (decoded.aud !== clientId) {
-    console.error(`[google-auth] Audience mismatch: token=${decoded.aud}, expected=${clientId}`);
+  if (!audienceMatches(decoded.aud, clientId) && decoded.azp !== clientId) {
+    console.error(`[google-auth] Audience mismatch: aud=${JSON.stringify(decoded.aud)}, azp=${decoded.azp}, expected=${clientId}`);
     return { valid: false, info: null, error: "Token audience mismatch" };
   }
-  if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+  const expNum = typeof decoded.exp === "string" ? parseInt(decoded.exp, 10) : decoded.exp;
+  if (expNum && expNum * 1000 < Date.now()) {
+    console.error(`[google-auth] Token expired: exp=${expNum}, now=${Math.floor(Date.now() / 1000)}`);
     return { valid: false, info: null, error: "Token expired" };
   }
   if (!decoded.email || !decoded.sub) {
+    console.error(`[google-auth] Missing fields: email=${!!decoded.email}, sub=${!!decoded.sub}`);
     return { valid: false, info: null, error: "Token missing required fields" };
   }
 
-  return { valid: true, info: decoded };
+  const normalizedAud = Array.isArray(decoded.aud) ? decoded.aud[0] : decoded.aud;
+  return { valid: true, info: { ...decoded, aud: normalizedAud } };
 }
 
 interface WcCustomer {
@@ -118,7 +134,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verification = await verifyGoogleToken(credential, GOOGLE_CLIENT_ID);
+    const verification = verifyGoogleToken(credential, GOOGLE_CLIENT_ID);
     if (!verification.valid || !verification.info) {
       return NextResponse.json(
         { success: false, error: { code: "invalid_token", message: verification.error || "Invalid Google token" } },
