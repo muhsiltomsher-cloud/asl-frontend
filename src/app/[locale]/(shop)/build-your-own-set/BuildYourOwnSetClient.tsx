@@ -991,7 +991,7 @@ export function BuildYourOwnSetClient({
                           {product.name}
                         </p>
                         {product.categoryName && (
-                          <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600 mt-0.5">
+                          <p className="font-medium uppercase tracking-wider text-amber-600 mt-0.5" style={{ fontSize: '9px' }}>
                             {product.categoryName}
                           </p>
                         )}

@@ -171,12 +171,12 @@ export function WCProductCard({
         </div>
 
         <div className="mt-4 space-y-1">
-                              <h3 className="text-xs font-semibold text-gray-900 line-clamp-2 group-hover:text-amber-800 transition-colors uppercase md:text-sm">
+                              <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-amber-800 transition-colors uppercase">
                                 {product.name}
                               </h3>
 
                                         {product.categories?.[0] && (
-                                <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600">
+                                <p className="font-medium uppercase tracking-wider text-amber-600" style={{ fontSize: '10px' }}>
                                   {decodeHtmlEntities(product.categories[0].name)}
                                 </p>
                               )}
