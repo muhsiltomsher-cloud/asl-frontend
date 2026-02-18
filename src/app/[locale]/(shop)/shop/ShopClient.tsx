@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ProductListing } from "@/components/shop/ProductListing";
 import type { WCProduct, WCProductsResponse } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
+import { BESTSELLER_PRODUCT_IDS } from "@/lib/api/woocommerce";
 
 // DEV MODE: Cache disabled for faster development - uncomment when done
 // const PRODUCTS_CACHE_KEY = "asl_products_cache";
@@ -67,13 +68,28 @@ export function ShopClient({
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
 
+  const bestsellerIdSet = useMemo(() => new Set(BESTSELLER_PRODUCT_IDS), []);
+
+  const sortBestsellersFirst = useCallback((items: WCProduct[]): WCProduct[] => {
+    const bestsellers: WCProduct[] = [];
+    const others: WCProduct[] = [];
+    for (const item of items) {
+      if (bestsellerIdSet.has(item.id)) {
+        bestsellers.push(item);
+      } else {
+        others.push(item);
+      }
+    }
+    return [...bestsellers, ...others];
+  }, [bestsellerIdSet]);
+
   useEffect(() => {
     // DEV MODE: Cache disabled - always use initial products
-    setProducts(initialProducts);
+    setProducts(sortBestsellersFirst(initialProducts));
     setTotal(initialTotal);
     setHasMore(initialProducts.length < initialTotal);
     isInitialMount.current = false;
-  }, [initialProducts, initialTotal, locale]);
+  }, [initialProducts, initialTotal, locale, sortBestsellersFirst]);
 
   const loadMoreProducts = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -110,7 +126,7 @@ export function ShopClient({
             index === self.findIndex((p) => p.id === product.id)
         );
         
-        setProducts(uniqueProducts);
+        setProducts(sortBestsellersFirst(uniqueProducts));
         setCurrentPage(nextPage);
         const giftCountInThisPage = data.products.length - filteredNewProducts.length;
         const newTotal = total - giftCountInThisPage;
@@ -124,7 +140,7 @@ export function ShopClient({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, hasMore, currentPage, products, total, locale, giftProductIds, giftProductSlugs]);
+  }, [isLoading, hasMore, currentPage, products, total, locale, giftProductIds, giftProductSlugs, sortBestsellersFirst]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

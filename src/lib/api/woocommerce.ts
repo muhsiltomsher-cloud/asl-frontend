@@ -1036,7 +1036,7 @@ export async function getNewProducts(params?: {
   });
 }
 
-const BESTSELLER_PRODUCT_IDS = [
+export const BESTSELLER_PRODUCT_IDS = [
   8004, // Dark Musk Perfume
   8009, // Velvet Amber Perfume
   8007, // Secret Leather Perfume
