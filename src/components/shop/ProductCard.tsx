@@ -111,7 +111,7 @@ export function ProductCard({ product, locale, className }: ProductCardProps) {
 
           {/* Category */}
                     {product.productCategories?.nodes?.[0] && (
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                      <p className="text-gray-500 uppercase tracking-wider" style={{ fontSize: '10px' }}>
                         {product.productCategories.nodes[0].name}
                       </p>
                     )}

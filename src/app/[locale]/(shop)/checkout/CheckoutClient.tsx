@@ -2083,7 +2083,7 @@ export default function CheckoutClient() {
                                   <div className="flex-1 min-w-0">
                                     <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
                                     {productCategories[item.id] && (
-                                      <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600 mt-0.5">
+                                      <p className="font-medium uppercase tracking-wider text-amber-600 mt-0.5" style={{ fontSize: '9px' }}>
                                         {productCategories[item.id]}
                                       </p>
                                     )}
