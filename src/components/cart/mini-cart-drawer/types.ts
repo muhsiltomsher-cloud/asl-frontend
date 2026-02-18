@@ -25,6 +25,7 @@ export interface CartItemProps {
   isGiftItem: boolean;
   isNewlyAddedGift: boolean;
   divisor: number;
+  categoryName?: string;
   onQuantityChange: (itemKey: string, newQuantity: number) => void;
   onRemove: (itemKey: string) => void;
 }

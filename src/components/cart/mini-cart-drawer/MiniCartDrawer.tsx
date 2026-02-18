@@ -16,6 +16,7 @@ import { Button } from "@/components/common/Button";
 import { EmptyCart } from "./EmptyCart";
 import { GiftSection } from "./GiftSection";
 import { CartItem } from "./CartItem";
+import { useProductCategories } from "@/hooks/useProductCategories";
 import type { MiniCartDrawerProps } from "./types";
 
 export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
@@ -112,6 +113,9 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
     </div>
   ) : undefined;
 
+  const productIds = cartItems.map((item) => item.id);
+  const productCategories = useProductCategories(productIds);
+
   const renderCartItems = () => (
     <ul className="divide-y">
       {cartItems.map((item) => {
@@ -138,6 +142,7 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
             isGiftItem={isGiftItem}
             isNewlyAddedGift={isNewlyAddedGift}
             divisor={divisor}
+            categoryName={productCategories[item.id]}
             onQuantityChange={handleQuantityChange}
             onRemove={handleRemoveItem}
           />

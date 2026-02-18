@@ -18,6 +18,7 @@ import { featureFlags, type Locale } from "@/config/site";
 import { MapPin, Check, ChevronDown, ChevronUp, Tag, X, Truck } from "lucide-react";
 import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getPricingMode, getFixedPrice, getBundleTotal } from "@/components/cart/BundleItemsList";
 import { PhoneInput } from "@/components/common/PhoneInput";
+import { useProductCategories } from "@/hooks/useProductCategories";
 
 interface ShippingRate {
   rate_id: string;
@@ -146,6 +147,8 @@ export default function CheckoutClient() {
         const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, isLoading: isCartLoading } = useCart();
         const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
         const { currency, convertPrice, getCurrencyInfo } = useCurrency();
+    const productIds = cartItems.map((item) => item.id);
+    const productCategories = useProductCategories(productIds);
     const isRTL = locale === "ar";
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -2079,6 +2082,11 @@ export default function CheckoutClient() {
                                   {/* Product Info */}
                                   <div className="flex-1 min-w-0">
                                     <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
+                                    {productCategories[item.id] && (
+                                      <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600 mt-0.5">
+                                        {productCategories[item.id]}
+                                      </p>
+                                    )}
                                     <p className="text-xs text-gray-500">
                                       {isRTL ? "الكمية:" : "Qty:"} {item.quantity.value}
                                     </p>
