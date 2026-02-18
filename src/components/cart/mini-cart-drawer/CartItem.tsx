@@ -15,6 +15,7 @@ export function CartItem({
   isGiftItem,
   isNewlyAddedGift,
   divisor,
+  categoryName,
   onQuantityChange,
   onRemove,
 }: CartItemProps) {
@@ -48,9 +49,16 @@ export function CartItem({
 
         <div className="flex flex-1 flex-col">
           <div className="flex justify-between">
-            <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
-              {item.name}
-            </h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
+                {item.name}
+              </h3>
+              {categoryName && (
+                <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600 mt-0.5">
+                  {categoryName}
+                </p>
+              )}
+            </div>
             {!isGiftItem && (
               <button
                 onClick={() => onRemove(item.item_key)}

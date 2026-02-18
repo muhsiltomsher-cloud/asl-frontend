@@ -74,6 +74,7 @@ interface ProductOption {
   slug: string;
   image: string;
   category: CategoryFilter;
+  categoryName: string;
 }
 
 interface BuildYourOwnSetClientProps {
@@ -246,6 +247,7 @@ export function BuildYourOwnSetClient({
         slug: product.slug,
         image: product.images?.[0]?.src || "/images/placeholder-product.jpg",
         category,
+        categoryName: product.categories?.[0]?.name || "",
       };
     });
   }, [products, eligibleProductIds, eligibleCategoryIds, excludeProductIds, excludeCategoryIds, getFreeGiftProductIds, bundleProduct]);
@@ -988,6 +990,11 @@ export function BuildYourOwnSetClient({
                         <p className="line-clamp-2 text-xs sm:text-sm font-medium text-gray-900 uppercase break-words">
                           {product.name}
                         </p>
+                        {product.categoryName && (
+                          <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600 mt-0.5">
+                            {product.categoryName}
+                          </p>
+                        )}
                         <p className={`mt-1 text-xs sm:text-sm font-semibold ${activeSlot !== null && isSlotFree(activeSlot) ? "text-green-600" : "text-amber-700"}`}>
                           {activeSlot !== null && isSlotFree(activeSlot) ? t.free : <FormattedPrice price={product.price} iconSize="sm" />}
                         </p>

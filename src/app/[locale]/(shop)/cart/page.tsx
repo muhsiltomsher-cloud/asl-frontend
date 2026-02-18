@@ -15,6 +15,7 @@ import { useFreeGift, getLocalizedProduct, containsArabic } from "@/contexts/Fre
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { featureFlags, type Locale } from "@/config/site";
+import { useProductCategories } from "@/hooks/useProductCategories";
 
 interface PublicCoupon {
   code: string;
@@ -47,6 +48,9 @@ export default function CartPage() {
             const giftProgress = getGiftProgress();
     
       const hasGiftItemsInCart = cartItems.some(item => isFreeGiftItem(item.item_key));
+
+    const productIds = cartItems.map((item) => item.id);
+    const productCategories = useProductCategories(productIds);
 
     const isRTL = locale === "ar";
   const isEmpty = cartItems.length === 0;
@@ -409,6 +413,11 @@ export default function CartPage() {
                                         >
                                           {item.name}
                                         </Link>
+                                        {productCategories[item.id] && (
+                                          <p className="text-[9px] font-medium uppercase tracking-wider text-amber-600 mt-0.5">
+                                            {productCategories[item.id]}
+                                          </p>
+                                        )}
                                         {isGiftItem && (
                                           <p className="mt-1 text-sm font-medium text-amber-600 inline-flex items-center gap-1">
                                             <Gift className="h-3 w-3" />
