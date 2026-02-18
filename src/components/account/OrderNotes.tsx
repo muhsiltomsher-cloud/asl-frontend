@@ -147,23 +147,8 @@ function formatNoteDate(dateString: string, locale: string, country?: string): s
   return date.toLocaleString(locale === "ar" ? "ar-SA" : "en-US", options);
 }
 
-function formatAuthorName(author: string, t: typeof translations.en): string {
-  const systemAuthors = [
-    "admin",
-    "woocommerce",
-    "system",
-    "administrator",
-    "store",
-    "shop",
-  ];
-  
-  const normalizedAuthor = author.toLowerCase().trim();
-  
-  if (!author || systemAuthors.includes(normalizedAuthor)) {
-    return t.storeAuthor;
-  }
-  
-  return author;
+function formatAuthorName(t: typeof translations.en): string {
+  return t.storeAuthor;
 }
 
 function PaymentDetailsCard({ 
@@ -242,7 +227,7 @@ function NoteItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="font-medium text-sm">
-              {formatAuthorName(note.author || "", t)}
+              {formatAuthorName(t)}
             </span>
             <span className="text-xs opacity-75">
               {formatNoteDate(note.date_created, locale, country)}
