@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Menu, X, ShoppingBag, User, Heart } from "lucide-react";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { CurrencySwitcher } from "@/components/common/CurrencySwitcher";
@@ -39,6 +39,14 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
   
   // Hide top bar on cart and checkout pages
   const hideTopBar = pathname?.includes("/cart") || pathname?.includes("/checkout");
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setIsMobileMenuOpen(false);
+      setIsMegaMenuOpen(false);
+    }, 0);
+    return () => clearTimeout(id);
+  }, [pathname]);
 
   const [isCategoriesDrawerOpen, setIsCategoriesDrawerOpen] = useState(false);
   const { cartItemsCount, setIsCartOpen } = useCart();
