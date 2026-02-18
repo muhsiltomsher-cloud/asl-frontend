@@ -8,6 +8,7 @@ import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { cn } from "@/lib/utils";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
+import { BESTSELLER_PRODUCT_IDS } from "@/lib/api/woocommerce";
 
 const STORAGE_KEY = "asl_product_view_preference";
 const PREFERENCE_CHANGE_EVENT = "asl_preference_change";
@@ -21,9 +22,24 @@ function getProductPrice(product: WCProduct): number {
   return isNaN(price) ? 0 : price;
 }
 
+const bestsellerIdSet = new Set(BESTSELLER_PRODUCT_IDS);
+
+function sortBestsellersFirst(products: WCProduct[]): WCProduct[] {
+  const bestsellers: WCProduct[] = [];
+  const others: WCProduct[] = [];
+  for (const product of products) {
+    if (bestsellerIdSet.has(product.id)) {
+      bestsellers.push(product);
+    } else {
+      others.push(product);
+    }
+  }
+  return [...bestsellers, ...others];
+}
+
 function sortProducts(products: WCProduct[], sortBy: SortOption): WCProduct[] {
   if (sortBy === "default") {
-    return products;
+    return sortBestsellersFirst(products);
   }
 
   const sorted = [...products];
@@ -48,7 +64,7 @@ function sortProducts(products: WCProduct[], sortBy: SortOption): WCProduct[] {
       break;
   }
 
-  return sorted;
+  return sortBestsellersFirst(sorted);
 }
 
 interface ViewPreference {
