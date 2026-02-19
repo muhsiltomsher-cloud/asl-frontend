@@ -2,7 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import {
@@ -31,8 +32,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/about",
     keywords: locale === "ar"
-      ? ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية"]
-      : ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances"],
+      ? ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية", "عطور يدوية دبي", "مكونات عطرية طبيعية", "بيت عطور الإمارات", "عود عربي أصلي"]
+      : ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances", "handcrafted perfume Dubai", "natural fragrance ingredients", "UAE perfume house", "authentic Arabian oud"],
   });
 }
 
@@ -46,8 +47,23 @@ export default async function AboutPage({ params }: AboutPageProps) {
     { name: dictionary.common.about, href: `/${locale}/about` },
   ];
 
+  const brandFaqItems = isRTL
+    ? [
+        { question: "ما هو أروماتيك سينتس لاب؟", answer: "أروماتيك سينتس لاب هو بيت عطور فاخر مقره الإمارات العربية المتحدة، يقدم عطوراً يدوية الصنع من أجود المكونات الطبيعية منذ عام 2021." },
+        { question: "أين يقع أروماتيك سينتس لاب؟", answer: "مقرنا في دبي، الإمارات العربية المتحدة، ونقدم خدمة التوصيل في جميع أنحاء الإمارات ودول مجلس التعاون الخليجي." },
+        { question: "ما المكونات المستخدمة في عطوركم؟", answer: "نستخدم مكونات طبيعية فاخرة تشمل العود العربي الأصيل والورد الفرنسي وخشب الصندل الهندي والمسك والعنبر والفانيليا." },
+        { question: "هل تقدمون خدمة التغليف كهدية؟", answer: "نعم، نوفر تغليف هدايا فاخر مجاني. يمكنك اختيار هذه الخدمة عند إتمام الشراء وإضافة رسالة شخصية." },
+      ]
+    : [
+        { question: "What is Aromatic Scents Lab?", answer: "Aromatic Scents Lab is a UAE-based luxury perfume house offering handcrafted fragrances made from the finest natural ingredients since 2021." },
+        { question: "Where is Aromatic Scents Lab located?", answer: "We are based in Dubai, UAE, and deliver across the Emirates and GCC countries." },
+        { question: "What ingredients do you use in your fragrances?", answer: "We use premium natural ingredients including authentic Arabian oud, French rose, Indian sandalwood, musk, amber, and vanilla." },
+        { question: "Do you offer gift wrapping?", answer: "Yes, we offer complimentary luxury gift wrapping. You can select this at checkout and add a personal message." },
+      ];
+
   return (
     <div className="flex flex-col">
+      <JsonLd data={generateFAQJsonLd(brandFaqItems)} />
       {/* Hero Section - Full Width with Gradient Overlay */}
       <section className="relative min-h-[70vh] overflow-hidden">
         {/* Background Image */}
@@ -163,6 +179,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="object-cover"
+                    loading="lazy"
                   />
                 </div>
                 {/* Decorative Circle */}
@@ -291,6 +308,42 @@ export default async function AboutPage({ params }: AboutPageProps) {
             items={pageContent.ingredients.items}
             isRTL={isRTL}
           />
+        </div>
+      </section>
+
+      {/* Brand FAQ Section */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#f7f6f2] to-white py-16 md:py-24">
+        <div className="container relative mx-auto px-4">
+          <div className="mb-12 text-center md:mb-16">
+            <div className="mb-4 flex items-center justify-center gap-4">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                {isRTL ? "أسئلة شائعة" : "FAQ"}
+              </span>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+            </div>
+            <h2 className="mb-4 text-3xl font-bold text-amber-900 md:text-4xl">
+              {isRTL ? "أسئلة شائعة عن العلامة التجارية" : "Frequently Asked Questions"}
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-amber-700/70">
+              {isRTL ? "كل ما تحتاج معرفته عن أروماتيك سينتس لاب" : "Everything you need to know about Aromatic Scents Lab"}
+            </p>
+          </div>
+          <div className="mx-auto max-w-3xl space-y-4">
+            {brandFaqItems.map((item, idx) => (
+              <details key={idx} className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
+                  <span>{item.question}</span>
+                  <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="px-5 pb-5 leading-relaxed text-amber-700/80">
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 

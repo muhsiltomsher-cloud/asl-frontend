@@ -40,6 +40,8 @@ function sanitizeProductDescription(html: string): string {
   sanitized = sanitized.replace(/<a[^>]*aria-label="Add to Wishlist"[^>]*>[\s\S]*?<\/a>/gi, "");
   sanitized = sanitized.replace(/<p>\s*<\/p>/gi, "");
   sanitized = sanitized.replace(/Add to Wishlist/gi, "");
+  sanitized = sanitized.replace(/<\/?b[^>]*>/gi, "");
+  sanitized = sanitized.replace(/<\/?strong[^>]*>/gi, "");
   sanitized = sanitized.trim();
   
   return sanitized;
@@ -843,10 +845,10 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
           </div>
 
 
-          {/* Short description - now showing full description data */}
+          {/* Notes / key info shown under price */}
           {product.description && sanitizeProductDescription(product.description) && (
             <div
-              className="text-sm leading-relaxed text-gray-600"
+              className="prose prose-sm max-w-none text-gray-600"
               dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description) }}
             />
           )}
@@ -998,7 +1000,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               </div>
             </AccordionSection>
 
-            {/* Description - now showing short description data */}
+            {/* Full description in accordion */}
             <AccordionSection
               title={isRTL ? "الوصف" : "Description"}
               isOpen={openAccordion === "description"}

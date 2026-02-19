@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { getDictionary } from "@/i18n";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
 import { getNewProducts, getFeaturedProducts, getBestsellerProducts, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
 import { getHomePageSettings, getSeoSettings } from "@/lib/api/wordpress";
 import {
@@ -13,6 +13,7 @@ import {
   CollectionsSection,
   BannersSection,
 } from "@/components/sections";
+import { JsonLd } from "@/components/seo/JsonLd";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -40,8 +41,8 @@ export async function generateMetadata({
     locale: validLocale,
     pathname: "",
     keywords: isArabic
-      ? ["عطور فاخرة", "عطور عربية", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين"]
-      : ["premium perfumes", "Arabian fragrances", "aromatic oils", "body care", "home fragrances", "Aromatic Scents Lab", "UAE perfume", "buy perfume online"],
+      ? ["عطور فاخرة", "عطور عربية", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور دبي", "بخور", "عطور طبيعية", "عطور نسائية", "عطور رجالية"]
+      : ["premium perfumes", "Arabian fragrances", "aromatic oils", "body care", "home fragrances", "Aromatic Scents Lab", "UAE perfume", "buy perfume online", "Arabian oud", "luxury perfume Dubai", "natural fragrance", "perfume gift sets", "oud perfume", "women perfume UAE", "men cologne Dubai", "bakhoor incense"],
   });
 
   return {
@@ -262,6 +263,38 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Our Collections */}
       <CollectionsSection settings={collectionsSettings} />
 
+      {/* Why Choose Us Section */}
+      <section className="relative overflow-hidden bg-white py-14 md:py-20">
+        <div className="container mx-auto px-4">
+          <div className="mb-10 text-center md:mb-14">
+            <div className="mb-4 flex items-center justify-center gap-4">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                {isRTL ? "تميزنا" : "Our Promise"}
+              </span>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+            </div>
+            <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
+              {dictionary.sections.whyChooseUs.title}
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-amber-700/70">
+              {dictionary.sections.whyChooseUs.subtitle}
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {dictionary.sections.whyChooseUs.items.map((item: { title: string; description: string }, idx: number) => (
+              <div key={idx} className="group rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
+                  <span className="text-xl font-bold">{idx + 1}</span>
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-amber-900">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-amber-700/70">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* About Section - Creative Design */}
       <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-[#f7f6f2] to-stone-50 py-16 md:py-24">
         {/* Decorative background elements */}
@@ -344,6 +377,65 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      {/* FAQ Section with JSON-LD */}
+      <section className="relative overflow-hidden bg-white py-14 md:py-20">
+        <JsonLd data={generateFAQJsonLd(dictionary.sections.faq.items)} />
+        <div className="container mx-auto px-4">
+          <div className="mb-10 text-center md:mb-14">
+            <div className="mb-4 flex items-center justify-center gap-4">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                {isRTL ? "مساعدة" : "Help"}
+              </span>
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+            </div>
+            <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
+              {dictionary.sections.faq.title}
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-amber-700/70">
+              {dictionary.sections.faq.subtitle}
+            </p>
+          </div>
+          <div className="mx-auto max-w-3xl space-y-4">
+            {dictionary.sections.faq.items.map((item: { question: string; answer: string }, idx: number) => (
+              <details key={idx} className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
+                  <span>{item.question}</span>
+                  <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="px-5 pb-5 text-amber-700/80 leading-relaxed">
+                  {item.answer}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SEO Content Section */}
+      <section className="bg-gradient-to-b from-[#f7f6f2] to-amber-50/30 py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-4xl">
+            <h2 className="mb-6 text-center text-2xl font-bold text-amber-900 md:text-3xl">
+              {isRTL ? "تسوق العطور الفاخرة اون لاين في الإمارات" : "Shop Premium Perfumes Online in the UAE"}
+            </h2>
+            <div className="space-y-4 text-center leading-relaxed text-amber-800/70">
+              <p>
+                {isRTL
+                  ? "أروماتيك سينتس لاب هو وجهتك المثالية لشراء العطور الفاخرة والعود العربي الأصيل ومنتجات العناية بالجسم ومعطرات المنزل والزيوت العطرية في الإمارات العربية المتحدة. نقدم مجموعة واسعة من العطور النسائية والرجالية المصنوعة يدوياً بأجود المكونات الطبيعية."
+                  : "Aromatic Scents Lab is your premier destination for buying luxury perfumes, authentic Arabian oud, body care products, home fragrances, and aromatic oils in the United Arab Emirates. We offer an extensive collection of handcrafted women's and men's fragrances made with the finest natural ingredients."}
+              </p>
+              <p>
+                {isRTL
+                  ? "اكتشف مجموعتنا المتنوعة من عطور الإمارات الفاخرة، بما في ذلك البخور والمسك والعنبر وخشب الصندل والورد. سواء كنت تبحث عن عطر يومي أنيق أو هدية فاخرة لشخص مميز، ستجد في متجرنا ما يناسب كل الأذواق والمناسبات مع توصيل مجاني للطلبات فوق 500 درهم."
+                  : "Explore our diverse collection of luxury UAE fragrances, including bakhoor, musk, amber, sandalwood, and rose. Whether you're looking for an elegant everyday scent or a luxurious gift for someone special, our store has something for every taste and occasion, with free delivery on orders over 500 AED."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -17,18 +17,31 @@ const notoSansArabic = Noto_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Aromatic Scents Lab",
-  description: "Premium fragrances and perfumes",
+  title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
+  description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE. Shop luxury handcrafted scents online with free delivery.",
+  metadataBase: new URL("https://aromaticscentslab.com"),
+  openGraph: {
+    title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
+    description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE. Shop luxury handcrafted scents online with free delivery.",
+    url: "https://aromaticscentslab.com",
+    siteName: "Aromatic Scents Lab",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Aromatic Scents Lab" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
+    description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE.",
+    images: ["/og-image.jpg"],
+  },
   verification: {
     google: "f_mMaADw5xQDw862fP3PjCa-2conJWM6uY0H_goWpE8",
   },
-  // iOS Home Screen Optimization
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Aromatic Scents Lab",
   },
-  // Additional mobile optimization
   formatDetection: {
     telephone: true,
     email: true,
@@ -47,10 +60,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="overflow-x-clip">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <link rel="dns-prefetch" href="https://cms.aromaticscentslab.com" />
         <link rel="preconnect" href="https://cms.aromaticscentslab.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://analytics.tiktok.com" />
