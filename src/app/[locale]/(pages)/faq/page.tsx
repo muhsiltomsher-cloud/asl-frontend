@@ -23,8 +23,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/faq",
     keywords: locale === "ar"
-      ? ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع"]
-      : ["FAQ", "frequently asked questions", "perfume help", "shipping", "returns", "payment methods"],
+      ? ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع", "توصيل الإمارات", "عود عربي", "عطور فاخرة", "Aromatic Scents Lab"]
+      : ["FAQ", "frequently asked questions", "perfume FAQ", "fragrance help", "shipping UAE", "returns", "payment methods", "Arabian oud", "luxury perfumes", "Aromatic Scents Lab"],
   });
 }
 

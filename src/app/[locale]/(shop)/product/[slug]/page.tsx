@@ -32,6 +32,7 @@ function getProductJsonLdData(product: WCProduct, locale: string, slug: string) 
     sku: product.sku || undefined,
     availability: product.is_in_stock ? "InStock" : "OutOfStock",
     url: `${siteConfig.url}/${locale}/product/${slug}`,
+    brandName: siteConfig.name,
   });
 }
 
@@ -94,8 +95,8 @@ export async function generateMetadata({
       ...categoryNames,
       ...tagNames,
       ...(locale === "ar"
-        ? ["عطور", "شراء عطور", "Aromatic Scents Lab"]
-        : ["perfume", "buy fragrance", "Aromatic Scents Lab"]),
+        ? ["عطور", "شراء عطور", "عطور فاخرة", "عطور الإمارات", "عطور دبي", "عود عربي", "هدايا عطرية", "Aromatic Scents Lab"]
+        : ["perfume", "buy fragrance", "luxury perfume UAE", "Dubai perfume", "Arabian oud", "fragrance gift", "premium scent", "Aromatic Scents Lab"]),
     ],
   });
 }

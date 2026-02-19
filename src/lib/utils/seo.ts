@@ -100,6 +100,7 @@ export function generateProductJsonLd(product: {
   sku?: string;
   availability: "InStock" | "OutOfStock";
   url: string;
+  brandName?: string;
 }) {
   return {
     "@context": "https://schema.org",
@@ -108,6 +109,14 @@ export function generateProductJsonLd(product: {
     description: product.description,
     image: product.image,
     sku: product.sku,
+    ...(product.brandName
+      ? {
+          brand: {
+            "@type": "Brand",
+            name: product.brandName,
+          },
+        }
+      : {}),
     offers: {
       "@type": "Offer",
       price: product.price,

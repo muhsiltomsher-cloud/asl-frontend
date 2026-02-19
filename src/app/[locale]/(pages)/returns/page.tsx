@@ -21,8 +21,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/returns",
     keywords: locale === "ar"
-      ? ["سياسة الإرجاع", "استبدال عطور", "إرجاع منتجات", "ضمان الجودة"]
-      : ["return policy", "perfume exchange", "product returns", "quality guarantee"],
+      ? ["سياسة الإرجاع", "استبدال عطور", "إرجاع منتجات", "ضمان الجودة", "إرجاع عطور", "استبدال منتجات", "مساعدة الطلبات", "Aromatic Scents Lab"]
+      : ["return policy", "perfume exchange", "product returns", "returns and exchanges", "order help", "quality guarantee", "Aromatic Scents Lab"],
   });
 }
 
