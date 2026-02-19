@@ -29,8 +29,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/shop",
     keywords: locale === "ar"
-      ? ["تسوق عطور", "عطور فاخرة", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "عطور عربية", "عطور إماراتية", "شراء عطور"]
-      : ["shop perfumes", "buy fragrances", "aromatic oils", "body care", "home fragrances", "Arabian perfume", "UAE perfume", "luxury perfume online"],
+      ? ["تسوق عطور", "عطور فاخرة", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "عطور عربية", "عطور إماراتية", "شراء عطور", "عود عربي", "بخور", "عطور نسائية", "عطور رجالية", "هدايا عطرية", "عطور طبيعية", "عطور دبي"]
+      : ["shop perfumes", "buy fragrances", "aromatic oils", "body care", "home fragrances", "Arabian perfume", "UAE perfume", "luxury perfume online", "oud perfume", "bakhoor incense", "women perfume", "men cologne", "perfume gift sets", "natural fragrance Dubai", "buy perfume UAE"],
   });
 }
 

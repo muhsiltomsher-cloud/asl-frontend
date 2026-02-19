@@ -13,7 +13,7 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { FreeGiftProvider } from "@/contexts/FreeGiftContext";
 import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
-import { generateOrganizationJsonLd, generateWebSiteJsonLd } from "@/lib/utils/seo";
+import { generateOrganizationJsonLd, generateWebSiteJsonLd, generateLocalBusinessJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
@@ -161,6 +161,7 @@ export default async function LocaleLayout({
                       <WishlistProvider>
               <JsonLd data={generateOrganizationJsonLd()} />
               <JsonLd data={generateWebSiteJsonLd()} />
+              <JsonLd data={generateLocalBusinessJsonLd()} />
               <TrackingScripts
                 gaId={seoSettings.analytics.gaId}
                 googleAdsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}

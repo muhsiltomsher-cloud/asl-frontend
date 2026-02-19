@@ -140,12 +140,21 @@ export function generateOrganizationJsonLd() {
     name: siteConfig.name,
     url: siteConfig.url,
     logo: `${siteConfig.url}/logo.png`,
-    description: "Premium fragrances and aromatic products crafted in the UAE. Explore perfumes, body care, and home fragrances.",
+    description: "Aromatic Scents Lab is a UAE-based luxury perfume house offering handcrafted premium fragrances, Arabian oud, body care products, home fragrances, and aromatic oils. Free delivery across the UAE.",
+    foundingDate: "2014",
+    foundingLocation: "Dubai, UAE",
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "+971-50-607-1405",
       contactType: "customer service",
       availableLanguage: ["English", "Arabic"],
+      areaServed: ["AE", "SA", "KW", "BH", "QA", "OM"],
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "AE",
+      addressLocality: "Dubai",
+      addressRegion: "Dubai",
     },
     sameAs: [
       siteConfig.links.instagram,
@@ -161,6 +170,8 @@ export function generateWebSiteJsonLd() {
     "@type": "WebSite",
     name: siteConfig.name,
     url: siteConfig.url,
+    description: siteConfig.description,
+    inLanguage: ["en", "ar"],
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -168,6 +179,56 @@ export function generateWebSiteJsonLd() {
         urlTemplate: `${siteConfig.url}/en/search?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function generateLocalBusinessJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    name: siteConfig.name,
+    url: siteConfig.url,
+    image: `${siteConfig.url}/logo.png`,
+    description: "Luxury perfume house in the UAE offering premium handcrafted fragrances, Arabian oud, body care, and home scents.",
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "AE",
+      addressLocality: "Dubai",
+      addressRegion: "Dubai",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 25.2048,
+      longitude: 55.2708,
+    },
+    telephone: "+971-50-607-1405",
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      opens: "10:00",
+      closes: "22:00",
+    },
+    areaServed: [
+      { "@type": "Country", name: "United Arab Emirates" },
+      { "@type": "Country", name: "Saudi Arabia" },
+      { "@type": "Country", name: "Kuwait" },
+      { "@type": "Country", name: "Bahrain" },
+      { "@type": "Country", name: "Qatar" },
+      { "@type": "Country", name: "Oman" },
+    ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Premium Fragrances",
+      itemListElement: [
+        { "@type": "OfferCatalog", name: "Perfumes" },
+        { "@type": "OfferCatalog", name: "Arabian Oud" },
+        { "@type": "OfferCatalog", name: "Body Care" },
+        { "@type": "OfferCatalog", name: "Home Fragrances" },
+        { "@type": "OfferCatalog", name: "Aromatic Oils" },
+        { "@type": "OfferCatalog", name: "Gift Sets" },
+      ],
     },
   };
 }

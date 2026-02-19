@@ -17,8 +17,8 @@ const notoSansArabic = Noto_Sans_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Aromatic Scents Lab",
-  description: "Premium fragrances and perfumes",
+  title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
+  description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE. Shop luxury handcrafted scents online with free delivery.",
   verification: {
     google: "f_mMaADw5xQDw862fP3PjCa-2conJWM6uY0H_goWpE8",
   },
@@ -47,10 +47,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="overflow-x-clip">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <link rel="dns-prefetch" href="https://cms.aromaticscentslab.com" />
         <link rel="preconnect" href="https://cms.aromaticscentslab.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://connect.facebook.net" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://analytics.tiktok.com" />

@@ -53,8 +53,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: `/category/${slug}`,
     keywords: locale === "ar"
-      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab"]
-      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab"],
+      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية"]
+      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab", "UAE perfume shop", "buy perfume online", "Arabian oud", "fragrance gifts"],
   });
 }
 

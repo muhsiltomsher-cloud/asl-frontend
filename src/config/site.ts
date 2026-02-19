@@ -10,7 +10,7 @@ export const siteConfig = {
   name: "Aromatic Scents Lab",
   
   // Site description - used for SEO meta description
-  description: "Premium fragrances and aromatic products",
+  description: "Premium perfumes, Arabian oud, body care, home fragrances & aromatic oils handcrafted in the UAE. Free delivery on orders over 500 AED.",
   
   // Frontend URL - reads from NEXT_PUBLIC_SITE_URL environment variable
   // Fallback for local development: https://aromaticscentslab.com
