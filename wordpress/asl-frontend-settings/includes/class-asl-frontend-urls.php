@@ -35,6 +35,14 @@ class ASL_Frontend_Urls {
         add_action('admin_bar_menu', array($this, 'rewrite_admin_bar_urls'), 999);
 
         add_filter('woocommerce_product_get_permalink', array($this, 'rewrite_wc_product_permalink'), 10, 2);
+
+        // Google Listings & Ads (Merchant Center) - rewrite product URLs in feeds
+        add_filter('woocommerce_gla_product_attribute_value_link', array($this, 'rewrite_gla_product_link'), 10, 2);
+        add_filter('woocommerce_gla_product_attribute_value_canonical_link', array($this, 'rewrite_gla_product_link'), 10, 2);
+
+        // WooCommerce product feed / REST API - always rewrite product permalinks
+        add_filter('woocommerce_product_get_permalink', array($this, 'rewrite_wc_product_permalink_global'), 20, 2);
+        add_filter('post_type_link', array($this, 'rewrite_product_post_type_link_global'), 20, 2);
     }
 
     public function register_settings_page() {
@@ -234,6 +242,55 @@ class ASL_Frontend_Urls {
             return trailingslashit($this->frontend_url) . 'en/product/' . $slug;
         }
         return $permalink;
+    }
+
+    /**
+     * Rewrite product permalinks globally (not just in admin)
+     * This ensures Google Merchant Center feeds, REST API, and Content API
+     * all use the new Next.js frontend URL structure.
+     */
+    public function rewrite_wc_product_permalink_global($permalink, $product) {
+        $slug = $product->get_slug();
+        if ($slug) {
+            return trailingslashit($this->frontend_url) . 'en/product/' . $slug;
+        }
+        return $permalink;
+    }
+
+    /**
+     * Rewrite product post type links globally for feeds and API responses.
+     * Only applies to 'product' post type to avoid affecting other post types.
+     */
+    public function rewrite_product_post_type_link_global($link, $post) {
+        if (get_post_type($post) !== 'product') {
+            return $link;
+        }
+
+        $slug = $post->post_name;
+        if ($slug) {
+            return trailingslashit($this->frontend_url) . 'en/product/' . $slug;
+        }
+        return $link;
+    }
+
+    /**
+     * Rewrite product link attribute for Google Listings & Ads plugin feeds.
+     * This ensures the Merchant Center product feed uses the new URL structure.
+     */
+    public function rewrite_gla_product_link($value, $product) {
+        if (!$product) return $value;
+
+        $slug = '';
+        if (is_a($product, 'WC_Product')) {
+            $slug = $product->get_slug();
+        } elseif (is_a($product, 'WP_Post')) {
+            $slug = $product->post_name;
+        }
+
+        if ($slug) {
+            return trailingslashit($this->frontend_url) . 'en/product/' . $slug;
+        }
+        return $value;
     }
 }
 
