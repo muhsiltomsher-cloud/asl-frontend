@@ -38,6 +38,30 @@ const nextConfig: NextConfig = {
     },
     optimizePackageImports: ["lucide-react", "swiper", "@mui/material", "@apollo/client", "@emotion/react", "@emotion/styled", "class-variance-authority", "clsx", "swr", "cookies-next"],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:slug([\\w-]+)-perfume',
+        destination: '/en/product/:slug-perfume',
+        permanent: true,
+      },
+      {
+        source: '/product/:slug',
+        destination: '/en/product/:slug',
+        permanent: true,
+      },
+      {
+        source: '/product-category/:slug',
+        destination: '/en/category/:slug',
+        permanent: true,
+      },
+      {
+        source: '/shop',
+        destination: '/en/shop',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const apiUrl = process.env.NEXT_PUBLIC_WC_API_URL || "https://cms.aromaticscentslab.com";
     return [
