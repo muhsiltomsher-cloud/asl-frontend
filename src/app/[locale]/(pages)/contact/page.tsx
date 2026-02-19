@@ -14,8 +14,9 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { ContactForm } from "@/components/common/ContactForm";
 import { QuickContactButtons } from "@/components/common/QuickContactButtons";
 import { getDictionary } from "@/i18n";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import type { Locale } from "@/config/site";
+import { generateMetadata as generateSeoMetadata, generateContactPageJsonLd } from "@/lib/utils/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 
 interface ContactPageProps {
@@ -102,6 +103,12 @@ export default async function ContactPage({ params }: ContactPageProps) {
 
   return (
     <div className="flex flex-col">
+      <JsonLd data={generateContactPageJsonLd({
+        url: `${siteConfig.url}/${locale}/contact`,
+        telephone: "+971-50-607-1405",
+        email: "customerservice@aromaticscentslab.com",
+        address: "Dubai",
+      })} />
       {/* Hero Section */}
       <section className="relative min-h-[50vh] overflow-hidden">
         {/* Background Image */}

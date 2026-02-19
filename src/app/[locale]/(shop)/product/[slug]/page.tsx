@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getProductBySlug, getRelatedProducts, getProducts, getEnglishSlugForProduct, getBundleConfig, getFreeGiftProductIds, getHiddenProductIds, getCategoryBySlug, getEnglishSlugForCategory, getProductUpsellIds, getProductsByIds } from "@/lib/api/woocommerce";
 import { getProductAddons } from "@/lib/api/wcpa";
-import { generateMetadata as generateSeoMetadata, generateProductJsonLd } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateProductJsonLd, generateBreadcrumbJsonLd } from "@/lib/utils/seo";
 import { getTopbarSettings } from "@/lib/api/wordpress";
 import { ProductDetail } from "./ProductDetail";
 import { BuildYourOwnSetClient } from "../../build-your-own-set/BuildYourOwnSetClient";
@@ -230,9 +230,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
     : null;
   const localizedCategoryName = localizedCategory?.name || primaryCategory?.name || null;
 
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: locale === "ar" ? "الرئيسية" : "Home", url: `${siteConfig.url}/${locale}` },
+    { name: locale === "ar" ? "المتجر" : "Shop", url: `${siteConfig.url}/${locale}/shop` },
+    ...(localizedCategoryName && englishCategorySlug ? [{ name: decodeHtmlEntities(localizedCategoryName), url: `${siteConfig.url}/${locale}/category/${englishCategorySlug}` }] : []),
+    { name: decodeHtmlEntities(product.name), url: `${siteConfig.url}/${locale}/product/${slug}` },
+  ]);
+
   return (
     <>
       <JsonLd data={getProductJsonLdData(product, locale, slug)} />
+      <JsonLd data={breadcrumbJsonLd} />
       <ProductDetail
         product={product}
         locale={locale as Locale}

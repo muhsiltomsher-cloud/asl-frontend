@@ -19,16 +19,29 @@ const notoSansArabic = Noto_Sans_Arabic({
 export const metadata: Metadata = {
   title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
   description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE. Shop luxury handcrafted scents online with free delivery.",
+  metadataBase: new URL("https://aromaticscentslab.com"),
+  openGraph: {
+    title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
+    description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE. Shop luxury handcrafted scents online with free delivery.",
+    url: "https://aromaticscentslab.com",
+    siteName: "Aromatic Scents Lab",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Aromatic Scents Lab" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE",
+    description: "Aromatic Scents Lab offers premium perfumes, Arabian oud, body care, home fragrances & aromatic oils in the UAE.",
+    images: ["/og-image.jpg"],
+  },
   verification: {
     google: "f_mMaADw5xQDw862fP3PjCa-2conJWM6uY0H_goWpE8",
   },
-  // iOS Home Screen Optimization
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Aromatic Scents Lab",
   },
-  // Additional mobile optimization
   formatDetection: {
     telephone: true,
     email: true,

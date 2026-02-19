@@ -300,6 +300,37 @@ export function generateStoreJsonLd(stores: {
   }));
 }
 
+export function generateContactPageJsonLd(params: {
+  url: string;
+  telephone: string;
+  email: string;
+  address: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "Contact Aromatic Scents Lab",
+    url: params.url,
+    mainEntity: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      telephone: params.telephone,
+      email: params.email,
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "AE",
+        addressLocality: params.address,
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: params.telephone,
+        contactType: "customer service",
+        availableLanguage: ["English", "Arabic"],
+      },
+    },
+  };
+}
+
 export function generateFAQJsonLd(
   items: { question: string; answer: string }[]
 ) {
