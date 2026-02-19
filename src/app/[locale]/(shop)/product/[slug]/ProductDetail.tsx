@@ -40,6 +40,8 @@ function sanitizeProductDescription(html: string): string {
   sanitized = sanitized.replace(/<a[^>]*aria-label="Add to Wishlist"[^>]*>[\s\S]*?<\/a>/gi, "");
   sanitized = sanitized.replace(/<p>\s*<\/p>/gi, "");
   sanitized = sanitized.replace(/Add to Wishlist/gi, "");
+  sanitized = sanitized.replace(/<\/?b[^>]*>/gi, "");
+  sanitized = sanitized.replace(/<\/?strong[^>]*>/gi, "");
   sanitized = sanitized.trim();
   
   return sanitized;
