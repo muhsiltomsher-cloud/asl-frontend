@@ -843,11 +843,11 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
           </div>
 
 
-          {/* Short description */}
-          {product.short_description && sanitizeProductDescription(product.short_description) && (
+          {/* Notes / key info shown under price */}
+          {product.description && sanitizeProductDescription(product.description) && (
             <div
               className="prose prose-sm max-w-none text-gray-600"
-              dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.short_description) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description) }}
             />
           )}
 
@@ -998,16 +998,16 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               </div>
             </AccordionSection>
 
-            {/* Description */}
+            {/* Full description in accordion */}
             <AccordionSection
               title={isRTL ? "الوصف" : "Description"}
               isOpen={openAccordion === "description"}
               onToggle={() => toggleAccordion("description")}
             >
-              {product.description && sanitizeProductDescription(product.description) ? (
+              {product.short_description ? (
                 <div
                   className="prose prose-sm max-w-none text-gray-600"
-                  dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description) }}
+                  dangerouslySetInnerHTML={{ __html: product.short_description }}
                 />
               ) : (
                 <p className="text-sm text-gray-500">
