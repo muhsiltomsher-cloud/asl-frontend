@@ -19,6 +19,7 @@ import { MapPin, Check, ChevronDown, ChevronUp, Tag, X, Truck } from "lucide-rea
 import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getPricingMode, getFixedPrice, getBundleTotal } from "@/components/cart/BundleItemsList";
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useProductCategories } from "@/hooks/useProductCategories";
+import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
 
 interface ShippingRate {
   rate_id: string;
@@ -150,6 +151,7 @@ export default function CheckoutClient() {
     const productIds = cartItems.map((item) => item.id);
     const productCategories = useProductCategories(productIds);
     const isRTL = locale === "ar";
+    const isKeyboardVisible = useKeyboardVisible();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [customerData, setCustomerData] = useState<Customer | null>(null);
@@ -2285,7 +2287,7 @@ export default function CheckoutClient() {
       </div>
 
       {/* Mobile Sticky Order Summary - positioned above bottom nav bar */}
-      {!isEmptyCart && (
+      {!isEmptyCart && !isKeyboardVisible && (
       <div className="fixed bottom-16 left-0 right-0 z-40 border-t border-black/10 bg-white px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] lg:hidden" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">

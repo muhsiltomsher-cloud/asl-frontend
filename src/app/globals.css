@@ -134,3 +134,11 @@ input::-webkit-credentials-auto-fill-button {
     font-size: 0.875rem;
   }
 }
+
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
