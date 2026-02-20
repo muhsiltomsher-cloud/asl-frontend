@@ -98,8 +98,8 @@ export function MobileBottomBar({ locale, settings, dictionary }: MobileBottomBa
                                  item.url.includes("categories") || item.url.includes("account");
 
             const activeClasses = isActive 
-              ? "text-[#C4885B] border-2 border-[#C4885B] rounded-xl bg-amber-50/50" 
-              : "text-gray-600 border-2 border-transparent";
+              ? "text-[#C4885B] bg-amber-50/50 rounded-xl" 
+              : "text-gray-600";
 
             if (isDrawerItem) {
               return (
