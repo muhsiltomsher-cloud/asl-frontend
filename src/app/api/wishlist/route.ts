@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getEnvVar } from "@/lib/utils/loadEnv";
-import { API_BASE, backendHeaders, noCacheUrl } from "@/lib/utils/backendFetch";
+import { API_BASE, backendHeaders, backendPostHeaders, noCacheUrl } from "@/lib/utils/backendFetch";
 // TI WooCommerce Wishlist REST API - uses WooCommerce REST API namespace
 const WISHLIST_BASE = `${API_BASE}/wp-json/wc/v3/wishlist`;
 const PRODUCTS_BASE = `${API_BASE}/wp-json/wc/v3/products`;
@@ -437,10 +437,11 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case "add": {
         // Get user's wishlist share_key
-        const { shareKey, error } = await getUserWishlistShareKey(userId);
+        const wishlistResult = await getUserWishlistShareKey(userId);
+        let shareKey = wishlistResult.shareKey;
         
         // Handle upstream auth errors
-        if (error === "upstream_unauthorized") {
+        if (wishlistResult.error === "upstream_unauthorized") {
           console.error("[Wishlist API] Upstream auth error when getting wishlist for add");
           return NextResponse.json(
             {
@@ -454,23 +455,44 @@ export async function POST(request: NextRequest) {
           );
         }
         
+        // Auto-create wishlist if user doesn't have one yet
         if (!shareKey) {
-          return NextResponse.json(
-            {
-              success: false,
-              error: {
-                code: "no_wishlist",
-                message: "No wishlist found. Please create a wishlist first.",
+          const createResponse = await fetch(noCacheUrl(`${WISHLIST_BASE}?${getBasicAuthParams()}`), {
+            method: "POST",
+            headers: backendPostHeaders(),
+            body: JSON.stringify({
+              user_id: userId,
+              title: "Default",
+              status: "private",
+            }),
+          });
+          
+          if (createResponse.ok) {
+            const createData = await createResponse.json();
+            shareKey = createData.share_key || null;
+            if (shareKey) {
+              setCachedShareKey(userId, shareKey);
+            }
+          }
+          
+          if (!shareKey) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: {
+                  code: "wishlist_create_error",
+                  message: "Could not create wishlist. Please try again later.",
+                },
               },
-            },
-            { status: 404 }
-          );
+              { status: 500 }
+            );
+          }
         }
         
         // TI Wishlist: POST /{share_key}/add_product
         const response = await fetch(noCacheUrl(`${WISHLIST_BASE}/${shareKey}/add_product?${getBasicAuthParams()}`), {
           method: "POST",
-          headers: backendHeaders(),
+          headers: backendPostHeaders(),
           body: JSON.stringify({
             product_id: body.product_id,
             variation_id: body.variation_id || 0,
@@ -569,7 +591,7 @@ export async function POST(request: NextRequest) {
         // TI Wishlist: DELETE /{share_key}/remove_product/{item_id}
         const response = await fetch(noCacheUrl(`${WISHLIST_BASE}/${shareKey}/remove_product/${itemId}?${getBasicAuthParams()}`), {
           method: "DELETE",
-          headers: backendHeaders(),
+          headers: backendPostHeaders(),
         });
         
         const responseText = await response.text();
@@ -626,10 +648,11 @@ export async function POST(request: NextRequest) {
         const results: Array<{ product_id: number; success: boolean }> = [];
         
         // Get user's wishlist share_key
-        const { shareKey, error } = await getUserWishlistShareKey(userId);
+        const syncResult = await getUserWishlistShareKey(userId);
+        let shareKey = syncResult.shareKey;
         
         // Handle upstream auth errors
-        if (error === "upstream_unauthorized") {
+        if (syncResult.error === "upstream_unauthorized") {
           console.error("[Wishlist API] Upstream auth error when getting wishlist for sync");
           return NextResponse.json(
             {
@@ -643,17 +666,38 @@ export async function POST(request: NextRequest) {
           );
         }
         
+        // Auto-create wishlist if user doesn't have one yet
         if (!shareKey) {
-          return NextResponse.json(
-            {
-              success: false,
-              error: {
-                code: "wishlist_error",
-                message: "Could not get wishlist for sync.",
+          const createResponse = await fetch(noCacheUrl(`${WISHLIST_BASE}?${getBasicAuthParams()}`), {
+            method: "POST",
+            headers: backendPostHeaders(),
+            body: JSON.stringify({
+              user_id: userId,
+              title: "Default",
+              status: "private",
+            }),
+          });
+          
+          if (createResponse.ok) {
+            const createData = await createResponse.json();
+            shareKey = createData.share_key || null;
+            if (shareKey) {
+              setCachedShareKey(userId, shareKey);
+            }
+          }
+          
+          if (!shareKey) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: {
+                  code: "wishlist_error",
+                  message: "Could not create wishlist for sync.",
+                },
               },
-            },
-            { status: 500 }
-          );
+              { status: 500 }
+            );
+          }
         }
         
         // Add each item to the wishlist
@@ -661,7 +705,7 @@ export async function POST(request: NextRequest) {
           try {
             const response = await fetch(noCacheUrl(`${WISHLIST_BASE}/${shareKey}/add_product?${getBasicAuthParams()}`), {
               method: "POST",
-              headers: backendHeaders(),
+              headers: backendPostHeaders(),
               body: JSON.stringify({
                 product_id: item.product_id,
                 variation_id: item.variation_id || 0,
