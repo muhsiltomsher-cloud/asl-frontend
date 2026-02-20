@@ -24,6 +24,7 @@ const WhatsAppFloatingButton = dynamic(() => import("@/components/common/WhatsAp
 const LocationCurrencyBanner = dynamic(() => import("@/components/common/LocationCurrencyBanner").then(mod => mod.LocationCurrencyBanner));
 const CookieConsentBanner = dynamic(() => import("@/components/common/CookieConsentBanner").then(mod => mod.CookieConsentBanner));
 const NetworkStatusBanner = dynamic(() => import("@/components/common/NetworkStatusBanner").then(mod => mod.NetworkStatusBanner));
+const MobileEnhancements = dynamic(() => import("@/components/common/MobileEnhancements").then(mod => mod.MobileEnhancements));
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
@@ -195,7 +196,9 @@ export default async function LocaleLayout({
                     topbarSettings={topbarSettings}
                   />
                 </nav>
-                <main id="main-content" className="flex-1" role="main">{children}</main>
+                <main id="main-content" className="flex-1" role="main">
+                  <MobileEnhancements>{children}</MobileEnhancements>
+                </main>
                 <footer className="print:hidden" role="contentinfo">
                   <Footer locale={validLocale} dictionary={dictionary} siteSettings={siteSettings} />
                 </footer>

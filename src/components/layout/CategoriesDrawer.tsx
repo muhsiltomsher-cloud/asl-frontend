@@ -13,6 +13,23 @@ import type { Locale } from "@/config/site";
 import type { WCCategory } from "@/types/woocommerce";
 import { getCategories } from "@/lib/api/woocommerce";
 import { decodeHtmlEntities } from "@/lib/utils";
+import { triggerHaptic } from "@/lib/utils/haptics";
+
+function CategorySkeleton() {
+  return (
+    <div className="p-4 space-y-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-4 py-3 animate-pulse">
+          <div className="h-10 w-10 rounded-lg bg-gray-200" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-3/4 rounded bg-gray-200" />
+          </div>
+          <div className="h-4 w-4 rounded bg-gray-100" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // DEV MODE: Cache disabled for faster development - uncomment when done
 // const categoriesCache: Record<string, { data: WCCategory[]; timestamp: number }> = {};
@@ -49,6 +66,7 @@ export function CategoriesDrawer({
     const toggleCategory = (categoryId: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    triggerHaptic();
     setExpandedCategories(prev => {
       const newSet = new Set(prev);
       if (newSet.has(categoryId)) {
@@ -115,14 +133,16 @@ export function CategoriesDrawer({
 
   return (
     <MuiDrawer
-      anchor={isRTL ? "right" : "left"}
+      anchor="bottom"
       open={isOpen}
       onClose={handleClose}
       keepMounted
       PaperProps={{
         sx: {
-          width: { xs: "100%", sm: 320 },
-          maxWidth: "100%",
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          maxHeight: "85vh",
+          width: "100%",
         },
       }}
     >
@@ -134,6 +154,10 @@ export function CategoriesDrawer({
         }}
         dir={isRTL ? "rtl" : "ltr"}
       >
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="h-1 w-10 rounded-full bg-gray-300" />
+        </div>
+
         <Box
           sx={{
             display: "flex",
@@ -142,7 +166,7 @@ export function CategoriesDrawer({
             borderBottom: "1px solid",
             borderColor: "divider",
             px: 2,
-            py: 2,
+            py: 1.5,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -162,9 +186,7 @@ export function CategoriesDrawer({
 
         <Box sx={{ flex: 1, overflow: "auto" }}>
           {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-black" />
-            </div>
+            <CategorySkeleton />
           ) : categories.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Grid3X3 className="mb-4 h-12 w-12 text-gray-300" />
@@ -173,7 +195,7 @@ export function CategoriesDrawer({
           ) : (
             <nav className="p-4">
               <ul className="space-y-1">
-header                {parentCategories.map((category) => {
+                {parentCategories.map((category) => {
                   const childCategories = getChildCategories(category.id);
                   const hasChildren = childCategories.length > 0;
                   const isExpanded = expandedCategories.has(category.id);
@@ -252,7 +274,7 @@ header                {parentCategories.map((category) => {
           )}
         </Box>
 
-        <div className="border-t p-4">
+        <div className="border-t p-4 pb-safe">
                     <Link
                       href={`/${locale}/shop`}
                       onClick={handleClose}

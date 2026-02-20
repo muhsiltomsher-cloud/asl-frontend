@@ -12,6 +12,7 @@ import type { MobileBarSettings } from "@/lib/api/wordpress";
 import type { Dictionary } from "@/i18n";
 import { CategoriesDrawer } from "@/components/layout/CategoriesDrawer";
 import { SearchDrawer } from "@/components/layout/SearchDrawer";
+import { triggerHaptic } from "@/lib/utils/haptics";
 
 interface MobileBottomBarProps {
   locale: Locale;
@@ -64,6 +65,7 @@ export function MobileBottomBar({ locale, settings, dictionary }: MobileBottomBa
   };
 
   const handleItemClick = (item: MobileBarSettings["items"][0], e: React.MouseEvent) => {
+    triggerHaptic();
     if (item.icon === "grid" || item.url.includes("categories")) {
       e.preventDefault();
       setActiveDrawer("categories");

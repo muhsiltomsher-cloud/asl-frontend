@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Heart, Eye } from "lucide-react";
+import { ShoppingBag, Heart, Eye, Check } from "lucide-react";
 import { Badge } from "@/components/common/Badge";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
 import { cn, decodeHtmlEntities, getProductSlugFromPermalink, BLUR_DATA_URL } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { triggerHaptic } from "@/lib/utils/haptics";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 
@@ -30,6 +31,7 @@ export function WCProductCard({
   englishSlug,
 }: WCProductCardProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
   const [imageError, setImageError] = useState(false);
   const { addToCart } = useCart();
@@ -38,24 +40,28 @@ export function WCProductCard({
   const router = useRouter();
   const isRTL = locale === "ar";
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    triggerHaptic();
     setIsAddingToCart(true);
     try {
       await addToCart(product.id, 1);
+      setIsAddedToCart(true);
+      setTimeout(() => setIsAddedToCart(false), 1500);
     } catch (error) {
       console.error("Failed to add to cart:", error);
     } finally {
       setIsAddingToCart(false);
     }
-  };
+  }, [addToCart, product.id]);
 
   const isWishlisted = isInWishlist(product.id);
 
   const handleWishlistToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    triggerHaptic();
     
     if (!isAuthenticated) {
       router.push(`/${locale}/login`);
@@ -160,10 +166,18 @@ export function WCProductCard({
                 <button
                   onClick={handleAddToCart}
                   disabled={isAddingToCart}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium uppercase tracking-wide text-white bg-[#C4885B] rounded-full shadow-lg transition-all duration-300 hover:text-[#C4885B] hover:bg-white/70 hover:backdrop-blur-md hover:border hover:border-[#C4885B]/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
+                    isAddedToCart
+                      ? "bg-green-500 text-white scale-95"
+                      : "text-white bg-[#C4885B] hover:text-[#C4885B] hover:bg-white/70 hover:backdrop-blur-md hover:border hover:border-[#C4885B]/30"
+                  )}
                 >
-                  <ShoppingBag className="h-4 w-4" />
-                  {isAddingToCart ? (isRTL ? "جاري الإضافة..." : "Adding...") : (isRTL ? "أضف للسلة" : "Add to Cart")}
+                  {isAddedToCart ? (
+                    <><Check className="h-4 w-4" />{isRTL ? "تمت الإضافة!" : "Added!"}</>
+                  ) : (
+                    <><ShoppingBag className={cn("h-4 w-4", isAddingToCart && "animate-pulse")} />{isAddingToCart ? (isRTL ? "جاري الإضافة..." : "Adding...") : (isRTL ? "أضف للسلة" : "Add to Cart")}</>
+                  )}
                 </button>
               )}
             </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Minus, Plus, ChevronDown, X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Grid, Layers, Move, Share2, ShoppingBag } from "lucide-react";
+import { Heart, Minus, Plus, ChevronDown, X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Grid, Layers, Move, Share2, ShoppingBag, Check } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs, FreeMode } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -23,6 +23,8 @@ import type { WCProduct } from "@/types/woocommerce";
 import type { WCPAForm, WCPAFormValues } from "@/types/wcpa";
 import type { Locale } from "@/config/site";
 import { decodeHtmlEntities, BLUR_DATA_URL } from "@/lib/utils";
+import { useSwipeBack } from "@/hooks/useSwipeBack";
+import { triggerHaptic } from "@/lib/utils/haptics";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -306,7 +308,10 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
+
+  useSwipeBack();
   const [openAccordion, setOpenAccordion] = useState<string | null>("characteristics");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
@@ -360,9 +365,9 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
   ];
 
   const handleAddToCart = async () => {
+    triggerHaptic();
     setIsAddingToCart(true);
     try {
-      // If there are addon forms and values, pass them as cart item data
       const hasAddonValues = Object.keys(addonValues).length > 0;
       if (hasAddonValues && addonForms && addonForms.length > 0) {
         await addToCart(product.id, quantity, undefined, undefined, {
@@ -371,6 +376,8 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
       } else {
         await addToCart(product.id, quantity);
       }
+      setIsAddedToCart(true);
+      setTimeout(() => setIsAddedToCart(false), 1500);
     } catch (error) {
       console.error("Failed to add to cart:", error);
     } finally {
@@ -381,6 +388,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
   const isWishlisted = isInWishlist(product.id);
 
   const handleWishlistToggle = async () => {
+    triggerHaptic();
     if (!isAuthenticated) {
       router.push(`/${locale}/login`);
       return;
@@ -938,11 +946,19 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock || !product.is_purchasable || isAddingToCart}
-                className="flex items-center justify-center gap-2 bg-[#C4885B] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 border-2 border-[#C4885B] rounded-full hover:bg-transparent hover:text-[#C4885B] disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 cursor-pointer"
+                className={`flex items-center justify-center gap-2 px-8 py-3 text-sm font-medium uppercase tracking-wide transition-all duration-300 border-2 rounded-full disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 cursor-pointer ${
+                  isAddedToCart
+                    ? "bg-green-500 border-green-500 text-white scale-95"
+                    : "bg-[#C4885B] border-[#C4885B] text-white hover:bg-transparent hover:text-[#C4885B]"
+                }`}
               >
-                {isAddingToCart 
-                  ? (isRTL ? "جاري الإضافة..." : "Adding...") 
-                  : (isRTL ? "أضف إلى السلة" : "Add to Cart")}
+                {isAddedToCart ? (
+                  <><Check className="h-4 w-4" />{isRTL ? "تمت الإضافة!" : "Added!"}</>
+                ) : isAddingToCart ? (
+                  <>{isRTL ? "جاري الإضافة..." : "Adding..."}</>
+                ) : (
+                  <>{isRTL ? "أضف إلى السلة" : "Add to Cart"}</>
+                )}
               </button>
 
               {/* Wishlist Button */}
@@ -1111,12 +1127,17 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               type="button"
               onClick={handleAddToCart}
               disabled={!product.is_purchasable || isAddingToCart}
-              className="flex items-center justify-center gap-2 bg-[#C4885B] px-6 py-2.5 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 border-2 border-[#C4885B] rounded-full hover:bg-transparent hover:text-[#C4885B] disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400"
+              className={`flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium uppercase tracking-wide transition-all duration-300 border-2 rounded-full disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 ${
+                isAddedToCart
+                  ? "bg-green-500 border-green-500 text-white scale-95"
+                  : "bg-[#C4885B] border-[#C4885B] text-white hover:bg-transparent hover:text-[#C4885B]"
+              }`}
             >
-              <ShoppingBag className="h-4 w-4" />
-              {isAddingToCart
-                ? (isRTL ? "جاري الإضافة..." : "Adding...")
-                : (isRTL ? "أضف إلى السلة" : "Add to Cart")}
+              {isAddedToCart ? (
+                <><Check className="h-4 w-4" />{isRTL ? "تمت الإضافة!" : "Added!"}</>
+              ) : (
+                <><ShoppingBag className="h-4 w-4" />{isAddingToCart ? (isRTL ? "جاري الإضافة..." : "Adding...") : (isRTL ? "أضف إلى السلة" : "Add to Cart")}</>
+              )}
             </button>
           </div>
         </div>

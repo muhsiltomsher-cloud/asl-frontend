@@ -98,13 +98,15 @@ export function SearchDrawer({
 
   return (
     <MuiDrawer
-      anchor="top"
+      anchor="bottom"
       open={isOpen}
       onClose={handleClose}
       PaperProps={{
         sx: {
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
           width: "100%",
-          maxHeight: "80vh",
+          maxHeight: "85vh",
         },
       }}
     >
@@ -116,6 +118,10 @@ export function SearchDrawer({
         }}
         dir={isRTL ? "rtl" : "ltr"}
       >
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="h-1 w-10 rounded-full bg-gray-300" />
+        </div>
+
         <Box
           sx={{
             display: "flex",
@@ -124,7 +130,7 @@ export function SearchDrawer({
             borderBottom: "1px solid",
             borderColor: "divider",
             px: 2,
-            py: 2,
+            py: 1.5,
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
