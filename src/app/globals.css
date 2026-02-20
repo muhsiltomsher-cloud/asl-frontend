@@ -130,11 +130,15 @@ input::-webkit-credentials-auto-fill-button {
     font-size: 14px;
   }
   
-  p, span, a, li, label, button {
+  p, span, a, li, label, input, button, select, textarea {
     font-size: 0.875rem;
   }
+}
 
-  input, select, textarea {
-    font-size: 1rem;
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
