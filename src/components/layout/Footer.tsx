@@ -56,9 +56,9 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
               )}
             </Link>
             <p className="text-sm text-gray-600">
-              {siteSettings?.tagline || (locale === "ar"
+              {locale === "ar"
                 ? "اكتشف العطور الفاخرة ومنتجات العناية العطرية المصنوعة بعناية في أروماتيك سينتس لاب."
-                : "Premium fragrances and aromatic products crafted with care.")}
+                : (siteSettings?.tagline || "Premium fragrances and aromatic products crafted with care.")}
             </p>
             <div className="flex justify-center gap-4 md:justify-start">
               <a
