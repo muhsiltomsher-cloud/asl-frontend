@@ -626,7 +626,67 @@
       "contentUnavailable": "Content is not available at the moment",
       "seo": {
         "title": "Shipping Information",
-        "description": "Learn about Aromatic Scents Lab's shipping and delivery policy"
+        "description": "Learn about Aromatic Scents Lab's shipping and delivery policy. We deliver perfumes and fragrances across UAE, Saudi Arabia, Bahrain, Kuwait, Oman and internationally."
+      },
+      "shippingRates": {
+        "title": "Shipping Rates by Destination",
+        "destination": "Destination",
+        "shippingCost": "Shipping Cost",
+        "estimatedDelivery": "Estimated Delivery",
+        "currency": "AED",
+        "rates": [
+          {
+            "location": "United Arab Emirates (UAE)",
+            "cost": "30",
+            "delivery": "1-2 business days"
+          },
+          {
+            "location": "Saudi Arabia",
+            "cost": "45",
+            "delivery": "3-5 business days"
+          },
+          {
+            "location": "Bahrain",
+            "cost": "45",
+            "delivery": "3-5 business days"
+          },
+          {
+            "location": "Kuwait",
+            "cost": "45",
+            "delivery": "3-5 business days"
+          },
+          {
+            "location": "Oman",
+            "cost": "45",
+            "delivery": "3-5 business days"
+          },
+          {
+            "location": "Qatar",
+            "cost": "45",
+            "delivery": "3-5 business days"
+          },
+          {
+            "location": "United States, Egypt, Jordan, United Kingdom, Europe",
+            "cost": "80",
+            "delivery": "7-14 business days"
+          },
+          {
+            "location": "Iraq, Croatia, Estonia, Hungary, Ireland, Latvia, Lithuania, Slovakia",
+            "cost": "100",
+            "delivery": "7-14 business days"
+          },
+          {
+            "location": "Norway, Iceland, Serbia, Montenegro",
+            "cost": "120",
+            "delivery": "10-15 business days"
+          },
+          {
+            "location": "Rest of World",
+            "cost": "150",
+            "delivery": "10-20 business days"
+          }
+        ],
+        "note": "All prices are in AED. Free shipping is not currently available."
       },
       "sections": [
         {
@@ -647,7 +707,7 @@
         {
           "key": "shipping_costs",
           "title": "Shipping Costs",
-          "content": "Shipping costs are based on the weight of your order and the delivery method. To find out how much your order will cost, simply add the items you would like to purchase to your cart and proceed to the checkout page. Once at the checkout screen, shipping charges will be displayed. Additional shipping charges may apply to remote areas or for large or heavy items. You will be advised of any charges on the checkout page. Sales VAT is on shipping is charged according to the province or territory to which the item is shipped."
+          "content": "Shipping costs are based on your delivery location. Below are our standard shipping rates by destination. Additional charges may apply to remote areas or oversized items."
         },
         {
           "key": "damaged_items",

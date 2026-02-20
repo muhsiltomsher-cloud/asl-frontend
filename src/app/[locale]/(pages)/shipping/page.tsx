@@ -53,6 +53,48 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
               <p className="leading-relaxed text-gray-600">
                 {section.content}
               </p>
+              {section.key === "shipping_costs" && pageContent.shippingRates && (
+                <div className="mt-6">
+                  <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                    {pageContent.shippingRates.title}
+                  </h3>
+                  <div className="overflow-x-auto rounded-lg border border-gray-200">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 font-semibold text-gray-900">
+                            {pageContent.shippingRates.destination}
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-gray-900">
+                            {pageContent.shippingRates.shippingCost}
+                          </th>
+                          <th className="px-4 py-3 font-semibold text-gray-900">
+                            {pageContent.shippingRates.estimatedDelivery}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {pageContent.shippingRates.rates.map((rate, rateIndex) => (
+                          <tr key={rateIndex} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-gray-700">
+                              {rate.location}
+                            </td>
+                            <td className="px-4 py-3 font-medium text-gray-900">
+                              {rate.cost} {pageContent.shippingRates.currency}
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {rate.delivery}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="mt-3 text-sm text-gray-500">
+                    {pageContent.shippingRates.note}
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>
