@@ -175,3 +175,17 @@ input::-webkit-credentials-auto-fill-button {
 .img-lazy-loaded {
   opacity: 1;
 }
+
+/* Hero slider - force Swiper to auto-size on mobile so banner images are not cropped */
+@media (max-width: 767px) {
+  .hero-slider.swiper {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  .hero-slider .swiper-wrapper {
+    height: auto !important;
+  }
+  .hero-slider .swiper-slide {
+    height: auto !important;
+  }
+}
