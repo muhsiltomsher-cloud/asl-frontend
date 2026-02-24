@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import type { HeroSliderSettings } from "@/types/wordpress";
@@ -15,6 +16,8 @@ interface HeroSliderProps {
 }
 
 export function HeroSlider({ settings }: HeroSliderProps) {
+  const { locale } = useParams<{ locale: string }>();
+
   if (!settings.enabled || settings.slides.length === 0) {
     return null;
   }
@@ -72,8 +75,12 @@ export function HeroSlider({ settings }: HeroSliderProps) {
     );
 
     if (slide.link?.url) {
+      // Prefix locale to relative links that don't already have a locale prefix
+      const linkUrl = slide.link.url.startsWith("/") && !slide.link.url.startsWith(`/${locale}/`)
+        ? `/${locale}${slide.link.url}`
+        : slide.link.url;
       return (
-        <Link href={slide.link.url} target={slide.link.target || "_self"} className="block">
+        <Link href={linkUrl} target={slide.link.target || "_self"} className="block">
           {imageContent}
         </Link>
       );
