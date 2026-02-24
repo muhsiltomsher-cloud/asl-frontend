@@ -1005,8 +1005,8 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 {product.attributes && product.attributes.length > 0 && (
                   product.attributes.map((attr) => (
                     <div key={attr.id} className="flex justify-between">
-                      <span className="text-gray-500">{attr.name}</span>
-                      <span className="text-gray-900">{attr.terms?.map(t => t.name).join(", ")}</span>
+                      <span className="text-gray-500">{decodeHtmlEntities(attr.name)}</span>
+                      <span className="text-gray-900">{attr.terms?.map(t => decodeHtmlEntities(t.name)).join(", ")}</span>
                     </div>
                   ))
                 )}
