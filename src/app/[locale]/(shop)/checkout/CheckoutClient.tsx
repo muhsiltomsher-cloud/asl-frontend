@@ -1414,7 +1414,6 @@ export default function CheckoutClient() {
                   required
                   value={formData.shipping.phone}
                   onChange={(phone) => handleShippingChange("phone", phone)}
-                  countryCode={formData.shipping.country}
                   isRTL={isRTL}
                 />
               </div>
@@ -1860,7 +1859,6 @@ export default function CheckoutClient() {
                     label={isRTL ? "رقم الهاتف" : "Phone"}
                     value={formData.billing.phone}
                     onChange={(phone) => handleBillingChange("phone", phone)}
-                    countryCode={formData.billing.country}
                     isRTL={isRTL}
                   />
                   <Input
