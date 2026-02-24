@@ -95,11 +95,12 @@ export function decodeHtmlEntities(text: string): string {
     "&gt;": ">",
     "&quot;": '"',
     "&#39;": "'",
+    "&#039;": "'",
     "&apos;": "'",
     "&nbsp;": " ",
   };
   
-  return text.replace(/&(?:amp|lt|gt|quot|#39|apos|nbsp);/g, (match) => entities[match] || match);
+  return text.replace(/&(?:amp|lt|gt|quot|#0?39|apos|nbsp);/g, (match) => entities[match] || match);
 }
 
 /**
