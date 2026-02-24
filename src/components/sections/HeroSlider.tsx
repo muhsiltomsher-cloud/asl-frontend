@@ -38,36 +38,40 @@ export function HeroSlider({ settings }: HeroSliderProps) {
 
   const SlideContent = ({ slide, index }: { slide: HeroSliderSettings["slides"][0]; index: number }) => {
     const imageContent = (
-      <div className="relative h-[50vh] min-h-[400px] w-full md:h-[70vh] md:min-h-[500px]">
+      <div className="relative w-full">
         {slide.image?.url ? (
           <>
+            {/* Desktop image */}
             <Image
               src={slide.image.url}
               alt={slide.image.alt || `Slide ${index + 1}`}
-              fill
+              width={2560}
+              height={1024}
               priority={index === 0}
               loading={index === 0 ? "eager" : "lazy"}
               fetchPriority={index === 0 ? "high" : "low"}
               sizes="100vw"
-              className="hidden object-cover md:block"
+              className="hidden h-auto w-full md:block"
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAICAIAAABPmPnhAAAAEUlEQVR4nGN4+vAWHsQwXKUBwlPSAflguX8AAAAASUVORK5CYII="
             />
+            {/* Mobile image */}
             <Image
               src={slide.mobile_image?.url || slide.image.url}
               alt={slide.mobile_image?.alt || slide.image.alt || `Slide ${index + 1}`}
-              fill
+              width={1080}
+              height={1475}
               priority={index === 0}
               loading={index === 0 ? "eager" : "lazy"}
               fetchPriority={index === 0 ? "high" : "low"}
               sizes="100vw"
-              className="object-cover md:hidden"
+              className="h-auto w-full md:hidden"
               placeholder="blur"
               blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAICAIAAABPmPnhAAAAEUlEQVR4nGN4+vAWHsQwXKUBwlPSAflguX8AAAAASUVORK5CYII="
             />
           </>
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-200">
+          <div className="flex h-[50vh] w-full items-center justify-center bg-gray-200 md:h-[70vh] md:min-h-[500px]">
             <span className="text-gray-400">No image</span>
           </div>
         )}
@@ -97,6 +101,7 @@ export function HeroSlider({ settings }: HeroSliderProps) {
         spaceBetween={0}
         slidesPerView={1}
         loop={true}
+        autoHeight={true}
         autoplay={
           settings.autoplay
             ? {
