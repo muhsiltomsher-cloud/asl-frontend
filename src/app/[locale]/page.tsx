@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Button } from "@/components/common/Button";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
-import { getNewProducts, getFeaturedProducts, getBestsellerProducts, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
+import { getNewProducts, getFeaturedProducts, getBestsellerProducts, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs, getEnglishSlugFromLocalizedSlug } from "@/lib/api/woocommerce";
 import { getHomePageSettings, getSeoSettings } from "@/lib/api/wordpress";
 import {
   HeroSlider,
@@ -101,29 +101,40 @@ export default async function HomePage({ params }: HomePageProps) {
   });
 
   // Create a mapping of localized category ID to English slug for URL generation
-  // WPML assigns different IDs for different locales, so we match by index position
-  // Both category lists are returned in the same order from the API
+  // Uses slug-based matching via WPML slug mappings for reliability,
+  // since the API may return categories in different orders across locales
   const englishCategorySlugs: Record<number, string> = {};
   
   // Filter to root categories only (parent === 0) and exclude uncategorized
   const localizedRootCategories = categories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
   const englishRootCategories = englishCategories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
   
-  // Map localized category IDs to English slugs and images by matching index position
-  // The API returns categories in a consistent order across locales
+  // Build a lookup from English slug to English category for image fallback
+  const englishCategoryBySlug: Record<string, typeof englishRootCategories[number]> = {};
+  englishRootCategories.forEach((cat) => {
+    englishCategoryBySlug[cat.slug] = cat;
+  });
+  
+  // Map localized category IDs to English slugs using the slug mapping
   // Also create a fallback image map for categories without images (common in Arabic locale)
   const englishCategoryImages: Record<number, { src: string; alt: string } | undefined> = {};
   
-  localizedRootCategories.forEach((localizedCat, index) => {
-    if (index < englishRootCategories.length) {
-      englishCategorySlugs[localizedCat.id] = englishRootCategories[index].slug;
+  localizedRootCategories.forEach((localizedCat) => {
+    // Use the slug mapping to find the English slug (handles both EN and AR slugs)
+    const englishSlug = getEnglishSlugFromLocalizedSlug(localizedCat.slug);
+    if (englishSlug) {
+      englishCategorySlugs[localizedCat.id] = englishSlug;
       // If the localized category doesn't have an image but the English one does, use English image as fallback
-      if (!localizedCat.image?.src && englishRootCategories[index].image?.src) {
+      const englishCat = englishCategoryBySlug[englishSlug];
+      if (!localizedCat.image?.src && englishCat?.image?.src) {
         englishCategoryImages[localizedCat.id] = {
-          src: englishRootCategories[index].image!.src,
-          alt: englishRootCategories[index].image!.alt || englishRootCategories[index].name,
+          src: englishCat.image.src,
+          alt: englishCat.image.alt || englishCat.name,
         };
       }
+    } else {
+      // Fallback: use the localized slug directly (works for EN categories)
+      englishCategorySlugs[localizedCat.id] = localizedCat.slug;
     }
   });
 
