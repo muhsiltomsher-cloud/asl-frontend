@@ -375,7 +375,7 @@ const ARABIC_TO_ENGLISH_CATEGORY_SLUGS: Record<string, string> = Object.fromEntr
 
 // Helper function to get English slug from an Arabic/localized category slug
 // Uses the reverse mapping for reliable slug conversion
-function getEnglishSlugFromLocalizedSlug(localizedSlug: string): string | null {
+export function getEnglishSlugFromLocalizedSlug(localizedSlug: string): string | null {
   // If the slug is already in English (exists in the English-to-Arabic mapping), return it
   if (ENGLISH_TO_ARABIC_CATEGORY_SLUGS[localizedSlug]) {
     return localizedSlug;
