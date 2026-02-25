@@ -1016,9 +1016,9 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                   ))
                 )}
                 {product.tags && product.tags.length > 0 && (
-                  <div className="space-y-3 pt-3 mt-1 border-t border-gray-100">
-                    <span className="text-gray-500">{isRTL ? "الوسوم" : "Tags"}</span>
-                    <div className="flex flex-wrap gap-1.5">
+                  <div className="pt-3 mt-1 border-t border-gray-100">
+                    <span className="block mb-3 text-gray-500">{isRTL ? "الوسوم" : "Tags"}</span>
+                    <div className="flex flex-wrap gap-2">
                       {product.tags.map(t => (
                         <span
                           key={t.slug}
