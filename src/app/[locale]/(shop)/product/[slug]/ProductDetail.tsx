@@ -44,6 +44,11 @@ function sanitizeProductDescription(html: string): string {
   sanitized = sanitized.replace(/Add to Wishlist/gi, "");
   sanitized = sanitized.replace(/<\/?b[^>]*>/gi, "");
   sanitized = sanitized.replace(/<\/?strong[^>]*>/gi, "");
+  // Strip <a> tags but keep their text content (links point to CMS URLs that don't work on frontend)
+  sanitized = sanitized.replace(/<a[^>]*>(.*?)<\/a>/gi, "$1");
+  // Clean up extra Word/Office formatting spans
+  sanitized = sanitized.replace(/<span[^>]*class="[^"]*(?:SCXW|BCX|EOP|TextRun|NormalTextRun)[^"]*"[^>]*>/gi, "");
+  sanitized = sanitized.replace(/<\/span>/gi, "");
   sanitized = sanitized.trim();
   
   return sanitized;
@@ -1011,7 +1016,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                   ))
                 )}
                 {product.tags && product.tags.length > 0 && (
-                  <div className="space-y-2">
+                  <div className="space-y-3 pt-3 mt-1 border-t border-gray-100">
                     <span className="text-gray-500">{isRTL ? "الوسوم" : "Tags"}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {product.tags.map(t => (
@@ -1036,8 +1041,8 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
             >
               {product.short_description ? (
                 <div
-                  className="prose prose-sm max-w-none text-gray-600 [&_a]:underline"
-                  dangerouslySetInnerHTML={{ __html: product.short_description }}
+                  className="prose prose-sm max-w-none text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.short_description) }}
                 />
               ) : (
                 <p className="text-sm text-gray-500">
