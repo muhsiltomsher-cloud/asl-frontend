@@ -21,16 +21,16 @@ export async function generateMetadata({
 }: ShopPageProps): Promise<Metadata> {
   const { locale } = await params;
   return generateSeoMetadata({
-    title: locale === "ar" ? "تسوق العطور الفاخرة" : "Shop Premium Fragrances & Perfumes",
+    title: locale === "ar" ? "تسوق العطور الفاخرة والزيوت العطرية أون لاين" : "Shop All Premium Perfumes, Oud & Home Fragrances Online",
     description:
       locale === "ar"
-        ? "تصفح مجموعتنا الكاملة من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم ومعطرات المنزل. شحن مجاني للطلبات فوق 500 درهم"
-        : "Browse our complete collection of premium fragrances, aromatic oils, body care products, and home fragrances. Free shipping on orders over 500 AED",
+        ? "تصفح مجموعتنا الكاملة من العطور الفاخرة والعود العربي والزيوت العطرية ومنتجات العناية بالجسم ومعطرات المنزل. منتجات يدوية فاخرة من الإمارات. شحن مجاني للطلبات فوق 500 درهم."
+        : "Browse our complete collection of luxury perfumes, Arabian oud, aromatic oils, body care & home fragrances. Handcrafted in the UAE. Free shipping on orders over 500 AED.",
     locale: locale as Locale,
     pathname: "/shop",
     keywords: locale === "ar"
-      ? ["تسوق عطور", "عطور فاخرة", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "عطور عربية", "عطور إماراتية", "شراء عطور", "عود عربي", "بخور", "عطور نسائية", "عطور رجالية", "هدايا عطرية", "عطور طبيعية", "عطور دبي"]
-      : ["shop perfumes", "buy fragrances", "aromatic oils", "body care", "home fragrances", "Arabian perfume", "UAE perfume", "luxury perfume online", "oud perfume", "bakhoor incense", "women perfume", "men cologne", "perfume gift sets", "natural fragrance Dubai", "buy perfume UAE"],
+      ? ["تسوق عطور", "عطور فاخرة", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "عطور عربية", "عطور إماراتية", "شراء عطور", "عود عربي", "بخور", "عطور نسائية", "عطور رجالية", "هدايا عطرية", "عطور طبيعية", "عطور دبي", "عطور مسك", "عطور عنبر", "عطور أصلية الإمارات", "متجر عطور أون لاين", "عطور فانيلا", "عطور جلد", "أفضل عطور الإمارات"]
+      : ["shop perfumes", "buy fragrances online", "aromatic oils", "body care products", "home fragrances", "Arabian perfume", "UAE perfume shop", "luxury perfume online", "oud perfume", "bakhoor incense", "women perfume UAE", "men cologne Dubai", "perfume gift sets", "natural fragrance Dubai", "buy perfume UAE", "musk perfume", "amber perfume", "vanilla perfume", "leather perfume", "sandalwood fragrance", "best perfume online store", "niche perfume UAE"],
   });
 }
 

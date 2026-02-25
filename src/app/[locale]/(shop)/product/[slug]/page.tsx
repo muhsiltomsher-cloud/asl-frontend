@@ -84,9 +84,20 @@ export async function generateMetadata({
   const categoryNames = product.categories?.map((c) => c.name) || [];
   const tagNames = product.tags?.map((t) => t.name) || [];
 
+  // Build a richer product description for SEO
+  const rawDescription = decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 120);
+  const minorUnit = product.prices?.currency_minor_unit || 2;
+  const divisor = Math.pow(10, minorUnit);
+  const priceValue = product.prices?.price ? (parseInt(product.prices.price, 10) / divisor).toFixed(0) : null;
+  const productDescription = locale === "ar"
+    ? `${rawDescription ? rawDescription + ". " : ""}${productName} من Aromatic Scents Lab.${priceValue ? " السعر: " + priceValue + " درهم." : ""} توصيل مجاني للطلبات فوق 500 درهم.`
+    : `${rawDescription ? rawDescription + ". " : ""}${productName} by Aromatic Scents Lab.${priceValue ? " Price: " + priceValue + " AED." : ""} Free delivery on orders over 500 AED.`;
+
   return generateSeoMetadata({
-    title: productName,
-    description: decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 160),
+    title: locale === "ar"
+      ? `${productName} | شراء أون لاين`
+      : `${productName} | Buy Online`,
+    description: productDescription.slice(0, 160),
     locale: locale as Locale,
     pathname: `/product/${slug}`,
     image: product.images[0]?.src,
@@ -95,8 +106,8 @@ export async function generateMetadata({
       ...categoryNames,
       ...tagNames,
       ...(locale === "ar"
-        ? ["عطور", "شراء عطور", "عطور فاخرة", "عطور الإمارات", "عطور دبي", "عود عربي", "هدايا عطرية", "Aromatic Scents Lab"]
-        : ["perfume", "buy fragrance", "luxury perfume UAE", "Dubai perfume", "Arabian oud", "fragrance gift", "premium scent", "Aromatic Scents Lab"]),
+        ? ["عطور", "شراء عطور", "عطور فاخرة", "عطور الإمارات", "عطور دبي", "عود عربي", "هدايا عطرية", "Aromatic Scents Lab", "عطور فخمة", "شراء عطر أون لاين", "عطور مسك", "عطور عنبر", "عطور فانيلا", "عطور عود", "أفضل عطور الإمارات"]
+        : ["perfume", "buy fragrance", "luxury perfume UAE", "Dubai perfume", "Arabian oud", "fragrance gift", "premium scent", "Aromatic Scents Lab", "niche perfume", "buy perfume online", "musk perfume", "amber fragrance", "vanilla perfume", "oud fragrance", "best perfume UAE"]),
     ],
   });
 }

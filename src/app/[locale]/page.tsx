@@ -41,8 +41,8 @@ export async function generateMetadata({
     locale: validLocale,
     pathname: "",
     keywords: isArabic
-      ? ["عطور فاخرة", "عطور عربية", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور دبي", "بخور", "عطور طبيعية", "عطور نسائية", "عطور رجالية"]
-      : ["premium perfumes", "Arabian fragrances", "aromatic oils", "body care", "home fragrances", "Aromatic Scents Lab", "UAE perfume", "buy perfume online", "Arabian oud", "luxury perfume Dubai", "natural fragrance", "perfume gift sets", "oud perfume", "women perfume UAE", "men cologne Dubai", "bakhoor incense"],
+      ? ["عطور فاخرة", "عطور عربية", "زيوت عطرية", "عناية بالجسم", "معطرات منزل", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور دبي", "بخور", "عطور طبيعية", "عطور نسائية", "عطور رجالية", "عطور أصلية", "عطور مسك", "عطور عنبر", "متجر عطور أون لاين الإمارات", "عطور فخمة دبي", "أفضل عطور عربية", "عطور هدايا فخمة", "بخور عود", "عطر شرقي", "توصيل عطور الإمارات"]
+      : ["premium perfumes", "Arabian fragrances", "aromatic oils", "body care", "home fragrances", "Aromatic Scents Lab", "UAE perfume", "buy perfume online", "Arabian oud", "luxury perfume Dubai", "natural fragrance", "perfume gift sets", "oud perfume", "women perfume UAE", "men cologne Dubai", "bakhoor incense", "best perfume UAE", "handcrafted perfume", "niche perfume Dubai", "oriental fragrance", "musk perfume", "amber perfume", "online perfume store UAE", "luxury scent collection", "perfume delivery UAE"],
   });
 
   return {

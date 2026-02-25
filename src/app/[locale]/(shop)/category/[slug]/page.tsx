@@ -62,13 +62,15 @@ export async function generateMetadata({
       : `Shop ${categoryName} at Aromatic Scents Lab. ${categoryCount > 0 ? `Explore ${categoryCount}+ handcrafted` : "Explore our handcrafted"} luxury products made in the UAE. Free delivery on orders over 500 AED.`;
 
   return generateSeoMetadata({
-    title: categoryName,
+    title: locale === "ar"
+      ? `${categoryName} | تسوق أون لاين`
+      : `${categoryName} | Shop Online`,
     description,
     locale: locale as Locale,
     pathname: `/category/${canonicalSlug}`,
     keywords: locale === "ar"
-      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية"]
-      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab", "UAE perfume shop", "buy perfume online", "Arabian oud", "fragrance gifts"],
+      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور مسك", "عطور عنبر", "عطور دبي", "أفضل عطور", "عطور نسائية", "عطور رجالية"]
+      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab", "UAE perfume shop", "buy perfume online", "Arabian oud", "fragrance gifts", "musk perfume", "amber fragrance", "Dubai perfume", "best perfume", "women perfume", "men cologne"],
   });
 }
 

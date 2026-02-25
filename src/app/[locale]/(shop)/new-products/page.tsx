@@ -19,16 +19,16 @@ export async function generateMetadata({
 }: NewProductsPageProps): Promise<Metadata> {
   const { locale } = await params;
   return generateSeoMetadata({
-    title: locale === "ar" ? "منتجات جديدة - أحدث العطور" : "New Products - Latest Fragrances & Perfumes",
+    title: locale === "ar" ? "منتجات جديدة | أحدث العطور والإصدارات الفاخرة" : "New Arrivals | Latest Luxury Perfumes & Oud Fragrances",
     description:
       locale === "ar"
-        ? "اكتشف أحدث منتجاتنا من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم. تسوق أحدث الإصدارات من Aromatic Scents Lab"
-        : "Discover our latest premium fragrances, aromatic oils, and body care products. Shop the newest arrivals from Aromatic Scents Lab",
+        ? "اكتشف أحدث إصداراتنا من العطور الفاخرة والعود العربي والزيوت العطرية من Aromatic Scents Lab. منتجات يدوية فاخرة من الإمارات. توصيل مجاني للطلبات فوق 500 درهم."
+        : "Discover our newest luxury perfumes, Arabian oud & aromatic oils from Aromatic Scents Lab. Handcrafted in the UAE. Free delivery on orders over 500 AED.",
     locale: locale as Locale,
     pathname: "/new-products",
     keywords: locale === "ar"
-      ? ["عطور جديدة", "أحدث العطور", "عطور فاخرة", "منتجات عطرية جديدة", "إصدارات جديدة", "عطور الإمارات", "عود عربي جديد", "عطور دبي الجديدة", "شراء عطور جديدة", "عطور نسائية جديدة", "عطور رجالية جديدة"]
-      : ["new perfumes", "latest fragrances", "new arrivals perfume", "premium fragrance", "aromatic products", "UAE perfume", "new oud perfume", "latest Dubai perfume", "new women perfume", "new men cologne", "luxury perfume new arrival"],
+      ? ["عطور جديدة", "أحدث العطور", "عطور فاخرة", "منتجات عطرية جديدة", "إصدارات جديدة", "عطور الإمارات", "عود عربي جديد", "عطور دبي الجديدة", "شراء عطور جديدة", "عطور نسائية جديدة", "عطور رجالية جديدة", "عطور مسك جديدة", "عطور عنبر جديدة", "أحدث عطور عربية", "عطور فانيلا جديدة", "عطور جديدة اون لاين", "معطرات منزل جديدة"]
+      : ["new perfumes", "latest fragrances", "new arrivals perfume", "premium fragrance", "aromatic products", "UAE perfume", "new oud perfume", "latest Dubai perfume", "new women perfume", "new men cologne", "luxury perfume new arrival", "new musk perfume", "new amber fragrance", "latest Arabian perfume", "new vanilla perfume", "new perfume online", "new home fragrance"],
   });
 }
 

@@ -32,8 +32,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/about",
     keywords: locale === "ar"
-      ? ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية", "عطور يدوية دبي", "مكونات عطرية طبيعية", "بيت عطور الإمارات", "عود عربي أصلي"]
-      : ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances", "handcrafted perfume Dubai", "natural fragrance ingredients", "UAE perfume house", "authentic Arabian oud"],
+      ? ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية", "عطور يدوية دبي", "مكونات عطرية طبيعية", "بيت عطور الإمارات", "عود عربي أصلي", "عطور عربية أصلية", "عطور دبي فاخرة", "عطور مسك وعنبر", "عطور ورد فرنسي", "عطور خشب الصندل"]
+      : ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances", "handcrafted perfume Dubai", "natural fragrance ingredients", "UAE perfume house", "authentic Arabian oud", "luxury perfume brand UAE", "Dubai fragrance house", "musk and amber perfume", "French rose perfume", "sandalwood fragrance"],
   });
 }
 

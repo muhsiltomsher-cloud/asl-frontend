@@ -21,8 +21,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/privacy",
     keywords: locale === "ar"
-      ? ["سياسة الخصوصية", "حماية البيانات", "أمان المعلومات", "خصوصية العملاء", "Aromatic Scents Lab"]
-      : ["privacy policy", "data protection", "customer privacy", "information security", "Aromatic Scents Lab"],
+      ? ["سياسة الخصوصية", "حماية البيانات", "أمان المعلومات", "خصوصية العملاء", "Aromatic Scents Lab", "حماية بيانات العملاء", "سياسة البيانات الإمارات", "أمان المعلومات الشخصية"]
+      : ["privacy policy", "data protection", "customer privacy", "information security", "Aromatic Scents Lab", "customer data protection", "UAE data policy", "personal information security"],
   });
 }
 
