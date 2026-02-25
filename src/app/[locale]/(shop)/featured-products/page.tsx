@@ -19,16 +19,16 @@ export async function generateMetadata({
 }: FeaturedProductsPageProps): Promise<Metadata> {
   const { locale } = await params;
   return generateSeoMetadata({
-    title: locale === "ar" ? "منتجات مميزة - الأكثر مبيعاً" : "Featured Products - Best Selling Fragrances",
+    title: locale === "ar" ? "الأكثر مبيعاً | أفضل العطور الفاخرة والمميزة" : "Best Sellers | Top Rated Luxury Perfumes & Oud Fragrances",
     description:
       locale === "ar"
-        ? "تسوق أفضل العطور المميزة والأكثر مبيعاً من Aromatic Scents Lab. عطور فاخرة وزيوت عطرية ومنتجات العناية بالجسم"
-        : "Shop our best-selling and featured premium fragrances from Aromatic Scents Lab. Luxury perfumes, aromatic oils, and body care products",
+        ? "تسوق أفضل العطور المميزة والأكثر مبيعاً من Aromatic Scents Lab. عطور فاخرة وعود عربي وزيوت عطرية مصنوعة يدوياً في الإمارات. توصيل مجاني للطلبات فوق 500 درهم."
+        : "Shop our best-selling luxury perfumes, Arabian oud & aromatic oils from Aromatic Scents Lab. Handcrafted in the UAE. Free delivery on orders over 500 AED.",
     locale: locale as Locale,
     pathname: "/featured-products",
     keywords: locale === "ar"
-      ? ["عطور مميزة", "الأكثر مبيعاً", "أفضل العطور", "عطور فاخرة", "عطور عربية", "هدايا عطرية", "عطور دبي المميزة", "أفضل عطور الإمارات", "عطور شعبية", "عود فاخر", "مجموعات هدايا"]
-      : ["featured perfumes", "best sellers", "top fragrances", "luxury perfume", "Arabian perfume", "fragrance gifts", "popular Dubai perfume", "best UAE perfume", "top rated oud", "luxury gift sets", "bestselling cologne"],
+      ? ["عطور مميزة", "الأكثر مبيعاً", "أفضل العطور", "عطور فاخرة", "عطور عربية", "هدايا عطرية", "عطور دبي المميزة", "أفضل عطور الإمارات", "عطور شعبية", "عود فاخر", "مجموعات هدايا", "عطور مسك مميزة", "عطور عنبر فاخرة", "أفضل عطور عربية", "عطور فاخرة أون لاين", "عطور رائجة", "عطور فخمة دبي"]
+      : ["featured perfumes", "best sellers", "top fragrances", "luxury perfume", "Arabian perfume", "fragrance gifts", "popular Dubai perfume", "best UAE perfume", "top rated oud", "luxury gift sets", "bestselling cologne", "best musk perfume", "best amber perfume", "top Arabian fragrance", "luxury perfume online", "trending perfume", "premium Dubai fragrance"],
   });
 }
 

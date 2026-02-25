@@ -20,15 +20,15 @@ export async function generateMetadata({
   const isRTL = locale === "ar";
 
   return generateSeoMetadata({
-    title: isRTL ? "اصنع مجموعتك الخاصة من العطور" : "Build Your Own Fragrance Set - Custom Perfume Bundle",
+    title: isRTL ? "اصنع مجموعتك | طقم عطور مخصص هدية فاخرة" : "Build Your Own Set | Custom Luxury Perfume Gift Bundle",
     description: isRTL
-      ? "أنشئ مجموعة عطور فريدة من اختيارك. اختر 3 منتجات أو أكثر من العطور والزيوت واللوشن ومعطرات المنزل من Aromatic Scents Lab"
-      : "Create a unique fragrance set of your choice. Pick 3 or more products from perfumes, oils, lotions, or home fragrances at Aromatic Scents Lab",
+      ? "أنشئ مجموعة عطور فريدة من اختيارك. اختر 3 منتجات أو أكثر من العطور والزيوت واللوشن ومعطرات المنزل. هدية مثالية من Aromatic Scents Lab. توصيل مجاني للطلبات فوق 500 درهم."
+      : "Create a unique fragrance gift set. Pick 3+ products from perfumes, oud, oils & home fragrances. The perfect luxury gift from Aromatic Scents Lab. Free delivery over 500 AED.",
     locale: locale as Locale,
     pathname: "/build-your-own-set",
     keywords: isRTL
-      ? ["مجموعة عطور", "هدايا عطور", "عطور مخصصة", "حزمة عطور", "طقم عطور", "هدية عطرية"]
-      : ["custom fragrance set", "perfume gift set", "build your own perfume", "fragrance bundle", "perfume collection", "gift set"],
+      ? ["مجموعة عطور", "هدايا عطور", "عطور مخصصة", "حزمة عطور", "طقم عطور", "هدية عطرية", "هدية عطور فاخرة", "طقم عطور هدية", "مجموعة عطور مخصصة", "هدية عيد عطور", "هدية عيد ميلاد", "هدية زواج عطور", "عطور إماراتية هدية", "طقم عود عربي"]
+      : ["custom fragrance set", "perfume gift set", "build your own perfume", "fragrance bundle", "perfume collection", "gift set", "luxury perfume gift", "perfume gift box", "custom perfume bundle", "birthday perfume gift", "wedding fragrance gift", "anniversary perfume set", "UAE perfume gift set", "oud gift set"],
   });
 }
 

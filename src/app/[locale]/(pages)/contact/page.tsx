@@ -36,8 +36,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/contact",
     keywords: locale === "ar"
-      ? ["تواصل معنا", "خدمة العملاء", "دعم العطور", "استفسارات", "Aromatic Scents Lab", "اتصل بنا دبي", "واتساب عطور", "مواقع متاجر العطور", "مساعدة عطور الإمارات"]
-      : ["contact us", "customer service", "perfume support", "inquiries", "Aromatic Scents Lab", "contact Dubai perfume", "WhatsApp fragrance", "perfume store locations", "UAE fragrance help"],
+      ? ["تواصل معنا", "خدمة العملاء", "دعم العطور", "استفسارات", "Aromatic Scents Lab", "اتصل بنا دبي", "واتساب عطور", "مواقع متاجر العطور", "مساعدة عطور الإمارات", "رقم هاتف عطور", "بريد إلكتروني عطور", "دعم عملاء الإمارات", "فروع عطور دبي"]
+      : ["contact us", "customer service", "perfume support", "inquiries", "Aromatic Scents Lab", "contact Dubai perfume", "WhatsApp fragrance", "perfume store locations", "UAE fragrance help", "perfume phone number", "perfume email", "UAE customer support", "Dubai perfume store"],
   });
 }
 

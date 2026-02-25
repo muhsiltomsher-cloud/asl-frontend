@@ -16,15 +16,15 @@ export async function generateMetadata({
   const isRTL = locale === "ar";
 
   return generateSeoMetadata({
-    title: isRTL ? "مواقع متاجرنا في الإمارات وعمان" : "Store Locations - UAE & Oman",
+    title: isRTL ? "مواقع متاجرنا | فروع الإمارات وعمان" : "Store Locator | Find Our Perfume Shops in UAE & Oman",
     description: isRTL
-      ? "اعثر على أقرب فرع لـ Aromatic Scents Lab. متاجرنا في أبوظبي والعين والفجيرة ومسقط. زورونا واستمتعوا بتجربة عطرية فريدة"
-      : "Find the nearest Aromatic Scents Lab store. Located in Abu Dhabi, Al Ain, Fujairah, and Muscat. Visit us for a unique aromatic experience",
+      ? "اعثر على أقرب فرع لـ Aromatic Scents Lab. 6 متاجر في أبوظبي والعين والفجيرة ومسقط. زورونا واستمتعوا بتجربة عطرية فريدة. مفتوح 10 ص - 10 م."
+      : "Find the nearest Aromatic Scents Lab store. 6 locations in Abu Dhabi, Al Ain, Fujairah & Muscat. Visit us for a unique aromatic experience. Open 10AM-10PM.",
     locale: locale as Locale,
     pathname: "/store-locator",
     keywords: isRTL
-      ? ["مواقع المتاجر", "فروع العطور", "متجر عطور أبوظبي", "متجر عطور العين", "متجر عطور الفجيرة", "عطور مسقط"]
-      : ["store locations", "perfume shop Abu Dhabi", "perfume store Al Ain", "fragrance shop Fujairah", "perfume Muscat", "Aromatic Scents Lab stores"],
+      ? ["مواقع المتاجر", "فروع العطور", "متجر عطور أبوظبي", "متجر عطور العين", "متجر عطور الفجيرة", "عطور مسقط", "عطور ياس مول", "عطور بوابة الشرق", "عطور بوادي مول", "عطور عمان مول", "Aromatic Scents Lab فروع", "متجر عطور الإمارات"]
+      : ["store locations", "perfume shop Abu Dhabi", "perfume store Al Ain", "fragrance shop Fujairah", "perfume Muscat", "Aromatic Scents Lab stores", "Yas Mall perfume", "Bawabat Al Sharq perfume", "Bawadi Mall fragrance", "Oman Mall perfume", "UAE perfume stores", "find perfume store near me"],
   });
 }
 

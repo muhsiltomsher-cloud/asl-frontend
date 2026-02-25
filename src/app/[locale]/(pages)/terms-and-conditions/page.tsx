@@ -21,8 +21,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/terms-and-conditions",
     keywords: locale === "ar"
-      ? ["الشروط والأحكام", "شروط الاستخدام", "اتفاقية المستخدم", "سياسات المتجر", "Aromatic Scents Lab"]
-      : ["terms and conditions", "terms of use", "user agreement", "store policies", "Aromatic Scents Lab"],
+      ? ["الشروط والأحكام", "شروط الاستخدام", "اتفاقية المستخدم", "سياسات المتجر", "Aromatic Scents Lab", "شروط الشراء", "سياسة المتجر الإلكتروني", "أحكام التسوق"]
+      : ["terms and conditions", "terms of use", "user agreement", "store policies", "Aromatic Scents Lab", "purchase terms", "online store policy", "shopping terms"],
   });
 }
 
