@@ -1011,9 +1011,18 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                   ))
                 )}
                 {product.tags && product.tags.length > 0 && (
-                  <div className="flex justify-between">
+                  <div className="space-y-2">
                     <span className="text-gray-500">{isRTL ? "الوسوم" : "Tags"}</span>
-                    <span className="text-gray-900">{product.tags.map(t => t.name).join(", ")}</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.tags.map(t => (
+                        <span
+                          key={t.slug}
+                          className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200"
+                        >
+                          {t.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

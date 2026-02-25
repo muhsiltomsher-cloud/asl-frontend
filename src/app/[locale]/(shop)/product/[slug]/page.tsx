@@ -85,7 +85,11 @@ export async function generateMetadata({
   const tagNames = product.tags?.map((t) => t.name) || [];
 
   // Build a richer product description for SEO
-  const rawDescription = decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 120);
+  // Truncate raw description at word boundary to avoid mid-word cuts
+  const fullRawDescription = decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, ""));
+  const rawDescription = fullRawDescription.length > 100
+    ? fullRawDescription.slice(0, 100).replace(/\s+\S*$/, "")
+    : fullRawDescription;
   const minorUnit = product.prices?.currency_minor_unit || 2;
   const divisor = Math.pow(10, minorUnit);
   const priceValue = product.prices?.price ? (parseInt(product.prices.price, 10) / divisor).toFixed(0) : null;
@@ -93,11 +97,16 @@ export async function generateMetadata({
     ? `${rawDescription ? rawDescription + ". " : ""}${productName} من Aromatic Scents Lab.${priceValue ? " السعر: " + priceValue + " درهم." : ""} توصيل مجاني للطلبات فوق 500 درهم.`
     : `${rawDescription ? rawDescription + ". " : ""}${productName} by Aromatic Scents Lab.${priceValue ? " Price: " + priceValue + " AED." : ""} Free delivery on orders over 500 AED.`;
 
+  // Truncate final description at word boundary (max 160 chars for SEO)
+  const trimmedDescription = productDescription.length > 160
+    ? productDescription.slice(0, 160).replace(/\s+\S*$/, "") + "..."
+    : productDescription;
+
   return generateSeoMetadata({
     title: locale === "ar"
       ? `${productName} | شراء أون لاين`
       : `${productName} | Buy Online`,
-    description: productDescription.slice(0, 160),
+    description: trimmedDescription,
     locale: locale as Locale,
     pathname: `/product/${slug}`,
     image: product.images[0]?.src,
