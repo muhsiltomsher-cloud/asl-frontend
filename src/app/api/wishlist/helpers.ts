@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getEnvVar } from "@/lib/utils/loadEnv";
+import { getWcCredentials } from "@/lib/utils/loadEnv";
 import { API_BASE, backendHeaders, backendPostHeaders, noCacheUrl } from "@/lib/utils/backendFetch";
 
 const WISHLIST_BASE = `${API_BASE}/wp-json/wc/v3/wishlist`;
@@ -94,19 +94,13 @@ export function setCachedShareKey(userId: number, shareKey: string): void {
 
 // --- Auth & Credentials ---
 
-function getWooCommerceCredentials() {
-  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_KEY") || "";
-  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_SECRET") || "";
-  return { consumerKey, consumerSecret };
-}
-
 export function areCredentialsConfigured(): boolean {
-  const { consumerKey, consumerSecret } = getWooCommerceCredentials();
+  const { consumerKey, consumerSecret } = getWcCredentials();
   return consumerKey.length > 0 && consumerSecret.length > 0;
 }
 
 export function getBasicAuthParams(): string {
-  const { consumerKey, consumerSecret } = getWooCommerceCredentials();
+  const { consumerKey, consumerSecret } = getWcCredentials();
   return `consumer_key=${consumerKey}&consumer_secret=${consumerSecret}`;
 }
 

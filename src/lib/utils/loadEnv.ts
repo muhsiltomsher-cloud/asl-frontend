@@ -87,3 +87,29 @@ export function getEnvVar(key: string): string | undefined {
 
   return process.env[key];
 }
+
+/**
+ * Get WooCommerce API credentials using direct literal process.env references.
+ *
+ * IMPORTANT: Next.js replaces process.env.NEXT_PUBLIC_* at BUILD TIME only when
+ * accessed as literal strings (e.g. process.env.NEXT_PUBLIC_WC_CONSUMER_KEY).
+ * Dynamic access via process.env[key] is NOT replaced at build time.
+ * On Hostinger, non-NEXT_PUBLIC env vars may not be available at runtime,
+ * so we need these direct references to ensure the values are inlined during build.
+ */
+export function getWcCredentials(): { consumerKey: string; consumerSecret: string } {
+  // Direct literal references allow Next.js to inline these at build time
+  const consumerKey =
+    process.env.WC_CONSUMER_KEY ||
+    process.env.NEXT_PUBLIC_WC_CONSUMER_KEY ||
+    getEnvVar("WC_CONSUMER_KEY") ||
+    getEnvVar("NEXT_PUBLIC_WC_CONSUMER_KEY") ||
+    "";
+  const consumerSecret =
+    process.env.WC_CONSUMER_SECRET ||
+    process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET ||
+    getEnvVar("WC_CONSUMER_SECRET") ||
+    getEnvVar("NEXT_PUBLIC_WC_CONSUMER_SECRET") ||
+    "";
+  return { consumerKey, consumerSecret };
+}

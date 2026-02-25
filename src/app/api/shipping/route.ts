@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
-import { getEnvVar } from "@/lib/utils/loadEnv";
+import { getWcCredentials } from "@/lib/utils/loadEnv";
 
 const WC_API_BASE = `${siteConfig.apiUrl}/wp-json/wc/v3`;
 
 function getBasicAuthParams(): string {
-  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_KEY") || "";
-  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_SECRET") || "";
+  const { consumerKey, consumerSecret } = getWcCredentials();
   return `consumer_key=${consumerKey}&consumer_secret=${consumerSecret}`;
 }
 
