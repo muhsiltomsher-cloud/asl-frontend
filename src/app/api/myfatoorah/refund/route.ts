@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEnvVar } from "@/lib/utils/loadEnv";
+import { getEnvVar, getWcCredentials } from "@/lib/utils/loadEnv";
 import { siteConfig } from "@/config/site";
 
 const WC_API_BASE = `${siteConfig.apiUrl}/wp-json/wc/v3`;
 
-function getWooCommerceCredentials() {
-  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_KEY") || "";
-  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_SECRET") || "";
-  return { consumerKey, consumerSecret };
-}
-
 function getBasicAuthParams(): string {
-  const { consumerKey, consumerSecret } = getWooCommerceCredentials();
+  const { consumerKey, consumerSecret } = getWcCredentials();
   return `consumer_key=${consumerKey}&consumer_secret=${consumerSecret}`;
 }
 
@@ -136,7 +130,7 @@ function getMyFatoorahApiBaseUrl(): string {
     case "OM":
     case "OMN":
     default:
-      return "https://api.myfatoorah.com";
+      return "https://api-ae.myfatoorah.com";
   }
 }
 

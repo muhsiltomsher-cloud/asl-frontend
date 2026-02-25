@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getEnvVar } from "@/lib/utils/loadEnv";
+import { getEnvVar, getWcCredentials } from "@/lib/utils/loadEnv";
 import { API_BASE as BASE_URL, backendHeaders, noCacheUrl } from "@/lib/utils/backendFetch";
 
 const API_BASE = `${BASE_URL}/wp-json/wc/v3`;
@@ -12,14 +12,8 @@ interface CachedGateways {
 }
 let gatewaysCache: CachedGateways | null = null;
 
-function getWooCommerceCredentials() {
-  const consumerKey = getEnvVar("WC_CONSUMER_KEY") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_KEY") || "";
-  const consumerSecret = getEnvVar("WC_CONSUMER_SECRET") || getEnvVar("NEXT_PUBLIC_WC_CONSUMER_SECRET") || "";
-  return { consumerKey, consumerSecret };
-}
-
 function getBasicAuthParams(): string {
-  const { consumerKey, consumerSecret } = getWooCommerceCredentials();
+  const { consumerKey, consumerSecret } = getWcCredentials();
   return `consumer_key=${consumerKey}&consumer_secret=${consumerSecret}`;
 }
 
@@ -91,7 +85,7 @@ export async function GET() {
       });
     }
 
-    const { consumerKey, consumerSecret } = getWooCommerceCredentials();
+    const { consumerKey, consumerSecret } = getWcCredentials();
     
     if (consumerKey && consumerSecret) {
       const url = `${API_BASE}/payment_gateways?${getBasicAuthParams()}`;
