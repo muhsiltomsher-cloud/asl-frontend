@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEnvVar, getWcCredentials } from "@/lib/utils/loadEnv";
+import { getWcCredentials, getMyFatoorahConfig } from "@/lib/utils/loadEnv";
 import { siteConfig } from "@/config/site";
 
 const WC_API_BASE = `${siteConfig.apiUrl}/wp-json/wc/v3`;
 
 function getMyFatoorahApiBaseUrl(): string {
-  if (getEnvVar("MYFATOORAH_TEST_MODE") === "true") {
+  const { testMode, country: rawCountry } = getMyFatoorahConfig();
+  if (testMode === "true") {
     return "https://apitest.myfatoorah.com";
   }
   
-  const country = (getEnvVar("MYFATOORAH_COUNTRY") || "KWT").toUpperCase();
+  const country = (rawCountry || "KWT").toUpperCase();
   
   switch (country) {
     case "AE":
@@ -160,7 +161,7 @@ interface SyncResult {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = getEnvVar("MYFATOORAH_API_KEY");
+    const { apiKey } = getMyFatoorahConfig();
     
     if (!apiKey) {
       return NextResponse.json(
