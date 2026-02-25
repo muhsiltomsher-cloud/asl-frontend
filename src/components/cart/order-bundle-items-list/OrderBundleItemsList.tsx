@@ -15,8 +15,12 @@ export function OrderBundleItemsList({ item, locale, compact = false, showPrices
   const orderQuantity = item.quantity || 1;
   const baseBundleTotal = getOrderBundleItemsTotal(bundleItems);
   const baseBoxPrice = getOrderBoxPrice(item, baseBundleTotal);
-  const bundleTotal = baseBundleTotal * orderQuantity;
   const boxPrice = baseBoxPrice !== null ? baseBoxPrice * orderQuantity : null;
+  
+  // Use the actual order line item price instead of the sum of individual bundle item metadata prices,
+  // since the actual charged price may differ from the raw sum of bundle item prices
+  const actualItemTotal = parseFloat(item.total) || (item.price * orderQuantity);
+  const bundleTotal = actualItemTotal > 0 ? actualItemTotal : baseBundleTotal * orderQuantity;
   
   const regularItems = bundleItems.filter(bi => !bi.is_addon);
   const addonItems = bundleItems.filter(bi => bi.is_addon);
