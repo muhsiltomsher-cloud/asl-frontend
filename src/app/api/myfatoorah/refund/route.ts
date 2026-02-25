@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEnvVar, getWcCredentials } from "@/lib/utils/loadEnv";
+import { getWcCredentials, getMyFatoorahConfig } from "@/lib/utils/loadEnv";
 import { siteConfig } from "@/config/site";
 
 const WC_API_BASE = `${siteConfig.apiUrl}/wp-json/wc/v3`;
@@ -100,11 +100,12 @@ async function updateOrderWithRefundDetails(
 }
 
 function getMyFatoorahApiBaseUrl(): string {
-  if (getEnvVar("MYFATOORAH_TEST_MODE") === "true") {
+  const { testMode, country: rawCountry } = getMyFatoorahConfig();
+  if (testMode === "true") {
     return "https://apitest.myfatoorah.com";
   }
   
-  const country = (getEnvVar("MYFATOORAH_COUNTRY") || "KWT").toUpperCase();
+  const country = (rawCountry || "KWT").toUpperCase();
   
   switch (country) {
     case "AE":
@@ -177,7 +178,7 @@ interface GetRefundStatusResponse {
 // POST - Make a refund request
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = getEnvVar("MYFATOORAH_API_KEY");
+    const { apiKey } = getMyFatoorahConfig();
     
     if (!apiKey) {
       console.error("MyFatoorah API Error: MYFATOORAH_API_KEY environment variable is not configured");
@@ -339,7 +340,7 @@ export async function POST(request: NextRequest) {
 // GET - Get refund status
 export async function GET(request: NextRequest) {
   try {
-    const apiKey = getEnvVar("MYFATOORAH_API_KEY");
+    const { apiKey } = getMyFatoorahConfig();
     
     if (!apiKey) {
       console.error("MyFatoorah API Error: MYFATOORAH_API_KEY environment variable is not configured");

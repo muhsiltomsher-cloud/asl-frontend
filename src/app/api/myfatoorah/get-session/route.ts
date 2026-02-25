@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEnvVar } from "@/lib/utils/loadEnv";
+import { getMyFatoorahConfig } from "@/lib/utils/loadEnv";
 
 function getMyFatoorahApiBaseUrl(): string {
-  if (getEnvVar("MYFATOORAH_TEST_MODE") === "true") {
+  const { testMode, country: rawCountry } = getMyFatoorahConfig();
+  if (testMode === "true") {
     return "https://apitest.myfatoorah.com";
   }
   
-  const country = (getEnvVar("MYFATOORAH_COUNTRY") || "KWT").toUpperCase();
+  const country = (rawCountry || "KWT").toUpperCase();
   
   switch (country) {
     case "AE":
@@ -77,7 +78,7 @@ interface MyFatoorahSessionDetailsResponse {
 
 export async function GET(request: NextRequest) {
   try {
-    const apiKey = getEnvVar("MYFATOORAH_API_KEY");
+    const { apiKey } = getMyFatoorahConfig();
     
     if (!apiKey) {
       console.error("MyFatoorah API Error: MYFATOORAH_API_KEY environment variable is not configured");
