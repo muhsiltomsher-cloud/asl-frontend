@@ -803,13 +803,24 @@ function asl_bundle_items_save_to_cart($cart_item_data, $product_id, $variation_
             
             if ($item_product_id > 0) {
                 $product = wc_get_product($item_product_id);
+                $is_free = !empty($item['is_free']);
+                $is_addon = !empty($item['is_addon']);
                 
-                $processed_items[] = array(
+                $processed_item = array(
                     'product_id' => $item_product_id,
                     'name' => $product ? $product->get_name() : (isset($item['name']) ? sanitize_text_field($item['name']) : 'Product #' . $item_product_id),
-                    'price' => $product ? floatval($product->get_price()) : (isset($item['price']) ? floatval($item['price']) : 0),
+                    'price' => $is_free ? 0 : ($product ? floatval($product->get_price()) : (isset($item['price']) ? floatval($item['price']) : 0)),
                     'quantity' => isset($item['quantity']) ? intval($item['quantity']) : 1,
                 );
+                
+                if ($is_free) {
+                    $processed_item['is_free'] = true;
+                }
+                if ($is_addon) {
+                    $processed_item['is_addon'] = true;
+                }
+                
+                $processed_items[] = $processed_item;
             }
         }
         
@@ -1030,13 +1041,24 @@ function asl_bundle_items_add_to_cocart_response($cart_contents, $cart_item_key,
                 
                 if ($product_id > 0) {
                     $product = wc_get_product($product_id);
+                    $is_free = !empty($bundle_item['is_free']);
+                    $is_addon = !empty($bundle_item['is_addon']);
                     
-                    $enriched_items[] = array(
+                    $enriched_item = array(
                         'product_id' => $product_id,
                         'name' => $product ? $product->get_name() : (isset($bundle_item['name']) ? $bundle_item['name'] : 'Product #' . $product_id),
-                        'price' => $product ? floatval($product->get_price()) : (isset($bundle_item['price']) ? floatval($bundle_item['price']) : 0),
+                        'price' => $is_free ? 0 : ($product ? floatval($product->get_price()) : (isset($bundle_item['price']) ? floatval($bundle_item['price']) : 0)),
                         'quantity' => isset($bundle_item['quantity']) ? intval($bundle_item['quantity']) : 1,
                     );
+                    
+                    if ($is_free) {
+                        $enriched_item['is_free'] = true;
+                    }
+                    if ($is_addon) {
+                        $enriched_item['is_addon'] = true;
+                    }
+                    
+                    $enriched_items[] = $enriched_item;
                 }
             }
             
@@ -1066,13 +1088,24 @@ function asl_bundle_items_add_to_cocart_item($item, $item_key, $cart_item) {
             
             if ($product_id > 0) {
                 $product = wc_get_product($product_id);
+                $is_free = !empty($bundle_item['is_free']);
+                $is_addon = !empty($bundle_item['is_addon']);
                 
-                $enriched_items[] = array(
+                $enriched_item = array(
                     'product_id' => $product_id,
                     'name' => $product ? $product->get_name() : (isset($bundle_item['name']) ? $bundle_item['name'] : 'Product #' . $product_id),
-                    'price' => $product ? floatval($product->get_price()) : (isset($bundle_item['price']) ? floatval($bundle_item['price']) : 0),
+                    'price' => $is_free ? 0 : ($product ? floatval($product->get_price()) : (isset($bundle_item['price']) ? floatval($bundle_item['price']) : 0)),
                     'quantity' => isset($bundle_item['quantity']) ? intval($bundle_item['quantity']) : 1,
                 );
+                
+                if ($is_free) {
+                    $enriched_item['is_free'] = true;
+                }
+                if ($is_addon) {
+                    $enriched_item['is_addon'] = true;
+                }
+                
+                $enriched_items[] = $enriched_item;
             }
         }
         

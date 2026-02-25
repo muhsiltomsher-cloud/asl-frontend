@@ -38,6 +38,7 @@ export function getOrderBundleItems(item: OrderLineItem): BundleItem[] | null {
         price: typeof bi.price === "number" || typeof bi.price === "string" ? bi.price : undefined,
         quantity: typeof bi.quantity === "number" ? bi.quantity : undefined,
         is_addon: typeof bi.is_addon === "boolean" ? bi.is_addon : undefined,
+        is_free: typeof bi.is_free === "boolean" ? bi.is_free : undefined,
       }));
   } catch {
     return null;
@@ -46,6 +47,7 @@ export function getOrderBundleItems(item: OrderLineItem): BundleItem[] | null {
 
 export function getOrderBundleItemsTotal(bundleItems: BundleItem[]): number {
   return bundleItems.reduce((total, item) => {
+    if (item.is_free) return total;
     const price = typeof item.price === "string" ? parseFloat(item.price) : (item.price || 0);
     const quantity = item.quantity || 1;
     return total + (price * quantity);
