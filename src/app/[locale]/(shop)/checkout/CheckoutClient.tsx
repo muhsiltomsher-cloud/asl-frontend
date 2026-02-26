@@ -20,6 +20,7 @@ import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getP
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useProductCategories } from "@/hooks/useProductCategories";
 import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
+import { updateCartCustomer } from "@/lib/api/cocart";
 
 interface ShippingRate {
   rate_id: string;
@@ -145,7 +146,7 @@ export default function CheckoutClient() {
   const { locale } = useParams<{ locale: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
-        const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, isLoading: isCartLoading } = useCart();
+        const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, refreshCart, isLoading: isCartLoading } = useCart();
         const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
         const { currency, convertPrice, getCurrencyInfo } = useCurrency();
     const productIds = cartItems.map((item) => item.id);
@@ -521,6 +522,31 @@ export default function CheckoutClient() {
           }
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [formData.shipping.country, formData.shipping.city, formData.shipping.postalCode]);
+
+        // Update CoCart customer shipping address when country changes
+        // This triggers WooCommerce fee recalculation (e.g., Customs fees via Extra Fees plugin)
+        useEffect(() => {
+          if (formData.shipping.country) {
+            const updateCustomerCountry = async () => {
+              try {
+                await updateCartCustomer({
+                  shipping_address: {
+                    shipping_country: formData.shipping.country,
+                    shipping_city: formData.shipping.city || "",
+                    shipping_postcode: formData.shipping.postalCode || "",
+                  },
+                });
+                // Refresh cart to get updated fees from CoCart
+                await refreshCart();
+              } catch (err) {
+                console.error("Failed to update cart customer address:", err);
+              }
+            };
+            const timeoutId = setTimeout(updateCustomerCountry, 600);
+            return () => clearTimeout(timeoutId);
+          }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [formData.shipping.country]);
 
         const handleSelectShippingRate = async (rateId: string, packageId: number = 0) => {
           setSelectedShippingRate(rateId);

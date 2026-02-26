@@ -300,6 +300,12 @@ export async function POST(request: NextRequest) {
       case "clear":
         baseUrl = appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart/clear`, currency, locale);
         break;
+      case "update-customer": {
+        // Update the CoCart session's customer shipping/billing address
+        // This triggers WooCommerce fee recalculation (e.g., Extra Fees plugin)
+        baseUrl = appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart/update-customer`, currency, locale);
+        break;
+      }
       case "apply-coupon":
       case "remove-coupon": {
         // Use WooCommerce Store API for coupons (CoCart v2 doesn't have coupon endpoints on this backend)
