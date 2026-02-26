@@ -361,13 +361,13 @@ export async function applyCoupon(couponCode: string): Promise<CartOperationResp
 }
 
 export async function updateCartCustomer(
-  shippingAddress: Record<string, string>
+  customerData: { shipping_address?: Record<string, string>; billing_address?: Record<string, string> }
 ): Promise<CartOperationResponse> {
   try {
     const response = await fetch("/api/cart?action=update-customer", {
       method: "POST",
       headers: getHeaders(),
-      body: JSON.stringify(shippingAddress),
+      body: JSON.stringify(customerData),
     });
 
     const data = await response.json();
