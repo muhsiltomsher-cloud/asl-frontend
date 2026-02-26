@@ -8,7 +8,7 @@ import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { cn } from "@/lib/utils";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
-import { BESTSELLER_PRODUCT_IDS } from "@/lib/api/woocommerce";
+import { BESTSELLER_PRODUCT_IDS, BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 
 const STORAGE_KEY = "asl_product_view_preference";
 const PREFERENCE_CHANGE_EVENT = "asl_preference_change";
@@ -23,12 +23,20 @@ function getProductPrice(product: WCProduct): number {
 }
 
 const bestsellerIdSet = new Set(BESTSELLER_PRODUCT_IDS);
+const bestsellerSlugSet = new Set(BESTSELLER_PRODUCT_SLUGS);
+
+// Check if a product is a bestseller using both ID and slug matching
+// Slug matching ensures bestseller sorting works across all WPML locales
+// (product IDs differ per locale, but slugs remain the same)
+function isBestseller(product: WCProduct): boolean {
+  return bestsellerIdSet.has(product.id) || bestsellerSlugSet.has(product.slug);
+}
 
 function sortBestsellersFirst(products: WCProduct[]): WCProduct[] {
   const bestsellers: WCProduct[] = [];
   const others: WCProduct[] = [];
   for (const product of products) {
-    if (bestsellerIdSet.has(product.id)) {
+    if (isBestseller(product)) {
       bestsellers.push(product);
     } else {
       others.push(product);
