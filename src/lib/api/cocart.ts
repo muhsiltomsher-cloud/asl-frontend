@@ -360,44 +360,6 @@ export async function applyCoupon(couponCode: string): Promise<CartOperationResp
   }
 }
 
-export async function updateCartCustomer(
-  customerData: { shipping_address?: Record<string, string>; billing_address?: Record<string, string> }
-): Promise<CartOperationResponse> {
-  try {
-    const response = await fetch("/api/cart?action=update-customer", {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify(customerData),
-    });
-
-    const data = await response.json();
-
-    if (!data.success) {
-      return {
-        success: false,
-        error: {
-          code: data.error?.code || "update_customer_error",
-          message: data.error?.message || "Failed to update customer.",
-          data: { status: response.status },
-        },
-      };
-    }
-
-    return {
-      success: true,
-      cart: data.cart,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: {
-        code: "network_error",
-        message: error instanceof Error ? error.message : "Network error occurred",
-      },
-    };
-  }
-}
-
 export async function removeCoupon(couponCode: string): Promise<CartOperationResponse> {
   try {
     const response = await fetch("/api/cart?action=remove-coupon", {

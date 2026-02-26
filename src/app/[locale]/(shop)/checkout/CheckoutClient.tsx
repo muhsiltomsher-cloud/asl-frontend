@@ -20,7 +20,6 @@ import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getP
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useProductCategories } from "@/hooks/useProductCategories";
 import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
-import { updateCartCustomer } from "@/lib/api/cocart";
 
 interface ShippingRate {
   rate_id: string;
@@ -523,39 +522,22 @@ export default function CheckoutClient() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [formData.shipping.country, formData.shipping.city, formData.shipping.postalCode]);
 
-        // Update WooCommerce customer shipping address when country changes
-        // This triggers fee recalculation (e.g., Customs fees via Extra Fees plugin)
-        const prevCountryRef = useRef<string | null>(null);
-        useEffect(() => {
-          if (formData.shipping.country) {
-            // Skip on initial mount — only fire when country actually changes
-            if (prevCountryRef.current === null) {
-              prevCountryRef.current = formData.shipping.country;
-              return;
-            }
-            if (prevCountryRef.current === formData.shipping.country) return;
-            prevCountryRef.current = formData.shipping.country;
-
-            const updateCustomerCountry = async () => {
-              try {
-                await updateCartCustomer({
-                  shipping_address: {
-                    country: formData.shipping.country,
-                    city: formData.shipping.city || "",
-                    postcode: formData.shipping.postalCode || "",
-                  },
-                });
-                // Refresh cart to get updated fees
-                await refreshCart();
-              } catch (err) {
-                console.error("Failed to update cart customer address:", err);
-              }
-            };
-            const timeoutId = setTimeout(updateCustomerCountry, 600);
-            return () => clearTimeout(timeoutId);
-          }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [formData.shipping.country]);
+        // Calculate customs fee client-side when shipping country is not UAE
+        // The WooCommerce Extra Fees plugin applies a 20% "Customs fees" for non-UAE countries,
+        // but the CoCart session doesn't update when the country changes on the frontend.
+        // So we calculate the fee here and include it in the order payload via fee_lines.
+        const customsFee = useMemo(() => {
+          const country = formData.shipping.country;
+          if (!country || country === "AE") return null;
+          // 20% of cart subtotal (subtotal is in minor units)
+          const subtotal = parseFloat(cartSubtotal) || 0;
+          if (subtotal <= 0) return null;
+          const feeAmount = Math.round(subtotal * 0.20);
+          return {
+            name: "Customs fees",
+            fee: String(feeAmount),
+          };
+        }, [formData.shipping.country, cartSubtotal]);
 
         const handleSelectShippingRate = async (rateId: string, packageId: number = 0) => {
           setSelectedShippingRate(rateId);
@@ -617,11 +599,12 @@ export default function CheckoutClient() {
           return `${coupon.amount} ${currency}`;
         };
 
-    // Calculate total fees from cart
+    // Calculate total fees — use client-side customs fee if available, otherwise fall back to cart.fees
     const cartFeeTotal = useMemo(() => {
+      if (customsFee) return parseFloat(customsFee.fee) || 0;
       if (!cart?.fees || cart.fees.length === 0) return 0;
       return cart.fees.reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
-    }, [cart?.fees]);
+    }, [customsFee, cart?.fees]);
 
     const checkoutTotal = useMemo(() => {
       if (shippingPackages.length > 0) {
@@ -1061,7 +1044,12 @@ export default function CheckoutClient() {
         line_items: lineItems,
         shipping_lines: shippingLines,
         coupon_lines: couponLines,
-        ...(cart?.fees && cart.fees.length > 0 ? {
+        ...(customsFee ? {
+          fee_lines: [{
+            name: customsFee.name,
+            total: convertPrice(parseFloat(customsFee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
+          }]
+        } : cart?.fees && cart.fees.length > 0 ? {
           fee_lines: cart.fees.map(fee => ({
             name: fee.name,
             total: convertPrice(parseFloat(fee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
@@ -2277,8 +2265,16 @@ export default function CheckoutClient() {
                                   <span className="text-green-600 font-medium">{isRTL ? "مجاني" : "Free"}</span>
                                 )}
                               </div>
-                              {/* Customs Fees */}
-                              {cart?.fees && cart.fees.length > 0 && cart.fees.map((fee, index) => (
+                              {/* Customs Fees — prefer client-side calculated fee */}
+                              {customsFee ? (
+                                <div className="flex justify-between text-sm text-gray-600">
+                                  <span>{isRTL ? "رسوم جمركية" : customsFee.name}</span>
+                                  <FormattedPrice
+                                    price={parseFloat(customsFee.fee) / divisor}
+                                    iconSize="xs"
+                                  />
+                                </div>
+                              ) : cart?.fees && cart.fees.length > 0 && cart.fees.map((fee, index) => (
                                 <div key={index} className="flex justify-between text-sm text-gray-600">
                                   <span>{isRTL ? "رسوم جمركية" : fee.name}</span>
                                   <FormattedPrice
