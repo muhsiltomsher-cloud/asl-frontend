@@ -531,9 +531,9 @@ export default function CheckoutClient() {
               try {
                 await updateCartCustomer({
                   shipping_address: {
-                    shipping_country: formData.shipping.country,
-                    shipping_city: formData.shipping.city || "",
-                    shipping_postcode: formData.shipping.postalCode || "",
+                    country: formData.shipping.country,
+                    city: formData.shipping.city || "",
+                    postcode: formData.shipping.postalCode || "",
                   },
                 });
                 // Refresh cart to get updated fees from CoCart
