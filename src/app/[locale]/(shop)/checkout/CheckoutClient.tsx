@@ -595,7 +595,7 @@ export default function CheckoutClient() {
         const discount = couponDiscount || 0;
         return subtotal - discount + shipping + cartFeeTotal;
       }
-      return (parseFloat(cartTotal) || 0) + cartFeeTotal;
+      return parseFloat(cartTotal) || 0;
     }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal, cartFeeTotal]);
 
     const breadcrumbItems = [
