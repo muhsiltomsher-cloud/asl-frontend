@@ -661,6 +661,16 @@ export default function CartPage() {
                                     : texts.calculatedAtCheckout}
                                 </span>
                               </div>
+                              {/* Customs Fees */}
+                              {cart?.fees && cart.fees.length > 0 && cart.fees.map((fee, index) => (
+                                <div key={index} className="flex justify-between text-gray-600">
+                                  <span>{isRTL ? "رسوم جمركية" : fee.name}</span>
+                                  <FormattedPrice
+                                    price={parseFloat(fee.fee) / divisor}
+                                    iconSize="xs"
+                                  />
+                                </div>
+                              ))}
                             </div>
 
                             <div className="flex justify-between py-4 text-lg font-semibold text-gray-900">
