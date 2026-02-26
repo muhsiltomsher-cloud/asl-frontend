@@ -523,10 +523,19 @@ export default function CheckoutClient() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [formData.shipping.country, formData.shipping.city, formData.shipping.postalCode]);
 
-        // Update CoCart customer shipping address when country changes
-        // This triggers WooCommerce fee recalculation (e.g., Customs fees via Extra Fees plugin)
+        // Update WooCommerce customer shipping address when country changes
+        // This triggers fee recalculation (e.g., Customs fees via Extra Fees plugin)
+        const prevCountryRef = useRef<string | null>(null);
         useEffect(() => {
           if (formData.shipping.country) {
+            // Skip on initial mount — only fire when country actually changes
+            if (prevCountryRef.current === null) {
+              prevCountryRef.current = formData.shipping.country;
+              return;
+            }
+            if (prevCountryRef.current === formData.shipping.country) return;
+            prevCountryRef.current = formData.shipping.country;
+
             const updateCustomerCountry = async () => {
               try {
                 await updateCartCustomer({
@@ -536,7 +545,7 @@ export default function CheckoutClient() {
                     postcode: formData.shipping.postalCode || "",
                   },
                 });
-                // Refresh cart to get updated fees from CoCart
+                // Refresh cart to get updated fees
                 await refreshCart();
               } catch (err) {
                 console.error("Failed to update cart customer address:", err);

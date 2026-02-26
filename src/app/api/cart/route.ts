@@ -301,10 +301,66 @@ export async function POST(request: NextRequest) {
         baseUrl = appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart/clear`, currency, locale);
         break;
       case "update-customer": {
-        // Update the CoCart session's customer shipping/billing address
-        // This triggers WooCommerce fee recalculation (e.g., Extra Fees plugin)
-        baseUrl = appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart/update-customer`, currency, locale);
-        break;
+        // Use WooCommerce Store API to update customer shipping/billing address
+        // This triggers WooCommerce fee recalculation (e.g., Customs fees via Extra Fees plugin)
+        // CoCart v2 does not have an update-customer endpoint on this backend
+        const { cartToken: ucCartToken, nonce: ucNonce } = await getStoreApiAuth();
+
+        if (!ucCartToken || !ucNonce) {
+          return NextResponse.json(
+            { success: false, error: { code: "store_api_auth_error", message: "Failed to get Store API authentication" } },
+            { status: 500 }
+          );
+        }
+
+        const updateCustomerUrl = `${API_BASE}/wp-json/wc/store/v1/cart/update-customer`;
+
+        const ucResponse = await fetch(noCacheUrl(updateCustomerUrl), {
+          method: "POST",
+          headers: backendPostHeaders({
+            "Cart-Token": ucCartToken,
+            "X-WP-Nonce": ucNonce,
+          }),
+          body: JSON.stringify(body),
+        });
+
+        const ucData = await safeJsonResponse(ucResponse);
+
+        if (!ucResponse.ok) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: String(ucData.code || "update_customer_error"),
+                message: String(ucData.message || "Failed to update customer."),
+              },
+            },
+            { status: ucResponse.status }
+          );
+        }
+
+        // Refresh CoCart cart to get updated fees/totals
+        const ucCoCartUrl = cartKey
+          ? appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart?cart_key=${cartKey}`, currency, locale)
+          : appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart`, currency, locale);
+
+        const ucCoCartResponse = await fetch(noCacheUrl(ucCoCartUrl), {
+          method: "GET",
+          headers: authToken ? getAuthHeaders(request, authToken) : getGuestHeaders(),
+        });
+
+        const ucCoCartData = await safeJsonResponse(ucCoCartResponse);
+
+        if (!ucCoCartResponse.ok) {
+          return NextResponse.json({
+            success: true,
+            cart: ucData,
+            warning: "Cart data may not be in expected format"
+          });
+        }
+
+        const ucNewCartKey = ucCoCartData.cart_key ? (ucCoCartData.cart_key as string) : null;
+        return createResponseWithCartKey({ success: true, cart: ucCoCartData }, ucNewCartKey);
       }
       case "apply-coupon":
       case "remove-coupon": {
