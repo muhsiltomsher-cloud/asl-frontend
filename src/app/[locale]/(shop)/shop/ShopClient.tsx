@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ProductListing } from "@/components/shop/ProductListing";
 import type { WCProduct, WCProductsResponse } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
-import { BESTSELLER_PRODUCT_IDS } from "@/lib/api/woocommerce";
+import { BESTSELLER_PRODUCT_IDS, BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 
 // DEV MODE: Cache disabled for faster development - uncomment when done
 // const PRODUCTS_CACHE_KEY = "asl_products_cache";
@@ -69,19 +69,21 @@ export function ShopClient({
   const isInitialMount = useRef(true);
 
   const bestsellerIdSet = useMemo(() => new Set(BESTSELLER_PRODUCT_IDS), []);
+  const bestsellerSlugSet = useMemo(() => new Set(BESTSELLER_PRODUCT_SLUGS), []);
 
   const sortBestsellersFirst = useCallback((items: WCProduct[]): WCProduct[] => {
     const bestsellers: WCProduct[] = [];
     const others: WCProduct[] = [];
     for (const item of items) {
-      if (bestsellerIdSet.has(item.id)) {
+      // Match by both ID and slug for WPML multi-locale support
+      if (bestsellerIdSet.has(item.id) || bestsellerSlugSet.has(item.slug)) {
         bestsellers.push(item);
       } else {
         others.push(item);
       }
     }
     return [...bestsellers, ...others];
-  }, [bestsellerIdSet]);
+  }, [bestsellerIdSet, bestsellerSlugSet]);
 
   useEffect(() => {
     // DEV MODE: Cache disabled - always use initial products

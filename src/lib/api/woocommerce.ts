@@ -116,8 +116,10 @@ export async function getProducts(params?: {
     if (params?.per_page) searchParams.set("per_page", params.per_page.toString());
     if (params?.category) searchParams.set("category", params.category);
     if (params?.search) searchParams.set("search", params.search);
-    if (params?.orderby) searchParams.set("orderby", params.orderby);
-    if (params?.order) searchParams.set("order", params.order);
+    // Default to date desc (newest first) to match backend ordering expectations
+    // This ensures the latest products appear first across all pages and categories
+    searchParams.set("orderby", params?.orderby || "date");
+    searchParams.set("order", params?.order || "desc");
     if (params?.include?.length) searchParams.set("include", params.include.join(","));
 
     const queryString = searchParams.toString();
@@ -1037,6 +1039,7 @@ export async function getNewProducts(params?: {
 }
 
 export const BESTSELLER_PRODUCT_IDS = [
+  9732, // ASL Ramadan Gift Set (latest added - keep first)
   8004, // Dark Musk Perfume
   8009, // Velvet Amber Perfume
   8007, // Secret Leather Perfume
@@ -1046,6 +1049,21 @@ export const BESTSELLER_PRODUCT_IDS = [
   8036, // Hand Body Lotion Velvet Amber
   8012, // Hair Mist Dark Musk
   8019, // Hair Mist Royal Tobacco
+];
+
+// Slug-based bestseller matching for WPML multi-locale support
+// Product IDs differ across locales (EN vs AR), but slugs remain the same
+export const BESTSELLER_PRODUCT_SLUGS = [
+  "asl-ramadan-box",                // ASL Ramadan Gift Set (latest added - keep first)
+  "dark-musk-perfume",              // Dark Musk Perfume
+  "velvet-amber-perfume",           // Velvet Amber Perfume
+  "secret-leather-perfume",         // Secret Leather Perfume
+  "cool-violet-air-fresheners",     // Cool Violet Air Fresheners
+  "dark-musk-oil",                  // Dark Musk Oil
+  "velvet-amber",                   // Velvet Amber Oil
+  "velvet-amber-hand-body-lotion",  // Hand Body Lotion Velvet Amber
+  "dark-musk-hair-body-mist",       // Hair Mist Dark Musk
+  "royal-tobacco-hair-body-mist",   // Hair Mist Royal Tobacco
 ];
 
 export async function getBestsellerProducts(params?: {
