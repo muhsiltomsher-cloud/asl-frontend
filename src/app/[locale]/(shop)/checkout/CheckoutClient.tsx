@@ -627,11 +627,15 @@ export default function CheckoutClient() {
         const discount = couponDiscount || 0;
         return subtotal - discount + shipping + cartFeeTotal;
       }
-      // cartTotal from CoCart doesn't include client-side customs fee, so add it
+      // cartTotal from CoCart may include server-side fees; subtract server customs fee
+      // before adding client-side customs fee to avoid double-counting
       const baseTotal = parseFloat(cartTotal) || 0;
+      const serverCustomsFeeTotal = (cart?.fees || [])
+        .filter(fee => fee.name.toLowerCase() === "customs fees")
+        .reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
       const clientCustomsFee = customsFee ? (parseFloat(customsFee.fee) || 0) : 0;
-      return baseTotal + clientCustomsFee;
-    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal, cartFeeTotal, customsFee]);
+      return baseTotal - serverCustomsFeeTotal + clientCustomsFee;
+    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal, cartFeeTotal, customsFee, cart?.fees]);
 
     const breadcrumbItems = [
     { name: isRTL ? "السلة" : "Cart", href: `/${locale}/cart` },
