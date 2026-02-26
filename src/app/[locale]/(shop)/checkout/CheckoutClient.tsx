@@ -145,7 +145,7 @@ export default function CheckoutClient() {
   const { locale } = useParams<{ locale: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
-        const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, isLoading: isCartLoading } = useCart();
+        const { cart, cartItems, cartSubtotal, cartTotal, clearCart, applyCoupon, removeCoupon, selectedCoupons, couponDiscount, clearSelectedCoupons, refreshCart, isLoading: isCartLoading } = useCart();
         const { isAuthenticated, user, isLoading: isAuthLoading } = useAuth();
         const { currency, convertPrice, getCurrencyInfo } = useCurrency();
     const productIds = cartItems.map((item) => item.id);
@@ -522,6 +522,23 @@ export default function CheckoutClient() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [formData.shipping.country, formData.shipping.city, formData.shipping.postalCode]);
 
+        // Calculate customs fee client-side when shipping country is not UAE
+        // The WooCommerce Extra Fees plugin applies a 20% "Customs fees" for non-UAE countries,
+        // but the CoCart session doesn't update when the country changes on the frontend.
+        // So we calculate the fee here and include it in the order payload via fee_lines.
+        const customsFee = useMemo(() => {
+          const country = formData.shipping.country;
+          if (!country || country === "AE") return null;
+          // 20% of cart subtotal (subtotal is in minor units)
+          const subtotal = parseFloat(cartSubtotal) || 0;
+          if (subtotal <= 0) return null;
+          const feeAmount = Math.round(subtotal * 0.20);
+          return {
+            name: "Customs fees",
+            fee: String(feeAmount),
+          };
+        }, [formData.shipping.country, cartSubtotal]);
+
         const handleSelectShippingRate = async (rateId: string, packageId: number = 0) => {
           setSelectedShippingRate(rateId);
           try {
@@ -582,11 +599,26 @@ export default function CheckoutClient() {
           return `${coupon.amount} ${currency}`;
         };
 
-    // Calculate total fees from cart
+    // Calculate total fees — merge client-side customs fee with any existing cart.fees
     const cartFeeTotal = useMemo(() => {
-      if (!cart?.fees || cart.fees.length === 0) return 0;
-      return cart.fees.reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
-    }, [cart?.fees]);
+      let total = 0;
+      // Add any existing cart fees from CoCart (excluding customs fees to avoid double-counting)
+      if (cart?.fees && cart.fees.length > 0) {
+        total += cart.fees
+          .filter(fee => fee.name.toLowerCase() !== "customs fees")
+          .reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
+      }
+      // Add client-side customs fee if present
+      if (customsFee) {
+        total += parseFloat(customsFee.fee) || 0;
+      } else if (cart?.fees && cart.fees.length > 0) {
+        // If no client-side customs fee, include any server-side customs fees
+        total += cart.fees
+          .filter(fee => fee.name.toLowerCase() === "customs fees")
+          .reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
+      }
+      return total;
+    }, [customsFee, cart?.fees]);
 
     const checkoutTotal = useMemo(() => {
       if (shippingPackages.length > 0) {
@@ -595,8 +627,15 @@ export default function CheckoutClient() {
         const discount = couponDiscount || 0;
         return subtotal - discount + shipping + cartFeeTotal;
       }
-      return parseFloat(cartTotal) || 0;
-    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal, cartFeeTotal]);
+      // cartTotal from CoCart may include server-side fees; subtract server customs fee
+      // before adding client-side customs fee to avoid double-counting
+      const baseTotal = parseFloat(cartTotal) || 0;
+      const serverCustomsFeeTotal = (cart?.fees || [])
+        .filter(fee => fee.name.toLowerCase() === "customs fees")
+        .reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
+      const clientCustomsFee = customsFee ? (parseFloat(customsFee.fee) || 0) : 0;
+      return baseTotal - serverCustomsFeeTotal + clientCustomsFee;
+    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal, cartFeeTotal, customsFee, cart?.fees]);
 
     const breadcrumbItems = [
     { name: isRTL ? "السلة" : "Cart", href: `/${locale}/cart` },
@@ -1026,12 +1065,37 @@ export default function CheckoutClient() {
         line_items: lineItems,
         shipping_lines: shippingLines,
         coupon_lines: couponLines,
-        ...(cart?.fees && cart.fees.length > 0 ? {
-          fee_lines: cart.fees.map(fee => ({
-            name: fee.name,
-            total: convertPrice(parseFloat(fee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
-          }))
-        } : {}),
+        ...(() => {
+          const feeLines: Array<{ name: string; total: string }> = [];
+          // Add non-customs fees from cart.fees
+          if (cart?.fees && cart.fees.length > 0) {
+            cart.fees
+              .filter(fee => fee.name.toLowerCase() !== "customs fees")
+              .forEach(fee => {
+                feeLines.push({
+                  name: fee.name,
+                  total: convertPrice(parseFloat(fee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
+                });
+              });
+          }
+          // Add client-side customs fee, or server-side customs fees if no client-side
+          if (customsFee) {
+            feeLines.push({
+              name: customsFee.name,
+              total: convertPrice(parseFloat(customsFee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
+            });
+          } else if (cart?.fees && cart.fees.length > 0) {
+            cart.fees
+              .filter(fee => fee.name.toLowerCase() === "customs fees")
+              .forEach(fee => {
+                feeLines.push({
+                  name: fee.name,
+                  total: convertPrice(parseFloat(fee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
+                });
+              });
+          }
+          return feeLines.length > 0 ? { fee_lines: feeLines } : {};
+        })(),
         customer_note: formData.orderNotes,
         ...(isAuthenticated && user?.user_id ? { customer_id: user.user_id } : newCustomerId ? { customer_id: newCustomerId } : {}),
       };
@@ -2242,9 +2306,30 @@ export default function CheckoutClient() {
                                   <span className="text-green-600 font-medium">{isRTL ? "مجاني" : "Free"}</span>
                                 )}
                               </div>
-                              {/* Customs Fees */}
-                              {cart?.fees && cart.fees.length > 0 && cart.fees.map((fee, index) => (
-                                <div key={index} className="flex justify-between text-sm text-gray-600">
+                              {/* Fees — show non-customs fees from cart, plus client-side customs fee */}
+                              {cart?.fees && cart.fees.length > 0 && cart.fees
+                                .filter(fee => fee.name.toLowerCase() !== "customs fees")
+                                .map((fee, index) => (
+                                <div key={`cart-fee-${index}`} className="flex justify-between text-sm text-gray-600">
+                                  <span>{isRTL ? fee.name : fee.name}</span>
+                                  <FormattedPrice
+                                    price={parseFloat(fee.fee) / divisor}
+                                    iconSize="xs"
+                                  />
+                                </div>
+                              ))}
+                              {customsFee ? (
+                                <div className="flex justify-between text-sm text-gray-600">
+                                  <span>{isRTL ? "رسوم جمركية" : customsFee.name}</span>
+                                  <FormattedPrice
+                                    price={parseFloat(customsFee.fee) / divisor}
+                                    iconSize="xs"
+                                  />
+                                </div>
+                              ) : cart?.fees && cart.fees.length > 0 && cart.fees
+                                .filter(fee => fee.name.toLowerCase() === "customs fees")
+                                .map((fee, index) => (
+                                <div key={`customs-fee-${index}`} className="flex justify-between text-sm text-gray-600">
                                   <span>{isRTL ? "رسوم جمركية" : fee.name}</span>
                                   <FormattedPrice
                                     price={parseFloat(fee.fee) / divisor}

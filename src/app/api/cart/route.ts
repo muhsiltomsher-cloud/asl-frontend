@@ -300,6 +300,9 @@ export async function POST(request: NextRequest) {
       case "clear":
         baseUrl = appendParamsToUrl(`${API_BASE}/wp-json/cocart/v2/cart/clear`, currency, locale);
         break;
+      // "update-customer" case removed — customs fees are now calculated client-side
+      // because CoCart v2 and WC Store API use separate sessions, making server-side
+      // fee recalculation unreliable for guest users.
       case "apply-coupon":
       case "remove-coupon": {
         // Use WooCommerce Store API for coupons (CoCart v2 doesn't have coupon endpoints on this backend)
