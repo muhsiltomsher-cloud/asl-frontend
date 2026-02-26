@@ -195,7 +195,8 @@ export default function InvoicePage({ params }: InvoicePageProps) {
     if (!order) return null;
     const orderTax = parseFloat(order.total_tax || "0");
     const totalWithoutTax = parseFloat(order.total) - orderTax;
-    const subtotal = totalWithoutTax - parseFloat(order.shipping_total) + parseFloat(order.discount_total);
+    const feeTotal = (order.fee_lines || []).reduce((sum, fee) => sum + parseFloat(fee.total || "0"), 0);
+    const subtotal = totalWithoutTax - parseFloat(order.shipping_total) + parseFloat(order.discount_total) - feeTotal;
 
     return (
       <div className="min-h-screen bg-gray-50" dir={isRTL ? "rtl" : "ltr"}>

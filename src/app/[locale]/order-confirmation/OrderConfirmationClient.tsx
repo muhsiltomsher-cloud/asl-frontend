@@ -27,7 +27,11 @@ interface OrderData {
   order_key: string;
   status: string;
   total: string;
+  total_tax: string;
+  shipping_total: string;
+  discount_total: string;
   currency: string;
+  currency_symbol: string;
   date_created: string;
   billing: {
     first_name: string;
@@ -616,6 +620,25 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
               </div>
 
               <div className="space-y-2">
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>{isRTL ? "المجموع الفرعي" : "Subtotal"}</span>
+                  <OrderPrice price={(() => {
+                    const orderTax = parseFloat(order.total_tax || "0");
+                    const totalWithoutTax = parseFloat(order.total) - orderTax;
+                    const feeTotal = (order.fee_lines || []).reduce((sum, fee) => sum + parseFloat(fee.total || "0"), 0);
+                    return totalWithoutTax - parseFloat(order.shipping_total || "0") + parseFloat(order.discount_total || "0") - feeTotal;
+                  })()} orderCurrency={order.currency} iconSize="xs" />
+                </div>
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>{isRTL ? "الشحن" : "Shipping"}</span>
+                  <OrderPrice price={order.shipping_total || "0"} orderCurrency={order.currency} iconSize="xs" />
+                </div>
+                {parseFloat(order.discount_total || "0") > 0 && (
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>{isRTL ? "الخصم" : "Discount"}</span>
+                    <span className="text-green-600">-<OrderPrice price={order.discount_total} orderCurrency={order.currency} iconSize="xs" /></span>
+                  </div>
+                )}
                 {/* Customs Fees */}
                 {order.fee_lines && order.fee_lines.length > 0 && order.fee_lines.map((fee) => (
                   <div key={fee.id} className="flex justify-between text-sm text-gray-600">
@@ -623,7 +646,7 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
                     <OrderPrice price={fee.total} orderCurrency={order.currency} iconSize="xs" />
                   </div>
                 ))}
-                <div className="flex justify-between text-lg font-semibold">
+                <div className="flex justify-between text-lg font-semibold border-t pt-2">
                   <span>{isRTL ? "الإجمالي" : "Total"}</span>
                   <OrderPrice price={order.total} orderCurrency={order.currency} iconSize="sm" showConversion={true} isRTL={isRTL} />
                 </div>
