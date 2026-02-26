@@ -582,15 +582,21 @@ export default function CheckoutClient() {
           return `${coupon.amount} ${currency}`;
         };
 
+    // Calculate total fees from cart
+    const cartFeeTotal = useMemo(() => {
+      if (!cart?.fees || cart.fees.length === 0) return 0;
+      return cart.fees.reduce((sum, fee) => sum + (parseFloat(fee.fee) || 0), 0);
+    }, [cart?.fees]);
+
     const checkoutTotal = useMemo(() => {
       if (shippingPackages.length > 0) {
         const subtotal = parseFloat(cartSubtotal) || 0;
         const shipping = parseFloat(shippingTotal) || 0;
         const discount = couponDiscount || 0;
-        return subtotal - discount + shipping;
+        return subtotal - discount + shipping + cartFeeTotal;
       }
-      return parseFloat(cartTotal) || 0;
-    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal]);
+      return (parseFloat(cartTotal) || 0) + cartFeeTotal;
+    }, [cartSubtotal, shippingTotal, couponDiscount, shippingPackages, cartTotal, cartFeeTotal]);
 
     const breadcrumbItems = [
     { name: isRTL ? "السلة" : "Cart", href: `/${locale}/cart` },
@@ -1020,6 +1026,12 @@ export default function CheckoutClient() {
         line_items: lineItems,
         shipping_lines: shippingLines,
         coupon_lines: couponLines,
+        ...(cart?.fees && cart.fees.length > 0 ? {
+          fee_lines: cart.fees.map(fee => ({
+            name: fee.name,
+            total: convertPrice(parseFloat(fee.fee) / divisor).toFixed(getCurrencyInfo().decimals),
+          }))
+        } : {}),
         customer_note: formData.orderNotes,
         ...(isAuthenticated && user?.user_id ? { customer_id: user.user_id } : newCustomerId ? { customer_id: newCustomerId } : {}),
       };
@@ -2230,6 +2242,16 @@ export default function CheckoutClient() {
                                   <span className="text-green-600 font-medium">{isRTL ? "مجاني" : "Free"}</span>
                                 )}
                               </div>
+                              {/* Customs Fees */}
+                              {cart?.fees && cart.fees.length > 0 && cart.fees.map((fee, index) => (
+                                <div key={index} className="flex justify-between text-sm text-gray-600">
+                                  <span>{isRTL ? "رسوم جمركية" : fee.name}</span>
+                                  <FormattedPrice
+                                    price={parseFloat(fee.fee) / divisor}
+                                    iconSize="xs"
+                                  />
+                                </div>
+                              ))}
                             </div>
 
               <div className="hidden py-4 text-lg font-bold text-gray-900 lg:flex lg:justify-between">

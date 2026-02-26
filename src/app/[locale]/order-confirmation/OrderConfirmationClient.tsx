@@ -15,6 +15,13 @@ interface OrderMetaData {
   value: string;
 }
 
+interface OrderFeeLine {
+  id: number;
+  name: string;
+  total: string;
+  total_tax: string;
+}
+
 interface OrderData {
   id: number;
   order_key: string;
@@ -32,6 +39,7 @@ interface OrderData {
     country: string;
   };
   line_items: OrderLineItem[];
+  fee_lines?: OrderFeeLine[];
   payment_method: string;
   payment_method_title: string;
   meta_data?: OrderMetaData[];
@@ -608,6 +616,13 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
               </div>
 
               <div className="space-y-2">
+                {/* Customs Fees */}
+                {order.fee_lines && order.fee_lines.length > 0 && order.fee_lines.map((fee) => (
+                  <div key={fee.id} className="flex justify-between text-sm text-gray-600">
+                    <span>{isRTL ? "رسوم جمركية" : fee.name}</span>
+                    <OrderPrice price={fee.total} orderCurrency={order.currency} iconSize="xs" />
+                  </div>
+                ))}
                 <div className="flex justify-between text-lg font-semibold">
                   <span>{isRTL ? "الإجمالي" : "Total"}</span>
                   <OrderPrice price={order.total} orderCurrency={order.currency} iconSize="sm" showConversion={true} isRTL={isRTL} />

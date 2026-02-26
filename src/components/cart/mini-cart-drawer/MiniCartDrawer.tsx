@@ -97,6 +97,17 @@ export function MiniCartDrawer({ locale, dictionary }: MiniCartDrawerProps) {
           iconSize="sm"
         />
       </div>
+      {/* Customs Fees */}
+      {cart?.fees && cart.fees.length > 0 && cart.fees.map((fee, index) => (
+        <div key={index} className="flex items-center justify-between">
+          <span className="text-sm text-gray-600">{isRTL ? "رسوم جمركية" : fee.name}</span>
+          <FormattedPrice
+            price={parseFloat(fee.fee) / divisor}
+            className="text-sm font-medium"
+            iconSize="xs"
+          />
+        </div>
+      ))}
 
             <div className="flex flex-col gap-3">
               <Button asChild variant="outline" size="lg" className="w-full">

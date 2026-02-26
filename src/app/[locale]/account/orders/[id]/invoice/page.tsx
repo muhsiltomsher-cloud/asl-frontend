@@ -432,6 +432,19 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                       </span>
                     </div>
                   )}
+                  {/* Customs Fees */}
+                  {order.fee_lines && order.fee_lines.length > 0 && order.fee_lines.map((fee) => (
+                    <div key={fee.id} className="flex justify-between">
+                      <span className="text-gray-600">{isRTL ? "رسوم جمركية" : fee.name}</span>
+                      <OrderPrice 
+                        price={fee.total} 
+                        orderCurrency={order.currency} 
+                        orderCurrencySymbol={order.currency_symbol}
+                        className="text-gray-900"
+                        iconSize="xs"
+                      />
+                    </div>
+                  ))}
                   <div className="flex justify-between border-t-2 border-gray-200 pt-2 text-base font-semibold">
                     <span className="text-gray-900">{t.grandTotal}</span>
                     <OrderPrice 
