@@ -266,7 +266,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
                           {item.content}
                         </a>
                       ) : item.key === "email" ? (
-                        <a href={`mailto:${item.content}`} className="break-all text-amber-700 transition-colors hover:text-amber-900">
+                        <a href={`mailto:${item.content}`} className="text-sm text-amber-700 transition-colors hover:text-amber-900" style={{ wordBreak: "break-all" }}>
                           {item.content}
                         </a>
                       ) : item.key === "address" ? (
