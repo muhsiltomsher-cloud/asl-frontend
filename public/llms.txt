@@ -12,84 +12,193 @@ We began our fragrance journey in 2021, as a UAE-based fragrance boutique, with 
 
 We curate stories that are radical and addictive, in every creation of our collection, through an endless array of products for self-care and home care with perfumes, hair mist, fragrance oil, candles, diffusers, and air fresheners. All our fragrances are completely handcrafted by a single ingredient, with the luxury of experiencing it in a single whiff.
 
+### Our Mission
+
+Our mission is to deliver a unique aromatic experience that lasts long and leaves an unforgettable impression. From luxury perfume gift sets to reed diffusers, candles, and hair mists, every Aromatic Scents Lab creation is designed to captivate your senses and elevate your everyday moments.
+
+### Our Journey
+
+From our humble beginnings to becoming a recognized name in the fragrance industry, our journey has been one of continuous learning and innovation. We travel the world to source the finest ingredients, from the lavender fields of Provence to the oud forests of Southeast Asia. Each ingredient is carefully selected to ensure the highest quality in every bottle.
+
+### Our Collection
+
+Our collection features a diverse range of fragrances, from timeless classics to modern interpretations. Whether you prefer the warmth of oriental notes, the freshness of citrus, or the elegance of floral bouquets, we have something for every taste. Each fragrance is crafted with precision and care, using traditional techniques combined with modern innovation.
+
+### Our Promise
+
+We are committed to excellence in everything we do. From the quality of our ingredients to the craftsmanship of our bottles, every detail matters. We promise to deliver fragrances that not only smell exceptional but also reflect our dedication to sustainability and ethical sourcing. Your satisfaction is our ultimate goal.
+
+### What Makes Us Unique
+
+We are a timeless brand and believe that the real richness lies in simplicity and quality while creating a product that can be appreciated by both domestic and foreign clients. An exclusive and admirable olfactory wardrobe is built by the most talented perfumers with the finest and rare raw materials. We love simplicity, and our vintage-look packaging along with displays convey to you the bare essence of our fragrance.
+
+### Brand Stats
+
+- Founded: 2021
+- Location: UAE Based
+- Production: 100% Handcrafted
+- Ingredients: 100% Natural
+- Experience: 10+ Years of Expertise
+- Approach: Sustainable
+
 ## Website
 
 - Live site: https://aromaticscentslab.com
 - Languages: English (en), Arabic (ar)
 - Currency: AED (United Arab Emirates Dirham)
 - Based in: United Arab Emirates (UAE)
+- E-commerce platform: WooCommerce/WordPress backend
+- Powered by: Cadvil Solutions (https://cadvil.com)
 
 ## Site Structure
 
 ### Pages
 
-- **Homepage** (`/en`, `/ar`): Hero banner, new products, shop by category, featured products, bestsellers, our story, why choose us, FAQ, newsletter signup
-- **Shop** (`/en/shop`, `/ar/shop`): Full product catalog with filters (sort, price range, categories)
-- **Product Pages** (`/en/product/{slug}`, `/ar/product/{slug}`): Individual product detail with description, specifications, reviews, related products, recently viewed
-- **Category Pages** (`/en/category/{slug}`, `/ar/category/{slug}`): Products filtered by category
-- **About Us** (`/en/about`, `/ar/about`): Brand story, our journey, our collection, our promise, uniqueness, ingredients spotlight
-- **Contact** (`/en/contact`, `/ar/contact`): Contact form, phone, email, working hours, map
-- **FAQ** (`/en/faq`, `/ar/faq`): Frequently asked questions about ordering, tracking, returns, payments, products
-- **Shipping** (`/en/shipping`, `/ar/shipping`): Shipping rates, delivery times, destinations
-- **Returns** (`/en/returns`, `/ar/returns`): 14-day return policy, exchange process, eligible/ineligible items
-- **Privacy Policy** (`/en/privacy`, `/ar/privacy`): Data protection, cookies, information usage
-- **Terms & Conditions** (`/en/terms-and-conditions`, `/ar/terms-and-conditions`): Website usage terms, governing law (UAE)
-- **Store Locator** (`/en/store-locator`, `/ar/store-locator`): Physical store locations
-- **New Products** (`/en/new-products`, `/ar/new-products`): Latest arrivals
-- **Featured Products** (`/en/featured-products`, `/ar/featured-products`): Curated featured items
-- **Build Your Own Set** (`/en/build-your-own-set`, `/ar/build-your-own-set`): Custom gift set builder
-- **Search** (`/en/search`, `/ar/search`): Product search functionality
-- **Cart** (`/en/cart`, `/ar/cart`): Shopping cart
-- **Checkout** (`/en/checkout`, `/ar/checkout`): Order checkout with billing/shipping details
-- **Wishlist** (`/en/wishlist`, `/ar/wishlist`): Saved products
-- **Account** (`/en/account`, `/ar/account`): User account dashboard, orders, addresses, profile, settings
-- **Login** (`/en/login`, `/ar/login`): User authentication
-- **Register** (`/en/register`, `/ar/register`): New account creation
+- **Homepage** (`/en`, `/ar`): Hero banner, new products, shop by category, featured products, bestsellers, our story, why choose us, FAQ, SEO content section, newsletter signup
+- **Shop** (`/en/shop`, `/ar/shop`): Full product catalog with filters (sort by newest/price/best selling/featured, price range slider, category filter)
+- **Product Pages** (`/en/product/{slug}`, `/ar/product/{slug}`): Individual product detail with description, specifications, reviews, related products, recently viewed products, add to cart, buy now, SKU, category, tags, share
+- **Category Pages** (`/en/category/{slug}`, `/ar/category/{slug}`): Products filtered by category with sorting and filtering options
+- **About Us** (`/en/about`, `/ar/about`): Brand story, our journey, our collection, our promise, uniqueness, ingredients spotlight, brand stats, CTA to shop
+- **Contact** (`/en/contact`, `/ar/contact`): Contact form (name, email, phone, message), phone numbers, email, working hours, map location
+- **FAQ** (`/en/faq`, `/ar/faq`): Frequently asked questions about ordering, tracking, returns, payments, products, gift wrapping, fragrance preservation
+- **Shipping** (`/en/shipping`, `/ar/shipping`): Shipping rates by destination, delivery times, general info, delivery locations, shipping costs, damaged items policy
+- **Returns** (`/en/returns`, `/ar/returns`): 14-day return policy, exchange process, return steps (contact, RMA number, ship, refund), eligible/ineligible items
+- **Privacy Policy** (`/en/privacy`, `/ar/privacy`): Data collection, cookies (5 types), information usage (10 purposes), data sharing, opt-out, data protection measures
+- **Terms & Conditions** (`/en/terms-and-conditions`, `/ar/terms-and-conditions`): 20 sections covering online store terms, general conditions, accuracy, modifications, products, billing, third-party tools/links, user submissions, personal information, errors, prohibited uses, disclaimers, indemnification, severability, termination, entire agreement, governing law (UAE), changes, contact
+- **Store Locator** (`/en/store-locator`, `/ar/store-locator`): Physical store locations in UAE
+- **New Products** (`/en/new-products`, `/ar/new-products`): Latest product arrivals
+- **Featured Products** (`/en/featured-products`, `/ar/featured-products`): Curated featured items, editor's picks
+- **Build Your Own Set** (`/en/build-your-own-set`, `/ar/build-your-own-set`): Custom gift set builder — choose products from categories to create personalized bundles for birthday, special events, gift sets, seasonal, corporate, wedding, or custom occasions
+- **Search** (`/en/search`, `/ar/search`): Product search functionality with instant results
+- **Cart** (`/en/cart`, `/ar/cart`): Shopping cart with quantity adjustment, subtotal, shipping, tax, discount, total
+- **Checkout** (`/en/checkout`, `/ar/checkout`): Order checkout with billing/shipping details (first name, last name, email, phone, address, city, state, postcode, country), payment method selection, order summary, order notes
+- **Wishlist** (`/en/wishlist`, `/ar/wishlist`): Saved products with add to cart, remove, stock status
+- **Account** (`/en/account`, `/ar/account`): User dashboard with orders (view/track), addresses (manage delivery addresses), account details, wishlist, settings (profile/preferences)
+- **Login** (`/en/login`, `/ar/login`): User authentication with remember me, social login options
+- **Register** (`/en/register`, `/ar/register`): New account creation with username, email, password, confirmation
 
 ## Product Categories
 
 Aromatic Scents Lab offers products across the following categories:
 
-- **Perfumes**: Premium eau de parfum for men and women, long-lasting fragrances (8-12 hours)
-- **Oud & Arabian Fragrances**: Authentic Arabian oud oils, bakhoor incense, traditional Middle Eastern scents
-- **Body Care**: Body mists, hair mists, aromatic oils for personal care
-- **Home Fragrances**: Reed diffusers, scented candles, air fresheners, room sprays
-- **Gift Sets**: Curated perfume gift sets, luxury gift boxes, Ramadan gift sets, build-your-own bundles
+### Perfumes & Oils
+- **Perfumes**: Premium eau de parfum for men and women, long-lasting fragrances (8-12 hours), signature scents
+- **Oud & Arabian Fragrances**: Authentic Arabian oud oils, bakhoor incense, traditional Middle Eastern scents, concentrated perfume oils
+- **Fragrance Oils**: Pure aromatic oils, concentrated fragrance blends, 6ml and larger sizes
+
+### Personal Care
+- **Body Mists**: Lightweight body fragrances for everyday wear
+- **Hair Mists**: Scented hair sprays that leave hair fragrant all day
+- **Body Lotions**: Scented hand and body lotions with moisturizing properties
+- **Tanning Oils**: Sun care products with aromatic properties (e.g., Sunbeam Tanning Oil)
+
+### Home Fragrances
+- **Reed Diffusers**: Long-lasting home fragrance with decorative reed sticks
+- **Scented Candles**: Hand-poured aromatic candles for ambiance
+- **Air Fresheners**: Room sprays and automatic air fresheners
+- **Bakhoor/Incense**: Traditional Middle Eastern incense for home
+
+### Gift Sets & Bundles
+- **Curated Gift Sets**: Pre-designed luxury gift boxes for special occasions
+- **Ramadan Gift Sets**: Special Ramadan-themed gift collections (e.g., ASL Ramadan Box)
+- **Build Your Own Set**: Custom bundle builder — choose your own products
+- **Corporate Gifts**: Bulk/corporate gifting options
+- **Wedding Gifts**: Bridal and wedding celebration fragrance sets
+
+### Collections
 - **New Arrivals**: Latest fragrance launches and seasonal collections
 - **Bestsellers**: Most popular and top-rated products
 - **Featured Products**: Editor's picks and staff recommendations
 
-## Key Products
+## Product Catalog
 
-Products available include (but are not limited to):
-- ASL Ramadan Gift Set / Box
-- Dark Musk Perfume
+### Key Products (with prices in AED)
+
+**Gift Sets & Bundles:**
+- ASL Ramadan Gift Set / Box — 1,090 AED (Ramadan special offer)
+- The Ultimate Fragrance Collection — 1,540 AED
+- The Signature Set — 875 AED
+- Build Your Own Set — Custom pricing
+
+**Perfumes (Eau de Parfum):**
+- Dark Musk Perfume — 385 AED
+- Dark Wood Perfume — 385 AED
+- Velvet Amber Perfume — 385 AED
 - Rich Vanilla Perfume
 - Secret Leather Perfume
-- Various eau de parfum collections
-- Oud oils and bakhoor
-- Hair mists and body mists
-- Scented candles and reed diffusers
+- Royal Tobacco Perfume
+- Cool Violet Perfume
+
+**Fragrance Oils (6ml):**
+- Dark Musk Oil — 145 AED
+- Dark Wood 6ml — 145 AED
+- Velvet Amber Oil — 145 AED
+
+**Hair & Body Mists:**
+- Royal Tobacco Hair & Body Mist — 195 AED
+- Dark Musk Hair & Body Mist — 195 AED
+
+**Body Care:**
+- Velvet Amber Hand & Body Lotion — 245 AED
+- Sunbeam Tanning Oil — 145 AED
+
+**Home Fragrances:**
+- Cool Violet Reed Diffuser — 245 AED
+- Cool Violet Air Freshener — 195 AED
+
+### Product Features
+- Long-lasting formulations (8-12 hours for eau de parfum)
+- Concentrated perfume oils last even longer
+- 100% natural ingredients
+- Handcrafted in Dubai, UAE
+- Luxury packaging
+- Available in multiple sizes
+- Detailed product descriptions with specifications
+- Customer reviews and ratings
+- Related product suggestions
+- Recently viewed products tracking
 
 ## Key Ingredients
 
-Our fragrances feature premium natural ingredients:
+Our fragrances feature premium natural ingredients, each carefully selected for their unique characteristics:
 
-- **Arabian Oud**: Sourced from Southeast Asian oud forests, the heart of our oriental fragrances
-- **Vanilla**: An ever-popular fragrance note that seduces the senses, warm and sweet
-- **Musk**: Ethical and unique, derived from natural sources, a timeless perfumery ingredient
-- **Leather**: A sophisticated note with a history dating back thousands of years in perfumery
-- **Amber**: Comforting and warm, a classic base note
-- **Sandalwood**: Indian sandalwood, relaxing and calming
-- **French Rose**: Delicate floral notes from the rose fields of Provence
-- **Florals**: Light and refreshing floral bouquets
+### Arabian Oud
+Sourced from Southeast Asian oud forests, the heart of our oriental fragrances. Oud (also known as agarwood) is one of the most precious and expensive natural ingredients in perfumery. It has a deep, complex, woody aroma that forms the backbone of many Arabian fragrances. Our oud is sustainably sourced and carefully aged to develop its rich character.
+
+### Vanilla
+An ever-popular fragrance note that seduces the senses, warm and sweet. Vanilla has been a beloved ingredient in perfumery for centuries. Its comforting, gourmand quality adds warmth and depth to fragrances. We use the finest vanilla extracts to create rich, indulgent scent profiles that linger beautifully on the skin.
+
+### Musk
+Ethical and unique, derived from natural sources, a timeless perfumery ingredient. Since classical times, people have used scented ingredients derived from nature to make fragrances. Our musk notes are sourced ethically and provide a clean, sensual base that enhances and extends the life of our perfume compositions.
+
+### Leather
+A sophisticated note with a history dating back thousands of years in perfumery. Perfumes and leather have been inseparable historically, with the link dating back about 2000 years. Our leather accords are crafted to evoke the rich, warm character of fine leather, adding depth and sophistication to our compositions.
+
+### Amber
+Comforting and warm, a classic base note in perfumery. Amber provides a rich, golden warmth that anchors fragrances and gives them longevity. Our amber accords combine resinous, sweet, and slightly powdery notes to create an enveloping, luxurious feel.
+
+### Sandalwood
+Indian sandalwood, relaxing and calming. Prized for thousands of years in Eastern cultures, sandalwood brings a creamy, woody smoothness to fragrances. We source our sandalwood sustainably to ensure both quality and environmental responsibility.
+
+### French Rose
+Delicate floral notes from the rose fields of Provence. The rose is often called the "queen of flowers" in perfumery. Our French rose absolute captures the full, rich, and romantic character of the Provence roses, adding elegance and femininity to our compositions.
+
+### Florals
+Light and refreshing floral bouquets. Our floral compositions range from single-note soliflores to complex bouquets, each designed to capture the beauty and freshness of nature's most beloved blooms — from jasmine and iris to neroli and ylang-ylang.
 
 ## Why Choose Aromatic Scents Lab
 
-1. **Handcrafted in the UAE**: Every fragrance is carefully blended and bottled by expert perfumers in our Dubai-based atelier
-2. **Premium Natural Ingredients**: We source the finest oud, musk, amber, rose, and sandalwood from trusted suppliers worldwide
-3. **Free UAE Delivery**: Complimentary shipping on all orders over 500 AED across the United Arab Emirates
-4. **Curated Gift Collections**: Bespoke perfume gift sets, build-your-own bundles for every occasion
+### 1. Handcrafted in the UAE
+Every fragrance is carefully blended and bottled by expert perfumers in our Dubai-based atelier, ensuring the highest quality in every drop. Our perfumers bring decades of experience in both traditional Arabian and modern Western perfumery techniques. Each batch is carefully quality-controlled and hand-finished.
+
+### 2. Premium Natural Ingredients
+We source the finest oud, musk, amber, rose, and sandalwood from trusted suppliers worldwide to create long-lasting, authentic scents. Our supply chain spans Southeast Asia (oud), India (sandalwood), France (rose), and East Africa (musk), ensuring we use only the best raw materials available.
+
+### 3. Free UAE Delivery
+Enjoy complimentary shipping on all orders over 500 AED across the United Arab Emirates, with express delivery options available. Orders within UAE are typically delivered within 1-2 business days, and we partner with reliable courier services to ensure safe and timely delivery.
+
+### 4. Curated Gift Collections
+From bespoke perfume gift sets to build-your-own bundles, find the perfect aromatic gift for every occasion and celebration. Our gift sets come in luxury packaging with complimentary gift wrapping available. Whether it's Ramadan, a birthday, wedding, corporate event, or simply a thoughtful gesture, we have the perfect aromatic gift.
 
 ## Shipping & Delivery
 
@@ -107,22 +216,49 @@ Our fragrances feature premium natural ingredients:
 | Norway, Iceland, Serbia, Montenegro | 120 | 10-15 business days |
 | Rest of World | 150 | 10-20 business days |
 
-- Business days: Sunday to Thursday (no shipping on Friday)
-- Free shipping on orders over 500 AED within UAE
+### Shipping Details
+- **Business days**: Sunday to Thursday (no shipping on Friday)
+- **Free shipping**: On orders over 500 AED within UAE
+- **Order processing**: All orders are subject to product availability. If an item is not in stock, you will be notified and refunded using the original payment method.
+- **Delivery locations**: Items are available for delivery to UAE, Saudi Arabia, Bahrain, Oman, Kuwait, and select international destinations.
+- **Delivery time note**: Delivery times are estimates commencing from the date of shipping, not the date of order. Unless there are exceptional circumstances, we make every effort to fulfill orders within 1-2 business days of the order date.
+- **Multiple shipments**: Products may be delivered in separate shipments depending on availability and logistics.
+- **Damaged items**: If there is any damage to the packaging on delivery, contact us immediately at +971506071405.
 
 ## Return & Exchange Policy
 
+### Overview
 - **14-day return window** from date of receipt
-- **Eligible**: Unopened products in original packaging, damaged/defective products, wrong products
-- **Not eligible**: Opened/used products, products without original packaging, samples, final sale items
 - **Refund processing**: 5-7 business days after product inspection
-- Contact customer service for Return Merchandise Authorization (RMA) number
+
+### Return Process
+1. **Contact Us**: Contact customer service via email or phone to initiate the return process
+2. **Get Return Number**: You will receive a Return Merchandise Authorization (RMA) number and shipping instructions
+3. **Ship the Product**: Pack the product securely and ship it to the specified address
+4. **Receive Refund**: After receiving and inspecting the product, your refund will be processed within 5-7 business days
+
+### Eligible for Return
+- Unopened products in their original packaging
+- Damaged or defective products upon receipt
+- Wrong products (different from order)
+- Returns within 14 days of receipt
+
+### Not Eligible for Return
+- Opened or used products
+- Products without original packaging
+- Samples and free gifts
+- Products purchased during final sales
+
+### Exchange Policy
+- Exchange your product for another of equal or higher value
+- Full refund available for unopened products
 
 ## Payment Methods
 
-- Credit cards (Visa, Mastercard)
-- Apple Pay
-- Cash on Delivery (COD) for UAE and GCC countries
+- **Credit Cards**: Visa, Mastercard (encrypted with SSL technology)
+- **Apple Pay**: Quick and secure mobile payment
+- **Cash on Delivery (COD)**: Available for UAE and GCC countries
+- **Secure Transactions**: All payment transactions are encrypted using Secure Socket Layer technology. Full payment card details are captured only for processing and are NOT stored, sold, shared, rented, or leased to any third parties.
 
 ## Contact Information
 
@@ -130,61 +266,164 @@ Our fragrances feature premium natural ingredients:
 - **Phone (Calls)**: +971 4 255 9952
 - **Email**: customerservice@aromaticscentslab.com
 - **Location**: United Arab Emirates
-- **Working Hours**: 10 AM - 10 PM
+- **Working Hours**: 10 AM - 10 PM (Sunday to Thursday)
+- **Website**: https://aromaticscentslab.com
 
 ## Social Media
 
-- Instagram: https://instagram.com/aromaticscentslab
-- Facebook: https://facebook.com/aromaticscentslab
-- Twitter/X: https://x.com/araboriginaloud
+- **Instagram**: https://instagram.com/aromaticscentslab
+- **Facebook**: https://facebook.com/aromaticscentslab
+- **Twitter/X**: https://x.com/araboriginaloud
+- **WhatsApp**: https://wa.me/971506071405
 
 ## Frequently Asked Questions
 
-**Q: What types of perfumes does Aromatic Scents Lab offer?**
-A: We offer a wide range of premium fragrances including Arabian oud perfumes, eau de parfum, body mists, aromatic oils, home fragrances, bakhoor incense, and curated gift sets. Our collections cater to both men and women with long-lasting scents crafted in the UAE.
+### Ordering
 
-**Q: Do you offer free shipping in the UAE?**
-A: Yes, we offer free shipping on all orders over 500 AED within the United Arab Emirates. We also ship internationally to Saudi Arabia, Kuwait, Bahrain, Qatar, Oman, and other GCC countries.
+**Q: How do I place an order?**
+A: Shopping for Aromatic Scents Lab products has never been easier! Browse our rich variety of products from the comfort of your own home or using a mobile device while you're on the move. All online prices are the same as the recommended retail prices found in Aromatic Scents Lab boutiques (T&C applied). Simply click "Add to Shopping Bag" on any product, then proceed to checkout when ready. You can adjust quantities, remove items, or continue shopping at any time.
+
+**Q: How do I track my order?**
+A: Once your order has been dispatched by our courier, you will receive an email confirmation with your tracking number. Click on the Aramex tracking link to enter your tracking number. Aromatic Scents Lab's delivery partner handles all shipments in the GCC.
+
+**Q: Can I modify or cancel my order after placing it?**
+A: Please contact customer service as soon as possible if you need to modify or cancel an order. We process orders quickly, so changes may not be possible once the order has been dispatched.
+
+### Products
+
+**Q: What types of perfumes does Aromatic Scents Lab offer?**
+A: We offer a wide range of premium fragrances including Arabian oud perfumes, eau de parfum, body mists, hair mists, aromatic oils, home fragrances (reed diffusers, candles, air fresheners), bakhoor incense, and curated gift sets. Our collections cater to both men and women with long-lasting scents crafted in the UAE.
 
 **Q: Are your fragrances made with natural ingredients?**
 A: We use 100% premium natural ingredients including authentic Arabian oud, French rose, Indian sandalwood, and Ethiopian musk. Each fragrance is handcrafted by expert perfumers in our Dubai atelier.
 
-**Q: Can I build a custom perfume gift set?**
-A: Absolutely! Our Build Your Own Set feature allows you to create personalized fragrance bundles. Choose from our entire collection of perfumes, body care products, and home fragrances to create the perfect gift.
-
 **Q: How long do your perfumes last?**
-A: Our eau de parfum formulations are designed for exceptional longevity, typically lasting 8-12 hours on skin. Our concentrated perfume oils and oud-based fragrances can last even longer.
+A: Our eau de parfum formulations are designed for exceptional longevity, typically lasting 8-12 hours on skin. Our concentrated perfume oils and oud-based fragrances can last even longer, providing a rich and evolving scent experience throughout the day.
+
+**Q: Are your products authentic?**
+A: Yes, all our products are 100% authentic and made from the finest natural ingredients. We guarantee the quality and authenticity of every product we offer.
+
+**Q: How do I choose the right fragrance for me?**
+A: We recommend testing the fragrance on your skin before purchasing. You can request samples of our fragrances or visit one of our stores to try them. You can also contact our team for personalized recommendations based on your preferences.
+
+**Q: How do I preserve my fragrance longer?**
+A: To maintain fragrance quality, store it in a cool, dry place away from direct sunlight. Close the cap tightly after each use and avoid exposing the fragrance to high temperatures.
+
+### Gifts & Customization
+
+**Q: Can I build a custom perfume gift set?**
+A: Absolutely! Our Build Your Own Set feature allows you to create personalized fragrance bundles. Choose from our entire collection of perfumes, body care products, and home fragrances to create the perfect gift. Available bundle types include birthday, special events, gift sets, seasonal, corporate, wedding, and custom occasions.
+
+**Q: Do you offer gift wrapping?**
+A: Yes, we offer complimentary luxury gift wrapping. You can select this service at checkout and add a personal message if desired.
+
+### Shipping & Delivery
+
+**Q: Do you offer free shipping in the UAE?**
+A: Yes, we offer free shipping on all orders over 500 AED within the United Arab Emirates. We also ship internationally to Saudi Arabia, Kuwait, Bahrain, Qatar, Oman, and other countries worldwide.
+
+**Q: What are the delivery times?**
+A: UAE delivery takes 1-2 business days. GCC countries (Saudi Arabia, Bahrain, Kuwait, Oman, Qatar) take 3-5 business days. International delivery takes 7-20 business days depending on the destination.
+
+### Returns & Payments
 
 **Q: Can I return a product?**
-A: Yes, we accept returns within 14 days of receipt, provided the product is unopened and in its original condition. Contact customer service to initiate a return.
+A: Yes, we accept returns within 14 days of receipt, provided the product is unopened and in its original condition. Please contact customer service to initiate a return.
 
 **Q: What payment methods do you accept?**
 A: We accept credit cards (Visa, Mastercard), Apple Pay, and cash on delivery for orders within UAE and GCC countries.
 
-**Q: Are your products authentic?**
-A: Yes, all products are 100% authentic and made from the finest natural ingredients. We guarantee the quality and authenticity of every product.
-
-**Q: Do you offer gift wrapping?**
-A: Yes, we offer complimentary luxury gift wrapping. Select this service at checkout and add a personal message.
-
-**Q: How do I preserve my fragrance longer?**
-A: Store in a cool, dry place away from direct sunlight. Close the cap tightly after each use and avoid exposing the fragrance to high temperatures.
+**Q: Is online payment secure?**
+A: Yes, all payment transactions are encrypted using Secure Socket Layer (SSL) technology. Your full payment card details are captured only for processing and are not stored by us.
 
 ## Brand Values
 
-- **Artistry & Perfection**: Every fragrance is a work of art
-- **Sustainability**: Innovative and sustainable technologies in fragrance production
-- **Ethical Sourcing**: Commitment to ethically sourced natural ingredients
-- **Handcrafted Quality**: Each product made with meticulous care by expert perfumers
-- **Simplicity & Elegance**: Vintage-look packaging conveying the bare essence of fragrance
-- **Customer Satisfaction**: Your satisfaction is our ultimate goal
+- **Artistry & Perfection**: Every fragrance is a work of art, crafted with meticulous attention to detail by expert perfumers
+- **Sustainability**: Innovative and sustainable technologies in fragrance production, committed to reducing environmental impact
+- **Ethical Sourcing**: Commitment to ethically sourced natural ingredients from trusted global suppliers
+- **Handcrafted Quality**: Each product made with meticulous care by expert perfumers in our Dubai atelier
+- **Simplicity & Elegance**: Vintage-look packaging conveying the bare essence of fragrance, reflecting our belief that real richness lies in simplicity
+- **Customer Satisfaction**: Your satisfaction is our ultimate goal — from ingredient selection to final delivery
+
+## SEO Keywords
+
+### English Keywords
+Premium perfumes UAE, Arabian oud perfume, luxury fragrances Dubai, handcrafted perfumes UAE, oud oil Dubai, body mist UAE, hair mist perfume, reed diffuser UAE, scented candles Dubai, perfume gift set UAE, Ramadan gift set, build your own perfume set, natural ingredients perfume, French rose perfume, Indian sandalwood perfume, musk perfume UAE, amber perfume, leather perfume, vanilla perfume UAE, buy perfume online UAE, perfume delivery UAE, free shipping perfume UAE, best perfume UAE, long lasting perfume, eau de parfum UAE, bakhoor incense UAE, air freshener UAE, body lotion perfume, tanning oil UAE, luxury gift box UAE, corporate gifts UAE, wedding perfume gift, women perfume UAE, men perfume UAE, unisex fragrance UAE, online perfume shop UAE, perfume store Dubai, fragrance oil UAE, perfume sale UAE, discount perfume UAE
+
+### Arabic Keywords
+عطور فاخرة الإمارات, عود عربي, عطور دبي, عطور يدوية الصنع, زيت العود, رذاذ الجسم, رذاذ الشعر المعطر, ناشر العطر, شموع معطرة, مجموعة هدايا عطرية, هدايا رمضان, صمم مجموعتك, مكونات طبيعية, ورد فرنسي, خشب الصندل الهندي, مسك, عنبر, جلد, فانيلا, شراء عطور اونلاين, توصيل عطور الإمارات, شحن مجاني, أفضل عطر, عطر يدوم طويلاً, بخور, معطر جو, لوشن الجسم, هدايا فاخرة, عطور نسائية, عطور رجالية, متجر عطور دبي, زيوت عطرية
+
+## Privacy & Data Protection
+
+### Information Collected
+- Contact details: name, delivery address, phone, email, billing info, date of birth
+- Website statistics: location, IP address, domain type
+- Transaction info: orders, items purchased, dates
+- Third-party info: from couriers, payment providers, loyalty programs
+
+### Cookie Types Used
+1. Website functionality cookies (shopping baskets, features)
+2. Website analytics cookies (usage measurement)
+3. Customer preference cookies (username, language, location)
+4. Targeting/advertising cookies (relevant ads)
+5. Third-party service provider cookies
+
+### Data Usage
+- Verify and execute financial transactions
+- Assist with customer service queries
+- Manage accounts and provide personalized experiences
+- Analytics and statistical purposes
+- Marketing (newsletters, promotional info) with opt-out option
+- Improve service and website
+- Fraud prevention and rights protection
+- Legal and regulatory compliance
+
+### Data Protection
+- Stored on secure servers
+- Payment transactions encrypted with SSL
+- Full payment card details NOT stored, sold, shared, rented, or leased
+- Data may be transferred to/from outside UAE
+- Users can opt out of marketing communications
+- Users can request rectification of incorrect data
+
+## Terms & Conditions Summary
+
+- **Governing Law**: United Arab Emirates
+- **Age Requirement**: Must be age of majority in your jurisdiction
+- **Pricing**: Subject to change without notice
+- **Product Display**: Colors may vary from screen display
+- **Order Rights**: We reserve the right to limit or cancel orders
+- **Account Security**: Users responsible for keeping passwords confidential
+- **Intellectual Property**: All content protected; prohibited uses include unlawful purposes, harassment, false information, malicious code
+- **Disputes**: Settled under UAE court jurisdiction
+- **Updates**: Terms may be updated at any time; continued use constitutes acceptance
+- **Contact**: customerservice@aromaticscentslab.com
+
+## Powered By — Cadvil Solutions
+
+This website is designed, developed, and powered by **Cadvil Solutions** (https://cadvil.com).
+
+Cadvil Solutions is a professional web development and digital solutions agency specializing in e-commerce, web applications, and digital transformation for businesses in the UAE and globally. They provide end-to-end technology solutions including:
+
+- **E-commerce Development**: Custom online stores, WooCommerce/Shopify integrations, payment gateway setup
+- **Web Application Development**: Next.js, React, full-stack development, headless CMS solutions
+- **Digital Marketing & SEO**: Search engine optimization, content strategy, social media marketing
+- **UI/UX Design**: User experience design, responsive design, mobile-first development
+- **Maintenance & Support**: Ongoing website maintenance, performance optimization, security updates
+
+For inquiries about building a similar e-commerce platform or digital solution, visit: https://cadvil.com
 
 ## Technical Details
 
-- Built with Next.js (App Router)
-- Bilingual: English (LTR) and Arabic (RTL)
-- WooCommerce/WordPress backend for product management
-- Server-side rendered for SEO optimization
-- Responsive design for mobile and desktop
-- Hreflang tags for multilingual SEO
-- Open Graph and Twitter Card meta tags for social sharing
+- **Framework**: Next.js 16 (App Router) with React
+- **Languages**: Bilingual — English (LTR) and Arabic (RTL)
+- **Backend**: WooCommerce/WordPress for product management and order processing
+- **Rendering**: Server-side rendered (SSR) for SEO optimization
+- **Design**: Fully responsive for mobile, tablet, and desktop
+- **SEO**: Hreflang tags for multilingual SEO, Open Graph and Twitter Card meta tags for social sharing, structured H1 tags, sitemap.xml
+- **Performance**: Image optimization via Next.js Image component, lazy loading, code splitting
+- **Security**: SSL encryption, X-Frame-Options, X-Content-Type-Options, HSTS, CSP headers, XSS protection
+- **Payments**: Integrated with secure payment gateways (Visa, Mastercard, Apple Pay, COD)
+- **Accessibility**: ARIA labels, semantic HTML, keyboard navigation support, screen reader compatible
+- **Internationalization**: Dictionary-based i18n for EN/AR, RTL support, locale-based routing
+- **Delivery Partner**: Aramex for GCC shipments
