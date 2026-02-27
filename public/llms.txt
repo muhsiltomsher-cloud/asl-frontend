@@ -1,0 +1,190 @@
+# Aromatic Scents Lab
+
+> Premium perfumes, Arabian oud, body care, home fragrances & aromatic oils handcrafted in the UAE. Free delivery on orders over 500 AED.
+
+## About
+
+Aromatic Scents Lab is a UAE-based luxury fragrance house founded in 2021. We handcraft premium perfumes, oud oils, body care products, and home fragrances using the finest natural ingredients sourced from around the world — including authentic Arabian oud, French rose, Indian sandalwood, musk, and amber.
+
+We create truly one-of-a-kind fragrances with the most innovative and sustainable technologies. By offering fragrances to inspire, captivate and beautify, we develop an invisible fragrant bond with our customers.
+
+We began our fragrance journey in 2021, as a UAE-based fragrance boutique, with quite a simple mission — to create statement-making fragrances with the highest quality ingredients. We produced fine fragrances with proficiency to shape that experience into a fragrance line that combines personal care and air care.
+
+We curate stories that are radical and addictive, in every creation of our collection, through an endless array of products for self-care and home care with perfumes, hair mist, fragrance oil, candles, diffusers, and air fresheners. All our fragrances are completely handcrafted by a single ingredient, with the luxury of experiencing it in a single whiff.
+
+## Website
+
+- Live site: https://aromaticscentslab.com
+- Languages: English (en), Arabic (ar)
+- Currency: AED (United Arab Emirates Dirham)
+- Based in: United Arab Emirates (UAE)
+
+## Site Structure
+
+### Pages
+
+- **Homepage** (`/en`, `/ar`): Hero banner, new products, shop by category, featured products, bestsellers, our story, why choose us, FAQ, newsletter signup
+- **Shop** (`/en/shop`, `/ar/shop`): Full product catalog with filters (sort, price range, categories)
+- **Product Pages** (`/en/product/{slug}`, `/ar/product/{slug}`): Individual product detail with description, specifications, reviews, related products, recently viewed
+- **Category Pages** (`/en/category/{slug}`, `/ar/category/{slug}`): Products filtered by category
+- **About Us** (`/en/about`, `/ar/about`): Brand story, our journey, our collection, our promise, uniqueness, ingredients spotlight
+- **Contact** (`/en/contact`, `/ar/contact`): Contact form, phone, email, working hours, map
+- **FAQ** (`/en/faq`, `/ar/faq`): Frequently asked questions about ordering, tracking, returns, payments, products
+- **Shipping** (`/en/shipping`, `/ar/shipping`): Shipping rates, delivery times, destinations
+- **Returns** (`/en/returns`, `/ar/returns`): 14-day return policy, exchange process, eligible/ineligible items
+- **Privacy Policy** (`/en/privacy`, `/ar/privacy`): Data protection, cookies, information usage
+- **Terms & Conditions** (`/en/terms-and-conditions`, `/ar/terms-and-conditions`): Website usage terms, governing law (UAE)
+- **Store Locator** (`/en/store-locator`, `/ar/store-locator`): Physical store locations
+- **New Products** (`/en/new-products`, `/ar/new-products`): Latest arrivals
+- **Featured Products** (`/en/featured-products`, `/ar/featured-products`): Curated featured items
+- **Build Your Own Set** (`/en/build-your-own-set`, `/ar/build-your-own-set`): Custom gift set builder
+- **Search** (`/en/search`, `/ar/search`): Product search functionality
+- **Cart** (`/en/cart`, `/ar/cart`): Shopping cart
+- **Checkout** (`/en/checkout`, `/ar/checkout`): Order checkout with billing/shipping details
+- **Wishlist** (`/en/wishlist`, `/ar/wishlist`): Saved products
+- **Account** (`/en/account`, `/ar/account`): User account dashboard, orders, addresses, profile, settings
+- **Login** (`/en/login`, `/ar/login`): User authentication
+- **Register** (`/en/register`, `/ar/register`): New account creation
+
+## Product Categories
+
+Aromatic Scents Lab offers products across the following categories:
+
+- **Perfumes**: Premium eau de parfum for men and women, long-lasting fragrances (8-12 hours)
+- **Oud & Arabian Fragrances**: Authentic Arabian oud oils, bakhoor incense, traditional Middle Eastern scents
+- **Body Care**: Body mists, hair mists, aromatic oils for personal care
+- **Home Fragrances**: Reed diffusers, scented candles, air fresheners, room sprays
+- **Gift Sets**: Curated perfume gift sets, luxury gift boxes, Ramadan gift sets, build-your-own bundles
+- **New Arrivals**: Latest fragrance launches and seasonal collections
+- **Bestsellers**: Most popular and top-rated products
+- **Featured Products**: Editor's picks and staff recommendations
+
+## Key Products
+
+Products available include (but are not limited to):
+- ASL Ramadan Gift Set / Box
+- Dark Musk Perfume
+- Rich Vanilla Perfume
+- Secret Leather Perfume
+- Various eau de parfum collections
+- Oud oils and bakhoor
+- Hair mists and body mists
+- Scented candles and reed diffusers
+
+## Key Ingredients
+
+Our fragrances feature premium natural ingredients:
+
+- **Arabian Oud**: Sourced from Southeast Asian oud forests, the heart of our oriental fragrances
+- **Vanilla**: An ever-popular fragrance note that seduces the senses, warm and sweet
+- **Musk**: Ethical and unique, derived from natural sources, a timeless perfumery ingredient
+- **Leather**: A sophisticated note with a history dating back thousands of years in perfumery
+- **Amber**: Comforting and warm, a classic base note
+- **Sandalwood**: Indian sandalwood, relaxing and calming
+- **French Rose**: Delicate floral notes from the rose fields of Provence
+- **Florals**: Light and refreshing floral bouquets
+
+## Why Choose Aromatic Scents Lab
+
+1. **Handcrafted in the UAE**: Every fragrance is carefully blended and bottled by expert perfumers in our Dubai-based atelier
+2. **Premium Natural Ingredients**: We source the finest oud, musk, amber, rose, and sandalwood from trusted suppliers worldwide
+3. **Free UAE Delivery**: Complimentary shipping on all orders over 500 AED across the United Arab Emirates
+4. **Curated Gift Collections**: Bespoke perfume gift sets, build-your-own bundles for every occasion
+
+## Shipping & Delivery
+
+### Shipping Rates (AED)
+| Destination | Cost (AED) | Delivery Time |
+|---|---|---|
+| United Arab Emirates (UAE) | 30 | 1-2 business days |
+| Saudi Arabia | 45 | 3-5 business days |
+| Bahrain | 45 | 3-5 business days |
+| Kuwait | 45 | 3-5 business days |
+| Oman | 45 | 3-5 business days |
+| Qatar | 45 | 3-5 business days |
+| US, Egypt, Jordan, UK, Europe | 80 | 7-14 business days |
+| Iraq, Croatia, Estonia, Hungary, Ireland, Latvia, Lithuania, Slovakia | 100 | 7-14 business days |
+| Norway, Iceland, Serbia, Montenegro | 120 | 10-15 business days |
+| Rest of World | 150 | 10-20 business days |
+
+- Business days: Sunday to Thursday (no shipping on Friday)
+- Free shipping on orders over 500 AED within UAE
+
+## Return & Exchange Policy
+
+- **14-day return window** from date of receipt
+- **Eligible**: Unopened products in original packaging, damaged/defective products, wrong products
+- **Not eligible**: Opened/used products, products without original packaging, samples, final sale items
+- **Refund processing**: 5-7 business days after product inspection
+- Contact customer service for Return Merchandise Authorization (RMA) number
+
+## Payment Methods
+
+- Credit cards (Visa, Mastercard)
+- Apple Pay
+- Cash on Delivery (COD) for UAE and GCC countries
+
+## Contact Information
+
+- **Phone (WhatsApp)**: +971 50 607 1405
+- **Phone (Calls)**: +971 4 255 9952
+- **Email**: customerservice@aromaticscentslab.com
+- **Location**: United Arab Emirates
+- **Working Hours**: 10 AM - 10 PM
+
+## Social Media
+
+- Instagram: https://instagram.com/aromaticscentslab
+- Facebook: https://facebook.com/aromaticscentslab
+- Twitter/X: https://x.com/araboriginaloud
+
+## Frequently Asked Questions
+
+**Q: What types of perfumes does Aromatic Scents Lab offer?**
+A: We offer a wide range of premium fragrances including Arabian oud perfumes, eau de parfum, body mists, aromatic oils, home fragrances, bakhoor incense, and curated gift sets. Our collections cater to both men and women with long-lasting scents crafted in the UAE.
+
+**Q: Do you offer free shipping in the UAE?**
+A: Yes, we offer free shipping on all orders over 500 AED within the United Arab Emirates. We also ship internationally to Saudi Arabia, Kuwait, Bahrain, Qatar, Oman, and other GCC countries.
+
+**Q: Are your fragrances made with natural ingredients?**
+A: We use 100% premium natural ingredients including authentic Arabian oud, French rose, Indian sandalwood, and Ethiopian musk. Each fragrance is handcrafted by expert perfumers in our Dubai atelier.
+
+**Q: Can I build a custom perfume gift set?**
+A: Absolutely! Our Build Your Own Set feature allows you to create personalized fragrance bundles. Choose from our entire collection of perfumes, body care products, and home fragrances to create the perfect gift.
+
+**Q: How long do your perfumes last?**
+A: Our eau de parfum formulations are designed for exceptional longevity, typically lasting 8-12 hours on skin. Our concentrated perfume oils and oud-based fragrances can last even longer.
+
+**Q: Can I return a product?**
+A: Yes, we accept returns within 14 days of receipt, provided the product is unopened and in its original condition. Contact customer service to initiate a return.
+
+**Q: What payment methods do you accept?**
+A: We accept credit cards (Visa, Mastercard), Apple Pay, and cash on delivery for orders within UAE and GCC countries.
+
+**Q: Are your products authentic?**
+A: Yes, all products are 100% authentic and made from the finest natural ingredients. We guarantee the quality and authenticity of every product.
+
+**Q: Do you offer gift wrapping?**
+A: Yes, we offer complimentary luxury gift wrapping. Select this service at checkout and add a personal message.
+
+**Q: How do I preserve my fragrance longer?**
+A: Store in a cool, dry place away from direct sunlight. Close the cap tightly after each use and avoid exposing the fragrance to high temperatures.
+
+## Brand Values
+
+- **Artistry & Perfection**: Every fragrance is a work of art
+- **Sustainability**: Innovative and sustainable technologies in fragrance production
+- **Ethical Sourcing**: Commitment to ethically sourced natural ingredients
+- **Handcrafted Quality**: Each product made with meticulous care by expert perfumers
+- **Simplicity & Elegance**: Vintage-look packaging conveying the bare essence of fragrance
+- **Customer Satisfaction**: Your satisfaction is our ultimate goal
+
+## Technical Details
+
+- Built with Next.js (App Router)
+- Bilingual: English (LTR) and Arabic (RTL)
+- WooCommerce/WordPress backend for product management
+- Server-side rendered for SEO optimization
+- Responsive design for mobile and desktop
+- Hreflang tags for multilingual SEO
+- Open Graph and Twitter Card meta tags for social sharing
