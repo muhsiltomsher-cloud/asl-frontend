@@ -102,12 +102,13 @@ export function proxy(request: NextRequest) {
   );
 
   if (pathnameHasLocale) {
-    // Set x-locale header so the root layout can read the locale
+    // Set x-locale on request headers so the root layout can read the locale
     // and set the correct HTML lang attribute (fixes Arabic pages having lang="en")
     const detectedLocale = pathname.startsWith("/ar") ? "ar" : "en";
-    const response = addSecurityHeaders(NextResponse.next());
-    response.headers.set("x-locale", detectedLocale);
-    return response;
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set("x-locale", detectedLocale);
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    return addSecurityHeaders(response);
   }
 
   // Skip locale redirect for static files and API routes
