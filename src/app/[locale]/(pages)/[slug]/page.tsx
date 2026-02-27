@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getPageBySlug, getPages, stripHtmlTags, isFunctionalPageSlug } from "@/lib/api/wordpress";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
@@ -58,7 +58,7 @@ export default async function DynamicPage({ params }: DynamicPageProps) {
   // Redirect WordPress CMS slugs to their proper frontend routes
   const redirectPath = SLUG_REDIRECTS[slug];
   if (redirectPath) {
-    redirect(`/${locale}${redirectPath}`);
+    permanentRedirect(`/${locale}${redirectPath}`);
   }
 
   if (isFunctionalPageSlug(slug)) {
