@@ -113,9 +113,9 @@ export function ContactForm({ locale }: ContactFormProps) {
   if (isSubmitted) {
     return (
       <div className="py-12 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
           <svg
-            className="h-8 w-8 text-green-600"
+            className="h-8 w-8 text-amber-700"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

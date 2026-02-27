@@ -72,23 +72,23 @@ export default async function ContactPage({ params }: ContactPageProps) {
   const infoConfig: Record<string, { icon: typeof MapPin; gradient: string; hoverGradient: string }> = {
     address: { 
       icon: MapPin, 
-      gradient: "from-amber-500 to-amber-600",
-      hoverGradient: "group-hover:from-amber-600 group-hover:to-amber-700"
+      gradient: "from-amber-600 to-amber-700",
+      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
     },
     phone: { 
       icon: Phone, 
-      gradient: "from-emerald-500 to-emerald-600",
-      hoverGradient: "group-hover:from-emerald-600 group-hover:to-emerald-700"
+      gradient: "from-amber-700 to-amber-800",
+      hoverGradient: "group-hover:from-amber-800 group-hover:to-amber-900"
     },
     email: { 
       icon: Mail, 
-      gradient: "from-blue-500 to-blue-600",
-      hoverGradient: "group-hover:from-blue-600 group-hover:to-blue-700"
+      gradient: "from-amber-800 to-amber-900",
+      hoverGradient: "group-hover:from-amber-900 group-hover:to-stone-900"
     },
     hours: { 
       icon: Clock, 
-      gradient: "from-purple-500 to-purple-600",
-      hoverGradient: "group-hover:from-purple-600 group-hover:to-purple-700"
+      gradient: "from-amber-500 to-amber-600",
+      hoverGradient: "group-hover:from-amber-600 group-hover:to-amber-700"
     },
   };
 
