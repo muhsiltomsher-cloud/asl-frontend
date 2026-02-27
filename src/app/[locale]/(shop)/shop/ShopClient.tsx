@@ -178,6 +178,7 @@ export function ShopClient({
         locale={locale}
         showToolbar={true}
         bundleProductSlugs={bundleProductSlugs}
+        totalCount={total}
       />
       
       <div ref={loadMoreRef} className="py-8 flex justify-center">

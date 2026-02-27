@@ -44,9 +44,9 @@ export default async function ShopPage({ params }: ShopPageProps) {
   ];
 
   // Fetch products, gift product info (IDs and slugs), and bundle product slugs in parallel
-  // Load 12 products initially for faster page load, more will load on scroll
+  // Load 15 products initially to ensure enough visible products after filtering out gift products
   const [productsResult, giftProductInfo, bundleProductSlugs] = await Promise.all([
-    getProducts({ per_page: 12, locale: locale as Locale }),
+    getProducts({ per_page: 15, locale: locale as Locale }),
     getFreeGiftProductInfo(),
     getBundleEnabledProductSlugs(),
   ]);
