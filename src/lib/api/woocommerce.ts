@@ -116,10 +116,10 @@ export async function getProducts(params?: {
     if (params?.per_page) searchParams.set("per_page", params.per_page.toString());
     if (params?.category) searchParams.set("category", params.category);
     if (params?.search) searchParams.set("search", params.search);
-    // Default to date desc (newest first) to match backend ordering expectations
-    // This ensures the latest products appear first across all pages and categories
-    searchParams.set("orderby", params?.orderby || "date");
-    searchParams.set("order", params?.order || "desc");
+    // Default to menu_order asc so product order is controlled dynamically from WP Admin
+    // Admin can reorder products via WP Admin > Products > Sorting (drag & drop)
+    searchParams.set("orderby", params?.orderby || "menu_order");
+    searchParams.set("order", params?.order || "asc");
     if (params?.include?.length) searchParams.set("include", params.include.join(","));
 
     const queryString = searchParams.toString();
