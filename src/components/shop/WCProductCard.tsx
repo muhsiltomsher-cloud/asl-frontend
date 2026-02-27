@@ -112,12 +112,11 @@ export function WCProductCard({
           ) : (
             <div className="flex h-full items-center justify-center bg-gray-100">
               <Image
-                src="https://cms.aromaticscentslab.com/wp-content/uploads/2024/12/ASL-Logo-1.png"
+                src="/images/asl-placeholder.png"
                 alt="Aromatic Scents Lab"
-                width={80}
-                height={80}
-                className="object-contain opacity-40"
-                unoptimized
+                width={120}
+                height={120}
+                className="object-contain opacity-30"
               />
             </div>
           )}

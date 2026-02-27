@@ -8,33 +8,20 @@ export function Skeleton({ className, ...props }: SkeletonProps) {
 }
 
 export function ProductCardSkeleton({ placeholderLogo }: { placeholderLogo?: string }) {
+  const logoSrc = placeholderLogo || "/images/asl-placeholder.png";
   return (
     <div className="space-y-4">
       <div className="relative aspect-square w-full rounded-xl overflow-hidden">
         <Skeleton className="absolute inset-0" />
-        {placeholderLogo ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Image
-              src={placeholderLogo}
-              alt="Loading"
-              width={120}
-              height={120}
-              className="object-contain opacity-20"
-              unoptimized
-            />
-          </div>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Image
-              src="https://cms.aromaticscentslab.com/wp-content/uploads/2024/12/ASL-Logo-1.png"
-              alt="Loading"
-              width={120}
-              height={120}
-              className="object-contain opacity-20"
-              unoptimized
-            />
-          </div>
-        )}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Image
+            src={logoSrc}
+            alt="Loading"
+            width={120}
+            height={120}
+            className="object-contain opacity-20"
+          />
+        </div>
       </div>
       <div className="space-y-2">
         <Skeleton className="h-3 w-1/3" />
