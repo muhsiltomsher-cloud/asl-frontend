@@ -77,8 +77,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
     },
     phone: { 
       icon: Phone, 
-      gradient: "from-amber-700 to-amber-800",
-      hoverGradient: "group-hover:from-amber-800 group-hover:to-amber-900"
+      gradient: "from-amber-800 to-amber-900",
+      hoverGradient: "group-hover:from-amber-900 group-hover:to-stone-900"
     },
     callPhone: { 
       icon: Phone, 
