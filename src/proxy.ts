@@ -101,7 +101,14 @@ export function proxy(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  if (pathnameHasLocale) return addSecurityHeaders(NextResponse.next());
+  if (pathnameHasLocale) {
+    // Set x-locale header so the root layout can read the locale
+    // and set the correct HTML lang attribute (fixes Arabic pages having lang="en")
+    const detectedLocale = pathname.startsWith("/ar") ? "ar" : "en";
+    const response = addSecurityHeaders(NextResponse.next());
+    response.headers.set("x-locale", detectedLocale);
+    return response;
+  }
 
   // Skip locale redirect for static files and API routes
   if (
