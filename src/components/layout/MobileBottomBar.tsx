@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
 import type { Locale } from "@/config/site";
 import type { MobileBarSettings } from "@/lib/api/wordpress";
+import type { WPMenuItem } from "@/types/wordpress";
 import type { Dictionary } from "@/i18n";
 import { CategoriesDrawer } from "@/components/layout/CategoriesDrawer";
 import { SearchDrawer } from "@/components/layout/SearchDrawer";
@@ -18,6 +19,7 @@ interface MobileBottomBarProps {
   locale: Locale;
   settings: MobileBarSettings;
   dictionary: Dictionary;
+  menuItems?: WPMenuItem[] | null;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -28,7 +30,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   user: User,
 };
 
-export function MobileBottomBar({ locale, settings, dictionary }: MobileBottomBarProps) {
+export function MobileBottomBar({ locale, settings, dictionary, menuItems }: MobileBottomBarProps) {
   const { wishlistItemsCount } = useWishlist();
   const { setIsAccountDrawerOpen } = useAuth();
   const isKeyboardVisible = useKeyboardVisible();
@@ -150,6 +152,7 @@ export function MobileBottomBar({ locale, settings, dictionary }: MobileBottomBa
         }}
         locale={locale}
         dictionary={dictionary}
+        menuItems={menuItems}
       />
       <SearchDrawer
         isOpen={isSearchDrawerOpen}

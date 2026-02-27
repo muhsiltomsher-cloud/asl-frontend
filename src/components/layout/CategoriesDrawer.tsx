@@ -11,9 +11,11 @@ import Typography from "@mui/material/Typography";
 import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/config/site";
 import type { WCCategory } from "@/types/woocommerce";
+import type { WPMenuItem } from "@/types/wordpress";
 import { getCategories } from "@/lib/api/woocommerce";
 import { decodeHtmlEntities } from "@/lib/utils";
 import { triggerHaptic } from "@/lib/utils/haptics";
+import { translateToArabic } from "@/config/menu";
 
 function CategorySkeleton() {
   return (
@@ -36,11 +38,32 @@ function CategorySkeleton() {
 // const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
 const fetchPromise: Record<string, Promise<WCCategory[]> | null> = {};
 
+/**
+ * Extract category slug from a WordPress menu item URL.
+ * Handles URLs like /category/perfumes, https://site.com/en/category/fragrance-oils, etc.
+ */
+function extractSlugFromMenuUrl(url: string): string | null {
+  if (!url || url === "#") return null;
+  try {
+    let path = url;
+    if (url.startsWith("http")) {
+      path = new URL(url).pathname;
+    }
+    // Remove locale prefix and trailing slashes
+    path = path.replace(/^\/(en|ar)\//, "/").replace(/\/$/, "");
+    const match = path.match(/\/category\/(.+)/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
 interface CategoriesDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   locale: Locale;
   dictionary: Dictionary;
+  menuItems?: WPMenuItem[] | null;
 }
 
 export function CategoriesDrawer({
@@ -48,6 +71,7 @@ export function CategoriesDrawer({
   onClose,
   locale,
   dictionary,
+  menuItems,
 }: CategoriesDrawerProps) {
   // DEV MODE: Cache disabled for faster development
   const [categories, setCategories] = useState<WCCategory[]>([]);
@@ -78,10 +102,41 @@ export function CategoriesDrawer({
     });
   };
 
-  // Organize categories into parent/child structure
-  const parentCategories = categories.filter(cat => cat.parent === 0);
+  // Build display categories from WordPress menu order (backend-dynamic)
+  // Falls back to parent categories if no menu items are provided
+  const allCategories = categories;
   const getChildCategories = (parentId: number) =>
-    categories.filter(cat => cat.parent === parentId);
+    allCategories.filter(cat => cat.parent === parentId);
+
+  const displayCategories = (() => {
+    if (!menuItems || menuItems.length === 0) {
+      // Fallback: show parent categories as before
+      return allCategories.filter(cat => cat.parent === 0);
+    }
+
+    // Use WordPress menu items (excluding "Shop All" type items) to determine order
+    const topLevelMenuItems = menuItems.filter(item => item.parent === 0);
+    const slugMap = new Map<string, WCCategory>();
+    for (const cat of allCategories) {
+      slugMap.set(cat.slug, cat);
+    }
+
+    const ordered: WCCategory[] = [];
+    for (const menuItem of topLevelMenuItems) {
+      const slug = extractSlugFromMenuUrl(menuItem.url);
+      if (!slug) continue;
+      const matched = slugMap.get(slug);
+      if (matched) {
+        // Use menu item title for display name (supports Arabic via translateToArabic)
+        const displayName = locale === "ar"
+          ? translateToArabic(menuItem.title)
+          : decodeHtmlEntities(menuItem.title);
+        ordered.push({ ...matched, name: displayName });
+      }
+    }
+
+    return ordered.length > 0 ? ordered : allCategories.filter(cat => cat.parent === 0);
+  })();
 
   const fetchCategoriesData = useCallback(async () => {
     // DEV MODE: Cache disabled for faster development
@@ -195,7 +250,7 @@ export function CategoriesDrawer({
           ) : (
             <nav className="p-4">
               <ul className="space-y-1">
-                {parentCategories.map((category) => {
+                {displayCategories.map((category) => {
                   const childCategories = getChildCategories(category.id);
                   const hasChildren = childCategories.length > 0;
                   const isExpanded = expandedCategories.has(category.id);

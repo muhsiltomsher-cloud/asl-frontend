@@ -207,6 +207,7 @@ export default async function LocaleLayout({
                     locale={validLocale}
                     settings={mobileBarSettings}
                     dictionary={dictionary}
+                    menuItems={menuItems?.items}
                   />
                 </div>
               </div>
