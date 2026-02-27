@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Inter, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 
@@ -52,13 +53,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read locale from middleware header to set correct HTML lang attribute
+  // This fixes Arabic pages having lang="en" instead of lang="ar"
+  const headersList = await headers();
+  const locale = headersList.get("x-locale") || "en";
+  const dir = locale === "ar" ? "rtl" : "ltr";
+
   return (
-    <html lang="en" suppressHydrationWarning className="overflow-x-clip">
+    <html lang={locale} dir={dir} suppressHydrationWarning className="overflow-x-clip">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <link rel="dns-prefetch" href="https://cms.aromaticscentslab.com" />

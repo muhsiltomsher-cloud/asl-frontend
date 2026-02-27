@@ -195,6 +195,44 @@ function asl_bundles_get_config_by_slug($request) {
     $exclude_products = isset($product_bundle['exclude_products']) ? $product_bundle['exclude_products'] : array();
     $exclude_categories = isset($product_bundle['exclude_categories']) ? $product_bundle['exclude_categories'] : array();
     
+    // Build slots array from items data for per-slot configuration
+    $slots = array();
+    if (!empty($product_bundle['items'])) {
+        foreach ($product_bundle['items'] as $index => $item) {
+            $slot = array(
+                'id' => isset($item['id']) ? $item['id'] : $index,
+                'title' => isset($item['title']) ? $item['title'] : '',
+                'is_optional' => !empty($item['display']['is_optional']),
+                'is_free' => !empty($item['display']['is_free']),
+            );
+            
+            // Per-slot eligible categories from item rules
+            if (!empty($item['rule']['categories'])) {
+                $slot['eligible_categories'] = array_values($item['rule']['categories']);
+            }
+            // Per-slot eligible products from item rules
+            if (!empty($item['rule']['products'])) {
+                $slot['eligible_products'] = array_values($item['rule']['products']);
+            }
+            
+            // Also check slot_configs for per-slot overrides
+            if (!empty($product_bundle['slot_configs'][$index])) {
+                $slot_config = $product_bundle['slot_configs'][$index];
+                if (!empty($slot_config['label'])) {
+                    $slot['title'] = $slot_config['label'];
+                }
+                if (!empty($slot_config['eligible_categories'])) {
+                    $slot['eligible_categories'] = array_values($slot_config['eligible_categories']);
+                }
+                if (!empty($slot_config['eligible_products'])) {
+                    $slot['eligible_products'] = array_values($slot_config['eligible_products']);
+                }
+            }
+            
+            $slots[] = $slot;
+        }
+    }
+    
     return array(
         'product_id' => $product_id,
         'bundle_id' => $product_bundle['id'] ?? null,
@@ -217,6 +255,7 @@ function asl_bundles_get_config_by_slug($request) {
         'enabled' => true,
         'title' => $product_bundle['title'] ?? '',
         'pricing' => $product_bundle['pricing'] ?? null,
+        'slots' => $slots,
     );
 }
 
