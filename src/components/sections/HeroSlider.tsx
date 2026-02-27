@@ -72,7 +72,13 @@ export function HeroSlider({ settings }: HeroSliderProps) {
           </>
         ) : (
           <div className="flex h-[50vh] w-full items-center justify-center bg-gray-200 md:h-[70vh] md:min-h-[500px]">
-            <span className="text-gray-400">No image</span>
+            <Image
+              src="/images/asl-placeholder.png"
+              alt="Aromatic Scents Lab"
+              width={200}
+              height={200}
+              className="object-contain opacity-20"
+            />
           </div>
         )}
       </div>

@@ -72,23 +72,28 @@ export default async function ContactPage({ params }: ContactPageProps) {
   const infoConfig: Record<string, { icon: typeof MapPin; gradient: string; hoverGradient: string }> = {
     address: { 
       icon: MapPin, 
-      gradient: "from-amber-500 to-amber-600",
-      hoverGradient: "group-hover:from-amber-600 group-hover:to-amber-700"
+      gradient: "from-amber-600 to-amber-700",
+      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
     },
     phone: { 
       icon: Phone, 
-      gradient: "from-emerald-500 to-emerald-600",
-      hoverGradient: "group-hover:from-emerald-600 group-hover:to-emerald-700"
+      gradient: "from-amber-600 to-amber-700",
+      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
+    },
+    callPhone: { 
+      icon: Phone, 
+      gradient: "from-amber-600 to-amber-700",
+      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
     },
     email: { 
       icon: Mail, 
-      gradient: "from-blue-500 to-blue-600",
-      hoverGradient: "group-hover:from-blue-600 group-hover:to-blue-700"
+      gradient: "from-amber-600 to-amber-700",
+      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
     },
     hours: { 
       icon: Clock, 
-      gradient: "from-purple-500 to-purple-600",
-      hoverGradient: "group-hover:from-purple-600 group-hover:to-purple-700"
+      gradient: "from-amber-600 to-amber-700",
+      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
     },
   };
 
@@ -256,12 +261,12 @@ export default async function ContactPage({ params }: ContactPageProps) {
                         <item.icon className="h-7 w-7 text-white" />
                       </div>
                       <h3 className="mb-1 text-lg font-bold text-amber-900">{item.title}</h3>
-                      {item.key === "phone" ? (
+                      {item.key === "phone" || item.key === "callPhone" ? (
                         <a href={`tel:${item.content.replace(/\s/g, "")}`} className="text-amber-700 transition-colors hover:text-amber-900">
                           {item.content}
                         </a>
                       ) : item.key === "email" ? (
-                        <a href={`mailto:${item.content}`} className="text-amber-700 transition-colors hover:text-amber-900">
+                        <a href={`mailto:${item.content}`} className="text-sm text-amber-700 transition-colors hover:text-amber-900" style={{ wordBreak: "break-all" }}>
                           {item.content}
                         </a>
                       ) : item.key === "address" ? (

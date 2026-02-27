@@ -8,8 +8,8 @@ import type { Locale } from "@/config/site";
 // DEV MODE: Cache disabled for faster development - uncomment when done
 // const PRODUCTS_CACHE_KEY = "asl_products_cache";
 // const CACHE_TTL_MS = 5 * 60 * 1000;
-// Reduced from 24 to 12 for faster scroll loading and reduced API weight
-const PER_PAGE = 12;
+// Match the initial SSR fetch size (per_page: 15 in page.tsx) to avoid overlap on page 2
+const PER_PAGE = 15;
 
 // Interface kept for type safety even when cache is disabled
 interface CachedProducts {
@@ -160,6 +160,7 @@ export function ShopClient({
         locale={locale}
         showToolbar={true}
         bundleProductSlugs={bundleProductSlugs}
+        totalCount={total}
       />
       
       <div ref={loadMoreRef} className="py-8 flex justify-center">

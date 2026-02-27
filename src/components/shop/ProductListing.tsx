@@ -66,6 +66,7 @@ interface ProductListingProps {
   showToolbar?: boolean;
   toolbarClassName?: string;
   bundleProductSlugs?: string[];
+  totalCount?: number;
 }
 
 const DEFAULT_PREFERENCE: ViewPreference = {
@@ -135,6 +136,7 @@ export function ProductListing({
   showToolbar = true,
   toolbarClassName,
   bundleProductSlugs = [],
+  totalCount,
 }: ProductListingProps) {
   const preference = useSyncExternalStore(
     subscribeToPreference,
@@ -186,7 +188,7 @@ export function ProductListing({
             onViewModeChange={handleViewModeChange}
             onGridColumnsChange={handleGridColumnsChange}
             locale={locale}
-            productCount={sortedProducts.length}
+            productCount={totalCount !== undefined ? totalCount : sortedProducts.length}
             sortBy={sortBy}
             onSortChange={handleSortChange}
           />

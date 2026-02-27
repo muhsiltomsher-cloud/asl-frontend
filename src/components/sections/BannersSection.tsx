@@ -11,7 +11,20 @@ interface BannersSectionProps {
 }
 
 function BannerSkeleton() {
-  return <Skeleton className="aspect-[2/1] w-full rounded-xl md:aspect-[3/1]" />;
+  return (
+    <div className="relative aspect-[2/1] w-full rounded-xl overflow-hidden md:aspect-[3/1]">
+      <Skeleton className="absolute inset-0" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Image
+          src="/images/asl-placeholder.png"
+          alt="Loading"
+          width={150}
+          height={150}
+          className="object-contain opacity-20"
+        />
+      </div>
+    </div>
+  );
 }
 
 export function BannersSectionSkeleton({ count = 2 }: { count?: number }) {
@@ -102,7 +115,15 @@ export function BannersSection({
                       />
                   </>
                 ) : (
-                  <div className="absolute inset-0 bg-stone-200" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-stone-200">
+                    <Image
+                      src="/images/asl-placeholder.png"
+                      alt="Aromatic Scents Lab"
+                      width={150}
+                      height={150}
+                      className="object-contain opacity-20"
+                    />
+                  </div>
                 )}
                 {(banner.title || banner.subtitle) && (
                   <>
