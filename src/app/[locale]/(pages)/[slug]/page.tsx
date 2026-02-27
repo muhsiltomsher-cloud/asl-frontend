@@ -1,9 +1,17 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getPageBySlug, getPages, stripHtmlTags, isFunctionalPageSlug } from "@/lib/api/wordpress";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
+
+// WordPress CMS slugs that have dedicated Next.js pages at different routes.
+// Redirect to the proper frontend routes to avoid duplicate content with broken metadata.
+const SLUG_REDIRECTS: Record<string, string> = {
+  "privacy-policy": "/privacy",
+  "shipping-policy": "/shipping",
+  "return-policy": "/returns",
+};
 
 interface DynamicPageProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -21,7 +29,7 @@ export async function generateMetadata({
 }: DynamicPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
 
-  if (isFunctionalPageSlug(slug)) {
+  if (isFunctionalPageSlug(slug) || SLUG_REDIRECTS[slug]) {
     return {};
   }
 
@@ -46,6 +54,12 @@ export async function generateMetadata({
 
 export default async function DynamicPage({ params }: DynamicPageProps) {
   const { locale, slug } = await params;
+
+  // Redirect WordPress CMS slugs to their proper frontend routes
+  const redirectPath = SLUG_REDIRECTS[slug];
+  if (redirectPath) {
+    permanentRedirect(`/${locale}${redirectPath}`);
+  }
 
   if (isFunctionalPageSlug(slug)) {
     notFound();
