@@ -31,7 +31,9 @@ export function generateMetadata({
   // Layout uses: template: `%s | ${siteConfig.name}`
   const fullTitle = title || siteConfig.name;
   const fullDescription = description || siteConfig.description;
-  const ogImage = image || siteConfig.ogImage;
+  // Ensure OG image URL is always absolute for social media crawlers
+  const rawImage = image || siteConfig.ogImage;
+  const ogImage = rawImage.startsWith("http") ? rawImage : `${siteConfig.url}${rawImage.startsWith("/") ? "" : "/"}${rawImage}`;
   const url = `${siteConfig.url}/${locale}${pathname}`;
 
   const enPathname = alternatePathnames?.en || pathname;

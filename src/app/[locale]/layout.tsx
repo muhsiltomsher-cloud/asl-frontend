@@ -84,6 +84,11 @@ export async function generateMetadata({
     metadataBase: new URL(siteConfig.url),
     alternates: {
       canonical: seoSettings.canonicalUrl || undefined,
+      languages: {
+        en: `${siteConfig.url}/en`,
+        ar: `${siteConfig.url}/ar`,
+        "x-default": `${siteConfig.url}/en`,
+      },
     },
     openGraph: {
       title: ogTitle,

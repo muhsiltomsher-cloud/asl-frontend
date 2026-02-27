@@ -215,8 +215,16 @@ export default async function HomePage({ params }: HomePageProps) {
       image: string;
     }> = [];
 
+  // H1 heading text for SEO - hidden visually but read by search engines
+  const h1Text = isRTL
+    ? "أروماتيك سينتس لاب | عطور فاخرة وعود عربي في الإمارات"
+    : "Aromatic Scents Lab | Premium Perfumes & Fragrances in UAE";
+
   return (
     <div className="flex flex-col">
+      {/* H1 tag for SEO - visually hidden but accessible to search engines */}
+      <h1 className="sr-only">{h1Text}</h1>
+
       {/* Hero Slider */}
       <HeroSlider settings={homeSettings.hero_slider} />
 
