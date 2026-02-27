@@ -8,7 +8,6 @@ import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { cn } from "@/lib/utils";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
-import { BESTSELLER_PRODUCT_IDS, BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 
 const STORAGE_KEY = "asl_product_view_preference";
 const PREFERENCE_CHANGE_EVENT = "asl_preference_change";
@@ -22,32 +21,11 @@ function getProductPrice(product: WCProduct): number {
   return isNaN(price) ? 0 : price;
 }
 
-const bestsellerIdSet = new Set(BESTSELLER_PRODUCT_IDS);
-const bestsellerSlugSet = new Set(BESTSELLER_PRODUCT_SLUGS);
-
-// Check if a product is a bestseller using both ID and slug matching
-// Slug matching ensures bestseller sorting works across all WPML locales
-// (product IDs differ per locale, but slugs remain the same)
-function isBestseller(product: WCProduct): boolean {
-  return bestsellerIdSet.has(product.id) || bestsellerSlugSet.has(product.slug);
-}
-
-function sortBestsellersFirst(products: WCProduct[]): WCProduct[] {
-  const bestsellers: WCProduct[] = [];
-  const others: WCProduct[] = [];
-  for (const product of products) {
-    if (isBestseller(product)) {
-      bestsellers.push(product);
-    } else {
-      others.push(product);
-    }
-  }
-  return [...bestsellers, ...others];
-}
-
+// Sort products client-side based on the selected sort option
+// "default" preserves the API order (controlled by WP Admin menu_order)
 function sortProducts(products: WCProduct[], sortBy: SortOption): WCProduct[] {
   if (sortBy === "default") {
-    return sortBestsellersFirst(products);
+    return products;
   }
 
   const sorted = [...products];
@@ -72,7 +50,7 @@ function sortProducts(products: WCProduct[], sortBy: SortOption): WCProduct[] {
       break;
   }
 
-  return sortBestsellersFirst(sorted);
+  return sorted;
 }
 
 interface ViewPreference {
