@@ -46,11 +46,11 @@ export default async function FAQPage({ params }: FAQPageProps) {
   const faqJsonLd = generateFAQJsonLd(faqItems);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-4">
       <JsonLd data={faqJsonLd} />
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
-      <div className="mb-12 text-center">
+      <div className="mb-6 text-center">
         <h1 className="mb-4 text-4xl font-bold text-gray-900">
           {pageContent.title}
         </h1>
