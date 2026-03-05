@@ -122,7 +122,7 @@ export function WCProductCard({
             </div>
           )}
 
-          <div className={cn("absolute top-3 flex flex-col gap-1.5", isRTL ? "right-3" : "left-3")}>
+          <div className={cn("absolute top-3 flex flex-col gap-1.5", isRTL ? "right-3 items-end" : "left-3 items-start")}>
             {product.tags?.some(tag => tag.slug === "ramadan-special") && (
               <Badge variant="special" className="shadow-sm">
                 {isRTL ? "عرض رمضان" : "Ramadan Special"}
