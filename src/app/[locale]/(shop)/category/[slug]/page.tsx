@@ -135,8 +135,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
     // For Personal Care: "Hair & Body Mist" subcategory items come first (after bestsellers)
     if (isPersonalCare && !aIsBestseller && !bIsBestseller) {
-      const aIsHairBodyMist = a.categories?.some(cat => cat.slug === "hair-body-mist" || decodeURIComponent(cat.slug).includes("hair-body-mist"));
-      const bIsHairBodyMist = b.categories?.some(cat => cat.slug === "hair-body-mist" || decodeURIComponent(cat.slug).includes("hair-body-mist"));
+      const aIsHairBodyMist = a.categories?.some(cat => { try { return cat.slug === "hair-body-mist" || decodeURIComponent(cat.slug).includes("hair-body-mist"); } catch { return false; } });
+      const bIsHairBodyMist = b.categories?.some(cat => { try { return cat.slug === "hair-body-mist" || decodeURIComponent(cat.slug).includes("hair-body-mist"); } catch { return false; } });
       if (aIsHairBodyMist && !bIsHairBodyMist) return -1;
       if (!aIsHairBodyMist && bIsHairBodyMist) return 1;
     }
