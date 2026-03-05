@@ -122,7 +122,7 @@ export function HeroSlider({ settings, parallax = false }: HeroSliderProps) {
 
   if (parallax) {
     return (
-      <div style={{ height: heroHeight || "auto" }} className={getVisibilityClass()}>
+      <div style={{ height: heroHeight > 0 ? heroHeight : "100svh" }} className={getVisibilityClass()}>
         <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 w-full">
           <section className="relative w-full">
             <Swiper
