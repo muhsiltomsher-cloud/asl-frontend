@@ -144,7 +144,7 @@ export function HeroSlider({ settings, parallax = false }: HeroSliderProps) {
 
   if (parallax) {
     return (
-      <div style={{ height: heroHeight > 0 ? heroHeight : "100svh" }} className={getVisibilityClass()}>
+      <div style={{ height: heroHeight > 0 ? heroHeight : "100svh" }} className={`overflow-hidden ${getVisibilityClass()}`}>
         <div
           ref={heroRef}
           className="fixed top-0 left-0 right-0 z-0 w-full will-change-transform"

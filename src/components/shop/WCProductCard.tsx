@@ -12,6 +12,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { triggerHaptic } from "@/lib/utils/haptics";
+import { BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 import type { WCProduct } from "@/types/woocommerce";
 import type { Locale } from "@/config/site";
 
@@ -127,7 +128,7 @@ export function WCProductCard({
                 {isRTL ? "عرض رمضان" : "Ramadan Special"}
               </Badge>
             )}
-            {product.tags?.some(tag => tag.slug === "bestseller") && (
+            {(product.tags?.some(tag => tag.slug === "bestseller") || BESTSELLER_PRODUCT_SLUGS.includes(productSlug) || BESTSELLER_PRODUCT_SLUGS.includes(product.slug)) && (
               <Badge variant="bestseller" className="shadow-sm">
                 {isRTL ? "الأكثر مبيعاً" : "Bestseller"}
               </Badge>

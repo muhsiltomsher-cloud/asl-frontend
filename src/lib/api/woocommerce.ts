@@ -1166,7 +1166,11 @@ export async function getFeaturedProducts(params?: {
         slug: cat.slug || "",
         link: "",
       })) : [],
-      tags: [],
+      tags: Array.isArray(product.tags) ? (product.tags as Array<Record<string, unknown>>).map((tag) => ({
+        id: tag.id || 0,
+        name: tag.name || "",
+        slug: tag.slug || "",
+      })) : [],
       brands: [],
       attributes: [],
       variations: [],
