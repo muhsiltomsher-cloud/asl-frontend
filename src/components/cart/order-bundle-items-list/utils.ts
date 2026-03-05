@@ -83,7 +83,7 @@ function detectBundleItemFreeStatus(items: BundleItem[], orderItem: OrderLineIte
   for (let i = enriched.length - 1; i >= 0 && remainingFree > 0.01; i--) {
     const price = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : (enriched[i].price || 0);
     const qty = enriched[i].quantity || 1;
-    const itemTotal = price * qty;
+    const itemTotal = price * qty * orderQty;
     if (itemTotal > 0 && itemTotal <= remainingFree + 0.01) {
       enriched[i] = { ...enriched[i], is_free: true, is_addon: true };
       remainingFree -= itemTotal;
