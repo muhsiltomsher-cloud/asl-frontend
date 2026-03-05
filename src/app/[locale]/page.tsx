@@ -225,11 +225,10 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* H1 tag for SEO - visually hidden but accessible to search engines */}
       <h1 className="sr-only">{h1Text}</h1>
 
-      {/* Hero Slider - Parallax: stays fixed while content scrolls over */}
-      <HeroSlider settings={homeSettings.hero_slider} parallax />
+      {/* Hero Slider */}
+      <HeroSlider settings={homeSettings.hero_slider} />
 
-      {/* Main content scrolls over the hero banner */}
-      <div className={`relative z-10 bg-[#f7f6f2] ${homeSettings.hero_slider.enabled && homeSettings.hero_slider.slides.length > 0 ? 'rounded-t-[2.5rem] -mt-16 pt-4 shadow-[0_-10px_30px_rgba(0,0,0,0.15)]' : ''}`}>
+      <div className="bg-[#f7f6f2]">
       {/* Banners - Top Position */}
       <BannersSection settings={homeSettings.banners} />
 
