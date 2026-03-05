@@ -12,8 +12,8 @@ export function Badge({ className, variant = "default", children, ...props }: Ba
     error: "bg-[#C4885B] text-white",
     info: "bg-blue-100 text-blue-800",
     new: "bg-[#C4885B] text-white",
-    special: "bg-gradient-to-r from-[#C4885B] to-[#D4A574] text-white min-w-[70px] justify-center",
-    bestseller: "bg-gradient-to-r from-[#C4885B] to-[#D4A574] text-white min-w-[70px] justify-center",
+    special: "bg-gradient-to-r from-[#C4885B] to-[#D4A574] text-white",
+    bestseller: "bg-gradient-to-r from-[#C4885B] to-[#D4A574] text-white",
   };
 
   return (
