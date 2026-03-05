@@ -86,7 +86,7 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
         setIsVisible(true);
         return;
       }
-      
+
       // Standard case: First-time visitors (no currency set yet)
       if (!dismissed && !existingCurrency) {
         const detected = getCurrencyForCountry(countryCode);
@@ -113,12 +113,12 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
         const response = await fetch("https://ipapi.co/json/", {
           cache: "no-store",
         });
-        
+
         if (!response.ok) return;
-        
+
         const data = await response.json();
         const countryCode = data.country_code;
-        
+
         if (countryCode) {
           // Cache the location data for future visits
           cacheLocation({ country_code: countryCode, country_name: data.country_name });
@@ -186,14 +186,15 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
   return (
     <div
       className={cn(
-        "fixed z-40 transform transition-transform duration-300 ease-out",
+        "fixed transform transition-transform duration-300 ease-out",
         "bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200 shadow-lg",
-        // Gulf banner: bottom center positioning with mobile bottom bar offset
-        // Mobile bottom bar is h-16 (64px) + safe area, visible below xl breakpoint
+        // On mobile: position well above bottom area to avoid overlapping cookie consent banner
+        // Cookie banner sits at bottom 4rem and is ~130px tall, so we need bottom ~216px+ to clear it
         isGulfBanner
-          ? "bottom-20 left-4 right-4 rounded-xl border xl:bottom-4 xl:left-1/2 xl:right-auto xl:-translate-x-1/2 xl:max-w-sm"
-          : "bottom-20 left-4 right-4 rounded-xl border xl:bottom-4 xl:left-4 xl:right-auto xl:max-w-sm"
+          ? "left-4 right-4 rounded-xl border md:left-1/2 md:right-auto md:-translate-x-1/2 md:max-w-sm"
+          : "left-4 right-4 rounded-xl border md:left-4 md:right-auto md:max-w-sm"
       )}
+      style={{ bottom: "13.5rem", zIndex: 65 }}
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative px-4 py-3">
@@ -213,11 +214,11 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
           <div className="flex-shrink-0 rounded-full bg-amber-200 p-2">
             <MapPin className="h-5 w-5 text-amber-700" />
           </div>
-          
+
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-amber-900">{t.detected}</p>
             <p className="text-xs text-amber-700 mt-0.5">{t.suggestion}</p>
-            
+
             <div className="flex items-center gap-2 mt-2">
               <button
                 onClick={handleAccept}

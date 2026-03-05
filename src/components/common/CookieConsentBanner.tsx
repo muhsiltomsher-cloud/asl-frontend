@@ -71,10 +71,11 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-[60] transform transition-all duration-300 ease-out",
-        "bg-white border-t border-gray-200 shadow-lg",
+        "fixed left-0 right-0 z-[60] transform transition-all duration-300 ease-out",
+        "bg-white border-t border-gray-200 shadow-lg rounded-t-xl",
         "md:bottom-4 md:left-auto md:right-4 md:rounded-xl md:border md:max-w-md"
       )}
+      style={{ bottom: "4rem" }}
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative px-4 py-4 md:px-5 md:py-4">
