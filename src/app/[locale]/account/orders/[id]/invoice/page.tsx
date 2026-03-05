@@ -326,8 +326,41 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                   {order.line_items.map((item) => {
                     const isFreeGift = isOrderFreeGift(item);
                     const isBundle = isOrderBundleProduct(item);
-                    const bundleItems = isBundle ? getOrderBundleItems(item) : null;
+                    const rawBundleItems = isBundle ? getOrderBundleItems(item) : null;
                     const orderQuantity = item.quantity || 1;
+                    
+                    // Ensure free item detection runs — fallback in case the
+                    // imported util returned items without is_free enrichment
+                    let bundleItems = rawBundleItems;
+                    if (bundleItems && bundleItems.length > 0) {
+                      const hasAnyFreeFlag = bundleItems.some(bi => bi.is_free === true || bi.is_free === false);
+                      if (!hasAnyFreeFlag) {
+                        const lineTotal = parseFloat(item.total) || 0;
+                        if (lineTotal > 0) {
+                          const oQty = item.quantity || 1;
+                          const sumAll = bundleItems.reduce((s, bi) => {
+                            const p = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+                            const q = bi.quantity || 1;
+                            return s + (p * q * oQty);
+                          }, 0);
+                          const freeAmt = sumAll - lineTotal;
+                          if (freeAmt > 0.01) {
+                            let rem = freeAmt;
+                            const enriched = [...bundleItems];
+                            for (let i = enriched.length - 1; i >= 0 && rem > 0.01; i--) {
+                              const p = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : (enriched[i].price || 0);
+                              const q = enriched[i].quantity || 1;
+                              const iTotal = p * q * oQty;
+                              if (iTotal > 0 && iTotal <= rem + 0.01) {
+                                enriched[i] = { ...enriched[i], is_free: true, is_addon: true };
+                                rem -= iTotal;
+                              }
+                            }
+                            bundleItems = enriched;
+                          }
+                        }
+                      }
+                    }
                     
                     return (
                       <React.Fragment key={item.id}>
