@@ -23,6 +23,7 @@ import type { WCProduct } from "@/types/woocommerce";
 import type { WCPAForm, WCPAFormValues } from "@/types/wcpa";
 import type { Locale } from "@/config/site";
 import { decodeHtmlEntities, BLUR_DATA_URL } from "@/lib/utils";
+import { BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { triggerHaptic } from "@/lib/utils/haptics";
 
@@ -858,7 +859,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
             {product.tags?.some(tag => tag.slug === "ramadan-special") && (
               <Badge variant="special">{isRTL ? "عرض رمضان" : "Ramadan Special"}</Badge>
             )}
-            {product.tags?.some(tag => tag.slug === "bestseller") && (
+            {(product.tags?.some(tag => tag.slug === "bestseller") || BESTSELLER_PRODUCT_SLUGS.includes(product.slug)) && (
               <Badge variant="bestseller">{isRTL ? "الأكثر مبيعاً" : "Bestseller"}</Badge>
             )}
           </div>
