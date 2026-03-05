@@ -229,7 +229,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <HeroSlider settings={homeSettings.hero_slider} parallax />
 
       {/* Main content scrolls over the hero banner */}
-      <div className="relative z-10 rounded-t-3xl bg-white -mt-6">
+      <div className="relative z-10 rounded-t-[2.5rem] bg-[#f7f6f2] -mt-16 pt-8 shadow-[0_-10px_30px_rgba(0,0,0,0.15)]">
       {/* Banners - Top Position */}
       <BannersSection settings={homeSettings.banners} />
 
