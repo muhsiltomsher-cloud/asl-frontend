@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { X, MapPin } from "lucide-react";
 import { getCookie, setCookie } from "cookies-next";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -32,12 +32,22 @@ const getCurrencyForCountry = (countryCode: string): Currency => {
   return gulfCountryCurrencies[countryCode] || "USD";
 };
 
+const mobileQuery = "(max-width: 767px)";
+const subscribeMobile = (callback: () => void) => {
+  const mql = window.matchMedia(mobileQuery);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+};
+const getIsMobile = () => window.matchMedia(mobileQuery).matches;
+const getIsMobileServer = () => false;
+
 export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBannerProps) {
   const { currency, setCurrency, currencies } = useCurrency();
   const [isVisible, setIsVisible] = useState(false);
   const [suggestedCurrency, setSuggestedCurrency] = useState<Currency | null>(null);
   const [detectedCountry, setDetectedCountry] = useState<string>("");
   const [isGulfBanner, setIsGulfBanner] = useState(false);
+  const isMobile = useSyncExternalStore(subscribeMobile, getIsMobile, getIsMobileServer);
   const isRTL = locale === "ar";
 
   useEffect(() => {
@@ -191,10 +201,10 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
         // On mobile: position well above bottom area to avoid overlapping cookie consent banner
         // Cookie banner sits at bottom 4rem and is ~130px tall, so we need bottom ~216px+ to clear it
         isGulfBanner
-          ? "left-4 right-4 rounded-xl border md:left-1/2 md:right-auto md:-translate-x-1/2 md:max-w-sm"
-          : "left-4 right-4 rounded-xl border md:left-4 md:right-auto md:max-w-sm"
+          ? "bottom-20 left-4 right-4 rounded-xl border md:bottom-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:max-w-sm"
+          : "bottom-20 left-4 right-4 rounded-xl border md:bottom-4 md:left-4 md:right-auto md:max-w-sm"
       )}
-      style={{ bottom: "13.5rem", zIndex: 65 }}
+      style={isMobile ? { bottom: "13.5rem", zIndex: 65 } : { zIndex: 65 }}
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative px-4 py-3">
