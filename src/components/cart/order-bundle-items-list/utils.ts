@@ -64,10 +64,12 @@ function detectBundleItemFreeStatus(items: BundleItem[], orderItem: OrderLineIte
   const lineItemTotal = parseFloat(orderItem.total) || 0;
   if (lineItemTotal <= 0) return items;
 
+  // Multiply by parent order quantity since orderItem.total already includes it
+  const orderQty = orderItem.quantity || 1;
   const allItemsSum = items.reduce((sum, bi) => {
     const price = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
     const qty = bi.quantity || 1;
-    return sum + (price * qty);
+    return sum + (price * qty * orderQty);
   }, 0);
 
   // If the sum of bundle item prices exceeds the line item total,
