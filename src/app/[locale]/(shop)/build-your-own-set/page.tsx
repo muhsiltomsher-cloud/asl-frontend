@@ -61,7 +61,7 @@ export default async function BuildYourOwnSetPage({
   ]);
 
   return (
-    <div className="container mx-auto px-4 py-4">
+    <div className="container mx-auto px-4 py-2">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <Suspense fallback={<ProductGridSkeleton count={1} />}>

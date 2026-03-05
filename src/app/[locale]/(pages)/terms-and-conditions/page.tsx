@@ -36,7 +36,7 @@ export default async function TermsPage({ params }: TermsPageProps) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-4 md:py-6">
+    <div className="container mx-auto px-4 py-2 md:py-3">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <div className="mx-auto max-w-3xl">
