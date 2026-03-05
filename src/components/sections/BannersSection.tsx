@@ -36,7 +36,7 @@ export function BannersSectionSkeleton({ count = 2 }: { count?: number }) {
   };
 
   return (
-    <section className="bg-[#f7f6f2] py-8 md:py-12">
+    <section className="bg-[#f7f6f2] py-4 md:py-6">
       <div className="container mx-auto px-4">
         <div className={`grid gap-4 md:gap-6 ${getGridClass()}`}>
           {Array.from({ length: count }).map((_, i) => (
@@ -85,7 +85,7 @@ export function BannersSection({
   };
 
   return (
-    <section className={`bg-white py-8 md:py-12 ${className} ${getVisibilityClass()}`}>
+    <section className={`bg-white py-4 md:py-6 ${className} ${getVisibilityClass()}`}>
       <div className="container mx-auto px-4">
         <div className={`grid gap-4 md:gap-6 ${getGridClass()}`}>
           {settings.banners.map((banner, index) => {

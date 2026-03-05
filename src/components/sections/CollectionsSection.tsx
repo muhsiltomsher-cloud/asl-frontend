@@ -24,7 +24,7 @@ function CollectionCardSkeleton() {
 
 export function CollectionsSectionSkeleton({ count = 3 }: { count?: number }) {
   return (
-    <section className="bg-[#f7f6f2] py-12 md:py-16">
+    <section className="bg-[#f7f6f2] py-6 md:py-8">
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center md:mb-10">
           <Skeleton className="mx-auto h-8 w-48 md:h-9" />
@@ -68,7 +68,7 @@ export function CollectionsSection({
   };
 
   return (
-    <section className={`bg-white py-12 md:py-16 ${className} ${getVisibilityClass()}`}>
+    <section className={`bg-white py-6 md:py-8 ${className} ${getVisibilityClass()}`}>
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center md:mb-10">
           <h2 className="mb-2 text-2xl font-bold text-amber-900 md:text-3xl">
