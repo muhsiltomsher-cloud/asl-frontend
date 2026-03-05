@@ -400,8 +400,9 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                         {/* Bundled product sub-rows */}
                         {isBundle && bundleItems && bundleItems.map((bi, idx) => {
                           const biPrice = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
-                          const biQty = (bi.quantity || 1) * orderQuantity;
-                          const biTotal = biPrice * orderQuantity;
+                          const biBaseQty = bi.quantity || 1;
+                          const biQty = biBaseQty * orderQuantity;
+                          const biTotal = biPrice * biBaseQty * orderQuantity;
                           const biIsFree = bi.is_free === true;
                           const biIsAddon = bi.is_addon === true;
                           return (
