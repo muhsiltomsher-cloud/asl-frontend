@@ -422,6 +422,11 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                                         {isRTL ? "مجاني" : "FREE"}
                                       </span>
                                     )}
+                                    {productCategories[bi.product_id]?.length > 0 && (
+                                      <p className="text-xs text-gray-500">
+                                        {productCategories[bi.product_id].join(", ")}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
                               </td>
