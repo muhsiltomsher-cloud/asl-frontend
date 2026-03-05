@@ -414,7 +414,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                                     <p className="text-sm text-gray-700">
                                       {bi.name || `Product #${bi.product_id}`}
                                       {biIsAddon && (
-                                        <span className="text-xs text-amber-600 ml-1">({isRTL ? "إضافة" : "Add-on"})</span>
+                                        <span className={`text-xs text-amber-600 ${isRTL ? "mr-1" : "ml-1"}`}>({isRTL ? "إضافة" : "Add-on"})</span>
                                       )}
                                     </p>
                                     {biIsFree && (
