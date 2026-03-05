@@ -62,8 +62,8 @@ export default async function SearchPage({ params, searchParams }: SearchPagePro
 function SearchPageSkeleton() {
   return (
     <div className="min-h-screen bg-[#f7f6f2]">
-      <div className="container mx-auto px-4 py-2">
-        <div className="mb-2">
+      <div className="container mx-auto px-4 py-3">
+        <div className="mb-3">
           <div className="h-10 w-64 skeleton-shimmer rounded-lg" />
           <div className="mt-2 h-5 w-48 skeleton-shimmer rounded" />
         </div>

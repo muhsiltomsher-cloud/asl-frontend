@@ -65,10 +65,10 @@ export default async function BundleManagerPage({
   );
 
   return (
-    <div className="container mx-auto px-4 py-2">
+    <div className="container mx-auto px-4 py-3">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
-      <div className="mb-2">
+      <div className="mb-3">
         <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
           {isRTL ? "منشئ الحزم" : "Bundles Creator"}
         </h1>
