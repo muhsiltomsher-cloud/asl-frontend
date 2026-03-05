@@ -21,6 +21,11 @@ export function HeroSlider({ settings, parallax = false }: HeroSliderProps) {
   const { locale } = useParams<{ locale: string }>();
   const heroRef = useRef<HTMLDivElement>(null);
   const [heroHeight, setHeroHeight] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+  const rafRef = useRef<number>(0);
+
+  // Parallax speed factor: 0 = fixed, 1 = normal scroll, 0.4 = moves at 40% of scroll speed
+  const PARALLAX_SPEED = 0.4;
 
   useEffect(() => {
     if (!parallax || !heroRef.current) return;
@@ -37,6 +42,23 @@ export function HeroSlider({ settings, parallax = false }: HeroSliderProps) {
     observer.observe(heroRef.current);
 
     return () => observer.disconnect();
+  }, [parallax]);
+
+  useEffect(() => {
+    if (!parallax) return;
+
+    const handleScroll = () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        setScrollY(window.scrollY);
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [parallax]);
 
   if (!settings.enabled || settings.slides.length === 0) {
@@ -123,7 +145,11 @@ export function HeroSlider({ settings, parallax = false }: HeroSliderProps) {
   if (parallax) {
     return (
       <div style={{ height: heroHeight > 0 ? heroHeight : "100svh" }} className={getVisibilityClass()}>
-        <div ref={heroRef} className="fixed top-0 left-0 right-0 z-0 w-full">
+        <div
+          ref={heroRef}
+          className="fixed top-0 left-0 right-0 z-0 w-full will-change-transform"
+          style={{ transform: `translate3d(0, ${-scrollY * PARALLAX_SPEED}px, 0)` }}
+        >
           <section className="relative w-full">
             <Swiper
               modules={[Autoplay, Pagination, Navigation]}
