@@ -722,8 +722,8 @@ export async function getBundleConfig(
       url,
       {
         next: {
-          revalidate: 60,
-          tags: ["bundle-config", `bundle-config-${productSlug}`, locale ? `bundle-config-${productSlug}-${locale}` : ""].filter(Boolean),
+            revalidate: 300, // Bundle config rarely changes - cache for 5 minutes
+            tags: ["bundle-config", `bundle-config-${productSlug}`, locale ? `bundle-config-${productSlug}-${locale}` : ""].filter(Boolean),
         },
       }
     );
@@ -801,7 +801,7 @@ export async function getFreeGiftProductInfo(currency?: string): Promise<FreeGif
 
     const response = await fetch(url, {
       next: {
-        revalidate: 60,
+        revalidate: 600, // Free gift rules rarely change - cache for 10 minutes
         tags: ["free-gifts"],
       },
     });
@@ -883,7 +883,7 @@ export async function getHiddenProductIds(): Promise<number[]> {
         Authorization: `Basic ${Buffer.from(`${process.env.WC_CONSUMER_KEY}:${process.env.WC_CONSUMER_SECRET}`).toString("base64")}`,
       },
       next: {
-        revalidate: 300,
+        revalidate: 600, // Hidden products rarely change - cache for 10 minutes
         tags: ["products", "hidden-products"],
       },
     });
