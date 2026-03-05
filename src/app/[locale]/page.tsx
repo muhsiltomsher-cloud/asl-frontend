@@ -225,9 +225,11 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* H1 tag for SEO - visually hidden but accessible to search engines */}
       <h1 className="sr-only">{h1Text}</h1>
 
-      {/* Hero Slider */}
-      <HeroSlider settings={homeSettings.hero_slider} />
+      {/* Hero Slider - Parallax: stays fixed while content scrolls over */}
+      <HeroSlider settings={homeSettings.hero_slider} parallax />
 
+      {/* Main content scrolls over the hero banner */}
+      <div className="relative z-10">
       {/* Banners - Top Position */}
       <BannersSection settings={homeSettings.banners} />
 
@@ -455,6 +457,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }
