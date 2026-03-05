@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { User, Package, MapPin, Heart, Settings, LogOut, X, ChevronRight, Globe, ChevronDown, Check, Coins } from "lucide-react";
+import { User, Package, MapPin, Heart, Settings, LogOut, X, ChevronRight, Globe, ChevronDown, Check, Coins, Info, Truck, RotateCcw, Shield, FileText, Store } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -219,6 +219,40 @@ export function AccountDrawer({
     </div>
   );
 
+  // Footer quick links for mobile (excluding Home and Shop which are in bottom bar)
+  const footerLinks = [
+    { icon: Info, label: locale === "en" ? "About Us" : "من نحن", href: `/${locale}/about` },
+    { icon: MapPin, label: locale === "en" ? "Contact" : "اتصل بنا", href: `/${locale}/contact` },
+    { icon: Store, label: locale === "en" ? "Store Locator" : "مواقع المتاجر", href: `/${locale}/store-locator` },
+    { icon: FileText, label: locale === "en" ? "FAQ" : "الأسئلة الشائعة", href: `/${locale}/faq` },
+    { icon: Truck, label: locale === "en" ? "Shipping" : "معلومات الشحن", href: `/${locale}/shipping` },
+    { icon: RotateCcw, label: locale === "en" ? "Returns" : "سياسة الإرجاع", href: `/${locale}/returns` },
+    { icon: Shield, label: locale === "en" ? "Privacy Policy" : "سياسة الخصوصية", href: `/${locale}/privacy` },
+    { icon: FileText, label: locale === "en" ? "Terms & Conditions" : "الشروط والأحكام", href: `/${locale}/terms-and-conditions` },
+  ];
+
+  const renderFooterLinksSection = () => (
+    <div className="border-t border-gray-200 py-2">
+      <p className="px-5 pt-3 pb-1 text-xs font-medium uppercase tracking-wider text-gray-400">
+        {locale === "en" ? "Quick Links" : "روابط سريعة"}
+      </p>
+      <ul>
+        {footerLinks.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              onClick={onClose}
+              className="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+            >
+              <link.icon className="h-4 w-4 flex-shrink-0 text-gray-400" />
+              <span>{link.label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+
   const renderSettingsSection = () => (
     <div className="border-t border-gray-200">
       {/* Language Switcher Row */}
@@ -369,6 +403,7 @@ export function AccountDrawer({
               ? renderAuthenticatedContent()
               : renderGuestContent()}
           </div>
+          {renderFooterLinksSection()}
           {!hideSettingsSection && renderSettingsSection()}
         </Box>
       </Box>

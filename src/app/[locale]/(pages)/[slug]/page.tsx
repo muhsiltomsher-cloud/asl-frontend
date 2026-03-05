@@ -77,10 +77,10 @@ export default async function DynamicPage({ params }: DynamicPageProps) {
   const breadcrumbItems = [{ name: pageTitle, href: `/${locale}/${slug}` }];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-3">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
-      <div className="mb-12 text-center">
+      <div className="mb-4 text-center">
         <h1 className="mb-4 text-4xl font-bold text-gray-900">{pageTitle}</h1>
         {page.excerpt.rendered && (
           <p className="mx-auto max-w-2xl text-lg text-gray-600">

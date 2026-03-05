@@ -36,7 +36,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
+    <div className="container mx-auto px-4 py-3 md:py-4">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <div className="mx-auto max-w-3xl">

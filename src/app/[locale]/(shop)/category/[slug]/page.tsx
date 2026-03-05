@@ -4,7 +4,7 @@ import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getCategoryBySlug, getProductsByCategory, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs, getEnglishSlugFromLocalizedSlug } from "@/lib/api/woocommerce";
+import { getCategoryBySlug, getProductsByCategory, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs, getEnglishSlugFromLocalizedSlug, BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { CategoryClient } from "./CategoryClient";
@@ -117,9 +117,32 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   // Use both ID and slug matching to handle WPML translations (different IDs per locale)
   const giftProductSlugsSet = new Set(giftProductInfo.slugs);
   const giftProductIdsSet = new Set(giftProductInfo.ids);
-  const products = allProducts.filter(
+  const filteredProducts = allProducts.filter(
     (product) => !giftProductIdsSet.has(product.id) && !giftProductSlugsSet.has(product.slug)
   );
+
+  // Sort products: bestsellers first (by tag), then apply category-specific ordering
+  const bestssellerSlugsSet = new Set(BESTSELLER_PRODUCT_SLUGS);
+  const isPersonalCare = slug === "personal-care";
+
+  const products = [...filteredProducts].sort((a, b) => {
+    const aIsBestseller = a.tags?.some(tag => tag.slug === "bestseller") || bestssellerSlugsSet.has(a.slug);
+    const bIsBestseller = b.tags?.some(tag => tag.slug === "bestseller") || bestssellerSlugsSet.has(b.slug);
+
+    // Bestsellers always come first
+    if (aIsBestseller && !bIsBestseller) return -1;
+    if (!aIsBestseller && bIsBestseller) return 1;
+
+    // For Personal Care: "Hair & Body Mist" subcategory items come first (after bestsellers)
+    if (isPersonalCare && !aIsBestseller && !bIsBestseller) {
+      const aIsHairBodyMist = a.categories?.some(cat => { try { return cat.slug === "hair-body-mist" || decodeURIComponent(cat.slug).includes("hair-body-mist"); } catch { return false; } });
+      const bIsHairBodyMist = b.categories?.some(cat => { try { return cat.slug === "hair-body-mist" || decodeURIComponent(cat.slug).includes("hair-body-mist"); } catch { return false; } });
+      if (aIsHairBodyMist && !bIsHairBodyMist) return -1;
+      if (!aIsHairBodyMist && bIsHairBodyMist) return 1;
+    }
+
+    return 0; // Keep original order for items in the same group
+  });
 
     const breadcrumbItems = [
       { name: dictionary.common.shop, href: `/${locale}/shop` },
@@ -127,10 +150,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-3">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
-      <div className="mb-8">
+      <div className="mb-3">
         <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">{decodeHtmlEntities(category.name)}</h1>
       </div>
 

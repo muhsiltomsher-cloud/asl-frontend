@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { X, Cookie } from "lucide-react";
 import { getCookie, setCookie } from "cookies-next";
 import { cn } from "@/lib/utils";
@@ -11,8 +11,18 @@ interface CookieConsentBannerProps {
 
 const COOKIE_CONSENT_KEY = "asl_cookie_consent";
 
+const mobileQuery = "(max-width: 767px)";
+const subscribeMobile = (callback: () => void) => {
+  const mql = window.matchMedia(mobileQuery);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+};
+const getIsMobile = () => window.matchMedia(mobileQuery).matches;
+const getIsMobileServer = () => false;
+
 export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useSyncExternalStore(subscribeMobile, getIsMobile, getIsMobileServer);
   const isRTL = locale === "ar";
 
   useEffect(() => {
@@ -72,9 +82,10 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
     <div
       className={cn(
         "fixed bottom-0 left-0 right-0 z-[60] transform transition-all duration-300 ease-out",
-        "bg-white border-t border-gray-200 shadow-lg",
+        "bg-white border-t border-gray-200 shadow-lg rounded-t-xl",
         "md:bottom-4 md:left-auto md:right-4 md:rounded-xl md:border md:max-w-md"
       )}
+      style={isMobile ? { bottom: "4rem" } : undefined}
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="relative px-4 py-4 md:px-5 md:py-4">

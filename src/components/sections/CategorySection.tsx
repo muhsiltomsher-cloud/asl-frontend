@@ -44,7 +44,7 @@ function CategoryCardSkeleton() {
 
 export function CategorySectionSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <section className="bg-[#f7f6f2] py-12 md:py-16">
+    <section className="bg-[#f7f6f2] py-6 md:py-8">
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center md:mb-10">
           <Skeleton className="mx-auto h-8 w-48 md:h-9" />
@@ -103,7 +103,7 @@ export function CategorySection({
   };
 
   return (
-    <section className={`bg-[#eae5d9] py-12 md:py-16 ${className} ${getVisibilityClass()}`}>
+    <section className={`bg-[#eae5d9] py-6 md:py-8 ${className} ${getVisibilityClass()}`}>
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center justify-between md:mb-10">
           <div className="text-center w-full md:text-left md:w-auto">

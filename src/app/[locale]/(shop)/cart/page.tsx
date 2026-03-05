@@ -212,7 +212,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen pb-32 md:pb-8" style={{ backgroundColor: '#F5F0E8' }}>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-3">
         <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
         {/* Login Status Indicator */}

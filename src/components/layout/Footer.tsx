@@ -93,8 +93,8 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
+          {/* Quick Links - hidden on mobile, shown in account drawer instead */}
+          <div className="hidden md:block">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-900 md:mb-4">
               {dictionary.footer.quickLinks}
             </h3>
@@ -112,8 +112,8 @@ export function Footer({ locale, dictionary, siteSettings }: FooterProps) {
             </ul>
           </div>
 
-          {/* Customer Service */}
-          <div>
+          {/* Customer Service - hidden on mobile, shown in account drawer instead */}
+          <div className="hidden md:block">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-900 md:mb-4">
               {dictionary.footer.customerService}
             </h3>

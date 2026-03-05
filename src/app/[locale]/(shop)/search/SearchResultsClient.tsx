@@ -120,7 +120,7 @@ export function SearchResultsClient({
       {/* Hero Search Section */}
       <div className="relative overflow-hidden bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900">
         <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
-        <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="container mx-auto px-4 py-4 md:py-5">
           <div className="relative z-10 mx-auto max-w-3xl text-center">
             <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">
               {query ? (
@@ -176,7 +176,7 @@ export function SearchResultsClient({
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-3">
         {/* Back to Shop Link */}
         {query && products.length > 0 && (
           <div className="mb-6">

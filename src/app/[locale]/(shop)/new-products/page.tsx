@@ -55,10 +55,10 @@ export default async function NewProductsPage({ params }: NewProductsPageProps) 
   const filteredTotal = productsResult.total - (productsResult.products.length - filteredProducts.length);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-3">
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
-      <div className="mb-8">
+      <div className="mb-3">
         <h1 className="text-3xl font-bold text-gray-900">
           {dictionary.sections.newProducts.title}
         </h1>

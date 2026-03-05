@@ -86,10 +86,17 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
   return (
     <>
       <nav className={`fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] xl:hidden transition-transform duration-200 ${isKeyboardVisible ? "translate-y-full" : "translate-y-0"}`}>
-        <div className="flex h-16 items-center justify-around px-2 pb-safe">
+        <div className="flex items-center justify-around px-3 py-2 pb-safe">
           {settings.items.map((item, index) => {
             const IconComponent = iconMap[item.icon] || Home;
-            const label = isRTL && item.labelAr ? item.labelAr : item.label;
+            // Override "Categories" label with "Menu" / "القائمة"
+            // Also handled server-side in getMobileBarSettings for SSR consistency
+            const rawLabel = isRTL && item.labelAr ? item.labelAr : item.label;
+            const isCategoriesItem = item.icon === "grid" || item.url.includes("categories") || 
+              item.label?.toLowerCase() === "categories" || item.labelAr === "الفئات";
+            const label = isCategoriesItem
+              ? (isRTL ? "القائمة" : "Menu")
+              : rawLabel;
             const href = item.url.startsWith("/") ? `/${locale}${item.url}` : item.url || `/${locale}`;
 
             const isWishlist = item.icon === "heart" || item.url.includes("wishlist");
@@ -100,7 +107,7 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
                                  item.url.includes("categories") || item.url.includes("account");
 
             const activeClasses = isActive 
-              ? "text-[#C4885B] bg-amber-50/50 rounded-xl" 
+              ? "text-[#C4885B]" 
               : "text-gray-600";
 
             if (isDrawerItem) {

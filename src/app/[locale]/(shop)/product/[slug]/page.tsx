@@ -193,7 +193,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     return (
       <>
         <JsonLd data={getProductJsonLdData(product, locale, slug)} />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-3">
           <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
           <BuildYourOwnSetClient
             products={bundleProducts}

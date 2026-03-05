@@ -225,9 +225,11 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* H1 tag for SEO - visually hidden but accessible to search engines */}
       <h1 className="sr-only">{h1Text}</h1>
 
-      {/* Hero Slider */}
-      <HeroSlider settings={homeSettings.hero_slider} />
+      {/* Hero Slider - Parallax: stays fixed while content scrolls over */}
+      <HeroSlider settings={homeSettings.hero_slider} parallax />
 
+      {/* Main content scrolls over the hero banner */}
+      <div className={`relative z-10 bg-[#f7f6f2] ${homeSettings.hero_slider.enabled && homeSettings.hero_slider.slides.length > 0 ? 'rounded-t-[2.5rem] -mt-16 pt-4 shadow-[0_-10px_30px_rgba(0,0,0,0.15)]' : ''}`}>
       {/* Banners - Top Position */}
       <BannersSection settings={homeSettings.banners} />
 
@@ -283,13 +285,13 @@ export default async function HomePage({ params }: HomePageProps) {
       <CollectionsSection settings={collectionsSettings} />
 
       {/* Why Choose Us Section */}
-      <section className="relative overflow-hidden bg-white py-14 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-10 text-center md:mb-14">
-            <div className="mb-4 flex items-center justify-center gap-4">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
-                {isRTL ? "تميزنا" : "Our Promise"}
+            <section className="relative overflow-hidden bg-white py-7 md:py-10">
+              <div className="container mx-auto px-4">
+                <div className="mb-5 text-center md:mb-7">
+                  <div className="mb-4 flex items-center justify-center gap-4">
+                    <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+                    <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                      {isRTL ? "تميزنا" : "Our Promise"}
               </span>
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
             </div>
@@ -315,7 +317,7 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* About Section - Creative Design */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-[#f7f6f2] to-stone-50 py-16 md:py-24">
+      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-[#f7f6f2] to-stone-50 py-8 md:py-12">
         {/* Decorative background elements */}
         <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-amber-100/40 blur-3xl" />
         <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-stone-100/60 blur-3xl" />
@@ -397,10 +399,10 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* FAQ Section with JSON-LD */}
-      <section className="relative overflow-hidden bg-white py-14 md:py-20">
-        <JsonLd data={generateFAQJsonLd(dictionary.sections.faq.items)} />
-        <div className="container mx-auto px-4">
-          <div className="mb-10 text-center md:mb-14">
+            <section className="relative overflow-hidden bg-white py-7 md:py-10">
+              <JsonLd data={generateFAQJsonLd(dictionary.sections.faq.items)} />
+              <div className="container mx-auto px-4">
+                <div className="mb-5 text-center md:mb-7">
             <div className="mb-4 flex items-center justify-center gap-4">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
               <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
@@ -434,7 +436,7 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* SEO Content Section */}
-      <section className="bg-gradient-to-b from-[#f7f6f2] to-amber-50/30 py-12 md:py-16">
+      <section className="bg-gradient-to-b from-[#f7f6f2] to-amber-50/30 py-6 md:py-8">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl">
             <h2 className="mb-6 text-center text-2xl font-bold text-amber-900 md:text-3xl">
@@ -455,6 +457,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
         </div>
       </section>
+      </div>
     </div>
   );
 }
