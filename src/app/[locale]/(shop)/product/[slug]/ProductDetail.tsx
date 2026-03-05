@@ -858,13 +858,16 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
             {product.tags?.some(tag => tag.slug === "ramadan-special") && (
               <Badge variant="special">{isRTL ? "عرض رمضان" : "Ramadan Special"}</Badge>
             )}
+            {product.tags?.some(tag => tag.slug === "bestseller") && (
+              <Badge variant="bestseller">{isRTL ? "الأكثر مبيعاً" : "Bestseller"}</Badge>
+            )}
           </div>
 
 
           {/* Notes / key info shown under price */}
           {product.description && sanitizeProductDescription(product.description) && (
             <div
-              className="prose prose-sm max-w-none text-gray-600 [&_a]:underline"
+              className="prose prose-sm max-w-none text-gray-600 [&_a]:underline [&_p]:mb-2 [&_p]:leading-relaxed break-words overflow-hidden"
               dangerouslySetInnerHTML={{ __html: sanitizeProductDescription(product.description) }}
             />
           )}
@@ -996,22 +999,22 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
             >
               <div className="space-y-2 text-sm">
                 {primaryCategory && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">{isRTL ? "الفئة" : "Category"}</span>
-                    <span className="text-gray-900">{decodeHtmlEntities(primaryCategory.name)}</span>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500 shrink-0">{isRTL ? "الفئة" : "Category"}</span>
+                    <span className="text-gray-900 text-right">{decodeHtmlEntities(primaryCategory.name)}</span>
                   </div>
                 )}
                 {product.sku && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">{isRTL ? "رمز المنتج" : "SKU"}</span>
-                    <span className="text-gray-900">{product.sku}</span>
+                  <div className="flex justify-between gap-4">
+                    <span className="text-gray-500 shrink-0">{isRTL ? "رمز المنتج" : "SKU"}</span>
+                    <span className="text-gray-900 text-right">{product.sku}</span>
                   </div>
                 )}
                 {product.attributes && product.attributes.length > 0 && (
                   product.attributes.map((attr) => (
-                    <div key={attr.id} className="flex justify-between">
-                      <span className="text-gray-500">{decodeHtmlEntities(attr.name)}</span>
-                      <span className="text-gray-900">{attr.terms?.map(t => decodeHtmlEntities(t.name)).join(", ")}</span>
+                    <div key={attr.id} className="flex justify-between gap-4">
+                      <span className="text-gray-500 shrink-0">{decodeHtmlEntities(attr.name)}</span>
+                      <span className="text-gray-900 text-right">{attr.terms?.map(t => decodeHtmlEntities(t.name)).join(", ")}</span>
                     </div>
                   ))
                 )}

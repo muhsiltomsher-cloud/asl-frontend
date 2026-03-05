@@ -127,6 +127,11 @@ export function WCProductCard({
                 {isRTL ? "عرض رمضان" : "Ramadan Special"}
               </Badge>
             )}
+            {product.tags?.some(tag => tag.slug === "bestseller") && (
+              <Badge variant="bestseller" className="shadow-sm">
+                {isRTL ? "الأكثر مبيعاً" : "Bestseller"}
+              </Badge>
+            )}
             {product.on_sale && (
               <Badge variant="error" className="shadow-sm">
                 {isRTL ? "تخفيض" : "Sale"}
