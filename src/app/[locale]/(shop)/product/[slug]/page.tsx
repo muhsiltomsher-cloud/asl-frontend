@@ -144,29 +144,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
   }
   
   // For English slugs, fetch the product with the current locale for localized content
-  const product = await getProductBySlug(slug, locale as Locale);
+  // Also start fetching hidden IDs, bundle config, and topbar settings in parallel
+  // This eliminates the waterfall of sequential API calls
+  const [product, hiddenGiftProductIds, hiddenCatalogProductIds, bundleConfig, topbarSettings] = await Promise.all([
+    getProductBySlug(slug, locale as Locale),
+    getFreeGiftProductIds(),
+    getHiddenProductIds(),
+    getBundleConfig(slug, locale as Locale),
+    getTopbarSettings(),
+  ]);
 
   if (!product) {
     notFound();
   }
 
-  // Fetch hidden product IDs (free gifts and products with catalog_visibility=hidden) in parallel
-  const [hiddenGiftProductIds, hiddenCatalogProductIds] = await Promise.all([
-    getFreeGiftProductIds(),
-    getHiddenProductIds(),
-  ]);
-  
   // Check if this product is a hidden gift product or has hidden catalog visibility
   // If so, return 404 to prevent direct URL access
   if (hiddenGiftProductIds.includes(product.id) || hiddenCatalogProductIds.includes(product.id)) {
     notFound();
   }
 
-  // Fetch topbar settings and bundle config in parallel
-  const [bundleConfig, topbarSettings] = await Promise.all([
-    getBundleConfig(slug, locale as Locale),
-    getTopbarSettings(),
-  ]);
   const freeShippingThreshold = topbarSettings.freeShippingThreshold;
   
   // If bundle is enabled for this product, show the bundle builder inline
@@ -207,8 +204,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     );
   }
 
-  // Fetch related products, addon forms, English product, and linked product IDs in parallel
-  const [relatedProductsRaw, productAddons, englishProduct, linkedIds] = await Promise.all([
+  // Fetch ALL remaining data in a single parallel batch:
+  // related products, addon forms, English product, upsell IDs, and category slug
+  // This replaces 3 sequential stages with 1 parallel stage
+  const primaryCategory = product.categories?.[0];
+  const [relatedProductsRaw, productAddons, englishProduct, linkedIds, categorySlugFromId] = await Promise.all([
     getRelatedProducts(product, {
       per_page: 12,
       locale: locale as Locale,
@@ -216,6 +216,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     getProductAddons(product.id, { locale: locale as Locale }),
     getProductBySlug(slug, "en"),
     getProductUpsellIds(product.id, locale as Locale),
+    // Pre-fetch the English category slug in parallel (saves a sequential call later)
+    primaryCategory?.id
+      ? getEnglishSlugForCategory(primaryCategory.id, locale as Locale)
+      : Promise.resolve(null),
   ]);
 
   // Filter out hidden products from related products (free gifts and products with catalog_visibility=hidden)
@@ -225,29 +229,24 @@ export default async function ProductPage({ params }: ProductPageProps) {
   );
 
   // Fetch upsell products if any are configured in WooCommerce Linked Products
-  const upsellProducts = linkedIds.upsell_ids.length > 0
-    ? (await getProductsByIds(linkedIds.upsell_ids, locale as Locale)).filter(
-        (p) => !hiddenProductIdsSet.has(p.id)
-      )
-    : [];
+  // Get the English category slug from the English product or pre-fetched value
+  const englishCategorySlugFromProduct = englishProduct?.categories?.[0]?.slug || null;
+  const englishCategorySlug = englishCategorySlugFromProduct || categorySlugFromId;
 
-  // Get the English category slug from the English product
-  // If the English product doesn't exist (WPML assigns different slugs per locale),
-  // fall back to getting the English slug from the localized category ID
-  let englishCategorySlug = englishProduct?.categories?.[0]?.slug || null;
-  
-  // If we couldn't get the English slug from the English product,
-  // try to get it from the localized category using getEnglishSlugForCategory
-  const primaryCategory = product.categories?.[0];
-  if (!englishCategorySlug && primaryCategory?.id) {
-    englishCategorySlug = await getEnglishSlugForCategory(primaryCategory.id, locale as Locale);
-  }
+  // Fetch upsell products and localized category in parallel
+  const [upsellProductsRaw, localizedCategory] = await Promise.all([
+    linkedIds.upsell_ids.length > 0
+      ? getProductsByIds(linkedIds.upsell_ids, locale as Locale)
+      : Promise.resolve([]),
+    englishCategorySlug
+      ? getCategoryBySlug(englishCategorySlug, locale as Locale)
+      : Promise.resolve(null),
+  ]);
 
-  // Fetch the localized category to get the properly localized category name
-  // The category name embedded in the product response may not be properly localized
-  const localizedCategory = englishCategorySlug 
-    ? await getCategoryBySlug(englishCategorySlug, locale as Locale)
-    : null;
+  const upsellProducts = upsellProductsRaw.filter(
+    (p) => !hiddenProductIdsSet.has(p.id)
+  );
+
   const localizedCategoryName = localizedCategory?.name || primaryCategory?.name || null;
 
   const breadcrumbJsonLd = generateBreadcrumbJsonLd([

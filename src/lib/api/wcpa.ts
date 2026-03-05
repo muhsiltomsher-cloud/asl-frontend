@@ -31,7 +31,7 @@ export async function getProductAddons(
 
     const response = await fetch(url, {
       next: {
-        revalidate: 60,
+        revalidate: 300, // Addon forms rarely change - cache for 5 minutes
         tags: ["product-addons", `product-addons-${productId}`],
       },
     });
