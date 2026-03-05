@@ -852,12 +852,19 @@ export async function getMobileBarSettings(locale?: Locale): Promise<MobileBarSe
 
   // Use default items if no items are configured
   const items = hasConfiguredItems
-    ? data.items.map((item) => ({
-        icon: item.icon || "",
-        label: item.label || "",
-        labelAr: item.labelAr || "",
-        url: item.url || "",
-      }))
+    ? data.items.map((item) => {
+        // Override "Categories" label with "Menu" / "القائمة"
+        const isCategoriesItem = item.icon === "grid" || 
+          (item.url && item.url.includes("categories")) || 
+          item.label?.toLowerCase() === "categories" || 
+          item.labelAr === "الفئات";
+        return {
+          icon: item.icon || "",
+          label: isCategoriesItem ? "Menu" : (item.label || ""),
+          labelAr: isCategoriesItem ? "القائمة" : (item.labelAr || ""),
+          url: item.url || "",
+        };
+      })
     : defaultMobileBarItems;
 
   return {

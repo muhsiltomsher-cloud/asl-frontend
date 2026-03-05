@@ -90,8 +90,11 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
           {settings.items.map((item, index) => {
             const IconComponent = iconMap[item.icon] || Home;
             // Override "Categories" label with "Menu" / "القائمة"
+            // Also handled server-side in getMobileBarSettings for SSR consistency
             const rawLabel = isRTL && item.labelAr ? item.labelAr : item.label;
-            const label = (item.icon === "grid" || item.url.includes("categories"))
+            const isCategoriesItem = item.icon === "grid" || item.url.includes("categories") || 
+              item.label?.toLowerCase() === "categories" || item.labelAr === "الفئات";
+            const label = isCategoriesItem
               ? (isRTL ? "القائمة" : "Menu")
               : rawLabel;
             const href = item.url.startsWith("/") ? `/${locale}${item.url}` : item.url || `/${locale}`;
