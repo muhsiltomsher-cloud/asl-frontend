@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Package, Printer, Gift } from "lucide-react";
@@ -12,7 +12,7 @@ import { AccountEmptyState } from "@/components/account/AccountEmptyState";
 import { OrderPrice } from "@/components/common/OrderPrice";
 import { AEDIcon } from "@/components/common/AEDIcon";
 import { getOrder, formatDate, getOrderDate, type Order } from "@/lib/api/customer";
-import { OrderBundleItemsList, isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
+import { isOrderBundleProduct, isOrderFreeGift, getOrderBundleItems } from "@/components/cart/OrderBundleItemsList";
 import { siteConfig } from "@/config/site";
 
 interface InvoicePageProps {
@@ -326,71 +326,177 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                   {order.line_items.map((item) => {
                     const isFreeGift = isOrderFreeGift(item);
                     const isBundle = isOrderBundleProduct(item);
+                    const rawBundleItems = isBundle ? getOrderBundleItems(item) : null;
+                    const orderQuantity = item.quantity || 1;
+                    
+                    // Ensure free item detection runs — fallback in case the
+                    // imported util returned items without is_free enrichment
+                    let bundleItems = rawBundleItems;
+                    if (bundleItems && bundleItems.length > 0) {
+                      const hasAnyFreeFlag = bundleItems.some(bi => bi.is_free === true || bi.is_free === false);
+                      if (!hasAnyFreeFlag) {
+                        const lineTotal = parseFloat(item.total) || 0;
+                        if (lineTotal > 0) {
+                          const oQty = item.quantity || 1;
+                          const sumAll = bundleItems.reduce((s, bi) => {
+                            const p = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+                            const q = bi.quantity || 1;
+                            return s + (p * q * oQty);
+                          }, 0);
+                          const freeAmt = sumAll - lineTotal;
+                          if (freeAmt > 0.01) {
+                            let rem = freeAmt;
+                            const enriched = [...bundleItems];
+                            for (let i = enriched.length - 1; i >= 0 && rem > 0.01; i--) {
+                              const p = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : (enriched[i].price || 0);
+                              const q = enriched[i].quantity || 1;
+                              const iTotal = p * q * oQty;
+                              if (iTotal > 0 && iTotal <= rem + 0.01) {
+                                enriched[i] = { ...enriched[i], is_free: true, is_addon: true };
+                                rem -= iTotal;
+                              }
+                            }
+                            bundleItems = enriched;
+                          }
+                        }
+                      }
+                    }
                     
                     return (
-                      <tr key={item.id}>
-                        <td className={`py-4 ${isRTL ? "text-right" : "text-left"}`}>
-                          <div className="flex items-center gap-3">
-                            {item.image?.src && (
-                              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-gray-100 print:hidden">
-                                <Image
-                                  src={item.image.src}
-                                  alt={item.name}
-                                  fill
-                                  className="object-cover"
-                                />
+                      <React.Fragment key={item.id}>
+                        {/* Main product row */}
+                        <tr>
+                          <td className={`py-4 ${isRTL ? "text-right" : "text-left"}`}>
+                            <div className="flex items-center gap-3">
+                              {item.image?.src && (
+                                <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded bg-gray-100 print:hidden">
+                                  <Image
+                                    src={item.image.src}
+                                    alt={item.name}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-medium text-gray-900">{item.name}</p>
+                                {productCategories[item.product_id]?.length > 0 && (
+                                  <p className="text-xs text-gray-500">
+                                    {productCategories[item.product_id].join(", ")}
+                                  </p>
+                                )}
+                                {isFreeGift && (
+                                  <span className="inline-flex items-center gap-1 text-xs text-amber-600">
+                                    <Gift className="h-3 w-3" />
+                                    {t.freeGift}
+                                  </span>
+                                )}
+                                {isBundle && bundleItems && bundleItems.length > 0 && (
+                                  <p className="text-xs text-amber-600 mt-1">
+                                    {isRTL ? `يحتوي على ${bundleItems.length} منتجات` : `Contains ${bundleItems.length} products`}
+                                  </p>
+                                )}
                               </div>
-                            )}
-                            <div>
-                              <p className="font-medium text-gray-900">{item.name}</p>
-                              {productCategories[item.product_id]?.length > 0 && (
-                                <p className="text-xs text-gray-500">
-                                  {productCategories[item.product_id].join(", ")}
-                                </p>
-                              )}
-                              {isFreeGift && (
-                                <span className="inline-flex items-center gap-1 text-xs text-amber-600">
-                                  <Gift className="h-3 w-3" />
-                                  {t.freeGift}
-                                </span>
-                              )}
-                              {isBundle && (
-                                <OrderBundleItemsList item={item} locale={locale} compact={true} showPrices={true} />
-                              )}
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 text-center text-gray-600">
-                          {item.quantity}
-                        </td>
-                        <td className={`py-4 ${isRTL ? "text-left" : "text-right"} text-gray-600`}>
-                          {isFreeGift ? (
-                            <span className="text-amber-600">-</span>
-                          ) : (
-                            <OrderPrice 
-                              price={item.price} 
-                              orderCurrency={order.currency} 
-                              orderCurrencySymbol={order.currency_symbol}
-                              iconSize="xs"
-                            />
-                          )}
-                        </td>
-                        <td className={`py-4 ${isRTL ? "text-left" : "text-right"} font-medium text-gray-900`}>
-                          {isFreeGift ? (
-                            <span className="text-amber-600 inline-flex items-center gap-1">
-                              {order.currency === "AED" ? <AEDIcon size="xs" /> : <span>{order.currency_symbol}</span>}
-                              0.00
-                            </span>
-                          ) : (
-                            <OrderPrice 
-                              price={item.total} 
-                              orderCurrency={order.currency} 
-                              orderCurrencySymbol={order.currency_symbol}
-                              iconSize="xs"
-                            />
-                          )}
-                        </td>
-                      </tr>
+                          </td>
+                          <td className="py-4 text-center text-gray-600">
+                            {item.quantity}
+                          </td>
+                          <td className={`py-4 ${isRTL ? "text-left" : "text-right"} text-gray-600`}>
+                            {isFreeGift ? (
+                              <span className="text-amber-600">-</span>
+                            ) : (
+                              <OrderPrice 
+                                price={item.price} 
+                                orderCurrency={order.currency} 
+                                orderCurrencySymbol={order.currency_symbol}
+                                iconSize="xs"
+                              />
+                            )}
+                          </td>
+                          <td className={`py-4 ${isRTL ? "text-left" : "text-right"} font-medium text-gray-900`}>
+                            {isFreeGift ? (
+                              <span className="text-amber-600 inline-flex items-center gap-1">
+                                {order.currency === "AED" ? <AEDIcon size="xs" /> : <span>{order.currency_symbol}</span>}
+                                0.00
+                              </span>
+                            ) : (
+                              <OrderPrice 
+                                price={item.total} 
+                                orderCurrency={order.currency} 
+                                orderCurrencySymbol={order.currency_symbol}
+                                iconSize="xs"
+                              />
+                            )}
+                          </td>
+                        </tr>
+                        {/* Bundled product sub-rows */}
+                        {isBundle && bundleItems && bundleItems.map((bi, idx) => {
+                          const biPrice = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+                          const biBaseQty = bi.quantity || 1;
+                          const biQty = biBaseQty * orderQuantity;
+                          const biTotal = biPrice * biBaseQty * orderQuantity;
+                          const biIsFree = bi.is_free === true;
+                          const biIsAddon = bi.is_addon === true;
+                          return (
+                            <tr key={`${item.id}-bundle-${bi.product_id}-${idx}`} className="bg-gray-50/50">
+                              <td className={`py-2 ${isRTL ? "text-right pr-8" : "text-left pl-8"}`}>
+                                <div className="flex items-center gap-2">
+                                  <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${biIsFree ? "bg-green-500" : biIsAddon ? "bg-amber-600" : "bg-amber-500"}`}></span>
+                                  <div>
+                                    <p className="text-sm text-gray-700">
+                                      {bi.name || `Product #${bi.product_id}`}
+                                      {biIsAddon && (
+                                        <span className={`text-xs text-amber-600 ${isRTL ? "mr-1" : "ml-1"}`}>({isRTL ? "إضافة" : "Add-on"})</span>
+                                      )}
+                                    </p>
+                                    {biIsFree && (
+                                      <span className="text-xs font-medium text-green-600">
+                                        {isRTL ? "مجاني" : "FREE"}
+                                      </span>
+                                    )}
+                                    {productCategories[bi.product_id]?.length > 0 && (
+                                      <p className="text-xs text-gray-500">
+                                        {productCategories[bi.product_id].join(", ")}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-2 text-center text-sm text-gray-500">
+                                {biQty}
+                              </td>
+                              <td className={`py-2 ${isRTL ? "text-left" : "text-right"} text-sm text-gray-500`}>
+                                {biIsFree ? (
+                                  <span className="text-green-600">-</span>
+                                ) : (
+                                  <OrderPrice 
+                                    price={biPrice} 
+                                    orderCurrency={order.currency} 
+                                    orderCurrencySymbol={order.currency_symbol}
+                                    iconSize="xs"
+                                  />
+                                )}
+                              </td>
+                              <td className={`py-2 ${isRTL ? "text-left" : "text-right"} text-sm text-gray-600`}>
+                                {biIsFree ? (
+                                  <span className="text-green-600 inline-flex items-center gap-1">
+                                    {order.currency === "AED" ? <AEDIcon size="xs" /> : <span>{order.currency_symbol}</span>}
+                                    0.00
+                                  </span>
+                                ) : (
+                                  <OrderPrice 
+                                    price={biTotal} 
+                                    orderCurrency={order.currency} 
+                                    orderCurrencySymbol={order.currency_symbol}
+                                    iconSize="xs"
+                                  />
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </React.Fragment>
                     );
                   })}
                 </tbody>

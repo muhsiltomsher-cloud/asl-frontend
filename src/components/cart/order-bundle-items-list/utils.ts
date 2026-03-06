@@ -26,7 +26,7 @@ export function getOrderBundleItems(item: OrderLineItem): BundleItem[] | null {
       return null;
     }
 
-    return bundleItems
+    const parsed = bundleItems
       .filter((bi: unknown): bi is BundleItem => 
         typeof bi === "object" && 
         bi !== null && 
@@ -40,9 +40,57 @@ export function getOrderBundleItems(item: OrderLineItem): BundleItem[] | null {
         is_addon: typeof bi.is_addon === "boolean" ? bi.is_addon : undefined,
         is_free: typeof bi.is_free === "boolean" ? bi.is_free : undefined,
       }));
+
+    // Detect free items for older orders that don't have is_free flag stored.
+    // Compare sum of bundle item prices to order line item total — if the sum
+    // exceeds the charged total, mark trailing items as free (add-on slots).
+    return detectBundleItemFreeStatus(parsed, item);
   } catch {
     return null;
   }
+}
+
+/**
+ * Detect free bundle items by comparing the sum of all bundle item prices
+ * against the actual order line item total. If the sum exceeds what was
+ * charged, items are marked as free starting from the last item backwards
+ * (add-on / optional slots are typically at the end of the list).
+ */
+function detectBundleItemFreeStatus(items: BundleItem[], orderItem: OrderLineItem): BundleItem[] {
+  // If any item already has is_free explicitly set, the data is complete
+  const hasExplicitFreeFlag = items.some(bi => bi.is_free === true || bi.is_free === false);
+  if (hasExplicitFreeFlag) return items;
+
+  const lineItemTotal = parseFloat(orderItem.total) || 0;
+  if (lineItemTotal <= 0) return items;
+
+  // Multiply by parent order quantity since orderItem.total already includes it
+  const orderQty = orderItem.quantity || 1;
+  const allItemsSum = items.reduce((sum, bi) => {
+    const price = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+    const qty = bi.quantity || 1;
+    return sum + (price * qty * orderQty);
+  }, 0);
+
+  // If the sum of bundle item prices exceeds the line item total,
+  // the difference represents free items
+  const freeAmount = allItemsSum - lineItemTotal;
+  if (freeAmount <= 0.01) return items;
+
+  // Mark items as free starting from the last item backwards
+  let remainingFree = freeAmount;
+  const enriched = [...items];
+  for (let i = enriched.length - 1; i >= 0 && remainingFree > 0.01; i--) {
+    const price = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : (enriched[i].price || 0);
+    const qty = enriched[i].quantity || 1;
+    const itemTotal = price * qty * orderQty;
+    if (itemTotal > 0 && itemTotal <= remainingFree + 0.01) {
+      enriched[i] = { ...enriched[i], is_free: true, is_addon: true };
+      remainingFree -= itemTotal;
+    }
+  }
+
+  return enriched;
 }
 
 export function getOrderBundleItemsTotal(bundleItems: BundleItem[]): number {

@@ -123,6 +123,48 @@ export async function GET(request: NextRequest) {
         }
       }
       
+      // Enrich bundle items with is_free detection server-side
+      // so the client always receives correctly-flagged data
+      if (orderData.line_items && Array.isArray(orderData.line_items)) {
+        for (const lineItem of orderData.line_items) {
+          if (!lineItem.meta_data || !Array.isArray(lineItem.meta_data)) continue;
+          const bundleMeta = lineItem.meta_data.find(
+            (m: { key: string }) => m.key === "_bundle_items" || m.key === "bundle_items"
+          );
+          if (!bundleMeta) continue;
+          let items = bundleMeta.value;
+          if (typeof items === "string") {
+            try { items = JSON.parse(items); } catch { continue; }
+          }
+          if (!Array.isArray(items) || items.length === 0) continue;
+          // Skip if any item already has is_free explicitly set
+          const hasFlag = items.some((bi: { is_free?: boolean }) => bi.is_free === true || bi.is_free === false);
+          if (hasFlag) continue;
+          const lineTotal = parseFloat(lineItem.total) || 0;
+          if (lineTotal <= 0) continue;
+          const oQty = lineItem.quantity || 1;
+          const sumAll = items.reduce((s: number, bi: { price?: string | number; quantity?: number }) => {
+            const p = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+            const q = bi.quantity || 1;
+            return s + (p * q * oQty);
+          }, 0);
+          const freeAmt = sumAll - lineTotal;
+          if (freeAmt <= 0.01) continue;
+          let rem = freeAmt;
+          for (let i = items.length - 1; i >= 0 && rem > 0.01; i--) {
+            const p = typeof items[i].price === "string" ? parseFloat(items[i].price) : (items[i].price || 0);
+            const q = items[i].quantity || 1;
+            const iTotal = p * q * oQty;
+            if (iTotal > 0 && iTotal <= rem + 0.01) {
+              items[i].is_free = true;
+              items[i].is_addon = true;
+              rem -= iTotal;
+            }
+          }
+          bundleMeta.value = items;
+        }
+      }
+
       return NextResponse.json({ success: true, data: orderData });
     } else if (customerId) {
       // For listing orders by customer, always require authentication
