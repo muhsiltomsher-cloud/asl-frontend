@@ -32,6 +32,7 @@ class ASL_Security {
         $this->add_security_headers();
         $this->protect_login();
         $this->disable_unnecessary_features();
+        $this->fix_admin_rest_url();
     }
 
     /**
@@ -202,6 +203,30 @@ class ASL_Security {
 
         add_action('login_head', function() {
             echo '<meta name="robots" content="noindex, nofollow">' . "\n";
+        });
+    }
+
+    /**
+     * Fix REST API URL in admin context for headless setups.
+     *
+     * When WordPress 'home' (Site Address) differs from 'siteurl' (WordPress Address),
+     * WooCommerce admin JS constructs REST API URLs using home_url(), which points to
+     * the Next.js frontend (e.g. aromaticscentslab.com). Since the admin is served from
+     * the WordPress backend (cms.aromaticscentslab.com), these cross-origin requests are
+     * blocked by the browser's CORS policy, breaking Analytics and other admin features.
+     *
+     * This filter forces admin REST API URLs to use siteurl instead of home.
+     */
+    private function fix_admin_rest_url() {
+        add_filter('rest_url', function($url) {
+            if (is_admin() && !wp_doing_ajax()) {
+                $home = untrailingslashit(home_url());
+                $site = untrailingslashit(site_url());
+                if ($home !== $site) {
+                    $url = str_replace($home, $site, $url);
+                }
+            }
+            return $url;
         });
     }
 
