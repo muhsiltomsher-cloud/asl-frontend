@@ -67,7 +67,7 @@ function detectBundleItemFreeStatus(items: BundleItem[], orderItem: OrderLineIte
   // Multiply by parent order quantity since orderItem.total already includes it
   const orderQty = orderItem.quantity || 1;
   const allItemsSum = items.reduce((sum, bi) => {
-    const price = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+    const price = typeof bi.price === "string" ? parseFloat(bi.price) : Number(bi.price || 0);
     const qty = bi.quantity || 1;
     return sum + (price * qty * orderQty);
   }, 0);
@@ -81,7 +81,7 @@ function detectBundleItemFreeStatus(items: BundleItem[], orderItem: OrderLineIte
   let remainingFree = freeAmount;
   const enriched = [...items];
   for (let i = enriched.length - 1; i >= 0 && remainingFree > 0.01; i--) {
-    const price = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : (enriched[i].price || 0);
+    const price = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : Number(enriched[i].price || 0);
     const qty = enriched[i].quantity || 1;
     const itemTotal = price * qty * orderQty;
     if (itemTotal > 0 && itemTotal <= remainingFree + 0.01) {
@@ -96,7 +96,7 @@ function detectBundleItemFreeStatus(items: BundleItem[], orderItem: OrderLineIte
 export function getOrderBundleItemsTotal(bundleItems: BundleItem[]): number {
   return bundleItems.reduce((total, item) => {
     if (item.is_free) return total;
-    const price = typeof item.price === "string" ? parseFloat(item.price) : (item.price || 0);
+    const price = typeof item.price === "string" ? parseFloat(item.price) : Number(item.price || 0);
     const quantity = item.quantity || 1;
     return total + (price * quantity);
   }, 0);
