@@ -339,7 +339,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                         if (lineTotal > 0) {
                           const oQty = item.quantity || 1;
                           const sumAll = bundleItems.reduce((s, bi) => {
-                            const p = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+                            const p = typeof bi.price === "string" ? parseFloat(bi.price) : Number(bi.price || 0);
                             const q = bi.quantity || 1;
                             return s + (p * q * oQty);
                           }, 0);
@@ -348,7 +348,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                             let rem = freeAmt;
                             const enriched = [...bundleItems];
                             for (let i = enriched.length - 1; i >= 0 && rem > 0.01; i--) {
-                              const p = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : (enriched[i].price || 0);
+                              const p = typeof enriched[i].price === "string" ? parseFloat(enriched[i].price as string) : Number(enriched[i].price || 0);
                               const q = enriched[i].quantity || 1;
                               const iTotal = p * q * oQty;
                               if (iTotal > 0 && iTotal <= rem + 0.01) {
@@ -432,7 +432,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                         </tr>
                         {/* Bundled product sub-rows */}
                         {isBundle && bundleItems && bundleItems.map((bi, idx) => {
-                          const biPrice = typeof bi.price === "string" ? parseFloat(bi.price) : (bi.price || 0);
+                          const biPrice = typeof bi.price === "string" ? parseFloat(bi.price) : Number(bi.price || 0);
                           const biBaseQty = bi.quantity || 1;
                           const biQty = biBaseQty * orderQuantity;
                           const biTotal = biPrice * biBaseQty * orderQuantity;
