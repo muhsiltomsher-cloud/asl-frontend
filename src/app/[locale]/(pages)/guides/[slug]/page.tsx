@@ -142,7 +142,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
           />
         </div>
 
-        <div className="container relative mx-auto px-4 py-16 md:py-24">
+        <div className="container relative mx-auto px-4 py-10 sm:py-16 md:py-24">
           <div className="mx-auto max-w-4xl text-center">
             {/* Decorative Line */}
             <div className="mb-8 flex items-center justify-center gap-4">
@@ -155,16 +155,16 @@ export default async function GuidePage({ params }: GuidePageProps) {
               {guide.eyebrow[validLocale]}
             </span>
 
-            <h1 className="mb-8 text-3xl font-bold leading-tight text-white md:text-4xl lg:text-5xl">
+            <h1 className="mb-4 text-2xl font-bold leading-tight text-white sm:mb-6 sm:text-3xl md:mb-8 md:text-4xl lg:text-5xl">
               {guide.title[validLocale]}
             </h1>
 
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-amber-100/90">
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-amber-100/90 sm:text-base md:text-lg">
               {guide.intro[validLocale]}
             </p>
 
             {/* Meta Info */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-amber-300/80">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-amber-300/80 sm:mt-8 sm:gap-6 sm:text-sm">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 <span>
@@ -197,8 +197,8 @@ export default async function GuidePage({ params }: GuidePageProps) {
       </div>
 
       {/* Product List Section */}
-      <section className="relative bg-[#f7f6f2] py-12 md:py-16">
-        <div className="container mx-auto px-4">
+      <section className="relative bg-[#f7f6f2] py-8 sm:py-12 md:py-16">
+        <div className="container mx-auto px-3 sm:px-4">
           <div className="mx-auto max-w-5xl">
             {/* Section Header */}
             <div className="mb-10 text-center">
@@ -215,7 +215,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
             </div>
 
             {/* Product Cards */}
-            <div className="space-y-8">
+            <div className="space-y-5 sm:space-y-8">
               {productPairs.map((pair) => (
                 <GuideProductCard
                   key={pair.guideProduct.slug}
@@ -234,10 +234,10 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
       {/* Content Blocks Section */}
       {guide.contentBlocks.length > 0 && (
-        <section className="bg-white py-12 md:py-16">
-          <div className="container mx-auto px-4">
+        <section className="bg-white py-8 sm:py-12 md:py-16">
+          <div className="container mx-auto px-3 sm:px-4">
             <div className="mx-auto max-w-4xl">
-              <div className="mb-10 text-center">
+              <div className="mb-6 text-center sm:mb-10">
                 <div className="mb-4 flex items-center justify-center gap-4">
                   <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
                   <BookOpen className="h-5 w-5 text-amber-600" />
@@ -248,16 +248,16 @@ export default async function GuidePage({ params }: GuidePageProps) {
                 </h2>
               </div>
 
-              <div className="space-y-10">
+              <div className="space-y-5 sm:space-y-10">
                 {guide.contentBlocks.map((block, index) => (
                   <div
                     key={index}
-                    className="rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm md:p-8"
+                    className="rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-4 shadow-sm sm:rounded-2xl sm:p-6 md:p-8"
                   >
-                    <h3 className="mb-4 text-xl font-bold text-amber-900 md:text-2xl">
+                    <h3 className="mb-3 text-lg font-bold text-amber-900 sm:mb-4 sm:text-xl md:text-2xl">
                       {block.heading[validLocale]}
                     </h3>
-                    <p className="leading-relaxed text-amber-800/80">
+                    <p className="text-sm leading-relaxed text-amber-800/80 sm:text-base">
                       {block.body[validLocale]}
                     </p>
                   </div>
@@ -270,10 +270,10 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
       {/* FAQ Section */}
       {guide.faqs.length > 0 && (
-        <section className="bg-[#f7f6f2] py-12 md:py-16">
-          <div className="container mx-auto px-4">
+        <section className="bg-[#f7f6f2] py-8 sm:py-12 md:py-16">
+          <div className="container mx-auto px-3 sm:px-4">
             <div className="mx-auto max-w-4xl">
-              <div className="mb-10 text-center">
+              <div className="mb-6 text-center sm:mb-10">
                 <h2 className="text-2xl font-bold text-amber-900 md:text-3xl">
                   {isRTL
                     ? "الأسئلة الشائعة"
@@ -286,17 +286,17 @@ export default async function GuidePage({ params }: GuidePageProps) {
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {guide.faqs.map((faq, index) => (
                   <details
                     key={index}
-                    className="group rounded-xl border border-amber-100 bg-white shadow-sm"
+                    className="group rounded-lg border border-amber-100 bg-white shadow-sm sm:rounded-xl"
                   >
-                    <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700 [&::-webkit-details-marker]:hidden">
+                    <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-amber-900 transition-colors hover:text-amber-700 sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
                       <span>{faq.question[validLocale]}</span>
                       <ChevronRight className="h-5 w-5 shrink-0 text-amber-400 transition-transform group-open:rotate-90" />
                     </summary>
-                    <div className="px-6 pb-5 leading-relaxed text-amber-800/80">
+                    <div className="px-4 pb-4 text-sm leading-relaxed text-amber-800/80 sm:px-6 sm:pb-5 sm:text-base">
                       {faq.answer[validLocale]}
                     </div>
                   </details>
@@ -341,14 +341,14 @@ export default async function GuidePage({ params }: GuidePageProps) {
       )}
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 py-12 md:py-16">
+      <section className="bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 py-8 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-4 text-2xl font-bold text-white md:text-3xl">
+          <h2 className="mb-3 text-xl font-bold text-white sm:mb-4 sm:text-2xl md:text-3xl">
             {isRTL
               ? "مستعد لاكتشاف عطرك المثالي؟"
               : "Ready to Find Your Perfect Scent?"}
           </h2>
-          <p className="mx-auto mb-8 max-w-xl text-amber-100/80">
+          <p className="mx-auto mb-6 max-w-xl text-sm text-amber-100/80 sm:mb-8 sm:text-base">
             {isRTL
               ? "تصفح مجموعتنا الكاملة من العطور الفاخرة المصنوعة يدوياً في الإمارات. توصيل مجاني للطلبات فوق 500 درهم."
               : "Browse our full collection of premium, handcrafted fragrances made in the UAE. Free delivery on orders over 500 AED."}

@@ -96,14 +96,15 @@ export function GuideProductCard({
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
+      {/* Mobile: Compact horizontal layout */}
       <div className="flex flex-col md:flex-row">
         {/* Rank Badge + Image */}
         <div className="relative w-full md:w-80 lg:w-96 shrink-0">
           {/* Rank Number */}
           <div
             className={cn(
-              "absolute top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-lg font-bold text-white shadow-lg",
-              isRTL ? "right-4" : "left-4"
+              "absolute top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-sm font-bold text-white shadow-lg md:top-4 md:h-10 md:w-10 md:text-lg",
+              isRTL ? "right-3 md:right-4" : "left-3 md:left-4"
             )}
           >
             {rank}
@@ -112,17 +113,17 @@ export function GuideProductCard({
           {/* Badges */}
           <div
             className={cn(
-              "absolute top-16 z-10 flex flex-col gap-1.5",
-              isRTL ? "right-4 items-end" : "left-4 items-start"
+              "absolute top-12 z-10 flex flex-col gap-1 md:top-16 md:gap-1.5",
+              isRTL ? "right-3 items-end md:right-4" : "left-3 items-start md:left-4"
             )}
           >
             {isBestseller && (
-              <Badge variant="bestseller" className="shadow-sm">
+              <Badge variant="bestseller" className="shadow-sm text-[10px] md:text-xs">
                 {isRTL ? "الأكثر مبيعاً" : "Bestseller"}
               </Badge>
             )}
             {product.on_sale && (
-              <Badge variant="error" className="shadow-sm">
+              <Badge variant="error" className="shadow-sm text-[10px] md:text-xs">
                 {isRTL ? "تخفيض" : "Sale"}
               </Badge>
             )}
@@ -132,7 +133,7 @@ export function GuideProductCard({
             href={`/${locale}/product/${productSlug}`}
             className="block"
           >
-            <div className="relative aspect-square overflow-hidden md:aspect-[4/5]">
+            <div className="relative aspect-[4/3] overflow-hidden sm:aspect-square md:aspect-[4/5]">
               {mainImage && !imageError ? (
                 <Image
                   src={mainImage.src}
@@ -161,36 +162,36 @@ export function GuideProductCard({
         </div>
 
         {/* Content */}
-        <div className="flex flex-1 flex-col justify-between p-6 md:p-8">
+        <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 md:p-8">
           <div>
             {/* Pick Reason / Award */}
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium uppercase tracking-wide text-amber-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-amber-700 sm:mb-3 sm:gap-2 sm:px-3 sm:text-xs">
+              <span className="h-1 w-1 rounded-full bg-amber-500 sm:h-1.5 sm:w-1.5" />
               {pickReason}
             </div>
 
             {/* Product Name */}
             <Link href={`/${locale}/product/${productSlug}`}>
-              <h3 className="mb-2 text-xl font-bold text-amber-900 transition-colors hover:text-amber-700 md:text-2xl">
+              <h3 className="mb-1 text-lg font-bold text-amber-900 transition-colors hover:text-amber-700 sm:mb-2 sm:text-xl md:text-2xl">
                 {product.name}
               </h3>
             </Link>
 
             {/* Category */}
             {product.categories?.[0] && (
-              <p className="mb-3 text-xs font-medium uppercase tracking-wider text-amber-600">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-amber-600 sm:mb-3 sm:text-xs">
                 {decodeHtmlEntities(product.categories[0].name)}
               </p>
             )}
 
             {/* Editorial Description */}
-            <p className="mb-4 leading-relaxed text-amber-800/80">
+            <p className="mb-3 text-sm leading-relaxed text-amber-800/80 sm:mb-4 sm:text-base">
               {description}
             </p>
           </div>
 
           {/* Price + Actions */}
-          <div className="flex flex-wrap items-center gap-4 border-t border-amber-100 pt-4">
+          <div className="flex flex-wrap items-center gap-3 border-t border-amber-100 pt-3 sm:gap-4 sm:pt-4">
             {/* Price */}
             <div className="flex items-center gap-2">
               {product.on_sale ? (
@@ -232,7 +233,7 @@ export function GuideProductCard({
                   onClick={handleAddToCart}
                   disabled={isAddingToCart}
                   className={cn(
-                    "inline-flex items-center justify-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium uppercase tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
+                    "inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium uppercase tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed sm:gap-2 sm:px-6 sm:py-2.5 sm:text-sm",
                     isAddedToCart
                       ? "bg-green-500 text-white"
                       : "bg-[#C4885B] text-white hover:bg-[#D4A574]"
