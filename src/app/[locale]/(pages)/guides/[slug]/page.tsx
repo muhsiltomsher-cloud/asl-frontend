@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd, generateBreadcrumbJsonLd } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd } from "@/lib/utils/seo";
 import { getProductBySlug } from "@/lib/api/woocommerce";
 import { getGuideBySlug, getAllGuideSlugs, getRelatedGuides } from "@/data/guides";
 import { siteConfig, type Locale } from "@/config/site";
@@ -133,13 +133,6 @@ export default async function GuidePage({ params }: GuidePageProps) {
     answer: faq.answer[validLocale],
   }));
 
-  // Breadcrumb JSON-LD for rich snippets
-  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
-    { name: isRTL ? "الرئيسية" : "Home", url: `${siteConfig.url}/${locale}` },
-    { name: isRTL ? "الأدلة" : "Guides", url: `${siteConfig.url}/${locale}/guides` },
-    { name: guide.title[validLocale], url: `${siteConfig.url}/${locale}/guides/${slug}` },
-  ]);
-
   // Article schema for enhanced search appearance
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -176,6 +169,10 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   const breadcrumbItems = [
     {
+      name: isRTL ? "الأدلة" : "Guides",
+      href: `/${locale}/guides`,
+    },
+    {
       name: guide.title[validLocale],
       href: `/${locale}/guides/${slug}`,
     },
@@ -183,7 +180,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   return (
     <div className="flex flex-col">
-      {/* JSON-LD Structured Data — ItemList, FAQ, Breadcrumb, Article */}
+      {/* JSON-LD Structured Data — ItemList, FAQ, Article (Breadcrumb handled by Breadcrumbs component) */}
       <JsonLd data={generateItemListJsonLd({
         name: guide.title[validLocale],
         description: guide.metaDescription[validLocale],
@@ -191,7 +188,6 @@ export default async function GuidePage({ params }: GuidePageProps) {
         items: itemListItems,
       })} />
       <JsonLd data={generateFAQJsonLd(faqItems)} />
-      <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={articleJsonLd} />
 
       {/* Hero Section */}
