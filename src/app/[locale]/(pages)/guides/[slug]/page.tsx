@@ -49,8 +49,10 @@ export async function generateMetadata({
   }
 
   const validLocale = locale as Locale;
+  const ogImageUrl = guide.ogImage || siteConfig.ogImage;
+  const absoluteOgImage = ogImageUrl.startsWith("http") ? ogImageUrl : `${siteConfig.url}${ogImageUrl.startsWith("/") ? "" : "/"}${ogImageUrl}`;
 
-  return generateSeoMetadata({
+  const baseMeta = generateSeoMetadata({
     title: guide.title[validLocale],
     description: guide.metaDescription[validLocale],
     locale: validLocale,
@@ -58,6 +60,37 @@ export async function generateMetadata({
     keywords: guide.keywords[validLocale],
     image: guide.ogImage,
   });
+
+  return {
+    ...baseMeta,
+    openGraph: {
+      ...baseMeta.openGraph,
+      type: "article",
+      publishedTime: guide.publishedAt,
+      modifiedTime: guide.updatedAt,
+      authors: ["Aromatic Scents Lab"],
+      tags: guide.keywords[validLocale],
+      images: [
+        {
+          url: absoluteOgImage,
+          width: 1200,
+          height: 630,
+          alt: `${guide.title[validLocale]} – Aromatic Scents Lab`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: guide.title[validLocale],
+      description: guide.metaDescription[validLocale],
+      images: [
+        {
+          url: absoluteOgImage,
+          alt: `${guide.title[validLocale]} – Aromatic Scents Lab`,
+        },
+      ],
+    },
+  };
 }
 
 export default async function GuidePage({ params }: GuidePageProps) {
@@ -100,6 +133,44 @@ export default async function GuidePage({ params }: GuidePageProps) {
     answer: faq.answer[validLocale],
   }));
 
+  // Breadcrumb JSON-LD for rich snippets
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: isRTL ? "الرئيسية" : "Home", url: `${siteConfig.url}/${locale}` },
+    { name: isRTL ? "الأدلة" : "Guides", url: `${siteConfig.url}/${locale}/guides` },
+    { name: guide.title[validLocale], url: `${siteConfig.url}/${locale}/guides/${slug}` },
+  ]);
+
+  // Article schema for enhanced search appearance
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: guide.title[validLocale],
+    description: guide.metaDescription[validLocale],
+    url: `${siteConfig.url}/${locale}/guides/${slug}`,
+    datePublished: guide.publishedAt,
+    dateModified: guide.updatedAt,
+    author: {
+      "@type": "Organization",
+      name: "Aromatic Scents Lab",
+      url: siteConfig.url,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Aromatic Scents Lab",
+      url: siteConfig.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteConfig.url}/logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteConfig.url}/${locale}/guides/${slug}`,
+    },
+    keywords: guide.keywords[validLocale].join(", "),
+    inLanguage: locale === "ar" ? "ar" : "en",
+  };
+
   // Get related guides
   const relatedGuides = getRelatedGuides(guide);
 
@@ -112,7 +183,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   return (
     <div className="flex flex-col">
-      {/* JSON-LD Structured Data */}
+      {/* JSON-LD Structured Data — ItemList, FAQ, Breadcrumb, Article */}
       <JsonLd data={generateItemListJsonLd({
         name: guide.title[validLocale],
         description: guide.metaDescription[validLocale],
@@ -120,6 +191,8 @@ export default async function GuidePage({ params }: GuidePageProps) {
         items: itemListItems,
       })} />
       <JsonLd data={generateFAQJsonLd(faqItems)} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={articleJsonLd} />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-amber-950 via-amber-900 to-stone-900">
