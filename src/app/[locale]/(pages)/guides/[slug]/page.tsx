@@ -105,10 +105,6 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   const breadcrumbItems = [
     {
-      name: isRTL ? "الأدلة" : "Guides",
-      href: `/${locale}/guides/${slug}`,
-    },
-    {
       name: guide.title[validLocale],
       href: `/${locale}/guides/${slug}`,
     },

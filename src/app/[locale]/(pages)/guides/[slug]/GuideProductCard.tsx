@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ShoppingBag, Heart, Check } from "lucide-react";
 import { Badge } from "@/components/common/Badge";
 import { FormattedPrice } from "@/components/common/FormattedPrice";
@@ -40,6 +41,7 @@ export function GuideProductCard({
   const { addToWishlist, removeFromWishlist, isInWishlist, getWishlistItemId } =
     useWishlist();
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const isRTL = locale === "ar";
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -66,6 +68,7 @@ export function GuideProductCard({
     triggerHaptic();
 
     if (!isAuthenticated) {
+      router.push(`/${locale}/login`);
       return;
     }
 
