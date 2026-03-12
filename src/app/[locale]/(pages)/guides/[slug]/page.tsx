@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd, generateBreadcrumbJsonLd } from "@/lib/utils/seo";
 import { getProductBySlug } from "@/lib/api/woocommerce";
 import { getGuideBySlug, getAllGuideSlugs, getRelatedGuides } from "@/data/guides";
 import { siteConfig, type Locale } from "@/config/site";
