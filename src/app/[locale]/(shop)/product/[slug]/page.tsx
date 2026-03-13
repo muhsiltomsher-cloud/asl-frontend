@@ -22,17 +22,22 @@ function getProductJsonLdData(product: WCProduct, locale: string, slug: string) 
   const minorUnit = product.prices.currency_minor_unit || 2;
   const divisor = Math.pow(10, minorUnit);
   const price = (parseInt(product.prices.price, 10) / divisor).toFixed(2);
+  const primaryCategory = product.categories?.[0]?.name || undefined;
   
   return generateProductJsonLd({
     name: decodeHtmlEntities(product.name),
     description: decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, "")).slice(0, 500),
     image: product.images[0]?.src || "",
+    images: product.images.map((img) => img.src).filter(Boolean),
     price,
     currency: product.prices.currency_code,
     sku: product.sku || undefined,
     availability: product.is_in_stock ? "InStock" : "OutOfStock",
     url: `${siteConfig.url}/${locale}/product/${slug}`,
     brandName: siteConfig.name,
+    category: primaryCategory ? decodeHtmlEntities(primaryCategory) : undefined,
+    ratingValue: product.average_rating || undefined,
+    reviewCount: product.review_count || undefined,
   });
 }
 

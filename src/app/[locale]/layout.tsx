@@ -162,7 +162,9 @@ export default async function LocaleLayout({
                       <WishlistProvider>
               <JsonLd data={generateOrganizationJsonLd()} />
               <JsonLd data={generateWebSiteJsonLd()} />
-              <JsonLd data={generateLocalBusinessJsonLd()} />
+              {generateLocalBusinessJsonLd().map((schema, i) => (
+                <JsonLd key={`local-business-${i}`} data={schema} />
+              ))}
               <TrackingScripts
                 gaId={seoSettings.analytics.gaId}
                 googleAdsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}
