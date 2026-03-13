@@ -172,6 +172,7 @@ export default async function LocaleLayout({
                 tiktokPixelId={seoSettings.analytics.tiktokPixelId}
                 snapPixelId={seoSettings.analytics.snapPixelId}
                 clarityId="vh6jxzu0av"
+                gtmId={seoSettings.analytics.gtmId}
               />
               <NextTopLoader
                 color="#92400e"
