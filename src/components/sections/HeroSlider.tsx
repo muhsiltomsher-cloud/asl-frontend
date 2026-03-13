@@ -6,7 +6,12 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { HeroSliderSettings } from "@/types/wordpress";
 
-// Lazy-load Swiper only when needed (multiple slides)
+// Swiper CSS — imported statically (small footprint, needed before JS loads)
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+
+// Lazy-load Swiper JS only when needed (multiple slides)
 let SwiperModule: typeof import("swiper/react") | null = null;
 let SwiperModulesLib: typeof import("swiper/modules") | null = null;
 
@@ -97,9 +102,6 @@ export function HeroSlider({ settings }: HeroSliderProps) {
         const [swiperReact, swiperModules] = await Promise.all([
           import("swiper/react"),
           import("swiper/modules"),
-          import("swiper/css"),
-          import("swiper/css/pagination"),
-          import("swiper/css/navigation"),
         ]);
         SwiperModule = swiperReact;
         SwiperModulesLib = swiperModules;
