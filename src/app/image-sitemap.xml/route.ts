@@ -1,5 +1,6 @@
 import { getProducts, getCategories } from "@/lib/api/woocommerce";
 import { siteConfig } from "@/config/site";
+import { decodeHtmlEntities } from "@/lib/utils";
 
 function escapeXml(str: string): string {
   return str
@@ -37,12 +38,12 @@ export async function GET() {
 
         for (const img of images) {
           if (!img.src) continue;
-          const categoryNames = product.categories?.map((c) => c.name).join(", ") || "Aromatic Scents Lab";
+          const categoryNames = product.categories?.map((c) => decodeHtmlEntities(c.name)).join(", ") || "Aromatic Scents Lab";
           xml += `
     <image:image>
       <image:loc>${escapeXml(img.src)}</image:loc>
-      <image:title>${escapeXml(product.name)}</image:title>
-      <image:caption>${escapeXml(`${product.name} - ${categoryNames}`)}</image:caption>
+      <image:title>${escapeXml(decodeHtmlEntities(product.name))}</image:title>
+      <image:caption>${escapeXml(`${decodeHtmlEntities(product.name)} - ${categoryNames}`)}</image:caption>
     </image:image>`;
         }
 
@@ -69,8 +70,8 @@ export async function GET() {
     <loc>${escapeXml(pageUrl)}</loc>
     <image:image>
       <image:loc>${escapeXml(category.image.src)}</image:loc>
-      <image:title>${escapeXml(category.name)}</image:title>
-      <image:caption>${escapeXml(`${category.name} - Aromatic Scents Lab`)}</image:caption>
+      <image:title>${escapeXml(decodeHtmlEntities(category.name))}</image:title>
+      <image:caption>${escapeXml(`${decodeHtmlEntities(category.name)} - Aromatic Scents Lab`)}</image:caption>
     </image:image>
   </url>`;
       }
