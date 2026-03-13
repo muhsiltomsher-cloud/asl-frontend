@@ -5,6 +5,7 @@ import { FacebookPixel } from "./FacebookPixel";
 import { TikTokPixel } from "./TikTokPixel";
 import { SnapchatPixel } from "./SnapchatPixel";
 import { MicrosoftClarity } from "./MicrosoftClarity";
+import { GoogleTagManager } from "./GoogleTagManager";
 
 interface TrackingScriptsProps {
   gaId?: string;
@@ -13,6 +14,7 @@ interface TrackingScriptsProps {
   tiktokPixelId?: string;
   snapPixelId?: string;
   clarityId?: string;
+  gtmId?: string;
 }
 
 export function TrackingScripts({
@@ -22,6 +24,7 @@ export function TrackingScripts({
   tiktokPixelId,
   snapPixelId,
   clarityId,
+  gtmId,
 }: TrackingScriptsProps){
   return (
     <>
@@ -30,6 +33,7 @@ export function TrackingScripts({
       {tiktokPixelId && <TikTokPixel pixelId={tiktokPixelId} />}
       {snapPixelId && <SnapchatPixel pixelId={snapPixelId} />}
       {clarityId && <MicrosoftClarity clarityId={clarityId} />}
+      {gtmId && <GoogleTagManager gtmId={gtmId} />}
     </>
   );
 }
