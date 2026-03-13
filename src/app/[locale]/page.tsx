@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/common/Button";
@@ -13,6 +14,9 @@ import {
   CollectionsSection,
   BannersSection,
 } from "@/components/sections";
+import { ProductSectionSkeleton } from "@/components/sections/ProductSection";
+import { CategorySectionSkeleton } from "@/components/sections/CategorySection";
+import { FeaturedProductsSliderSkeleton } from "@/components/sections/FeaturedProductsSlider";
 import { JsonLd } from "@/components/seo/JsonLd";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
@@ -51,80 +55,84 @@ export async function generateMetadata({
   };
 }
 
-export default async function HomePage({ params }: HomePageProps) {
-  const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
-  const isRTL = locale === "ar";
-
-  // Fetch all data in parallel
-  // Fetch separate product lists for each section + English versions for URL slugs
+// ─── Async server component: New Products section ───
+// Fetches its own data so the hero/banners can render without waiting for products
+async function NewProductsSection({ locale, isRTL, dictionary, homeSettings }: {
+  locale: Locale;
+  isRTL: boolean;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>;
+  homeSettings: Awaited<ReturnType<typeof getHomePageSettings>>;
+}) {
   const [
     { products: newProductsRaw },
     { products: newProductsEn },
-    { products: featuredProductsRaw },
-    { products: featuredProductsEn },
-    { products: bestsellerProductsRaw },
-    { products: bestsellerProductsEn },
-    categories,
-    englishCategories,
-    homeSettings,
     giftProductInfo,
     bundleProductSlugs,
   ] = await Promise.all([
-    getNewProducts({ per_page: 20, locale: locale as Locale }),
+    getNewProducts({ per_page: 20, locale }),
     getNewProducts({ per_page: 20, locale: "en" }),
-    getFeaturedProducts({ per_page: 20, locale: locale as Locale }),
-    getFeaturedProducts({ per_page: 20, locale: "en" }),
-    getBestsellerProducts({ per_page: 20, locale: locale as Locale }),
-    getBestsellerProducts({ per_page: 20, locale: "en" }),
-    getCategories(locale as Locale),
-    getCategories("en"),
-    getHomePageSettings(locale as Locale),
     getFreeGiftProductInfo(),
     getBundleEnabledProductSlugs(),
   ]);
 
-  // Create English slug mappings for each section's products
   const newProductEnglishSlugs: Record<number, string> = {};
   newProductsEn.forEach((product) => {
     newProductEnglishSlugs[product.id] = product.slug;
   });
 
-  const featuredProductEnglishSlugs: Record<number, string> = {};
-  featuredProductsEn.forEach((product) => {
-    featuredProductEnglishSlugs[product.id] = product.slug;
-  });
+  const newProducts = newProductsRaw.filter(
+    (product) =>
+      !giftProductInfo.ids.includes(product.id) &&
+      !giftProductInfo.slugs.includes(product.slug)
+  );
 
-  const bestsellerProductEnglishSlugs: Record<number, string> = {};
-  bestsellerProductsEn.forEach((product) => {
-    bestsellerProductEnglishSlugs[product.id] = product.slug;
-  });
+  const settings = {
+    ...homeSettings.new_products,
+    section_title: homeSettings.new_products.section_title || dictionary.sections.newProducts.title,
+    section_subtitle: homeSettings.new_products.section_subtitle || dictionary.sections.newProducts.subtitle,
+  };
 
-  // Create a mapping of localized category ID to English slug for URL generation
-  // Uses slug-based matching via WPML slug mappings for reliability,
-  // since the API may return categories in different orders across locales
+  return (
+    <ProductSection
+      settings={settings}
+      products={newProducts}
+      locale={locale}
+      isRTL={isRTL}
+      viewAllText={dictionary.common.viewAll}
+      className="bg-[#f7f6f2]"
+      bundleProductSlugs={bundleProductSlugs}
+      englishProductSlugs={newProductEnglishSlugs}
+    />
+  );
+}
+
+// ─── Async server component: Categories section ───
+async function CategoriesSection({ locale, isRTL, dictionary, homeSettings }: {
+  locale: Locale;
+  isRTL: boolean;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>;
+  homeSettings: Awaited<ReturnType<typeof getHomePageSettings>>;
+}) {
+  const [categories, englishCategories] = await Promise.all([
+    getCategories(locale),
+    getCategories("en"),
+  ]);
+
   const englishCategorySlugs: Record<number, string> = {};
-  
-  // Filter to root categories only (parent === 0) and exclude uncategorized
   const localizedRootCategories = categories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
   const englishRootCategories = englishCategories.filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized");
-  
-  // Build a lookup from English slug to English category for image fallback
+
   const englishCategoryBySlug: Record<string, typeof englishRootCategories[number]> = {};
   englishRootCategories.forEach((cat) => {
     englishCategoryBySlug[cat.slug] = cat;
   });
-  
-  // Map localized category IDs to English slugs using the slug mapping
-  // Also create a fallback image map for categories without images (common in Arabic locale)
+
   const englishCategoryImages: Record<number, { src: string; alt: string } | undefined> = {};
-  
+
   localizedRootCategories.forEach((localizedCat) => {
-    // Use the slug mapping to find the English slug (handles both EN and AR slugs)
     const englishSlug = getEnglishSlugFromLocalizedSlug(localizedCat.slug);
     if (englishSlug) {
       englishCategorySlugs[localizedCat.id] = englishSlug;
-      // If the localized category doesn't have an image but the English one does, use English image as fallback
       const englishCat = englishCategoryBySlug[englishSlug];
       if (!localizedCat.image?.src && englishCat?.image?.src) {
         englishCategoryImages[localizedCat.id] = {
@@ -133,87 +141,158 @@ export default async function HomePage({ params }: HomePageProps) {
         };
       }
     } else {
-      // Fallback: use the localized slug directly (works for EN categories)
       englishCategorySlugs[localizedCat.id] = localizedCat.slug;
     }
   });
 
-  // Filter out gift products from each section
-  const filterGiftProducts = (productList: typeof newProductsRaw) =>
-    productList.filter(
-      (product) =>
-        !giftProductInfo.ids.includes(product.id) &&
-        !giftProductInfo.slugs.includes(product.slug)
-    );
-
-  const newProducts = filterGiftProducts(newProductsRaw);
-  const featuredProducts = filterGiftProducts(featuredProductsRaw);
-  const bestsellerProducts = filterGiftProducts(bestsellerProductsRaw);
-
-  // Translations for sections - using dictionary for dynamic content
-  const sectionTexts = {
-    viewAll: dictionary.common.viewAll,
-    products: dictionary.sections.products,
-    newProducts: {
-      title: dictionary.sections.newProducts.title,
-      subtitle: dictionary.sections.newProducts.subtitle,
-    },
-    bestsellers: {
-      title: dictionary.sections.bestsellers.title,
-      subtitle: dictionary.sections.bestsellers.subtitle,
-    },
-    shopByCategory: {
-      title: dictionary.sections.shopByCategory.title,
-      subtitle: dictionary.sections.shopByCategory.subtitle,
-    },
-    featuredProducts: {
-      title: dictionary.sections.featuredProducts.title,
-      subtitle: dictionary.sections.featuredProducts.subtitle,
-    },
-    collections: {
-      title: dictionary.sections.collections.title,
-      subtitle: dictionary.sections.collections.subtitle,
-    },
-  };
-
-  // Apply translations to settings if not set from WordPress
-  const newProductsSettings = {
-    ...homeSettings.new_products,
-    section_title: homeSettings.new_products.section_title || sectionTexts.newProducts.title,
-    section_subtitle: homeSettings.new_products.section_subtitle || sectionTexts.newProducts.subtitle,
-  };
-
-  const bestsellerSettings = {
-    ...homeSettings.bestseller_products,
-    section_title: homeSettings.bestseller_products.section_title || sectionTexts.bestsellers.title,
-    section_subtitle: homeSettings.bestseller_products.section_subtitle || sectionTexts.bestsellers.subtitle,
-  };
-
-  const categorySettings = {
+  const settings = {
     ...homeSettings.shop_by_category,
-    section_title: homeSettings.shop_by_category.section_title || sectionTexts.shopByCategory.title,
-    section_subtitle: homeSettings.shop_by_category.section_subtitle || sectionTexts.shopByCategory.subtitle,
+    section_title: homeSettings.shop_by_category.section_title || dictionary.sections.shopByCategory.title,
+    section_subtitle: homeSettings.shop_by_category.section_subtitle || dictionary.sections.shopByCategory.subtitle,
   };
 
-  const featuredSettings = {
+  const categoryExtraItems: Array<{
+    id: string;
+    name: { en: string; ar: string };
+    slug: string;
+    href: string;
+    image: string;
+  }> = [];
+
+  return (
+    <CategorySection
+      settings={settings}
+      categories={categories}
+      locale={locale}
+      isRTL={isRTL}
+      viewAllText={dictionary.common.viewAll}
+      productsText={dictionary.sections.products}
+      englishCategorySlugs={englishCategorySlugs}
+      extraItems={categoryExtraItems}
+      fallbackImages={englishCategoryImages}
+    />
+  );
+}
+
+// ─── Async server component: Featured Products section ───
+async function FeaturedSection({ locale, isRTL, dictionary, homeSettings }: {
+  locale: Locale;
+  isRTL: boolean;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>;
+  homeSettings: Awaited<ReturnType<typeof getHomePageSettings>>;
+}) {
+  const [
+    { products: featuredProductsRaw },
+    { products: featuredProductsEn },
+    giftProductInfo,
+    bundleProductSlugs,
+  ] = await Promise.all([
+    getFeaturedProducts({ per_page: 20, locale }),
+    getFeaturedProducts({ per_page: 20, locale: "en" }),
+    getFreeGiftProductInfo(),
+    getBundleEnabledProductSlugs(),
+  ]);
+
+  const featuredProductEnglishSlugs: Record<number, string> = {};
+  featuredProductsEn.forEach((product) => {
+    featuredProductEnglishSlugs[product.id] = product.slug;
+  });
+
+  const featuredProducts = featuredProductsRaw.filter(
+    (product) =>
+      !giftProductInfo.ids.includes(product.id) &&
+      !giftProductInfo.slugs.includes(product.slug)
+  );
+
+  const settings = {
     ...homeSettings.featured_products,
-    section_title: homeSettings.featured_products.section_title || sectionTexts.featuredProducts.title,
-    section_subtitle: homeSettings.featured_products.section_subtitle || sectionTexts.featuredProducts.subtitle,
+    section_title: homeSettings.featured_products.section_title || dictionary.sections.featuredProducts.title,
+    section_subtitle: homeSettings.featured_products.section_subtitle || dictionary.sections.featuredProducts.subtitle,
   };
+
+  return (
+    <FeaturedProductsSlider
+      settings={settings}
+      products={featuredProducts}
+      locale={locale}
+      isRTL={isRTL}
+      viewAllText={dictionary.common.viewAll}
+      bundleProductSlugs={bundleProductSlugs}
+      englishProductSlugs={featuredProductEnglishSlugs}
+    />
+  );
+}
+
+// ─── Async server component: Bestseller Products section ───
+async function BestsellerSection({ locale, isRTL, dictionary, homeSettings }: {
+  locale: Locale;
+  isRTL: boolean;
+  dictionary: Awaited<ReturnType<typeof getDictionary>>;
+  homeSettings: Awaited<ReturnType<typeof getHomePageSettings>>;
+}) {
+  const [
+    { products: bestsellerProductsRaw },
+    { products: bestsellerProductsEn },
+    giftProductInfo,
+    bundleProductSlugs,
+  ] = await Promise.all([
+    getBestsellerProducts({ per_page: 20, locale }),
+    getBestsellerProducts({ per_page: 20, locale: "en" }),
+    getFreeGiftProductInfo(),
+    getBundleEnabledProductSlugs(),
+  ]);
+
+  const bestsellerProductEnglishSlugs: Record<number, string> = {};
+  bestsellerProductsEn.forEach((product) => {
+    bestsellerProductEnglishSlugs[product.id] = product.slug;
+  });
+
+  const bestsellerProducts = bestsellerProductsRaw.filter(
+    (product) =>
+      !giftProductInfo.ids.includes(product.id) &&
+      !giftProductInfo.slugs.includes(product.slug)
+  );
+
+  const settings = {
+    ...homeSettings.bestseller_products,
+    section_title: homeSettings.bestseller_products.section_title || dictionary.sections.bestsellers.title,
+    section_subtitle: homeSettings.bestseller_products.section_subtitle || dictionary.sections.bestsellers.subtitle,
+  };
+
+  return (
+    <ProductSection
+      settings={settings}
+      products={bestsellerProducts}
+      locale={locale}
+      isRTL={isRTL}
+      viewAllText={dictionary.common.viewAll}
+      className="bg-[#f7f6f2]"
+      bundleProductSlugs={bundleProductSlugs}
+      englishProductSlugs={bestsellerProductEnglishSlugs}
+    />
+  );
+}
+
+// ─── Main homepage component ───
+// Only fetches hero/banner settings for instant above-the-fold render.
+// Product sections stream in via Suspense boundaries.
+export default async function HomePage({ params }: HomePageProps) {
+  const { locale } = await params;
+  const validLocale = locale as Locale;
+  const isRTL = locale === "ar";
+
+  // Only fetch what's needed for above-the-fold content (hero + banners + dictionary)
+  // Product data is fetched independently by each Suspense-wrapped section below
+  const [dictionary, homeSettings] = await Promise.all([
+    getDictionary(validLocale),
+    getHomePageSettings(validLocale),
+  ]);
 
   const collectionsSettings = {
     ...homeSettings.collections,
-    section_title: homeSettings.collections.section_title || sectionTexts.collections.title,
-    section_subtitle: homeSettings.collections.section_subtitle || sectionTexts.collections.subtitle,
+    section_title: homeSettings.collections.section_title || dictionary.sections.collections.title,
+    section_subtitle: homeSettings.collections.section_subtitle || dictionary.sections.collections.subtitle,
   };
-
-    const categoryExtraItems: Array<{
-      id: string;
-      name: { en: string; ar: string };
-      slug: string;
-      href: string;
-      image: string;
-    }> = [];
 
   // H1 heading text for SEO - hidden visually but read by search engines
   const h1Text = isRTL
@@ -225,62 +304,54 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* H1 tag for SEO - visually hidden but accessible to search engines */}
       <h1 className="sr-only">{h1Text}</h1>
 
-      {/* Hero Slider */}
+      {/* Hero Slider — renders instantly, no product data dependency */}
       <HeroSlider settings={homeSettings.hero_slider} />
 
       <div className="bg-[#f7f6f2]">
-      {/* Banners - Top Position */}
+      {/* Banners — renders instantly, no product data dependency */}
       <BannersSection settings={homeSettings.banners} />
 
-            {/* New Products Section */}
-            <ProductSection
-              settings={newProductsSettings}
-              products={newProducts}
-              locale={locale as Locale}
-              isRTL={isRTL}
-              viewAllText={sectionTexts.viewAll}
-              className="bg-[#f7f6f2]"
-              bundleProductSlugs={bundleProductSlugs}
-              englishProductSlugs={newProductEnglishSlugs}
-            />
+      {/* New Products — streams in with skeleton fallback */}
+      <Suspense fallback={<ProductSectionSkeleton />}>
+        <NewProductsSection
+          locale={validLocale}
+          isRTL={isRTL}
+          dictionary={dictionary}
+          homeSettings={homeSettings}
+        />
+      </Suspense>
 
-      {/* Shop by Category */}
-      <CategorySection
-        settings={categorySettings}
-        categories={categories}
-        locale={locale as Locale}
-        isRTL={isRTL}
-        viewAllText={sectionTexts.viewAll}
-        productsText={sectionTexts.products}
-        englishCategorySlugs={englishCategorySlugs}
-        extraItems={categoryExtraItems}
-        fallbackImages={englishCategoryImages}
-      />
+      {/* Shop by Category — streams in with skeleton fallback */}
+      <Suspense fallback={<CategorySectionSkeleton />}>
+        <CategoriesSection
+          locale={validLocale}
+          isRTL={isRTL}
+          dictionary={dictionary}
+          homeSettings={homeSettings}
+        />
+      </Suspense>
 
-      {/* Featured Products Slider */}
-      <FeaturedProductsSlider
-        settings={featuredSettings}
-        products={featuredProducts}
-        locale={locale as Locale}
-        isRTL={isRTL}
-        viewAllText={sectionTexts.viewAll}
-        bundleProductSlugs={bundleProductSlugs}
-        englishProductSlugs={featuredProductEnglishSlugs}
-      />
+      {/* Featured Products — streams in with skeleton fallback */}
+      <Suspense fallback={<FeaturedProductsSliderSkeleton />}>
+        <FeaturedSection
+          locale={validLocale}
+          isRTL={isRTL}
+          dictionary={dictionary}
+          homeSettings={homeSettings}
+        />
+      </Suspense>
 
-      {/* Bestseller Products Section */}
-      <ProductSection
-        settings={bestsellerSettings}
-        products={bestsellerProducts}
-        locale={locale as Locale}
-        isRTL={isRTL}
-        viewAllText={sectionTexts.viewAll}
-        className="bg-[#f7f6f2]"
-        bundleProductSlugs={bundleProductSlugs}
-        englishProductSlugs={bestsellerProductEnglishSlugs}
-      />
+      {/* Bestseller Products — streams in with skeleton fallback */}
+      <Suspense fallback={<ProductSectionSkeleton />}>
+        <BestsellerSection
+          locale={validLocale}
+          isRTL={isRTL}
+          dictionary={dictionary}
+          homeSettings={homeSettings}
+        />
+      </Suspense>
 
-      {/* Our Collections */}
+      {/* Our Collections — no API call needed, renders from homeSettings */}
       <CollectionsSection settings={collectionsSettings} />
 
       {/* Why Choose Us Section */}
