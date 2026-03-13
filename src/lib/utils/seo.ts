@@ -333,6 +333,29 @@ export function generateContactPageJsonLd(params: {
   };
 }
 
+export function generateItemListJsonLd(params: {
+  name: string;
+  description: string;
+  url: string;
+  items: { name: string; url: string; image: string; position: number }[];
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: params.name,
+    description: params.description,
+    url: params.url,
+    numberOfItems: params.items.length,
+    itemListElement: params.items.map((item) => ({
+      "@type": "ListItem",
+      position: item.position,
+      name: item.name,
+      url: item.url,
+      image: item.image,
+    })),
+  };
+}
+
 export function generateFAQJsonLd(
   items: { question: string; answer: string }[]
 ) {

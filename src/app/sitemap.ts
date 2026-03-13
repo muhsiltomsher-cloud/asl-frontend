@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { getProducts, getCategories } from "@/lib/api/woocommerce";
+import { getAllGuideSlugs } from "@/data/guides";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
@@ -96,8 +97,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Failed to fetch categories for sitemap:", error);
   }
 
+  // Generate guide page entries for all locales
+  const guideEntries: MetadataRoute.Sitemap = [];
+  const guideSlugs = getAllGuideSlugs();
+  for (const guideSlug of guideSlugs) {
+    for (const locale of locales) {
+      guideEntries.push({
+        url: `${baseUrl}/${locale}/guides/${guideSlug}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.8,
+        alternates: {
+          languages: {
+            en: `${baseUrl}/en/guides/${guideSlug}`,
+            ar: `${baseUrl}/ar/guides/${guideSlug}`,
+          },
+        },
+      });
+    }
+  }
+
   // Combine all entries, removing duplicates by URL
-  const allEntries = [...staticEntries, ...productEntries, ...categoryEntries];
+  const allEntries = [...staticEntries, ...productEntries, ...categoryEntries, ...guideEntries];
   const uniqueEntries = allEntries.filter(
     (entry, index, self) => index === self.findIndex((e) => e.url === entry.url)
   );
