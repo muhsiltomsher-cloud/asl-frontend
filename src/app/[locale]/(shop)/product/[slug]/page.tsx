@@ -101,35 +101,26 @@ export async function generateMetadata({
     : null;
 
   // Build SEO-optimized title with fragrance type/notes
-  // Format: "Product Name - Olfactory Family Category | Aromatic Scents Lab"
-  // Example: "Leather Intense - Leathery Perfume | Aromatic Scents Lab"
-  // Fallback: "Product Name - Category | Aromatic Scents Lab"
+  // Format: "Product Name - Olfactory Family Category | Premium Scent"
+  // Example: "Leather Intense - Leathery Perfume | Premium Scent"
+  // Fallback: "Product Name - Category | Premium Scent"
+  const seoSuffix = "Premium Scent";
   let seoTitle: string;
-  if (locale === "ar") {
-    if (olfactoryFamily && primaryCategoryName) {
-      seoTitle = `${productName} - ${olfactoryFamily} ${primaryCategoryName} | ${siteConfig.name}`;
-    } else if (primaryCategoryName) {
-      seoTitle = `${productName} - ${primaryCategoryName} | ${siteConfig.name}`;
-    } else {
-      seoTitle = `${productName} | ${siteConfig.name}`;
-    }
+  if (olfactoryFamily && primaryCategoryName) {
+    seoTitle = `${productName} - ${olfactoryFamily} ${primaryCategoryName} | ${seoSuffix}`;
+  } else if (primaryCategoryName) {
+    seoTitle = `${productName} - ${primaryCategoryName} | ${seoSuffix}`;
   } else {
-    if (olfactoryFamily && primaryCategoryName) {
-      seoTitle = `${productName} - ${olfactoryFamily} ${primaryCategoryName} | ${siteConfig.name}`;
-    } else if (primaryCategoryName) {
-      seoTitle = `${productName} - ${primaryCategoryName} | ${siteConfig.name}`;
-    } else {
-      seoTitle = `${productName} | ${siteConfig.name}`;
-    }
+    seoTitle = `${productName} | ${seoSuffix}`;
   }
 
   // Ensure title stays within ~60 chars for optimal Google display
-  // If too long, drop olfactory family and keep product name + category + brand
+  // If too long, drop olfactory family and keep product name + category
   if (seoTitle.length > 60 && olfactoryFamily && primaryCategoryName) {
-    seoTitle = `${productName} - ${primaryCategoryName} | ${siteConfig.name}`;
+    seoTitle = `${productName} - ${primaryCategoryName} | ${seoSuffix}`;
   }
   if (seoTitle.length > 60 && primaryCategoryName) {
-    seoTitle = `${productName} | ${siteConfig.name}`;
+    seoTitle = `${productName} | ${seoSuffix}`;
   }
 
   // Build a richer product description for SEO
