@@ -102,8 +102,8 @@ export function decodeHtmlEntities(text: string): string {
   
   return text
     .replace(/&(?:amp|lt|gt|quot|#0?39|apos|nbsp);/g, (match) => entities[match] || match)
-    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCodePoint(parseInt(hex, 16)));
+    .replace(/&#(\d+);/g, (_, code) => { const n = Number(code); return n >= 0 && n <= 0x10FFFF ? String.fromCodePoint(n) : `&#${code};`; })
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => { const n = parseInt(hex, 16); return n >= 0 && n <= 0x10FFFF ? String.fromCodePoint(n) : `&#x${hex};`; });
 }
 
 /**
