@@ -158,7 +158,7 @@ export async function generateMetadata({
   const olfactoryKeywords = olfactoryFamily ? [olfactoryFamily, `${olfactoryFamily} perfume`] : [];
   const noteKeywords = fragranceNotes.map((n) => n.toLowerCase());
 
-  return generateSeoMetadata({
+  const metadata = generateSeoMetadata({
     title: seoTitle,
     description: trimmedDescription,
     locale: locale as Locale,
@@ -175,6 +175,13 @@ export async function generateMetadata({
         : ["perfume", "buy fragrance", "luxury perfume UAE", "Dubai perfume", "Arabian oud", "fragrance gift", "premium scent", "Aromatic Scents Lab", "niche perfume", "buy perfume online", "musk perfume", "amber fragrance", "vanilla perfume", "oud fragrance", "best perfume UAE"]),
     ],
   });
+
+  // Use absolute title to bypass the layout template (which appends the brand name)
+  // This gives full control over the product page title in Google search results
+  return {
+    ...metadata,
+    title: { absolute: seoTitle },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
