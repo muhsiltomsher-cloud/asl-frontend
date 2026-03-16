@@ -100,7 +100,10 @@ export function decodeHtmlEntities(text: string): string {
     "&nbsp;": " ",
   };
   
-  return text.replace(/&(?:amp|lt|gt|quot|#0?39|apos|nbsp);/g, (match) => entities[match] || match);
+  return text
+    .replace(/&(?:amp|lt|gt|quot|#0?39|apos|nbsp);/g, (match) => entities[match] || match)
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 }
 
 /**

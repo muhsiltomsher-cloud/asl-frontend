@@ -90,12 +90,14 @@ export async function generateMetadata({
   const tagNames = product.tags?.map((t) => t.name) || [];
 
   // Extract fragrance attributes for SEO title enrichment
-  const olfactoryFamily = product.attributes
+  // Decode HTML entities from term names to avoid raw &amp; etc. in titles/descriptions
+  const olfactoryFamilyRaw = product.attributes
     ?.find((a) => decodeHtmlEntities(a.name).toLowerCase() === "olfactory family")
-    ?.terms?.[0]?.name || null;
+    ?.terms?.[0]?.name;
+  const olfactoryFamily = olfactoryFamilyRaw ? decodeHtmlEntities(olfactoryFamilyRaw) : null;
   const fragranceNotes = product.attributes
     ?.find((a) => decodeHtmlEntities(a.name).toLowerCase() === "notes")
-    ?.terms?.map((t) => t.name) || [];
+    ?.terms?.map((t) => decodeHtmlEntities(t.name)) || [];
   const primaryCategoryName = product.categories?.[0]?.name
     ? decodeHtmlEntities(product.categories[0].name)
     : null;
