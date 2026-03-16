@@ -89,6 +89,49 @@ export async function generateMetadata({
   const categoryNames = product.categories?.map((c) => c.name) || [];
   const tagNames = product.tags?.map((t) => t.name) || [];
 
+  // Extract fragrance attributes for SEO title enrichment
+  const olfactoryFamily = product.attributes
+    ?.find((a) => decodeHtmlEntities(a.name).toLowerCase() === "olfactory family")
+    ?.terms?.[0]?.name || null;
+  const fragranceNotes = product.attributes
+    ?.find((a) => decodeHtmlEntities(a.name).toLowerCase() === "notes")
+    ?.terms?.map((t) => t.name) || [];
+  const primaryCategoryName = product.categories?.[0]?.name
+    ? decodeHtmlEntities(product.categories[0].name)
+    : null;
+
+  // Build SEO-optimized title with fragrance type/notes
+  // Format: "Product Name - Olfactory Family Category | Aromatic Scents Lab"
+  // Example: "Leather Intense - Leathery Perfume | Aromatic Scents Lab"
+  // Fallback: "Product Name - Category | Aromatic Scents Lab"
+  let seoTitle: string;
+  if (locale === "ar") {
+    if (olfactoryFamily && primaryCategoryName) {
+      seoTitle = `${productName} - ${olfactoryFamily} ${primaryCategoryName} | ${siteConfig.name}`;
+    } else if (primaryCategoryName) {
+      seoTitle = `${productName} - ${primaryCategoryName} | ${siteConfig.name}`;
+    } else {
+      seoTitle = `${productName} | ${siteConfig.name}`;
+    }
+  } else {
+    if (olfactoryFamily && primaryCategoryName) {
+      seoTitle = `${productName} - ${olfactoryFamily} ${primaryCategoryName} | ${siteConfig.name}`;
+    } else if (primaryCategoryName) {
+      seoTitle = `${productName} - ${primaryCategoryName} | ${siteConfig.name}`;
+    } else {
+      seoTitle = `${productName} | ${siteConfig.name}`;
+    }
+  }
+
+  // Ensure title stays within ~60 chars for optimal Google display
+  // If too long, drop olfactory family and keep product name + category + brand
+  if (seoTitle.length > 60 && olfactoryFamily && primaryCategoryName) {
+    seoTitle = `${productName} - ${primaryCategoryName} | ${siteConfig.name}`;
+  }
+  if (seoTitle.length > 60 && primaryCategoryName) {
+    seoTitle = `${productName} | ${siteConfig.name}`;
+  }
+
   // Build a richer product description for SEO
   // Truncate raw description at word boundary to avoid mid-word cuts
   const fullRawDescription = decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, ""));
@@ -98,19 +141,34 @@ export async function generateMetadata({
   const minorUnit = product.prices?.currency_minor_unit || 2;
   const divisor = Math.pow(10, minorUnit);
   const priceValue = product.prices?.price ? (parseInt(product.prices.price, 10) / divisor).toFixed(0) : null;
+
+  // Include fragrance notes in the description for richer SEO snippets
+  const notesSnippet = fragranceNotes.length > 0
+    ? (locale === "ar"
+      ? ` المكونات: ${fragranceNotes.slice(0, 3).join("، ")}.`
+      : ` Notes: ${fragranceNotes.slice(0, 3).join(", ")}.`)
+    : "";
+  const olfactorySnippet = olfactoryFamily
+    ? (locale === "ar"
+      ? ` عائلة العطر: ${olfactoryFamily}.`
+      : ` Fragrance family: ${olfactoryFamily}.`)
+    : "";
+
   const productDescription = locale === "ar"
-    ? `${rawDescription ? rawDescription + ". " : ""}${productName} من Aromatic Scents Lab.${priceValue ? " السعر: " + priceValue + " درهم." : ""} توصيل مجاني للطلبات فوق 500 درهم.`
-    : `${rawDescription ? rawDescription + ". " : ""}${productName} by Aromatic Scents Lab.${priceValue ? " Price: " + priceValue + " AED." : ""} Free delivery on orders over 500 AED.`;
+    ? `${rawDescription ? rawDescription + ". " : ""}${productName} من ${siteConfig.name}.${olfactorySnippet}${notesSnippet}${priceValue ? " السعر: " + priceValue + " درهم." : ""} توصيل مجاني للطلبات فوق 500 درهم.`
+    : `${rawDescription ? rawDescription + ". " : ""}${productName} by ${siteConfig.name}.${olfactorySnippet}${notesSnippet}${priceValue ? " Price: " + priceValue + " AED." : ""} Free delivery on orders over 500 AED.`;
 
   // Truncate final description at word boundary (max 160 chars for SEO)
   const trimmedDescription = productDescription.length > 160
     ? productDescription.slice(0, 160).replace(/\s+\S*$/, "") + "..."
     : productDescription;
 
+  // Build enriched keywords from product attributes
+  const olfactoryKeywords = olfactoryFamily ? [olfactoryFamily, `${olfactoryFamily} perfume`] : [];
+  const noteKeywords = fragranceNotes.map((n) => n.toLowerCase());
+
   return generateSeoMetadata({
-    title: locale === "ar"
-      ? `${productName} | شراء أون لاين`
-      : `${productName} | Buy Online`,
+    title: seoTitle,
     description: trimmedDescription,
     locale: locale as Locale,
     pathname: `/product/${slug}`,
@@ -119,6 +177,8 @@ export async function generateMetadata({
       productName,
       ...categoryNames,
       ...tagNames,
+      ...olfactoryKeywords,
+      ...noteKeywords,
       ...(locale === "ar"
         ? ["عطور", "شراء عطور", "عطور فاخرة", "عطور الإمارات", "عطور دبي", "عود عربي", "هدايا عطرية", "Aromatic Scents Lab", "عطور فخمة", "شراء عطر أون لاين", "عطور مسك", "عطور عنبر", "عطور فانيلا", "عطور عود", "أفضل عطور الإمارات"]
         : ["perfume", "buy fragrance", "luxury perfume UAE", "Dubai perfume", "Arabian oud", "fragrance gift", "premium scent", "Aromatic Scents Lab", "niche perfume", "buy perfume online", "musk perfume", "amber fragrance", "vanilla perfume", "oud fragrance", "best perfume UAE"]),
