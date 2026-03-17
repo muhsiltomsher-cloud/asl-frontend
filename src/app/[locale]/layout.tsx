@@ -17,6 +17,9 @@ import { generateOrganizationJsonLd, generateWebSiteJsonLd, generateLocalBusines
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
+import { Suspense } from "react";
+
+const CustomerTracker = dynamic(() => import("@/components/tracking/CustomerTracker").then(mod => mod.CustomerTracker));
 
 const MiniCartDrawer = dynamic(() => import("@/components/cart/MiniCartDrawer").then(mod => mod.MiniCartDrawer));
 const AccountDrawer = dynamic(() => import("@/components/account/AccountDrawer").then(mod => mod.AccountDrawer));
@@ -174,6 +177,9 @@ export default async function LocaleLayout({
                 clarityId="vh6jxzu0av"
                 gtmId={seoSettings.analytics.gtmId}
               />
+              <Suspense fallback={null}>
+                <CustomerTracker />
+              </Suspense>
               <NextTopLoader
                 color="#92400e"
                 initialPosition={0.08}

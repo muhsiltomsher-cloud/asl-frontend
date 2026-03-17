@@ -5,3 +5,4 @@ export { TikTokPixel } from "./TikTokPixel";
 export { SnapchatPixel } from "./SnapchatPixel";
 export { MicrosoftClarity } from "./MicrosoftClarity";
 export { GoogleTagManager } from "./GoogleTagManager";
+export { CustomerTracker } from "./CustomerTracker";

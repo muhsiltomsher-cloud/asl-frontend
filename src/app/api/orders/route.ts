@@ -66,6 +66,7 @@ interface CreateOrderRequest {
   fee_lines?: FeeLine[];
   customer_note?: string;
   customer_id?: number;
+  meta_data?: Array<{ key: string; value: string }>;
 }
 
 export async function GET(request: NextRequest) {
@@ -288,6 +289,10 @@ export async function POST(request: NextRequest) {
 
     if (body.customer_id) {
       orderData.customer_id = body.customer_id;
+    }
+
+    if (body.meta_data && body.meta_data.length > 0) {
+      orderData.meta_data = body.meta_data;
     }
 
     const url = `${API_BASE}/orders?${getBasicAuthParams()}`;
