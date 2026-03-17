@@ -20,6 +20,7 @@ import { BundleItemsList, getBundleItems, getBundleItemsTotal, getBoxPrice, getP
 import { PhoneInput } from "@/components/common/PhoneInput";
 import { useProductCategories } from "@/hooks/useProductCategories";
 import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
+import { useCustomerTracking } from "@/hooks/useCustomerTracking";
 
 interface ShippingRate {
   rate_id: string;
@@ -152,6 +153,7 @@ export default function CheckoutClient() {
     const productCategories = useProductCategories(productIds);
     const isRTL = locale === "ar";
     const isKeyboardVisible = useKeyboardVisible();
+    const { getOrderMetaData, clearTracking } = useCustomerTracking();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [customerData, setCustomerData] = useState<Customer | null>(null);
@@ -1098,6 +1100,7 @@ export default function CheckoutClient() {
         })(),
         customer_note: formData.orderNotes,
         ...(isAuthenticated && user?.user_id ? { customer_id: user.user_id } : newCustomerId ? { customer_id: newCustomerId } : {}),
+        meta_data: getOrderMetaData(),
       };
 
       const response = await fetch("/api/orders", {
@@ -1166,6 +1169,9 @@ export default function CheckoutClient() {
             const isTabbyPayment = formData.paymentMethod.startsWith("tabby");
             const isTamaraPayment = formData.paymentMethod.startsWith("tamara");
             const isExternalPayment = isMyFatoorahPayment || isTabbyPayment || isTamaraPayment;
+
+            // Clear customer tracking data after successful order creation
+            clearTracking();
 
             // Only clear cart for non-external payment methods (like COD)
             // For external payments, cart will be cleared in order-confirmation after payment is verified
