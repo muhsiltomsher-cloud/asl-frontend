@@ -8,7 +8,7 @@ import { useNotification } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { getBundleItems, getBundleItemsTotal } from "@/components/cart/BundleItemsList";
 import { getBundleData } from "@/lib/utils/bundleStorage";
-import { omnisendTrackAddToCart } from "@/lib/utils/omnisend";
+import { omnisendTrackAddToCart, type OmnisendLineItem } from "@/lib/utils/omnisend";
 
 // Cache key now includes locale for proper multilingual support
 const getCartCacheKey = (locale: string) => `/api/cart?locale=${locale}`;
@@ -272,17 +272,43 @@ export function CartProvider({ children, locale }: CartProviderProps) {
         // Update cache with actual data
         await mutate(cacheKey, data.cart, false);
 
-        // Fire Omnisend "added to cart" event for abandoned cart tracking
-        const addedItem = (data.cart as CoCartResponse)?.items?.find(
+        // Fire Omnisend "added product to cart" event for abandoned cart tracking
+        const updatedCart = data.cart as CoCartResponse;
+        const addedItem = updatedCart?.items?.find(
           (i: CoCartItem) => i.id === productId
         );
-        if (addedItem) {
+        if (addedItem && updatedCart) {
+          const currMinorUnit = updatedCart.currency?.currency_minor_unit ?? 2;
+          const currDivisor = Math.pow(10, currMinorUnit);
+          const cartValue = parseFloat(updatedCart.totals?.total || "0") / currDivisor;
+          const itemPrice = parseFloat(addedItem.price || "0") / currDivisor;
+
+          // Build line items for all cart items
+          const lineItems: OmnisendLineItem[] = updatedCart.items.map((ci: CoCartItem) => ({
+            productID: String(ci.id),
+            productTitle: ci.name || ci.title || "",
+            productPrice: parseFloat(ci.price || "0") / currDivisor,
+            productImageURL: ci.featured_image || "",
+            productURL: ci.slug
+              ? `${typeof window !== "undefined" ? window.location.origin : ""}/en/product/${ci.slug}`
+              : "",
+          }));
+
           omnisendTrackAddToCart({
-            productID: String(addedItem.id),
-            productTitle: addedItem.name || addedItem.title || "",
-            productPrice: parseInt(addedItem.price || "0", 10),
-            productQuantity: quantity,
-            productImageUrl: addedItem.featured_image || "",
+            addedItem: {
+              productID: String(addedItem.id),
+              productTitle: addedItem.name || addedItem.title || "",
+              productPrice: itemPrice,
+              productImageURL: addedItem.featured_image || "",
+              productURL: addedItem.slug
+                ? `${typeof window !== "undefined" ? window.location.origin : ""}/en/product/${addedItem.slug}`
+                : "",
+            },
+            lineItems,
+            value: cartValue,
+            currency: updatedCart.currency?.currency_code || "AED",
+            cartID: updatedCart.cart_key || "",
+            email: user?.user_email || "",
           });
         }
 
@@ -298,7 +324,7 @@ export function CartProvider({ children, locale }: CartProviderProps) {
         setIsOperationLoading(false);
       }
     },
-    [notify, cacheKey]
+    [notify, cacheKey, user?.user_email]
   );
 
   const updateCartItem = useCallback(
