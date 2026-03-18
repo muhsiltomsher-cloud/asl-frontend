@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { getCookie, setCookie, deleteCookie } from "cookies-next";
 import { validateToken, refreshToken as apiRefreshToken, type AuthUser, type LoginCredentials, type LoginResponse } from "@/lib/api/auth";
+import { omnisendIdentify } from "@/lib/utils/omnisend";
 
 const AUTH_TOKEN_KEY = "asl_auth_token";
 const AUTH_USER_KEY = "asl_auth_user";
@@ -45,6 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (token && userDataStr) {
           const userData = JSON.parse(userDataStr as string) as AuthUser;
           setUser(userData);
+          // Identify user in Omnisend for abandoned cart tracking
+          if (userData.user_email) {
+            omnisendIdentify(userData.user_email);
+          }
           setIsLoading(false);
 
           try {
@@ -121,6 +126,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
         setUser(response.user);
+        // Identify user in Omnisend for abandoned cart tracking
+        if (response.user.user_email) {
+          omnisendIdentify(response.user.user_email);
+        }
       }
 
       return response;
@@ -164,6 +173,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           });
         }
         setUser(response.user);
+        // Identify user in Omnisend for abandoned cart tracking
+        if (response.user.user_email) {
+          omnisendIdentify(response.user.user_email);
+        }
       }
 
       return response;

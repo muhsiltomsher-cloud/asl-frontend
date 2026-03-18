@@ -8,6 +8,7 @@ import { useNotification } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { getBundleItems, getBundleItemsTotal } from "@/components/cart/BundleItemsList";
 import { getBundleData } from "@/lib/utils/bundleStorage";
+import { omnisendTrackAddToCart } from "@/lib/utils/omnisend";
 
 // Cache key now includes locale for proper multilingual support
 const getCartCacheKey = (locale: string) => `/api/cart?locale=${locale}`;
@@ -270,6 +271,21 @@ export function CartProvider({ children, locale }: CartProviderProps) {
 
         // Update cache with actual data
         await mutate(cacheKey, data.cart, false);
+
+        // Fire Omnisend "added to cart" event for abandoned cart tracking
+        const addedItem = (data.cart as CoCartResponse)?.items?.find(
+          (i: CoCartItem) => i.id === productId
+        );
+        if (addedItem) {
+          omnisendTrackAddToCart({
+            productID: String(addedItem.id),
+            productTitle: addedItem.name || addedItem.title || "",
+            productPrice: parseInt(addedItem.price || "0", 10),
+            productQuantity: quantity,
+            productImageUrl: addedItem.featured_image || "",
+          });
+        }
+
         notify("cart", "Item added to cart");
         // Open cart drawer after successfully adding item
         setIsCartOpen(true);

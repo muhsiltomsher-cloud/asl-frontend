@@ -175,6 +175,7 @@ export default async function LocaleLayout({
                 tiktokPixelId={seoSettings.analytics.tiktokPixelId}
                 snapPixelId={seoSettings.analytics.snapPixelId}
                 clarityId="vh6jxzu0av"
+                omnisendBrandId={process.env.NEXT_PUBLIC_OMNISEND_BRAND_ID}
                 gtmId={seoSettings.analytics.gtmId}
               />
               <Suspense fallback={null}>
