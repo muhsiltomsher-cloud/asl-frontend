@@ -21,6 +21,8 @@ import { PhoneInput } from "@/components/common/PhoneInput";
 import { useProductCategories } from "@/hooks/useProductCategories";
 import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
 import { useCustomerTracking } from "@/hooks/useCustomerTracking";
+import { omnisendIdentify, omnisendTrackStartedCheckout, type OmnisendLineItem } from "@/lib/utils/omnisend";
+import type { CoCartItem } from "@/lib/api/cocart";
 
 interface ShippingRate {
   rate_id: string;
@@ -751,6 +753,38 @@ export default function CheckoutClient() {
     // Set a new timeout to check email after 500ms of no typing
     emailCheckTimeoutRef.current = setTimeout(() => {
       checkEmailRegistration(email);
+
+      // Identify user in Omnisend when guest enters email at checkout
+      // This enables abandoned cart/checkout email recovery for guest users
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (email && emailRegex.test(email)) {
+        omnisendIdentify(email);
+
+        // Also fire "started checkout" event so Omnisend can track checkout abandonment
+        if (cart && cartItems.length > 0) {
+          const currMinorUnit = cart.currency?.currency_minor_unit ?? 2;
+          const currDivisor = Math.pow(10, currMinorUnit);
+          const cartValue = parseFloat(cart.totals?.total || "0") / currDivisor;
+
+          const lineItems: OmnisendLineItem[] = cartItems.map((ci: CoCartItem) => ({
+            productID: String(ci.id),
+            productTitle: ci.name || ci.title || "",
+            productPrice: parseFloat(ci.price || "0") / currDivisor,
+            productImageURL: ci.featured_image || "",
+            productURL: ci.slug
+              ? `${window.location.origin}/en/product/${ci.slug}`
+              : "",
+          }));
+
+          omnisendTrackStartedCheckout({
+            lineItems,
+            value: cartValue,
+            currency: cart.currency?.currency_code || "AED",
+            cartID: cart.cart_key || "",
+            email,
+          });
+        }
+      }
     }, 500);
 
     // Cleanup on unmount
@@ -759,7 +793,7 @@ export default function CheckoutClient() {
         clearTimeout(emailCheckTimeoutRef.current);
       }
     };
-  }, [formData.shipping.email, checkEmailRegistration]);
+  }, [formData.shipping.email, checkEmailRegistration, cart, cartItems]);
 
   const handleSelectSavedAddress = (address: SavedAddress) => {
     setSelectedAddressId(address.id);

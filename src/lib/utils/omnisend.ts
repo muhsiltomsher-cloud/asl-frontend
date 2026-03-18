@@ -1,25 +1,60 @@
 /**
  * Omnisend tracking utility for headless WooCommerce frontend.
  *
- * Omnisend's "Added product to cart" automation trigger relies on
+ * Omnisend's "added product to cart" automation trigger relies on
  * the browser snippet receiving contact-identify + cart events.
  * Because the site is headless Next.js, the WooCommerce plugin
- * cannot inject these automatically — we fire them from the client.
+ * cannot inject these automatically -- we fire them from the client.
  *
- * @see https://developers.omnisend.com/web-tracking
+ * Event names and payloads follow the official Omnisend JavaScript
+ * snippet API documented at:
+ * @see https://api-docs.omnisend.com/docs/how-to-enable-cart-abandonment
+ * @see https://api-docs.omnisend.com/docs/how-to-track-cart-events-snippet
  */
 
 // ---------------------------------------------------------------------------
 // Type helpers
 // ---------------------------------------------------------------------------
 
-interface OmnisendProductItem {
+export interface OmnisendLineItem {
   productID: string;
   productTitle: string;
-  productPrice: number; // price in cents / minor-unit
-  productQuantity: number;
-  productUrl?: string;
-  productImageUrl?: string;
+  productDescription?: string;
+  productPrice: number;
+  productImageURL?: string;
+  productURL?: string;
+}
+
+export interface OmnisendCartEventPayload {
+  /** The item that was just added (for addedToCart events). */
+  addedItem: OmnisendLineItem;
+  /** All items currently in the cart. */
+  lineItems: OmnisendLineItem[];
+  /** Cart total value (in major currency units, e.g. 19.99). */
+  value: number;
+  /** ISO 4217 currency code, e.g. "AED". */
+  currency: string;
+  /** Unique cart identifier from CoCart (cart_key). */
+  cartID: string;
+  /** URL to recover the abandoned cart. */
+  abandonedCheckoutURL?: string;
+  /** Contact email so Omnisend can associate the event with a person. */
+  email?: string;
+}
+
+export interface OmnisendCheckoutEventPayload {
+  /** All items currently in the cart. */
+  lineItems: OmnisendLineItem[];
+  /** Cart total value (in major currency units, e.g. 19.99). */
+  value: number;
+  /** ISO 4217 currency code, e.g. "AED". */
+  currency: string;
+  /** Unique cart identifier from CoCart (cart_key). */
+  cartID: string;
+  /** URL to recover the abandoned checkout. */
+  abandonedCheckoutURL?: string;
+  /** Contact email so Omnisend can associate the event with a person. */
+  email?: string;
 }
 
 // Extend Window to include omnisend global
@@ -39,6 +74,15 @@ function push(...args: unknown[]): void {
   window.omnisend.push(args);
 }
 
+/** Generate a simple unique event ID (UUID v4-like). */
+function generateEventID(): string {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -54,40 +98,88 @@ export function omnisendIdentify(email: string): void {
 }
 
 /**
- * Track an "added to cart" event.
- * This is the event that triggers the Omnisend "Abandoned Cart" workflow.
+ * Track an "added product to cart" event using the official Omnisend
+ * JavaScript snippet format. This is the event that triggers the
+ * Omnisend "Abandoned Cart" workflow.
+ *
+ * @see https://api-docs.omnisend.com/docs/how-to-track-cart-events-snippet
  */
-export function omnisendTrackAddToCart(item: OmnisendProductItem): void {
-  push("track", "$addedToCart", {
-    productID: item.productID,
-    productTitle: item.productTitle,
-    productPrice: item.productPrice,
-    productQuantity: item.productQuantity,
-    productUrl: item.productUrl || "",
-    productImageUrl: item.productImageUrl || "",
-  });
+export function omnisendTrackAddToCart(
+  payload: OmnisendCartEventPayload
+): void {
+  const eventData: Record<string, unknown> = {
+    origin: "api",
+    eventID: generateEventID(),
+    eventVersion: "",
+    properties: {
+      abandonedCheckoutURL:
+        payload.abandonedCheckoutURL ||
+        `${typeof window !== "undefined" ? window.location.origin : ""}/en/cart`,
+      cartID: payload.cartID,
+      value: payload.value,
+      currency: payload.currency,
+      addedItem: {
+        productID: payload.addedItem.productID,
+        productTitle: payload.addedItem.productTitle,
+        productDescription: payload.addedItem.productDescription || "",
+        productPrice: payload.addedItem.productPrice,
+        productImageURL: payload.addedItem.productImageURL || "",
+        productURL: payload.addedItem.productURL || "",
+      },
+      lineItems: payload.lineItems.map((item) => ({
+        productID: item.productID,
+        productTitle: item.productTitle,
+        productDescription: item.productDescription || "",
+        productPrice: item.productPrice,
+        productImageURL: item.productImageURL || "",
+        productURL: item.productURL || "",
+      })),
+    },
+  };
+
+  // Include contact info so Omnisend can associate the event with a person
+  // (critical for guest users who haven't gone through $identify).
+  if (payload.email) {
+    eventData.contact = { email: payload.email };
+  }
+
+  push("track", "added product to cart", eventData);
 }
 
 /**
- * Track a "started checkout" event.
+ * Track a "started checkout" event using the official Omnisend format.
+ * This cancels the "Abandoned Cart" flow and starts "Abandoned Checkout".
  */
 export function omnisendTrackStartedCheckout(
-  cartTotal: number,
-  items: OmnisendProductItem[],
-  currency?: string
+  payload: OmnisendCheckoutEventPayload
 ): void {
-  push("track", "$startedCheckout", {
-    currency: currency || "AED",
-    cartTotal,
-    lineItems: items.map((i) => ({
-      productID: i.productID,
-      productTitle: i.productTitle,
-      productPrice: i.productPrice,
-      productQuantity: i.productQuantity,
-      productUrl: i.productUrl || "",
-      productImageUrl: i.productImageUrl || "",
-    })),
-  });
+  const eventData: Record<string, unknown> = {
+    origin: "api",
+    eventID: generateEventID(),
+    eventVersion: "",
+    properties: {
+      abandonedCheckoutURL:
+        payload.abandonedCheckoutURL ||
+        `${typeof window !== "undefined" ? window.location.origin : ""}/en/checkout`,
+      cartID: payload.cartID,
+      value: payload.value,
+      currency: payload.currency,
+      lineItems: payload.lineItems.map((item) => ({
+        productID: item.productID,
+        productTitle: item.productTitle,
+        productDescription: item.productDescription || "",
+        productPrice: item.productPrice,
+        productImageURL: item.productImageURL || "",
+        productURL: item.productURL || "",
+      })),
+    },
+  };
+
+  if (payload.email) {
+    eventData.contact = { email: payload.email };
+  }
+
+  push("track", "started checkout", eventData);
 }
 
 /**
