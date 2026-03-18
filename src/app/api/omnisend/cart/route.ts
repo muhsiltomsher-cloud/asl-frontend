@@ -18,6 +18,14 @@ function getApiKey(): string {
   return process.env.OMNISEND_API_KEY || "";
 }
 
+/**
+ * Validate cartID to prevent SSRF via path traversal.
+ * Only allows alphanumeric characters, hyphens, and underscores.
+ */
+function isValidCartID(id: string): boolean {
+  return /^[a-zA-Z0-9_-]+$/.test(id);
+}
+
 interface OmnisendCartProduct {
   cartProductID: string;
   productID: string;
@@ -56,14 +64,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize cartID to prevent SSRF via path traversal
+    if (!isValidCartID(body.cartID)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid cartID format" },
+        { status: 400 }
+      );
+    }
+
     // Try to replace existing cart first, fall back to creating new one
-    const replaceResponse = await fetch(`${OMNISEND_API_URL}/${body.cartID}`, {
+    const replaceResponse = await fetch(`${OMNISEND_API_URL}/${encodeURIComponent(body.cartID)}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         "X-API-KEY": apiKey,
       },
       body: JSON.stringify({
+        email: body.email,
         currency: body.currency,
         cartSum: body.cartSum,
         cartRecoveryUrl: body.cartRecoveryUrl,
@@ -123,7 +140,15 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Missing cartID" }, { status: 400 });
     }
 
-    await fetch(`${OMNISEND_API_URL}/${cartID}`, {
+    // Sanitize cartID to prevent SSRF via path traversal
+    if (!isValidCartID(cartID)) {
+      return NextResponse.json(
+        { success: false, error: "Invalid cartID format" },
+        { status: 400 }
+      );
+    }
+
+    await fetch(`${OMNISEND_API_URL}/${encodeURIComponent(cartID)}`, {
       method: "DELETE",
       headers: { "X-API-KEY": apiKey },
     });
