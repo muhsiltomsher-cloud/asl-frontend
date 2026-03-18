@@ -13,6 +13,7 @@ import {
 } from "@/lib/api/wishlist";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/contexts/NotificationContext";
+import { omnisendTrackAddedToWishlist } from "@/lib/utils/omnisend";
 
 const WISHLIST_COUNT_CACHE_KEY = "asl_wishlist_count";
 
@@ -132,6 +133,21 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
             setCachedWishlistCount(newCount);
             setCachedCount(newCount);
           }
+          // Fire Omnisend "added to wishlist" event for wishlist reminder automation
+          const addedWishlistItem = response.wishlist?.items?.find(
+            (i) => i.product_id === productId
+          );
+          if (addedWishlistItem) {
+            omnisendTrackAddedToWishlist({
+              productID: String(addedWishlistItem.product_id),
+              productTitle: addedWishlistItem.product_name || "",
+              productPrice: parseFloat(addedWishlistItem.product_price || "0"),
+              productImageURL: addedWishlistItem.product_image || "",
+              productURL: addedWishlistItem.product_url || "",
+              email: user?.user_email || "",
+            });
+          }
+
           notify("success", "Added to wishlist");
           return true;
         } else if (response.error) {
@@ -154,7 +170,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         NProgress.done();
       }
     },
-    [notify]
+    [notify, user]
   );
 
   const removeFromWishlist = useCallback(

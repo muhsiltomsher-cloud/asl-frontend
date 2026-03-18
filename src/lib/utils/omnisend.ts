@@ -182,6 +182,53 @@ export function omnisendTrackStartedCheckout(
   push("track", "started checkout", eventData);
 }
 
+// ---------------------------------------------------------------------------
+// Wishlist tracking
+// ---------------------------------------------------------------------------
+
+export interface OmnisendWishlistEventPayload {
+  /** The product that was added to the wishlist. */
+  productID: string;
+  productTitle: string;
+  productPrice: number;
+  productImageURL?: string;
+  productURL?: string;
+  /** Contact email so Omnisend can associate the event with a person. */
+  email?: string;
+}
+
+/**
+ * Track an "added to wishlist" custom event.
+ * This fires when a logged-in user adds a product to their wishlist.
+ * Used as the trigger for the "Wishlist Reminder" automation workflow.
+ */
+export function omnisendTrackAddedToWishlist(
+  payload: OmnisendWishlistEventPayload
+): void {
+  const eventData: Record<string, unknown> = {
+    origin: "api",
+    eventID: generateEventID(),
+    eventVersion: "",
+    properties: {
+      productID: payload.productID,
+      productTitle: payload.productTitle,
+      productPrice: payload.productPrice,
+      productImageURL: payload.productImageURL || "",
+      productURL: payload.productURL || "",
+    },
+  };
+
+  if (payload.email) {
+    eventData.contact = { email: payload.email };
+  }
+
+  push("track", "added to wishlist", eventData);
+}
+
+// ---------------------------------------------------------------------------
+// Page / product view tracking
+// ---------------------------------------------------------------------------
+
 /**
  * Track a page view.
  */
