@@ -294,6 +294,7 @@ export function CartProvider({ children, locale }: CartProviderProps) {
               : "",
           }));
 
+          // 1. Fire JS snippet event (shows in Omnisend Live View)
           omnisendTrackAddToCart({
             addedItem: {
               productID: String(addedItem.id),
@@ -310,6 +311,42 @@ export function CartProvider({ children, locale }: CartProviderProps) {
             cartID: updatedCart.cart_key || "",
             email: user?.user_email || "",
           });
+
+          // 2. Create/update cart in Omnisend via REST API (required for
+          //    the built-in "Abandoned Cart" automation workflow to trigger).
+          //    The JS snippet events show in Live View but don't create the
+          //    cart objects that the pre-built workflow monitors.
+          if (user?.user_email) {
+            const siteOrigin = typeof window !== "undefined" ? window.location.origin : "";
+            const omnisendProducts = updatedCart.items.map((ci: CoCartItem) => ({
+              cartProductID: ci.item_key,
+              productID: String(ci.id),
+              variantID: String(ci.id),
+              title: ci.name || ci.title || "",
+              quantity: ci.quantity.value,
+              price: Math.round(parseFloat(ci.price || "0")),
+              imageUrl: ci.featured_image || "",
+              productUrl: ci.slug
+                ? `${siteOrigin}/en/product/${ci.slug}`
+                : "",
+            }));
+
+            fetch("/api/omnisend/cart", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                cartID: updatedCart.cart_key || "",
+                email: user.user_email,
+                currency: updatedCart.currency?.currency_code || "AED",
+                cartSum: Math.round(parseFloat(updatedCart.totals?.total || "0")),
+                cartRecoveryUrl: `${siteOrigin}/en/cart`,
+                products: omnisendProducts,
+              }),
+            }).catch((err) => {
+              // Non-blocking — don't break the cart flow
+              console.error("[Omnisend] Cart sync error:", err);
+            });
+          }
         }
 
         notify("cart", "Item added to cart");
@@ -426,6 +463,18 @@ export function CartProvider({ children, locale }: CartProviderProps) {
     // Clear localStorage cache immediately
     clearCachedCart();
 
+    // Delete cart from Omnisend so the abandoned cart workflow stops
+    const cartKey = cart?.cart_key;
+    if (cartKey) {
+      fetch("/api/omnisend/cart", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartID: cartKey }),
+      }).catch((err) => {
+        console.error("[Omnisend] Cart delete error:", err);
+      });
+    }
+
     // Optimistically clear the cart
     await mutate(
       cacheKey,
@@ -457,7 +506,7 @@ export function CartProvider({ children, locale }: CartProviderProps) {
     } finally {
       setIsOperationLoading(false);
     }
-  }, [cacheKey]);
+  }, [cacheKey, cart?.cart_key]);
 
   const applyCoupon = useCallback(async (code: string, couponData?: SelectedCoupon): Promise<{ success: boolean; error?: string }> => {
     const normalizedCode = code.toLowerCase().trim();
