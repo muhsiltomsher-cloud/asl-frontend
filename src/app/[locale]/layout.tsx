@@ -17,6 +17,9 @@ import { generateOrganizationJsonLd, generateWebSiteJsonLd, generateLocalBusines
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
+import { Suspense } from "react";
+
+const CustomerTracker = dynamic(() => import("@/components/tracking/CustomerTracker").then(mod => mod.CustomerTracker));
 
 const MiniCartDrawer = dynamic(() => import("@/components/cart/MiniCartDrawer").then(mod => mod.MiniCartDrawer));
 const AccountDrawer = dynamic(() => import("@/components/account/AccountDrawer").then(mod => mod.AccountDrawer));
@@ -162,7 +165,9 @@ export default async function LocaleLayout({
                       <WishlistProvider>
               <JsonLd data={generateOrganizationJsonLd()} />
               <JsonLd data={generateWebSiteJsonLd()} />
-              <JsonLd data={generateLocalBusinessJsonLd()} />
+              {generateLocalBusinessJsonLd().map((schema, i) => (
+                <JsonLd key={`local-business-${i}`} data={schema} />
+              ))}
               <TrackingScripts
                 gaId={seoSettings.analytics.gaId}
                 googleAdsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}
@@ -171,7 +176,11 @@ export default async function LocaleLayout({
                 snapPixelId={seoSettings.analytics.snapPixelId}
                 clarityId="vh6jxzu0av"
                 omnisendBrandId={process.env.NEXT_PUBLIC_OMNISEND_BRAND_ID}
+                gtmId={seoSettings.analytics.gtmId}
               />
+              <Suspense fallback={null}>
+                <CustomerTracker />
+              </Suspense>
               <NextTopLoader
                 color="#92400e"
                 initialPosition={0.08}

@@ -533,8 +533,11 @@ export async function getSiteSettings(locale?: Locale): Promise<SiteSettings> {
   const faviconUrl: string | null = pluginSiteData?.favicon?.url || siteInfo?.site_icon_url || null;
 
   // Get site name and tagline - prioritize plugin data, then WordPress root endpoint
-  const siteName = pluginSiteData?.name || siteInfo?.name || siteConfig.name;
-  const siteTagline = pluginSiteData?.description || siteInfo?.description || siteConfig.description;
+  // Decode HTML entities to prevent double-encoding in <title> and meta tags
+  const rawSiteName = pluginSiteData?.name || siteInfo?.name || siteConfig.name;
+  const rawSiteTagline = pluginSiteData?.description || siteInfo?.description || siteConfig.description;
+  const siteName = decodeHtmlEntities(rawSiteName);
+  const siteTagline = decodeHtmlEntities(rawSiteTagline);
 
   // Build site settings from available sources
   const settings: SiteSettings = {
@@ -763,31 +766,36 @@ export async function getSeoSettings(locale?: Locale): Promise<SeoSettings> {
     }
   );
 
+  // Decode HTML entities from WordPress text fields to prevent double-encoding
+  // WordPress returns e.g. "Premium Fragrances &amp; Perfumes" which Next.js would
+  // re-encode to "&amp;amp;" in <title> tags if not decoded first
+  const d = (val: string | undefined) => val ? decodeHtmlEntities(val) : "";
+
   return {
-    title: data?.title || "",
-    titleAr: data?.titleAr || "",
-    description: data?.description || "",
-    descriptionAr: data?.descriptionAr || "",
-    keywords: data?.keywords || "",
-    keywordsAr: data?.keywordsAr || "",
+    title: d(data?.title),
+    titleAr: d(data?.titleAr),
+    description: d(data?.description),
+    descriptionAr: d(data?.descriptionAr),
+    keywords: d(data?.keywords),
+    keywordsAr: d(data?.keywordsAr),
     openGraph: {
-      title: data?.ogTitle || "",
-      titleAr: data?.ogTitleAr || "",
-      description: data?.ogDescription || "",
-      descriptionAr: data?.ogDescriptionAr || "",
+      title: d(data?.ogTitle),
+      titleAr: d(data?.ogTitleAr),
+      description: d(data?.ogDescription),
+      descriptionAr: d(data?.ogDescriptionAr),
       image: data?.ogImage || "",
       type: data?.ogType || "website",
-      siteName: data?.ogSiteName || "",
+      siteName: d(data?.ogSiteName),
       fbAppId: data?.fbAppId || "",
     },
     twitter: {
       card: data?.twitterCard || "summary_large_image",
       site: data?.twitterSite || "",
       creator: data?.twitterCreator || "",
-      title: data?.twitterTitle || "",
-      titleAr: data?.twitterTitleAr || "",
-      description: data?.twitterDescription || "",
-      descriptionAr: data?.twitterDescriptionAr || "",
+      title: d(data?.twitterTitle),
+      titleAr: d(data?.twitterTitleAr),
+      description: d(data?.twitterDescription),
+      descriptionAr: d(data?.twitterDescriptionAr),
       image: data?.twitterImage || "",
     },
     verification: {
