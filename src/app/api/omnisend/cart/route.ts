@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Server-side API route to create/update carts in Omnisend via REST API.
+ * Server-side API route to sync carts to Omnisend and fire the
+ * "added product to cart" trigger event for the abandoned-cart workflow.
  *
- * Omnisend's built-in "Abandoned Cart" automation workflow requires cart
- * objects to exist in their system (created via the REST API). The
- * JavaScript snippet events show in Live View but do NOT create the cart
- * objects that the pre-built workflow monitors.
+ * Two separate Omnisend systems are involved:
+ *   1. POST/PUT /v3/carts  — creates/updates the cart *object* (storage).
+ *   2. POST    /v5/events — fires the trigger *event* that the automation
+ *      workflow listens for ("Added product to cart (api)" trigger type).
  *
- * This route bridges that gap for our headless WooCommerce frontend by
- * proxying cart data to Omnisend's v3 carts endpoint.
+ * Both calls are required: the cart object alone does NOT fire the trigger,
+ * and the trigger event alone does NOT create the cart object that the
+ * email template pulls product data from.
  */
 
 const OMNISEND_API_URL = "https://api.omnisend.com/v3/carts";
+const OMNISEND_EVENTS_URL = "https://api.omnisend.com/v5/events";
 
 function getApiKey(): string {
   return process.env.OMNISEND_API_KEY || "";
@@ -24,6 +27,17 @@ function getApiKey(): string {
  */
 function isValidCartID(id: string): boolean {
   return /^[a-zA-Z0-9_-]+$/.test(id);
+}
+
+/**
+ * Generate a UUID v4 for the eventID required by Omnisend /v5/events.
+ */
+function generateUUID(): string {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 interface OmnisendCartProduct {
@@ -88,35 +102,86 @@ export async function POST(request: NextRequest) {
       }),
     });
 
+    let cartAction = "";
+
     if (replaceResponse.ok) {
-      return NextResponse.json({ success: true, action: "updated" });
+      cartAction = "updated";
     }
 
-    // If replace fails (cart doesn't exist yet), create a new one
-    const createResponse = await fetch(OMNISEND_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": apiKey,
-      },
-      body: JSON.stringify({
-        cartID: body.cartID,
-        email: body.email,
-        currency: body.currency,
-        cartSum: body.cartSum,
-        cartRecoveryUrl: body.cartRecoveryUrl,
-        products: body.products,
-      }),
-    });
+    if (!cartAction) {
+      // If replace fails (cart doesn't exist yet), create a new one
+      const createResponse = await fetch(OMNISEND_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
+        },
+        body: JSON.stringify({
+          cartID: body.cartID,
+          email: body.email,
+          currency: body.currency,
+          cartSum: body.cartSum,
+          cartRecoveryUrl: body.cartRecoveryUrl,
+          products: body.products,
+        }),
+      });
 
-    if (!createResponse.ok) {
-      const errorData = await createResponse.text();
-      console.error("[Omnisend Cart API] Failed to create cart:", errorData);
-      // Don't fail the main cart flow — just log the error
-      return NextResponse.json({ success: false, error: errorData }, { status: 200 });
+      if (!createResponse.ok) {
+        const errorData = await createResponse.text();
+        console.error("[Omnisend Cart API] Failed to create cart:", errorData);
+        // Don't fail the main cart flow — just log the error
+        return NextResponse.json({ success: false, error: errorData }, { status: 200 });
+      }
+
+      cartAction = "created";
     }
 
-    return NextResponse.json({ success: true, action: "created" });
+    // --- Fire the "added product to cart" trigger event via /v5/events ---
+    // This is what the Omnisend automation workflow actually listens for
+    // (trigger type: "Added product to cart (api)").
+    // Cart objects alone do NOT trigger the workflow.
+    try {
+      const firstProduct = body.products[0];
+      await fetch(OMNISEND_EVENTS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
+        },
+        body: JSON.stringify({
+          eventName: "added product to cart",
+          origin: "api",
+          eventVersion: "",
+          eventID: generateUUID(),
+          contact: { email: body.email },
+          properties: {
+            abandonedCheckoutURL: body.cartRecoveryUrl,
+            cartID: body.cartID,
+            value: body.cartSum,
+            currency: body.currency,
+            addedItem: {
+              productID: firstProduct.productID,
+              productTitle: firstProduct.title,
+              productPrice: firstProduct.price,
+              productImageURL: firstProduct.imageUrl || "",
+              productURL: firstProduct.productUrl || "",
+            },
+            lineItems: body.products.map((p) => ({
+              productID: p.productID,
+              productTitle: p.title,
+              productPrice: p.price,
+              productImageURL: p.imageUrl || "",
+              productURL: p.productUrl || "",
+            })),
+          },
+        }),
+      });
+    } catch (eventError) {
+      // Non-blocking: don't break cart flow if event fails
+      console.error("[Omnisend Cart API] Failed to send trigger event:", eventError);
+    }
+
+    return NextResponse.json({ success: true, action: cartAction });
   } catch (error) {
     console.error("[Omnisend Cart API] Error:", error);
     // Don't fail the main cart flow
