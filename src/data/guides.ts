@@ -2293,6 +2293,76 @@ export const guides: Guide[] = [
     publishedAt: "2025-03-20T00:00:00Z",
     updatedAt: "2025-03-20T00:00:00Z",
   },
+
+  // ==========================================================================
+  // 40. AROMATIC PERFUMES FOR MEN & WOMEN — UNISEX FRAGRANCES
+  // ==========================================================================
+  {
+    slug: "aromatic-perfumes-for-men-and-women",
+    title: {
+      en: "Aromatic Perfumes for Men & Women – Best Unisex Fragrances UAE 2025",
+      ar: "عطور أروماتيك للرجال والنساء – أفضل عطور يونيسكس الإمارات 2025",
+    },
+    metaDescription: {
+      en: "Discover aromatic perfumes for men and women. Unisex fragrances crafted for everyone — oud, musk, amber, vanilla & leather from Aromatic Scents Lab UAE.",
+      ar: "اكتشف عطور أروماتيك للرجال والنساء. عطور يونيسكس مصنوعة للجميع — عود ومسك وعنبر وفانيليا وجلد من Aromatic Scents Lab الإمارات.",
+    },
+    keywords: {
+      en: [
+        "aromatic perfume for men",
+        "aromatic perfume for women",
+        "unisex perfume UAE",
+        "perfume for men and women Dubai",
+        "gender neutral fragrance",
+        "shared perfume couples",
+        "best unisex scent UAE",
+        "aromatic men perfume",
+        "aromatic women perfume",
+        "perfume for him and her",
+        "couple perfume set UAE",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر أروماتيك للرجال",
+        "عطر أروماتيك للنساء",
+        "عطر يونيسكس الإمارات",
+        "عطر للرجال والنساء دبي",
+        "عطر محايد الجنس",
+        "عطر مشترك للأزواج",
+        "أفضل عطر يونيسكس الإمارات",
+        "عطر أروماتيك رجالي",
+        "عطر أروماتيك نسائي",
+        "عطر له ولها",
+        "طقم عطور للأزواج الإمارات",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Unisex Fragrances 2025", ar: "عطور يونيسكس 2025" },
+    intro: {
+      en: "At Aromatic Scents Lab, we believe great fragrance has no gender. Every perfume in our collection is designed to be worn by anyone who loves the scent — whether you're a man who adores vanilla, a woman who loves oud, or a couple who wants to share one signature fragrance. In Arabian perfumery, unisex scents are the tradition — oud, musk, amber, and rose have been worn by men and women for centuries. Here are our best fragrances for everyone.",
+      ar: "في Aromatic Scents Lab، نؤمن أن العطر الرائع لا جنس له. كل عطر في مجموعتنا مصمم ليرتديه أي شخص يحب الرائحة — سواء كنت رجلاً يعشق الفانيليا أو امرأة تحب العود أو زوجين يريدان مشاركة عطر واحد مميز. في العطور العربية، العطور المشتركة هي التقليد — العود والمسك والعنبر والورد يرتديها الرجال والنساء منذ قرون. هنا أفضل عطورنا للجميع.",
+    },
+    products: [
+      { slug: "dark-musk-perfume", rank: 1, pickReason: { en: "Most Versatile — Dark Musk | Oriental Musky | Loved Equally by Men & Women", ar: "الأكثر تنوعاً — المسك الداكن | محبوب من الرجال والنساء" }, description: { en: "Dark Musk | Oriental Musky | Top: Mandarin, Praline | Heart: Cypriol, Guaiac wood | Base: Ambergris, Musk. Our most gender-neutral scent — the musky warmth appeals universally. Men love its depth and masculinity, women love its sensual softness. Perfect for couples who want to share a signature scent.", ar: "المسك الداكن هو عطرنا الأكثر حيادية — الدفء المسكي يعجب الجميع عالمياً. الرجال يحبون عمقه ورجولته، والنساء يحببن نعومته الحسية. تركيبته تبدأ بالماندرين والبرالين، مع قلب من السيبريول والجواياك، وقاعدة من العنبر الأشهب والمسك. مثالي للأزواج الذين يريدون مشاركة عطر مميز واحد." } },
+      { slug: "velvet-amber-perfume", rank: 2, pickReason: { en: "Elegant for All — Velvet Amber | Ambry | Sophisticated & Warm for Any Gender", ar: "أنيق للجميع — فلفت أمبر | راقي ودافئ لأي جنس" }, description: { en: "Velvet Amber | Ambry | Top: Lily of the Valley | Heart: Cedarwood, Dry Amber | Base: Sandalwood, Musk. Warm amber and creamy sandalwood create an elegant, skin-like scent that's impossibly versatile — equally stunning on men and women. One of the most complimented fragrances in our collection.", ar: "فلفت أمبر يجمع بين العنبر الدافئ وخشب الصندل الكريمي لخلق رائحة أنيقة شبيهة بالبشرة متنوعة بشكل لا يُصدق — مذهلة بالتساوي على الرجال والنساء. تركيبته تبدأ بزنبق الوادي، مع قلب من خشب الأرز والعنبر الجاف، وقاعدة من خشب الصندل والمسك. من أكثر العطور التي تتلقى المديح في مجموعتنا." } },
+      { slug: "royal-tobacco-perfume", rank: 3, pickReason: { en: "Bold Unisex — Royal Tobacco | Oriental Spicy | Incense & Tobacco for the Confident", ar: "يونيسكس جريء — رويال توباكو | للواثقين" }, description: { en: "Royal Tobacco | Oriental Spicy | Top: Mandarin | Heart: Incense, Vanilla | Base: Vetiver, Tobacco. Traditionally seen as masculine, but increasingly popular with women who love bold, smoky fragrances. The vanilla heart softens the tobacco, making it approachable for all.", ar: "رويال توباكو تقليدياً يُعتبر رجالياً لكنه شائع بشكل متزايد بين النساء اللواتي يحببن العطور الجريئة والدخانية. قلب الفانيلا يلطف التبغ مما يجعله مقبولاً للجميع. تركيبته تبدأ بالماندرين، مع قلب من البخور والفانيلا، وقاعدة من الفيتيفر والتبغ." } },
+      { slug: "secret-leather-perfume", rank: 4, pickReason: { en: "Daring Leather — Secret Leather | Oriental | Leather & Cypress for Bold Women & Men", ar: "جلد جريء — سيكرت ليذر | للرجال والنساء الجريئين" }, description: { en: "Secret Leather | Oriental | Top: Orris | Heart: Leather, Cypress | Base: Tonka Bean, Musk. Leather fragrances are trending among women — the orris opening adds a soft, powdery femininity while the leather heart delivers bold character. A statement scent for any gender.", ar: "سيكرت ليذر — عطور الجلد رائجة بين النساء — الأوريس يضيف أنوثة ناعمة وبودرية بينما قلب الجلد يقدم شخصية جريئة. تركيبته تبدأ بالأوريس، مع قلب من الجلد والسرو، وقاعدة من حبوب التونكا والمسك. عطر مميز لأي جنس." } },
+      { slug: "rich-vanilla-perfume", rank: 5, pickReason: { en: "Sweet for Everyone — Rich Vanilla | Oriental | Men Are Embracing Vanilla in 2025", ar: "حلو للجميع — ريتش فانيليا | الرجال يتبنون الفانيليا" }, description: { en: "Rich Vanilla | Oriental | Top: Bergamot, Heliotrope | Heart: Tonka Bean, Amber | Base: Vanilla, Benzoin. The 2025 trend: men wearing vanilla. Rich Vanilla's warm, sophisticated composition appeals to modern men and women alike — sweet, confident, and universally adored.", ar: "ريتش فانيليا — ترند 2025: الرجال يرتدون الفانيليا. تركيبته الدافئة والراقية تعجب الرجال والنساء العصريين على حد سواء. تبدأ بالبرغموت والهيليوتروب، مع قلب من حبوب التونكا والعنبر، وقاعدة من الفانيليا والبنزوين. حلو وواثق ومحبوب عالمياً." } },
+      { slug: "black-vanilla-perfume", rank: 6, pickReason: { en: "Dark Unisex — Black Vanilla | Gourmand | Rose, Cinnamon & Patchouli for All", ar: "يونيسكس داكن — بلاك فانيليا | للجميع" }, description: { en: "Black Vanilla | Gourmand | Top: Bergamot, Cinnamon | Heart: Rose, Tonka | Base: Vanilla, Patchouli. Rose and cinnamon in a dark gourmand blend — the rose appeals to floral lovers while the cinnamon-patchouli base attracts spice enthusiasts. Truly gender-free.", ar: "بلاك فانيليا يجمع الورد والقرفة في مزيج حلو داكن — الورد يعجب محبي الأزهار بينما قاعدة القرفة والباتشولي تجذب عشاق التوابل. تركيبته تبدأ بالبرغموت والقرفة، مع قلب من الورد والتونكا، وقاعدة من الفانيلا والباتشولي. حقاً بلا جنس." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Why Unisex Perfume Is the Arabian Tradition", ar: "لماذا العطر المشترك هو التقليد العربي" }, body: { en: "In Western perfumery, fragrances were divided into 'for him' and 'for her' — but this was never the case in Arabian culture. Oud, musk, amber, and rose have been shared scents for centuries. A man burning oud bakhoor wears the same scent as the woman in the same majlis. Aromatic Scents Lab returns to this beautiful tradition — our perfumes are crafted for noses, not genders. Choose what you love, and wear it with confidence.", ar: "في العطور الغربية، قُسمت العطور إلى 'له' و'لها' — لكن هذا لم يكن الحال أبداً في الثقافة العربية. العود والمسك والعنبر والورد كانت روائح مشتركة لقرون. الرجل الذي يحرق بخور العود يرتدي نفس الرائحة مع المرأة في نفس المجلس. Aromatic Scents Lab يعود لهذا التقليد الجميل — عطورنا مصنوعة للأنوف لا للأجناس. اختر ما تحب وارتدِه بثقة." } },
+      { heading: { en: "How to Choose a Perfume as a Couple", ar: "كيف تختار عطراً كزوجين" }, body: { en: "Sharing a signature scent as a couple is deeply romantic — you both carry the same fragrance memory. Dark Musk is our top recommendation for couples: its musky warmth smells slightly different on each person's skin chemistry, creating a shared-but-unique experience. For couples who prefer different scents, try complementary fragrances from the same family — like both wearing orientals (Dark Musk + Velvet Amber) that harmonize when you're together.", ar: "مشاركة عطر مميز كزوجين هو أمر رومانسي بعمق — كلاكما يحمل نفس الذكرى العطرية. المسك الداكن هو توصيتنا الأولى للأزواج: دفؤه المسكي يشم بشكل مختلف قليلاً على كيمياء بشرة كل شخص مما يخلق تجربة مشتركة لكن فريدة. للأزواج الذين يفضلون روائح مختلفة، جربوا عطوراً متكاملة من نفس العائلة — مثل ارتداء شرقيات (المسك الداكن + فلفت أمبر) تتناغم عندما تكونان معاً." } },
+    ],
+    faqs: [
+      { question: { en: "Are Aromatic Scents Lab perfumes for men or women?", ar: "هل عطور Aromatic Scents Lab للرجال أم للنساء؟" }, answer: { en: "All our perfumes are unisex — designed for anyone who loves the scent. We don't label fragrances as 'for men' or 'for women'. In Arabian tradition, oud, musk, and rose have always been shared between genders.", ar: "كل عطورنا يونيسكس — مصممة لأي شخص يحب الرائحة. لا نصنف العطور على أنها 'للرجال' أو 'للنساء'. في التقاليد العربية، العود والمسك والورد كانت دائماً مشتركة بين الجنسين." } },
+      { question: { en: "What is the best perfume for a man who likes sweet scents?", ar: "ما أفضل عطر لرجل يحب الروائح الحلوة؟" }, answer: { en: "Rich Vanilla is perfect — it's warm, sophisticated, and the 2025 trend shows more men embracing gourmand scents. Black Vanilla is another excellent choice with its darker, spicier take on vanilla.", ar: "ريتش فانيليا مثالي — دافئ وراقي وترند 2025 يُظهر أن المزيد من الرجال يتبنون العطور الحلوة. بلاك فانيليا خيار ممتاز آخر بنظرته الأعمق والأكثر حرارة للفانيليا." } },
+      { question: { en: "Can a woman wear oud perfume?", ar: "هل يمكن للمرأة ارتداء عطر العود؟" }, answer: { en: "Absolutely! In the Gulf, women have worn oud for centuries. Dark Musk with its oud-like cypriol note is loved by women across the UAE. Royal Tobacco's smoky intensity is also increasingly popular among women.", ar: "بالتأكيد! في الخليج، النساء يرتدين العود منذ قرون. المسك الداكن بنفحة السيبريول الشبيهة بالعود محبوب من النساء في الإمارات. كما أن رويال توباكو بكثافته الدخانية شائع بشكل متزايد بين النساء." } },
+    ],
+    relatedGuideSlugs: ["best-perfumes-uae", "best-perfumes-for-date-night", "best-perfumes-for-weddings"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
 ];
 
 /**
