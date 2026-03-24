@@ -1587,6 +1587,259 @@ export const guides: Guide[] = [
     publishedAt: "2025-03-05T00:00:00Z",
     updatedAt: "2025-03-12T00:00:00Z",
   },
+
+  // ==========================================================================
+  // 29. BEST AROMATIC PERFUMES UNDER 100 AED
+  // ==========================================================================
+  {
+    slug: "best-aromatic-perfumes-under-100-aed",
+    title: {
+      en: "Best Aromatic Perfumes Under 100 AED – Affordable Fragrances 2025",
+      ar: "أفضل عطور أروماتيك بأقل من 100 درهم – عطور بأسعار مناسبة 2025",
+    },
+    metaDescription: {
+      en: "Discover the best aromatic perfumes under 100 AED. Budget-friendly body mists, fragrance oils & scented lotions from Aromatic Scents Lab. Free delivery over 500 AED.",
+      ar: "اكتشف أفضل عطور أروماتيك بأقل من 100 درهم. بخاخات جسم وزيوت عطرية ولوشن معطر بأسعار مناسبة من Aromatic Scents Lab. توصيل مجاني فوق 500 درهم.",
+    },
+    keywords: {
+      en: [
+        "perfume under 100 AED",
+        "affordable perfume UAE",
+        "cheap perfume Dubai",
+        "budget fragrance UAE",
+        "aromatic perfume under 100",
+        "body mist under 100 AED",
+        "fragrance oil under 100",
+        "good perfume cheap price",
+        "best affordable scent UAE",
+        "aromatic body mist",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر بأقل من 100 درهم",
+        "عطور بأسعار مناسبة الإمارات",
+        "عطور رخيصة دبي",
+        "عطور اقتصادية الإمارات",
+        "عطور أروماتيك بأقل من 100",
+        "بخاخ جسم بأقل من 100 درهم",
+        "زيت عطري بأقل من 100",
+        "عطر جيد بسعر رخيص",
+        "أفضل رائحة بسعر مناسب الإمارات",
+        "بخاخ جسم أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Affordable Fragrances 2025", ar: "عطور بأسعار مناسبة 2025" },
+    intro: {
+      en: "Great fragrance doesn't have to break the bank. Aromatic Scents Lab offers a range of beautifully crafted body mists, fragrance oils, and scented lotions — all under 100 AED. These budget-friendly options deliver amazing scents with impressive longevity, proving that affordable perfume in the UAE can still smell luxurious.",
+      ar: "العطر الرائع لا يحتاج لميزانية كبيرة. يقدم Aromatic Scents Lab مجموعة من بخاخات الجسم والزيوت العطرية واللوشن المعطر بأقل من 100 درهم. هذه الخيارات الاقتصادية تقدم روائح مذهلة مع ثبات مثير للإعجاب، مما يثبت أن العطور بأسعار معقولة في الإمارات يمكن أن تبدو فاخرة.",
+    },
+    products: [
+      { slug: "dark-musk-oil", rank: 1, pickReason: { en: "Best Value — Dark Musk Oil | Concentrated Fragrance Oil", ar: "أفضل قيمة — زيت المسك الداكن" }, description: { en: "Our signature Dark Musk in a concentrated oil form. Alcohol-free and long-lasting, this fragrance oil delivers hours of deep, musky scent at an unbeatable price. Perfect for the UAE climate.", ar: "مسكنا الداكن المميز في صيغة زيت مركز. خالي من الكحول ويدوم طويلاً، يقدم هذا الزيت العطري ساعات من الرائحة المسكية العميقة بسعر لا يُضاهى. مثالي لمناخ الإمارات." } },
+      { slug: "velvet-amber", rank: 2, pickReason: { en: "Warm & Affordable — Velvet Amber Oil | Rich Amber Scent", ar: "دافئ ومناسب — زيت فلفت أمبر" }, description: { en: "Velvet Amber Oil captures warm amber and vanilla in a pocket-friendly format. This concentrated oil sits close to the skin, creating an intimate scent bubble that evolves beautifully throughout the day.", ar: "زيت فلفت أمبر يلتقط العنبر الدافئ والفانيلا بسعر مناسب للجميع. هذا الزيت المركز يبقى قريباً من البشرة، مما يخلق فقاعة عطرية حميمية تتطور بجمال طوال اليوم." } },
+      { slug: "dark-musk-hair-body-mist", rank: 3, pickReason: { en: "Fresh Pick — Dark Musk Hair & Body Mist | Light & Refreshing", ar: "اختيار منعش — بخاخ الشعر والجسم المسك الداكن" }, description: { en: "A lighter take on our beloved Dark Musk. This hair & body mist delivers a refreshing burst of musky fragrance that's perfect for daily use. Gentle on hair and skin.", ar: "نسخة أخف من مسكنا الداكن المحبوب. بخاخ الشعر والجسم هذا يقدم انتعاشاً مسكياً مثالياً للاستخدام اليومي. لطيف على الشعر والبشرة." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "How to Find Good Perfume at a Low Price", ar: "كيف تجد عطراً جيداً بسعر منخفض" }, body: { en: "The key to affordable luxury fragrance is choosing the right format. Fragrance oils and body mists offer excellent scent quality at lower price points than traditional eau de parfum sprays. Oils are more concentrated, so a little goes a long way — making them better value per wear. Body mists are perfect for layering and freshening up throughout the day.", ar: "سر العطور الفاخرة بأسعار مناسبة هو اختيار الصيغة المناسبة. الزيوت العطرية وبخاخات الجسم تقدم جودة رائحة ممتازة بأسعار أقل من بخاخات أو دو بارفان التقليدية. الزيوت أكثر تركيزاً، فكمية قليلة تدوم طويلاً — مما يجعلها قيمة أفضل لكل استخدام." } },
+    ],
+    faqs: [
+      { question: { en: "Can I find good perfume under 100 AED?", ar: "هل يمكنني إيجاد عطر جيد بأقل من 100 درهم؟" }, answer: { en: "Absolutely! Fragrance oils and body mists from Aromatic Scents Lab offer amazing scents under 100 AED. Oils are concentrated and long-lasting, making them excellent value.", ar: "بالتأكيد! الزيوت العطرية وبخاخات الجسم من Aromatic Scents Lab تقدم روائح رائعة بأقل من 100 درهم. الزيوت مركزة وتدوم طويلاً مما يجعلها قيمة ممتازة." } },
+      { question: { en: "Are cheap perfumes worth it?", ar: "هل العطور الرخيصة تستحق؟" }, answer: { en: "Price doesn't always determine quality. Our fragrance oils under 100 AED use the same premium ingredients as our luxury perfumes — just in a different, more concentrated format.", ar: "السعر لا يحدد الجودة دائماً. زيوتنا العطرية بأقل من 100 درهم تستخدم نفس المكونات الفاخرة الموجودة في عطورنا الغالية — فقط بصيغة مختلفة وأكثر تركيزاً." } },
+    ],
+    relatedGuideSlugs: ["best-aromatic-perfumes-under-200-aed", "best-perfumes-uae", "best-fragrance-oils"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 30. BEST AROMATIC PERFUMES UNDER 200 AED
+  // ==========================================================================
+  {
+    slug: "best-aromatic-perfumes-under-200-aed",
+    title: {
+      en: "Best Aromatic Perfumes Under 200 AED – Mid-Range Luxury Fragrances 2025",
+      ar: "أفضل عطور أروماتيك بأقل من 200 درهم – عطور فاخرة متوسطة السعر 2025",
+    },
+    metaDescription: {
+      en: "Discover the best aromatic perfumes under 200 AED. Premium oud oils, signature perfumes & gift-worthy fragrances from Aromatic Scents Lab. Free delivery over 500 AED.",
+      ar: "اكتشف أفضل عطور أروماتيك بأقل من 200 درهم. زيوت عود فاخرة وعطور مميزة وهدايا عطرية من Aromatic Scents Lab. توصيل مجاني فوق 500 درهم.",
+    },
+    keywords: {
+      en: [
+        "perfume under 200 AED",
+        "mid-range perfume UAE",
+        "aromatic perfume under 200",
+        "oud oil under 200 AED",
+        "good perfume 200 AED",
+        "luxury perfume affordable",
+        "best fragrance under 200",
+        "aromatic scents mid-range",
+        "perfume gift under 200",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر بأقل من 200 درهم",
+        "عطور متوسطة السعر الإمارات",
+        "عطور أروماتيك بأقل من 200",
+        "زيت عود بأقل من 200 درهم",
+        "عطر جيد 200 درهم",
+        "عطور فاخرة بأسعار مناسبة",
+        "أفضل عطر بأقل من 200",
+        "عطور أروماتيك متوسطة السعر",
+        "هدية عطر بأقل من 200",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Mid-Range Luxury 2025", ar: "فخامة متوسطة السعر 2025" },
+    intro: {
+      en: "The sweet spot of perfumery — under 200 AED, you unlock a world of premium fragrances that rival much pricier options. From concentrated oud oils to signature eau de parfum sprays, Aromatic Scents Lab delivers exceptional quality at this price range. These perfumes make excellent gifts and everyday signature scents.",
+      ar: "النقطة المثالية في عالم العطور — بأقل من 200 درهم، تفتح عالماً من العطور الفاخرة التي تنافس خيارات أغلى بكثير. من زيوت العود المركزة إلى بخاخات أو دو بارفان المميزة، يقدم Aromatic Scents Lab جودة استثنائية في هذا النطاق السعري. هذه العطور تصلح كهدايا ممتازة وعطور يومية مميزة.",
+    },
+    products: [
+      { slug: "dark-musk-perfume", rank: 1, pickReason: { en: "Best Under 200 — Dark Musk EDP | Oriental Musky | 10+ Hour Longevity", ar: "الأفضل بأقل من 200 — المسك الداكن" }, description: { en: "Our bestselling Dark Musk EDP delivers an unforgettable oriental musky experience with incredible 10+ hour longevity — all under 200 AED. The perfect balance of quality and value.", ar: "المسك الداكن الأكثر مبيعاً يقدم تجربة مسكية شرقية لا تُنسى مع ثبات يتجاوز 10 ساعات — كل ذلك بأقل من 200 درهم. التوازن المثالي بين الجودة والقيمة." } },
+      { slug: "velvet-amber-perfume", rank: 2, pickReason: { en: "Elegant Choice — Velvet Amber EDP | Warm Amber & Vanilla", ar: "اختيار أنيق — فلفت أمبر" }, description: { en: "Velvet Amber is a warm, sophisticated fragrance that feels much more expensive than its price tag. Rich amber and vanilla blend with soft sandalwood for an elegant scent that turns heads.", ar: "فلفت أمبر عطر دافئ وراقي يبدو أغلى بكثير من سعره. العنبر الغني والفانيلا يمتزجان مع خشب الصندل الناعم لرائحة أنيقة تلفت الأنظار." } },
+      { slug: "secret-leather-perfume", rank: 3, pickReason: { en: "Bold Value — Secret Leather EDP | Leather & Oriental", ar: "قيمة جريئة — سيكرت ليذر" }, description: { en: "Secret Leather brings bold, masculine luxury under 200 AED. Smooth leather meets rich oriental notes for a powerful fragrance that projects confidently and lasts all day.", ar: "سيكرت ليذر يقدم فخامة ذكورية جريئة بأقل من 200 درهم. الجلد الناعم يلتقي بالنفحات الشرقية الغنية لعطر قوي ينتشر بثقة ويدوم طوال اليوم." } },
+      { slug: "black-vanilla-perfume", rank: 4, pickReason: { en: "Gourmand Gem — Black Vanilla EDP | Dark Vanilla & Spice", ar: "جوهرة حلوة — بلاك فانيليا" }, description: { en: "Black Vanilla offers a uniquely dark, gourmand experience under 200 AED. Cinnamon, rose, and deep vanilla create a mysteriously addictive scent perfect for cooler UAE evenings.", ar: "بلاك فانيليا يقدم تجربة حلوة وداكنة فريدة بأقل من 200 درهم. القرفة والورد والفانيلا العميقة تخلق رائحة غامضة ومُغرية مثالية لأمسيات الإمارات الباردة." } },
+      { slug: "patchouli-glow-perfume", rank: 5, pickReason: { en: "Earthy Luxury — Patchouli Glow EDP | Woody Oriental", ar: "فخامة ترابية — باتشولي جلو" }, description: { en: "Patchouli Glow brings earthy sophistication under 200 AED. Bergamot, patchouli, and warm amber create a grounding, long-lasting scent that's truly unique in this price range.", ar: "باتشولي جلو يقدم تطوراً ترابياً بأقل من 200 درهم. البرغموت والباتشولي والعنبر الدافئ يخلقون رائحة مستقرة وطويلة الأمد فريدة حقاً في هذا النطاق السعري." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Why 200 AED Is the Sweet Spot for Perfume", ar: "لماذا 200 درهم هو السعر المثالي للعطور" }, body: { en: "At the 200 AED range, you access full-sized eau de parfum bottles with premium ingredients and professional formulation. Unlike mass-market brands, Aromatic Scents Lab crafts each fragrance by hand in the UAE, so you get artisan quality without the luxury markup. This price range offers the best ratio of quality to cost in the perfume world.", ar: "في نطاق 200 درهم، تحصل على عبوات أو دو بارفان كاملة الحجم بمكونات فاخرة وتركيبة احترافية. بخلاف الماركات التجارية، يصنع Aromatic Scents Lab كل عطر يدوياً في الإمارات، فتحصل على جودة حرفية بدون هامش الفخامة الزائد. هذا النطاق السعري يقدم أفضل نسبة جودة إلى تكلفة في عالم العطور." } },
+    ],
+    faqs: [
+      { question: { en: "What is the best perfume under 200 AED?", ar: "ما هو أفضل عطر بأقل من 200 درهم؟" }, answer: { en: "Dark Musk EDP is our top pick under 200 AED — it's our bestseller with 10+ hour longevity, a rich oriental musky profile, and exceptional value for money.", ar: "المسك الداكن هو اختيارنا الأول بأقل من 200 درهم — الأكثر مبيعاً مع ثبات يتجاوز 10 ساعات وتركيبة مسكية شرقية غنية وقيمة استثنائية مقابل السعر." } },
+      { question: { en: "Is it worth buying perfume under 200 AED?", ar: "هل يستحق شراء عطر بأقل من 200 درهم؟" }, answer: { en: "Absolutely. Our full-sized EDPs under 200 AED use the same premium ingredients as luxury brands. Handcrafted in the UAE, they offer outstanding quality at accessible prices.", ar: "بالتأكيد. عطورنا الكاملة بأقل من 200 درهم تستخدم نفس المكونات الفاخرة. مصنوعة يدوياً في الإمارات وتقدم جودة متميزة بأسعار في المتناول." } },
+    ],
+    relatedGuideSlugs: ["best-aromatic-perfumes-under-100-aed", "best-aromatic-perfumes-under-300-aed", "best-perfumes-uae"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 31. BEST AROMATIC PERFUMES UNDER 300 AED
+  // ==========================================================================
+  {
+    slug: "best-aromatic-perfumes-under-300-aed",
+    title: {
+      en: "Best Aromatic Perfumes Under 300 AED – Premium Fragrances & Gift Sets 2025",
+      ar: "أفضل عطور أروماتيك بأقل من 300 درهم – عطور فاخرة وأطقم هدايا 2025",
+    },
+    metaDescription: {
+      en: "Discover the best aromatic perfumes under 300 AED. Premium fragrances, luxury body care sets & curated gift boxes from Aromatic Scents Lab. Free delivery over 500 AED.",
+      ar: "اكتشف أفضل عطور أروماتيك بأقل من 300 درهم. عطور فاخرة وأطقم عناية بالجسم وعلب هدايا مختارة من Aromatic Scents Lab. توصيل مجاني فوق 500 درهم.",
+    },
+    keywords: {
+      en: [
+        "perfume under 300 AED",
+        "premium perfume UAE",
+        "aromatic perfume under 300",
+        "luxury gift set under 300",
+        "best perfume 300 AED",
+        "perfume gift box affordable",
+        "aromatic fragrance premium",
+        "body care gift set UAE",
+        "perfume and lotion set",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر بأقل من 300 درهم",
+        "عطور فاخرة الإمارات",
+        "عطور أروماتيك بأقل من 300",
+        "طقم هدايا فاخر بأقل من 300",
+        "أفضل عطر 300 درهم",
+        "علبة هدايا عطور بسعر مناسب",
+        "عطور أروماتيك فاخرة",
+        "طقم عناية بالجسم الإمارات",
+        "طقم عطر ولوشن",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Premium Fragrances 2025", ar: "عطور فاخرة 2025" },
+    intro: {
+      en: "Under 300 AED opens the door to Aromatic Scents Lab's premium collections — including larger perfume sizes, body care duos, and beautifully packaged gift sets. At this range, you get the full luxury experience with exceptional craftsmanship and ingredients that rival international niche brands.",
+      ar: "بأقل من 300 درهم تفتح الباب لمجموعات Aromatic Scents Lab الفاخرة — بما في ذلك أحجام عطور أكبر وثنائيات العناية بالجسم وأطقم هدايا مغلفة بشكل جميل. في هذا النطاق، تحصل على تجربة فخامة كاملة بحرفية ومكونات تنافس العلامات العالمية.",
+    },
+    products: [
+      { slug: "dark-musk-perfume", rank: 1, pickReason: { en: "Top Premium — Dark Musk EDP 100ml | Full-Size Signature Scent", ar: "الأفضل فاخر — المسك الداكن 100 مل" }, description: { en: "The full-size Dark Musk EDP — our crown jewel. At under 300 AED, you get our bestselling signature fragrance in a generous 100ml bottle that lasts for months of daily wear.", ar: "المسك الداكن بالحجم الكامل — جوهرة تاجنا. بأقل من 300 درهم، تحصل على عطرنا المميز الأكثر مبيعاً بعبوة 100 مل سخية تدوم لأشهر من الاستخدام اليومي." } },
+      { slug: "royal-tobacco-perfume", rank: 2, pickReason: { en: "Bold Luxury — Royal Tobacco EDP | Oriental Spicy Masterpiece", ar: "فخامة جريئة — رويال توباكو" }, description: { en: "Royal Tobacco brings incense, vanilla, and smoky tobacco in a bold oriental composition. A niche-quality fragrance under 300 AED that commands attention.", ar: "رويال توباكو يجمع البخور والفانيلا والتبغ الدخاني في تركيبة شرقية جريئة. عطر بجودة نيش بأقل من 300 درهم يفرض حضوره." } },
+      { slug: "velvet-amber-perfume", rank: 3, pickReason: { en: "Gift-Worthy — Velvet Amber EDP | Elegant Warm Fragrance", ar: "يستحق الإهداء — فلفت أمبر" }, description: { en: "Velvet Amber in its full-size format makes an incredible gift. The warm amber and vanilla fragrance appeals to everyone and comes in beautiful packaging.", ar: "فلفت أمبر بالحجم الكامل يصنع هدية لا تُنسى. عطر العنبر الدافئ والفانيلا يعجب الجميع ويأتي في تغليف جميل." } },
+      { slug: "secret-leather-perfume", rank: 4, pickReason: { en: "Statement Piece — Secret Leather EDP | Powerful Oriental", ar: "قطعة مميزة — سيكرت ليذر" }, description: { en: "Secret Leather at full size is the ultimate statement fragrance under 300 AED. Leather, oud-like depth, and oriental spice create an unforgettable presence.", ar: "سيكرت ليذر بالحجم الكامل هو عطر التميز الأقصى بأقل من 300 درهم. الجلد والعمق الشبيه بالعود والتوابل الشرقية تخلق حضوراً لا يُنسى." } },
+      { slug: "rich-vanilla-perfume", rank: 5, pickReason: { en: "Crowd Pleaser — Rich Vanilla EDP | Sweet & Universally Loved", ar: "محبوب الجميع — ريتش فانيليا" }, description: { en: "Rich Vanilla is universally adored. Its blend of bergamot, tonka bean, amber, and creamy vanilla makes it the perfect crowd-pleasing fragrance under 300 AED.", ar: "ريتش فانيليا محبوب عالمياً. مزيجه من البرغموت وحبوب التونكا والعنبر والفانيلا الكريمية يجعله العطر المثالي الذي يعجب الجميع بأقل من 300 درهم." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Perfume as a Luxury Gift Under 300 AED", ar: "العطر كهدية فاخرة بأقل من 300 درهم" }, body: { en: "A premium perfume under 300 AED makes a thoughtful and luxurious gift for any occasion — birthdays, Eid, weddings, or corporate gifting. At Aromatic Scents Lab, our fragrances come in elegant packaging ready for gifting. You can also pair a perfume with a matching body lotion or fragrance oil for a complete scented experience.", ar: "العطر الفاخر بأقل من 300 درهم يصنع هدية مدروسة وفاخرة لأي مناسبة — أعياد الميلاد والعيد والزفاف وهدايا الشركات. في Aromatic Scents Lab، عطورنا تأتي في تغليف أنيق جاهز للإهداء. يمكنك أيضاً دمج عطر مع لوشن جسم مطابق أو زيت عطري لتجربة عطرية متكاملة." } },
+    ],
+    faqs: [
+      { question: { en: "What luxury perfume can I get under 300 AED?", ar: "أي عطر فاخر يمكنني الحصول عليه بأقل من 300 درهم؟" }, answer: { en: "Under 300 AED, you can get full-size EDPs like Dark Musk, Royal Tobacco, or Velvet Amber — all handcrafted luxury fragrances with niche-quality ingredients.", ar: "بأقل من 300 درهم، يمكنك الحصول على عطور كاملة الحجم مثل المسك الداكن ورويال توباكو وفلفت أمبر — كلها عطور فاخرة يدوية بمكونات بجودة نيش." } },
+    ],
+    relatedGuideSlugs: ["best-aromatic-perfumes-under-200-aed", "best-aromatic-perfumes-under-500-aed", "best-perfumes-for-weddings"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 32. BEST AROMATIC PERFUMES UNDER 500 AED
+  // ==========================================================================
+  {
+    slug: "best-aromatic-perfumes-under-500-aed",
+    title: {
+      en: "Best Aromatic Perfumes Under 500 AED – Exclusive Collections & Oud Sets 2025",
+      ar: "أفضل عطور أروماتيك بأقل من 500 درهم – مجموعات حصرية وأطقم عود 2025",
+    },
+    metaDescription: {
+      en: "Discover the best aromatic perfumes under 500 AED. Exclusive oud collections, luxury gift boxes & premium fragrance sets from Aromatic Scents Lab. Free delivery included.",
+      ar: "اكتشف أفضل عطور أروماتيك بأقل من 500 درهم. مجموعات عود حصرية وعلب هدايا فاخرة وأطقم عطور من Aromatic Scents Lab. توصيل مجاني مشمول.",
+    },
+    keywords: {
+      en: [
+        "perfume under 500 AED",
+        "luxury perfume UAE",
+        "aromatic perfume under 500",
+        "oud collection under 500",
+        "premium gift box UAE",
+        "exclusive perfume set",
+        "luxury fragrance collection",
+        "aromatic oud set",
+        "perfume gift box luxury",
+        "best perfume 500 AED",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر بأقل من 500 درهم",
+        "عطور فاخرة الإمارات",
+        "عطور أروماتيك بأقل من 500",
+        "مجموعة عود بأقل من 500",
+        "علبة هدايا فاخرة الإمارات",
+        "طقم عطور حصري",
+        "مجموعة عطور فاخرة",
+        "طقم عود أروماتيك",
+        "علبة هدايا عطور فاخرة",
+        "أفضل عطر 500 درهم",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Exclusive Collections 2025", ar: "مجموعات حصرية 2025" },
+    intro: {
+      en: "Under 500 AED unlocks Aromatic Scents Lab's most exclusive offerings — premium multi-piece gift boxes, oud collections, and deluxe fragrance sets. This is where you find the perfect luxury gift with free delivery included. Each set is beautifully curated and packaged to impress.",
+      ar: "بأقل من 500 درهم تحصل على أكثر عروض Aromatic Scents Lab حصرية — علب هدايا فاخرة متعددة القطع ومجموعات عود وأطقم عطور ديلوكس. هنا تجد الهدية الفاخرة المثالية مع توصيل مجاني مشمول. كل مجموعة مُختارة ومُغلفة بعناية لتُبهر.",
+    },
+    products: [
+      { slug: "dark-musk-perfume", rank: 1, pickReason: { en: "Ultimate Collection — Dark Musk Fragrance Trio | EDP + Oil + Mist", ar: "المجموعة النهائية — ثلاثية المسك الداكن" }, description: { en: "Experience Dark Musk in every format — the full EDP spray, concentrated oil, and refreshing body mist. The ultimate fragrance layering set under 500 AED for all-day scent.", ar: "استمتع بالمسك الداكن بكل صيغه — بخاخ أو دو بارفان الكامل والزيت المركز وبخاخ الجسم المنعش. مجموعة طبقات العطر النهائية بأقل من 500 درهم لرائحة تدوم طوال اليوم." } },
+      { slug: "velvet-amber-perfume", rank: 2, pickReason: { en: "Luxury Gift Box — Velvet Amber Complete Set | Perfume + Body Care", ar: "علبة هدايا فاخرة — طقم فلفت أمبر الكامل" }, description: { en: "The complete Velvet Amber experience — perfume paired with matching body lotion for a full fragrance ritual. Elegantly boxed and ready to gift under 500 AED.", ar: "تجربة فلفت أمبر الكاملة — عطر مع لوشن جسم مطابق لطقوس عطرية متكاملة. مُعبأ بأناقة وجاهز للإهداء بأقل من 500 درهم." } },
+      { slug: "royal-tobacco-perfume", rank: 3, pickReason: { en: "Prestige Pick — Royal Tobacco Deluxe | Bold Oriental Gift", ar: "اختيار مرموق — رويال توباكو ديلوكس" }, description: { en: "Royal Tobacco in its deluxe presentation is a statement gift. The bold oriental spicy fragrance with incense and vanilla makes an unforgettable impression.", ar: "رويال توباكو بتقديمه الديلوكس هدية مميزة. العطر الشرقي الحار الجريء بالبخور والفانيلا يترك انطباعاً لا يُنسى." } },
+      { slug: "secret-leather-perfume", rank: 4, pickReason: { en: "Executive Gift — Secret Leather Premium | Leather & Oud Luxury", ar: "هدية تنفيذية — سيكرت ليذر بريميوم" }, description: { en: "Secret Leather in premium format is the ideal executive or corporate gift under 500 AED. Sophisticated leather and oriental notes exude confidence and class.", ar: "سيكرت ليذر بالصيغة الفاخرة هو الهدية التنفيذية المثالية بأقل من 500 درهم. الجلد الراقي والنفحات الشرقية تنضح بالثقة والفخامة." } },
+      { slug: "black-vanilla-perfume", rank: 5, pickReason: { en: "Indulgent Set — Black Vanilla Duo | Gourmand Luxury Pair", ar: "طقم مُدلل — ثنائية بلاك فانيليا" }, description: { en: "Black Vanilla paired with its matching fragrance oil creates the ultimate gourmand indulgence under 500 AED. Dark vanilla, cinnamon, and rose in two complementary formats.", ar: "بلاك فانيليا مع زيته العطري المطابق يخلقان ترف حلو نهائي بأقل من 500 درهم. الفانيلا الداكنة والقرفة والورد بصيغتين متكاملتين." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "The Art of Fragrance Gifting Under 500 AED", ar: "فن إهداء العطور بأقل من 500 درهم" }, body: { en: "Under 500 AED, fragrance gifting becomes an experience. At Aromatic Scents Lab, we curate multi-product gift sets that include perfumes, oils, body lotions, and hair mists — all in matching scents. Our elegant gift boxes are ready for special occasions: Eid, Ramadan, weddings, birthdays, or corporate events. Plus, orders over 500 AED qualify for free delivery across the UAE.", ar: "بأقل من 500 درهم، يصبح إهداء العطور تجربة. في Aromatic Scents Lab، نختار أطقم هدايا متعددة المنتجات تشمل العطور والزيوت ولوشن الجسم وبخاخات الشعر — كلها بروائح متطابقة. علب هداياتنا الأنيقة جاهزة للمناسبات الخاصة: العيد ورمضان والزفاف وأعياد الميلاد. والطلبات فوق 500 درهم تحصل على توصيل مجاني في الإمارات." } },
+    ],
+    faqs: [
+      { question: { en: "What is the best perfume gift under 500 AED?", ar: "ما هي أفضل هدية عطر بأقل من 500 درهم؟" }, answer: { en: "Our Dark Musk Fragrance Trio (EDP + Oil + Mist) is the ultimate gift under 500 AED — three complementary formats of our bestselling scent, beautifully packaged.", ar: "ثلاثية المسك الداكن (بخاخ + زيت + بخاخ جسم) هي الهدية النهائية بأقل من 500 درهم — ثلاث صيغ متكاملة من عطرنا الأكثر مبيعاً بتغليف جميل." } },
+      { question: { en: "Do I get free delivery on orders under 500 AED?", ar: "هل أحصل على توصيل مجاني للطلبات بأقل من 500 درهم؟" }, answer: { en: "Free delivery applies to orders over 500 AED. For orders under 500 AED, a small delivery fee applies. Consider adding a fragrance oil or body mist to reach the free delivery threshold!", ar: "التوصيل المجاني للطلبات فوق 500 درهم. للطلبات بأقل من 500 درهم، تُطبق رسوم توصيل بسيطة. فكر بإضافة زيت عطري أو بخاخ جسم للوصول لحد التوصيل المجاني!" } },
+    ],
+    relatedGuideSlugs: ["best-aromatic-perfumes-under-300-aed", "best-perfumes-uae", "best-perfumes-for-weddings"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
 ];
 
 /**
