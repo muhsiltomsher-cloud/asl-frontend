@@ -23,8 +23,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/faq",
     keywords: locale === "ar"
-      ? ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع", "توصيل الإمارات", "عود عربي", "عطور فاخرة", "Aromatic Scents Lab", "كيف اطلب عطور", "مدة التوصيل", "طريقة الاستبدال", "تتبع الطلب"]
-      : ["FAQ", "frequently asked questions", "perfume FAQ", "fragrance help", "shipping UAE", "returns", "payment methods", "Arabian oud", "luxury perfumes", "Aromatic Scents Lab", "how to order perfume", "delivery time UAE", "exchange policy", "order tracking"],
+      ? ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع", "توصيل الإمارات", "عود عربي", "عطور فاخرة", "Aromatic Scents Lab", "كيف اطلب عطور", "مدة التوصيل", "طريقة الاستبدال", "تتبع الطلب", "أسئلة عطور أروماتيك", "مساعدة أروماتيك سنتس لاب", "أسئلة شائعة أروماتيك", "كيف اطلب من أروماتيك"]
+      : ["FAQ", "frequently asked questions", "perfume FAQ", "fragrance help", "shipping UAE", "returns", "payment methods", "Arabian oud", "luxury perfumes", "Aromatic Scents Lab", "how to order perfume", "delivery time UAE", "exchange policy", "order tracking", "aromatic perfume FAQ", "aromatic scents help", "aromatic scents lab questions", "how to order from aromatic"],
   });
 }
 
