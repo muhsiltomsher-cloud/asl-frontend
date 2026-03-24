@@ -27,8 +27,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/build-your-own-set",
     keywords: isRTL
-      ? ["مجموعة عطور", "هدايا عطور", "عطور مخصصة", "حزمة عطور", "طقم عطور", "هدية عطرية", "هدية عطور فاخرة", "طقم عطور هدية", "مجموعة عطور مخصصة", "هدية عيد عطور", "هدية عيد ميلاد", "هدية زواج عطور", "عطور إماراتية هدية", "طقم عود عربي"]
-      : ["custom fragrance set", "perfume gift set", "build your own perfume", "fragrance bundle", "perfume collection", "gift set", "luxury perfume gift", "perfume gift box", "custom perfume bundle", "birthday perfume gift", "wedding fragrance gift", "anniversary perfume set", "UAE perfume gift set", "oud gift set"],
+      ? ["مجموعة عطور", "هدايا عطور", "عطور مخصصة", "حزمة عطور", "طقم عطور", "هدية عطرية", "هدية عطور فاخرة", "طقم عطور هدية", "مجموعة عطور مخصصة", "هدية عيد عطور", "هدية عيد ميلاد", "هدية زواج عطور", "عطور إماراتية هدية", "طقم عود عربي", "طقم عطور أروماتيك مخصص", "اصنع هدية أروماتيك", "مجموعة عطور أروماتيك شخصية", "علبة هدايا أروماتيك الإمارات"]
+      : ["custom fragrance set", "perfume gift set", "build your own perfume", "fragrance bundle", "perfume collection", "gift set", "luxury perfume gift", "perfume gift box", "custom perfume bundle", "birthday perfume gift", "wedding fragrance gift", "anniversary perfume set", "UAE perfume gift set", "oud gift set", "aromatic custom perfume set", "build your own aromatic gift", "personalized aromatic fragrance", "create aromatic gift box UAE"],
   });
 }
 
