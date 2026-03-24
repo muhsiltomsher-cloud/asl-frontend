@@ -1840,6 +1840,77 @@ export const guides: Guide[] = [
     publishedAt: "2025-03-20T00:00:00Z",
     updatedAt: "2025-03-20T00:00:00Z",
   },
+
+  // ==========================================================================
+  // 33. AROMATIC BODY CARE — PROTECT & NOURISH YOUR SKIN
+  // ==========================================================================
+  {
+    slug: "aromatic-body-care-protect-your-skin",
+    title: {
+      en: "Aromatic Body Care — Protect & Nourish Your Skin with Fragrance",
+      ar: "العناية بالجسم أروماتيك — احمِ وغذِّ بشرتك بالعطور",
+    },
+    metaDescription: {
+      en: "Discover aromatic body care that protects and nourishes your skin. Hand & body lotions, hair mists & scented oils from Aromatic Scents Lab. Moisturize while smelling amazing.",
+      ar: "اكتشف العناية بالجسم العطرية التي تحمي وتغذي بشرتك. لوشن اليد والجسم وبخاخات الشعر والزيوت المعطرة من Aromatic Scents Lab. رطب بشرتك وتمتع برائحة رائعة.",
+    },
+    keywords: {
+      en: [
+        "aromatic body lotion",
+        "hand and body lotion UAE",
+        "protect your skin fragrance",
+        "skin care perfume",
+        "moisturizing body lotion Dubai",
+        "aromatic skin protection",
+        "scented body cream UAE",
+        "fragrance body care",
+        "nourish skin with perfume",
+        "aromatic hand cream",
+        "body lotion for dry skin UAE",
+        "perfumed moisturizer Dubai",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "لوشن جسم أروماتيك",
+        "لوشن يد وجسم الإمارات",
+        "حماية البشرة بالعطور",
+        "عناية البشرة بالعطور",
+        "لوشن مرطب دبي",
+        "حماية البشرة أروماتيك",
+        "كريم جسم معطر الإمارات",
+        "عناية الجسم بالعطور",
+        "تغذية البشرة بالعطر",
+        "كريم يد أروماتيك",
+        "لوشن جسم للبشرة الجافة الإمارات",
+        "مرطب معطر دبي",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Skin Care & Fragrance 2025", ar: "العناية بالبشرة والعطور 2025" },
+    intro: {
+      en: "Your skin deserves more than just fragrance — it deserves protection, hydration, and nourishment. At Aromatic Scents Lab, our body care range combines luxurious scents with skin-loving ingredients that moisturize, soften, and shield your skin from the harsh UAE climate. From rich hand & body lotions to lightweight hair & body mists, every product is designed to protect your skin while wrapping you in beautiful fragrance all day long.",
+      ar: "بشرتك تستحق أكثر من مجرد عطر — تستحق الحماية والترطيب والتغذية. في Aromatic Scents Lab، تجمع مجموعة العناية بالجسم بين الروائح الفاخرة والمكونات المحبة للبشرة التي ترطب وتنعم وتحمي بشرتك من مناخ الإمارات القاسي. من لوشن اليد والجسم الغني إلى بخاخات الشعر والجسم الخفيفة، كل منتج مصمم لحماية بشرتك مع تغليفك برائحة جميلة طوال اليوم.",
+    },
+    products: [
+      { slug: "dark-musk-hand-body-lotion", rank: 1, pickReason: { en: "Best Moisturizer — Dark Musk Hand & Body Lotion | Deep Hydration + Fragrance", ar: "أفضل مرطب — لوشن المسك الداكن لليد والجسم" }, description: { en: "Our bestselling Dark Musk scent in a deeply hydrating hand & body lotion. This rich formula protects your skin from dryness while enveloping you in the warm, musky fragrance loved across the UAE. Perfect for daily use after showering — it locks in moisture and leaves your skin silky smooth and beautifully scented all day.", ar: "رائحة المسك الداكن الأكثر مبيعاً في لوشن مرطب لليد والجسم. هذه التركيبة الغنية تحمي بشرتك من الجفاف مع تغليفك بالرائحة المسكية الدافئة المحبوبة في الإمارات. مثالي للاستخدام اليومي بعد الاستحمام — يحبس الرطوبة ويترك بشرتك ناعمة كالحرير ومعطرة طوال اليوم." } },
+      { slug: "velvet-amber-hand-body-lotion", rank: 2, pickReason: { en: "Nourishing Luxury — Velvet Amber Hand & Body Lotion | Warm Amber Hydration", ar: "فخامة مغذية — لوشن فلفت أمبر لليد والجسم" }, description: { en: "Velvet Amber Hand & Body Lotion delivers warm amber and vanilla fragrance while deeply nourishing your skin. The creamy texture absorbs quickly, leaving no greasy residue — just soft, protected skin with a subtle, elegant scent that lasts for hours.", ar: "لوشن فلفت أمبر لليد والجسم يقدم رائحة العنبر الدافئ والفانيلا مع تغذية عميقة لبشرتك. القوام الكريمي يُمتص بسرعة دون ترك أثر دهني — فقط بشرة ناعمة ومحمية مع رائحة أنيقة تدوم لساعات." } },
+      { slug: "dark-musk-hair-body-mist", rank: 3, pickReason: { en: "Light Protection — Dark Musk Hair & Body Mist | Refresh & Shield", ar: "حماية خفيفة — بخاخ الشعر والجسم المسك الداكن" }, description: { en: "A lightweight mist that refreshes your hair and body while providing a protective fragrance layer. Gentle enough for daily use on all skin types, this mist adds a burst of musky freshness without weighing down hair or irritating sensitive skin.", ar: "بخاخ خفيف ينعش شعرك وجسمك مع توفير طبقة عطرية واقية. لطيف بما يكفي للاستخدام اليومي على جميع أنواع البشرة، يضيف هذا البخاخ انتعاشاً مسكياً دون إثقال الشعر أو تهييج البشرة الحساسة." } },
+      { slug: "dark-musk-oil", rank: 4, pickReason: { en: "Skin-Loving Oil — Dark Musk Fragrance Oil | Alcohol-Free Skin Care", ar: "زيت محب للبشرة — زيت المسك الداكن" }, description: { en: "Fragrance oils are naturally kind to skin — alcohol-free and gentle on even sensitive skin. Dark Musk Oil provides intense, long-lasting scent while helping maintain your skin's natural moisture barrier. Apply to pulse points for fragrance that nourishes rather than dries.", ar: "الزيوت العطرية لطيفة طبيعياً على البشرة — خالية من الكحول ولطيفة حتى على البشرة الحساسة. زيت المسك الداكن يقدم رائحة مكثفة وطويلة الأمد مع المساعدة في الحفاظ على حاجز الرطوبة الطبيعي لبشرتك." } },
+      { slug: "velvet-amber", rank: 5, pickReason: { en: "Gentle Nourishment — Velvet Amber Oil | Moisturizing Fragrance Oil", ar: "تغذية لطيفة — زيت فلفت أمبر" }, description: { en: "Velvet Amber Oil combines beautiful amber fragrance with skin-conditioning benefits. This alcohol-free oil sits gently on the skin, providing lasting scent while keeping your skin soft and hydrated — especially beneficial in the UAE's dry climate.", ar: "زيت فلفت أمبر يجمع بين رائحة العنبر الجميلة وفوائد تكييف البشرة. هذا الزيت الخالي من الكحول يجلس بلطف على البشرة، يقدم رائحة دائمة مع الحفاظ على بشرتك ناعمة ورطبة — مفيد بشكل خاص في مناخ الإمارات الجاف." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "How Fragranced Body Care Protects Your Skin", ar: "كيف تحمي العناية المعطرة بالجسم بشرتك" }, body: { en: "The UAE's hot, dry climate can be harsh on skin. Air conditioning, sun exposure, and low humidity strip away natural moisture, leaving skin dry, rough, and vulnerable. Aromatic Scents Lab's body care products are formulated to combat these conditions — our hand & body lotions create a protective moisture barrier, while our alcohol-free fragrance oils nourish rather than dry out your skin. By choosing scented body care over alcohol-based perfume sprays, you get lasting fragrance AND skin protection in one step.", ar: "مناخ الإمارات الحار والجاف يمكن أن يكون قاسياً على البشرة. التكييف والتعرض للشمس والرطوبة المنخفضة تسحب الرطوبة الطبيعية، تاركة البشرة جافة وخشنة وضعيفة. منتجات العناية بالجسم من Aromatic Scents Lab مصممة لمحاربة هذه الظروف — لوشن اليد والجسم يخلق حاجز رطوبة واقي، بينما زيوتنا العطرية الخالية من الكحول تغذي بشرتك بدلاً من تجفيفها. باختيار العناية المعطرة بالجسم بدلاً من بخاخات العطور الكحولية، تحصل على رائحة دائمة وحماية للبشرة في خطوة واحدة." } },
+      { heading: { en: "Layering: The Secret to All-Day Fragrance & Skin Care", ar: "التطبيق بالطبقات: سر العطر والعناية بالبشرة طوال اليوم" }, body: { en: "For the ultimate fragrance experience that also cares for your skin, layer your products: start with a matching body lotion right after showering to lock in moisture, add a few dabs of fragrance oil on pulse points for intensity, then finish with a hair & body mist for a refreshing top layer. This three-step ritual keeps your skin hydrated and protected while creating a fragrance that evolves beautifully and lasts all day.", ar: "للحصول على تجربة عطرية مثالية تعتني أيضاً ببشرتك، طبق منتجاتك بالطبقات: ابدأ بلوشن الجسم المطابق بعد الاستحمام مباشرة لحبس الرطوبة، أضف بضع قطرات من الزيت العطري على نقاط النبض للكثافة، ثم أنهِ ببخاخ الشعر والجسم كطبقة علوية منعشة. هذا الطقس المكون من ثلاث خطوات يحافظ على ترطيب بشرتك وحمايتها مع خلق عطر يتطور بجمال ويدوم طوال اليوم." } },
+    ],
+    faqs: [
+      { question: { en: "Does body lotion help perfume last longer?", ar: "هل يساعد لوشن الجسم العطر على الثبات أطول؟" }, answer: { en: "Yes! Moisturized skin holds fragrance much better than dry skin. Applying a scented body lotion before your perfume creates a hydrated base that helps the fragrance molecules bind and last significantly longer — up to twice as long in many cases.", ar: "نعم! البشرة المرطبة تحتفظ بالعطر أفضل بكثير من البشرة الجافة. وضع لوشن جسم معطر قبل العطر يخلق قاعدة رطبة تساعد جزيئات العطر على الالتصاق والثبات لفترة أطول بكثير — حتى ضعف المدة في كثير من الحالات." } },
+      { question: { en: "Is fragrance oil better for sensitive skin than perfume spray?", ar: "هل زيت العطر أفضل للبشرة الحساسة من بخاخ العطر؟" }, answer: { en: "Generally yes. Fragrance oils are alcohol-free, which means they don't dry out or irritate sensitive skin. They sit gently on the skin and provide long-lasting scent without the harshness of alcohol-based sprays.", ar: "عموماً نعم. الزيوت العطرية خالية من الكحول، مما يعني أنها لا تجفف أو تهيج البشرة الحساسة. تجلس بلطف على البشرة وتقدم رائحة طويلة الأمد دون قسوة البخاخات الكحولية." } },
+      { question: { en: "How can I protect my skin from UAE heat and dryness?", ar: "كيف أحمي بشرتي من حرارة وجفاف الإمارات؟" }, answer: { en: "Use a rich body lotion daily — especially after showering when skin is still slightly damp. Our hand & body lotions lock in moisture and create a protective barrier. For extra protection, layer with a fragrance oil which adds an additional moisture-sealing layer while keeping you beautifully scented.", ar: "استخدم لوشن جسم غني يومياً — خاصة بعد الاستحمام عندما تكون البشرة رطبة قليلاً. لوشن اليد والجسم لدينا يحبس الرطوبة ويخلق حاجزاً واقياً. لحماية إضافية، أضف طبقة من الزيت العطري الذي يضيف طبقة إضافية لحبس الرطوبة مع الحفاظ على رائحتك الجميلة." } },
+    ],
+    relatedGuideSlugs: ["best-aromatic-perfumes-under-100-aed", "best-fragrance-oils", "long-lasting-perfumes"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
 ];
 
 /**
