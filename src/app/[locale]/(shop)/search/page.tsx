@@ -31,8 +31,8 @@ export async function generateMetadata({
     pathname: "/search",
     noIndex: true,
     keywords: locale === "ar"
-      ? ["بحث عطور", "عطور فاخرة", "زيوت عطرية", "منتجات عطرية"]
-      : ["search perfumes", "find fragrances", "aromatic products", "perfume search"],
+      ? ["بحث عطور", "عطور فاخرة", "زيوت عطرية", "منتجات عطرية", "بحث عطور أروماتيك", "اعثر على روائح أروماتيك", "دليل عطور أروماتيك", "اكتشف منتجات أروماتيك الإمارات"]
+      : ["search perfumes", "find fragrances", "aromatic products", "perfume search", "search aromatic perfumes", "find aromatic scents", "aromatic fragrance finder", "discover aromatic products UAE"],
   });
 }
 

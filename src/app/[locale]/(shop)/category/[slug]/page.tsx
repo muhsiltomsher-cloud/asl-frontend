@@ -9,6 +9,7 @@ import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { CategoryClient } from "./CategoryClient";
 import { decodeHtmlEntities } from "@/lib/utils";
+import { categorySeoContent } from "@/data/category-seo-content";
 
 // Helper to check if a slug contains non-ASCII characters (e.g., Arabic)
 function isNonAsciiSlug(slug: string): boolean {
@@ -69,8 +70,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: `/category/${canonicalSlug}`,
     keywords: locale === "ar"
-      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور مسك", "عطور عنبر", "عطور دبي", "أفضل عطور", "عطور نسائية", "عطور رجالية"]
-      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab", "UAE perfume shop", "buy perfume online", "Arabian oud", "fragrance gifts", "musk perfume", "amber fragrance", "Dubai perfume", "best perfume", "women perfume", "men cologne"],
+      ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور مسك", "عطور عنبر", "عطور دبي", "أفضل عطور", "عطور نسائية", "عطور رجالية", `أروماتيك ${categoryName}`, `أفضل ${categoryName} الإمارات`, `${categoryName} بأسعار مناسبة`, "عطور أروماتيك أصلية", "روائح عطرية فاخرة", "تسوق عطور أروماتيك"]
+      : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab", "UAE perfume shop", "buy perfume online", "Arabian oud", "fragrance gifts", "musk perfume", "amber fragrance", "Dubai perfume", "best perfume", "women perfume", "men cologne", `aromatic ${categoryName.toLowerCase()}`, `best ${categoryName.toLowerCase()} UAE`, `${categoryName.toLowerCase()} affordable price`, "aromatic original perfume", "luxury aromatic scents", "shop aromatic fragrances"],
   });
 }
 
@@ -168,6 +169,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             className="text-gray-700 leading-relaxed category-description [&_strong]:block [&_strong]:text-lg [&_strong]:text-gray-900 [&_strong]:font-semibold [&_strong]:mb-2 [&_a]:text-primary [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-primary/50 [&_a]:hover:decoration-primary [&_a]:transition-colors"
             dangerouslySetInnerHTML={{ __html: category.description }}
           />
+        </div>
+      )}
+
+      {/* SEO keyword-rich content section unique per category */}
+      {categorySeoContent[slug] && (
+        <div className="mt-8 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">
+            {locale === "ar" ? categorySeoContent[slug].title.ar : categorySeoContent[slug].title.en}
+          </h2>
+          <p className="text-gray-600 leading-relaxed">
+            {locale === "ar" ? categorySeoContent[slug].description.ar : categorySeoContent[slug].description.en}
+          </p>
         </div>
       )}
     </div>
