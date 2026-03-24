@@ -1911,6 +1911,388 @@ export const guides: Guide[] = [
     publishedAt: "2025-03-20T00:00:00Z",
     updatedAt: "2025-03-20T00:00:00Z",
   },
+
+  // ==========================================================================
+  // 34. BEST VANILLA PERFUMES — SWEET & WARM FRAGRANCES
+  // ==========================================================================
+  {
+    slug: "best-vanilla-perfumes",
+    title: {
+      en: "Best Vanilla Perfumes UAE – Sweet, Warm & Gourmand Fragrances 2025",
+      ar: "أفضل عطور الفانيليا في الإمارات – عطور حلوة ودافئة 2025",
+    },
+    metaDescription: {
+      en: "Discover the best vanilla perfumes in UAE. Rich Vanilla, Black Vanilla & gourmand fragrances with warm, sweet, creamy scent profiles from Aromatic Scents Lab.",
+      ar: "اكتشف أفضل عطور الفانيليا في الإمارات. ريتش فانيليا وبلاك فانيليا وعطور حلوة بروائح دافئة وكريمية من Aromatic Scents Lab.",
+    },
+    keywords: {
+      en: [
+        "vanilla perfume UAE",
+        "best vanilla fragrance",
+        "sweet perfume Dubai",
+        "gourmand perfume UAE",
+        "warm vanilla scent",
+        "creamy perfume",
+        "vanilla smell perfume",
+        "dessert fragrance",
+        "sweet smell perfume UAE",
+        "aromatic vanilla perfume",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر فانيليا الإمارات",
+        "أفضل عطر فانيليا",
+        "عطر حلو دبي",
+        "عطر حلويات الإمارات",
+        "رائحة فانيليا دافئة",
+        "عطر كريمي",
+        "عطر برائحة الفانيليا",
+        "عطر حلو الإمارات",
+        "عطر فانيليا أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Vanilla Fragrances 2025", ar: "عطور الفانيليا 2025" },
+    intro: {
+      en: "Vanilla is one of the most beloved scent families in perfumery — warm, comforting, and irresistibly sweet. Whether you prefer a rich gourmand vanilla, a dark and mysterious blend, or a light creamy finish, Aromatic Scents Lab has crafted vanilla perfumes that capture every facet of this timeless ingredient. These are the best vanilla fragrances for the UAE.",
+      ar: "الفانيليا من أكثر عائلات الروائح المحبوبة في عالم العطور — دافئة ومريحة وحلوة بشكل لا يُقاوم. سواء كنت تفضل فانيليا حلوة غنية أو مزيجاً داكناً وغامضاً أو لمسة كريمية خفيفة، صنع Aromatic Scents Lab عطور فانيليا تلتقط كل جوانب هذا المكون الخالد. هذه أفضل عطور الفانيليا للإمارات.",
+    },
+    products: [
+      { slug: "rich-vanilla-perfume", rank: 1, pickReason: { en: "Creamiest Vanilla — Rich Vanilla | Oriental | Bergamot, Tonka, Amber, Vanilla, Benzoin", ar: "أكثر فانيليا كريمية — ريتش فانيليا" }, description: { en: "Rich Vanilla | Oriental | Top: Bergamot, Heliotrope | Heart: Tonka Bean, Amber | Base: Vanilla, Benzoin. A creamy, enveloping vanilla that feels like a warm cashmere blanket — sweet, rich, and deeply comforting.", ar: "ريتش فانيليا يقدم فانيليا كريمية تحتضنك كبطانية كشمير دافئة. تركيبته الشرقية تبدأ بالبرغموت والهيليوتروب، مع قلب من حبوب التونكا والعنبر، وقاعدة من الفانيليا والبنزوين. حلو وغني ومريح بعمق." } },
+      { slug: "black-vanilla-perfume", rank: 2, pickReason: { en: "Darkest Vanilla — Black Vanilla | Gourmand | Cinnamon, Rose, Vanilla, Patchouli", ar: "أعمق فانيليا — بلاك فانيليا" }, description: { en: "Black Vanilla | Gourmand | Top: Bergamot, Cinnamon | Heart: Rose, Tonka | Base: Vanilla, Patchouli. A dark, mysterious take on vanilla — spiced with cinnamon and grounded by earthy patchouli for a complex, addictive scent.", ar: "بلاك فانيليا تقدم نظرة داكنة وغامضة على الفانيليا — متبلة بالقرفة ومثبتة بالباتشولي الترابي. تركيبته تبدأ بالبرغموت والقرفة، مع قلب من الورد والتونكا، وقاعدة من الفانيليا والباتشولي. عطر معقد ومُدمن." } },
+      { slug: "velvet-amber-perfume", rank: 3, pickReason: { en: "Amber-Vanilla Fusion — Velvet Amber | Ambry | Lily, Cedarwood, Sandalwood, Musk", ar: "اندماج عنبر-فانيليا — فلفت أمبر" }, description: { en: "Velvet Amber | Ambry | Top: Lily of the Valley | Heart: Cedarwood, Dry Amber | Base: Sandalwood, Musk. Where warm amber meets soft vanilla undertones — sophisticated, elegant, and universally appealing.", ar: "فلفت أمبر حيث يلتقي العنبر الدافئ مع نغمات الفانيليا الناعمة. تركيبته العنبرية تبدأ بزنبق الوادي، مع قلب من خشب الأرز والعنبر الجاف، وقاعدة من خشب الصندل والمسك. راقي وأنيق ومحبوب عالمياً." } },
+      { slug: "patchouli-glow-perfume", rank: 4, pickReason: { en: "Earthy Vanilla — Patchouli Glow | Woody Oriental | Bergamot, Patchouli, Amber, Musk", ar: "فانيليا ترابية — باتشولي جلو" }, description: { en: "Patchouli Glow | Woody Oriental | Top: Bergamot | Heart: Patchouli, Sandalwood | Base: Amber, Musk. Earthy patchouli meets warm amber in a vanilla-adjacent fragrance that's grounding and sensual.", ar: "باتشولي جلو يجمع بين الباتشولي الترابي والعنبر الدافئ في عطر قريب من الفانيليا لكنه أرضي وحسي. يبدأ بالبرغموت، مع قلب من الباتشولي وخشب الصندل، وقاعدة من العنبر والمسك." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Why Vanilla Is the World's Most Popular Scent", ar: "لماذا الفانيليا هي الرائحة الأكثر شعبية في العالم" }, body: { en: "Vanilla is scientifically proven to reduce stress and create feelings of comfort and happiness. Its warm, sweet aroma is universally appealing — studies show it's the most-liked scent across all cultures and age groups. In perfumery, vanilla acts as a beautiful base note that adds depth, warmth, and longevity to any composition. From light and creamy to dark and spiced, vanilla offers incredible versatility.", ar: "الفانيليا مثبتة علمياً في تقليل التوتر وخلق مشاعر الراحة والسعادة. رائحتها الدافئة والحلوة محبوبة عالمياً — تُظهر الدراسات أنها الرائحة الأكثر إعجاباً عبر جميع الثقافات والفئات العمرية. في صناعة العطور، تعمل الفانيليا كقاعدة جميلة تضيف العمق والدفء والثبات لأي تركيبة." } },
+    ],
+    faqs: [
+      { question: { en: "What does vanilla perfume smell like?", ar: "كيف تبدو رائحة عطر الفانيليا؟" }, answer: { en: "Vanilla perfumes range from sweet and creamy (like Rich Vanilla) to dark and spicy (like Black Vanilla). The common thread is warmth and comfort — vanilla adds a soft, sweet, enveloping quality to any fragrance.", ar: "عطور الفانيليا تتراوح من الحلو والكريمي (مثل ريتش فانيليا) إلى الداكن والحار (مثل بلاك فانيليا). القاسم المشترك هو الدفء والراحة — الفانيليا تضيف جودة ناعمة وحلوة ومحتضنة لأي عطر." } },
+      { question: { en: "Is vanilla perfume good for everyday wear?", ar: "هل عطر الفانيليا مناسب للاستخدام اليومي؟" }, answer: { en: "Absolutely! Vanilla perfumes are versatile and universally appealing. Rich Vanilla is perfect for daily wear — it's comforting without being overwhelming, and people around you will always compliment it.", ar: "بالتأكيد! عطور الفانيليا متعددة الاستخدامات ومحبوبة عالمياً. ريتش فانيليا مثالي للاستخدام اليومي — مريح دون أن يكون طاغياً، والناس حولك سيمدحونه دائماً." } },
+    ],
+    relatedGuideSlugs: ["best-amber-perfumes", "best-perfumes-for-date-night", "best-aromatic-perfumes-under-200-aed"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 35. BEST SANDALWOOD PERFUMES — CREAMY & MEDITATIVE FRAGRANCES
+  // ==========================================================================
+  {
+    slug: "best-sandalwood-perfumes",
+    title: {
+      en: "Best Sandalwood Perfumes UAE – Creamy, Woody & Meditative Scents 2025",
+      ar: "أفضل عطور خشب الصندل في الإمارات – روائح كريمية وخشبية 2025",
+    },
+    metaDescription: {
+      en: "Discover the best sandalwood perfumes in UAE. Creamy, woody & meditative fragrances featuring Velvet Amber, Patchouli Glow & more from Aromatic Scents Lab.",
+      ar: "اكتشف أفضل عطور خشب الصندل في الإمارات. روائح كريمية وخشبية وتأملية من فلفت أمبر وباتشولي جلو والمزيد من Aromatic Scents Lab.",
+    },
+    keywords: {
+      en: [
+        "sandalwood perfume UAE",
+        "best sandalwood fragrance",
+        "sandalwood scent Dubai",
+        "creamy wood perfume",
+        "sandalwood smell",
+        "meditative fragrance",
+        "sandalwood oud perfume",
+        "warm sandalwood scent UAE",
+        "aromatic sandalwood perfume",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر خشب الصندل الإمارات",
+        "أفضل عطر صندل",
+        "رائحة خشب الصندل دبي",
+        "عطر خشبي كريمي",
+        "رائحة الصندل",
+        "عطر تأملي",
+        "عطر صندل وعود",
+        "رائحة صندل دافئة الإمارات",
+        "عطر صندل أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Sandalwood Fragrances 2025", ar: "عطور خشب الصندل 2025" },
+    intro: {
+      en: "Sandalwood is one of perfumery's most precious woods — prized for its creamy, smooth, almost milky warmth that calms the mind and soothes the soul. In Arabian tradition, sandalwood has been burned alongside oud and incense for centuries. These sandalwood-rich fragrances from Aromatic Scents Lab capture that meditative, luxurious quality in modern perfume form.",
+      ar: "خشب الصندل من أثمن الأخشاب في صناعة العطور — يُقدّر لدفئه الكريمي الناعم شبه الحليبي الذي يهدئ العقل ويريح الروح. في التقاليد العربية، يُحرق خشب الصندل مع العود والبخور منذ قرون. هذه العطور الغنية بالصندل من Aromatic Scents Lab تلتقط تلك الجودة التأملية الفاخرة في شكل عطر عصري.",
+    },
+    products: [
+      { slug: "velvet-amber-perfume", rank: 1, pickReason: { en: "Creamiest Sandalwood — Velvet Amber | Ambry | Sandalwood & Musk Base", ar: "أكثر صندل كريمي — فلفت أمبر" }, description: { en: "Velvet Amber | Ambry | Top: Lily of the Valley | Heart: Cedarwood, Dry Amber | Base: Sandalwood, Musk. The sandalwood base creates a creamy, skin-like warmth that lingers beautifully — meditative and deeply calming.", ar: "فلفت أمبر يتميز بقاعدة خشب الصندل التي تخلق دفئاً كريمياً شبيهاً بالبشرة يبقى بجمال. تركيبته تبدأ بزنبق الوادي، مع قلب من خشب الأرز والعنبر الجاف، وقاعدة من خشب الصندل والمسك. تأملي ومهدئ بعمق." } },
+      { slug: "patchouli-glow-perfume", rank: 2, pickReason: { en: "Earthy Sandalwood — Patchouli Glow | Woody Oriental | Sandalwood Heart", ar: "صندل ترابي — باتشولي جلو" }, description: { en: "Patchouli Glow | Woody Oriental | Top: Bergamot | Heart: Patchouli, Sandalwood | Base: Amber, Musk. Sandalwood in the heart blends with earthy patchouli for a grounding, nature-inspired fragrance.", ar: "باتشولي جلو يجمع خشب الصندل في القلب مع الباتشولي الترابي لعطر مستوحى من الطبيعة. يبدأ بالبرغموت المنعش، مع قلب من الباتشولي وخشب الصندل، وقاعدة من العنبر والمسك. عطر ترابي ومستقر." } },
+      { slug: "dark-wood", rank: 3, pickReason: { en: "Woody Depth — Dark Wood | Woody | Cedarwood, Vetiver & Warm Spice", ar: "عمق خشبي — دارك وود" }, description: { en: "Dark Wood | Woody | Top: Bergamot | Heart: Caramel, Cardamom | Base: Cedarwood, Vetiver. While cedar-focused, this fragrance shares sandalwood's creamy warmth through its caramel heart and vetiver base.", ar: "دارك وود يشارك دفء خشب الصندل الكريمي من خلال قلبه الكراميلي وقاعدة الفيتيفر. يبدأ بالبرغموت، مع قلب دافئ من الكراميل والهيل، وقاعدة من خشب الأرز والفيتيفر. عطر خشبي عميق يذكّر بالصندل." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Sandalwood in Arabian Perfumery", ar: "خشب الصندل في العطور العربية" }, body: { en: "Sandalwood has been central to Arabian fragrance culture for centuries — burned as incense in majlis gatherings, blended with oud in bakhoor, and worn as pure sandalwood oil. Indian Mysore sandalwood is considered the finest variety, prized for its creamy, buttery richness. In modern perfumery, sandalwood serves as the ultimate 'skin scent' — it melts into your natural body chemistry, creating a scent that's uniquely yours.", ar: "خشب الصندل كان محورياً في ثقافة العطور العربية لقرون — يُحرق كبخور في المجالس ويُمزج مع العود في البخور ويُرتدى كزيت صندل نقي. يُعتبر صندل ميسور الهندي أجود الأنواع لغناه الكريمي. في العطور الحديثة، يعمل خشب الصندل كـ'عطر بشرة' مثالي — يذوب في كيمياء جسمك الطبيعية ليخلق رائحة فريدة خاصة بك." } },
+    ],
+    faqs: [
+      { question: { en: "What does sandalwood smell like?", ar: "كيف تبدو رائحة خشب الصندل؟" }, answer: { en: "Sandalwood has a creamy, smooth, almost milky woody scent — softer and rounder than cedar or oud. It's warm, meditative, and becomes more skin-like over time. Many describe it as the most comforting of all wood notes.", ar: "خشب الصندل له رائحة خشبية كريمية وناعمة شبه حليبية — أنعم وأكثر استدارة من الأرز أو العود. دافئ وتأملي ويصبح أكثر شبهاً بالبشرة مع الوقت. يصفه الكثيرون بأنه أكثر الأخشاب راحة." } },
+    ],
+    relatedGuideSlugs: ["best-woody-perfumes", "best-amber-perfumes", "best-arabian-oud-perfumes"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 36. BEST OUD & WOOD PERFUMES — DEEP & SMOKY FRAGRANCES
+  // ==========================================================================
+  {
+    slug: "best-oud-wood-perfumes",
+    title: {
+      en: "Best Oud & Wood Perfumes UAE – Deep, Smoky & Earthy Scents 2025",
+      ar: "أفضل عطور العود والخشب في الإمارات – روائح عميقة ودخانية 2025",
+    },
+    metaDescription: {
+      en: "Discover the best oud & wood perfumes in UAE. Deep, smoky agarwood blended with cedarwood, vetiver & guaiac from Aromatic Scents Lab. Traditional Arabian wood scents.",
+      ar: "اكتشف أفضل عطور العود والخشب في الإمارات. خشب العود الدخاني العميق ممزوج بالأرز والفيتيفر والجواياك من Aromatic Scents Lab.",
+    },
+    keywords: {
+      en: [
+        "oud wood perfume UAE",
+        "wood smell perfume",
+        "agarwood fragrance Dubai",
+        "smoky wood scent",
+        "deep woody perfume",
+        "cedarwood perfume UAE",
+        "vetiver wood fragrance",
+        "earthy wood smell",
+        "oud and wood scent",
+        "aromatic wood perfume",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر عود وخشب الإمارات",
+        "عطر برائحة الخشب",
+        "عطر خشب العود دبي",
+        "رائحة خشب دخانية",
+        "عطر خشبي عميق",
+        "عطر خشب الأرز الإمارات",
+        "عطر فيتيفر خشبي",
+        "رائحة خشب ترابية",
+        "رائحة عود وخشب",
+        "عطر خشبي أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Oud & Wood Scents 2025", ar: "روائح العود والخشب 2025" },
+    intro: {
+      en: "Wood fragrances are the backbone of Arabian perfumery — from the legendary oud (agarwood) to rich cedarwood, smoky guaiac, and earthy vetiver. These deep, masculine scents connect you to nature and tradition. Aromatic Scents Lab crafts wood-forward perfumes that honour the Arabian love of oud while blending in modern sophistication for today's fragrance lover.",
+      ar: "العطور الخشبية هي العمود الفقري للعطور العربية — من العود الأسطوري إلى خشب الأرز الغني والجواياك الدخاني والفيتيفر الترابي. هذه الروائح العميقة والذكورية تربطك بالطبيعة والتقاليد. يصنع Aromatic Scents Lab عطوراً خشبية تحترم حب العرب للعود مع مزج التطور العصري لعشاق العطور اليوم.",
+    },
+    products: [
+      { slug: "dark-wood", rank: 1, pickReason: { en: "Pure Wood — Dark Wood | Woody | Bergamot, Cedarwood, Vetiver", ar: "خشب نقي — دارك وود" }, description: { en: "Dark Wood | Woody | Top: Bergamot | Heart: Caramel, Cardamom | Base: Cedarwood, Vetiver. A pure woody composition — cedarwood and vetiver create a deep, earthy scent grounded in nature. The caramel heart adds unexpected warmth.", ar: "دارك وود تركيبة خشبية نقية — خشب الأرز والفيتيفر يخلقان رائحة ترابية عميقة متجذرة في الطبيعة. يبدأ بالبرغموت، مع قلب دافئ من الكراميل والهيل، وقاعدة من خشب الأرز والفيتيفر. قلب الكراميل يضيف دفئاً غير متوقع." } },
+      { slug: "dark-musk-perfume", rank: 2, pickReason: { en: "Oud-Like Depth — Dark Musk | Oriental Musky | Cypriol, Guaiac Wood", ar: "عمق شبيه بالعود — المسك الداكن" }, description: { en: "Dark Musk | Oriental Musky | Top: Mandarin, Praline | Heart: Cypriol, Guaiac wood | Base: Ambergris, Musk. Cypriol (nagarmotha) brings oud-like smokiness while guaiac wood adds resinous depth — a modern interpretation of traditional oud.", ar: "المسك الداكن يجلب دخانية شبيهة بالعود من خلال السيبريول بينما يضيف خشب الجواياك عمقاً راتنجياً. تركيبة شرقية مسكية تبدأ بالماندرين والبرالين، مع قلب من السيبريول والجواياك، وقاعدة من العنبر الأشهب والمسك. تفسير عصري للعود التقليدي." } },
+      { slug: "secret-leather-perfume", rank: 3, pickReason: { en: "Leather & Wood — Secret Leather | Oriental | Cypress, Tonka", ar: "جلد وخشب — سيكرت ليذر" }, description: { en: "Secret Leather | Oriental | Top: Orris | Heart: Leather, Cypress | Base: Tonka Bean, Musk. Cypress adds a green, woody dimension to the bold leather — like walking through a forest of ancient trees.", ar: "سيكرت ليذر يضيف السرو بُعداً أخضر وخشبياً للجلد الجريء. تركيبته الشرقية تبدأ بالأوريس، مع قلب من الجلد والسرو، وقاعدة من حبوب التونكا والمسك. كالمشي عبر غابة من الأشجار العتيقة." } },
+      { slug: "royal-tobacco-perfume", rank: 4, pickReason: { en: "Incense & Wood — Royal Tobacco | Oriental Spicy | Incense, Vetiver", ar: "بخور وخشب — رويال توباكو" }, description: { en: "Royal Tobacco | Oriental Spicy | Top: Mandarin | Heart: Incense, Vanilla | Base: Vetiver, Tobacco. The incense and vetiver create a smoky, earthy woodiness that's deeply Arabian in character.", ar: "رويال توباكو يخلق خشبية دخانية وترابية من البخور والفيتيفر. تركيبته الشرقية الحارة تبدأ بالماندرين، مع قلب من البخور والفانيلا، وقاعدة من الفيتيفر والتبغ. عربي بعمق في طابعه." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Types of Wood Scents in Perfumery", ar: "أنواع الروائح الخشبية في العطور" }, body: { en: "Wood notes vary dramatically: Oud (agarwood) is the most complex — smoky, animalic, and resinous. Cedarwood is clean, dry, and pencil-like. Sandalwood is creamy and milky. Vetiver is earthy and rooty. Guaiac wood is smoky and sweet. Cypress is green and fresh. Each wood brings a different character — from deep and meditative to bright and energizing. Understanding wood types helps you find your perfect woody fragrance.", ar: "النفحات الخشبية تتنوع بشكل كبير: العود أكثرها تعقيداً — دخاني وحيواني وراتنجي. خشب الأرز نظيف وجاف. خشب الصندل كريمي وحليبي. الفيتيفر ترابي وجذري. خشب الجواياك دخاني وحلو. السرو أخضر ومنعش. كل خشب يجلب طابعاً مختلفاً — فهم أنواع الأخشاب يساعدك في إيجاد عطرك الخشبي المثالي." } },
+    ],
+    faqs: [
+      { question: { en: "What does oud wood smell like?", ar: "كيف تبدو رائحة خشب العود؟" }, answer: { en: "Oud (agarwood) has a complex, smoky, slightly animalic scent with resinous depth. It's unlike any other wood — rich, dark, and deeply layered. Our Dark Musk uses cypriol and guaiac wood to capture that oud character.", ar: "العود (خشب العقر) له رائحة معقدة ودخانية وحيوانية قليلاً مع عمق راتنجي. لا يشبه أي خشب آخر — غني وداكن ومتعدد الطبقات. المسك الداكن لدينا يستخدم السيبريول وخشب الجواياك لالتقاط طابع العود." } },
+      { question: { en: "What is the difference between oud and cedar perfume?", ar: "ما الفرق بين عطر العود وعطر الأرز؟" }, answer: { en: "Oud is dark, smoky, and complex — a prized Arabian ingredient. Cedar is lighter, cleaner, and drier with a pencil-shaving quality. Dark Wood features cedarwood for a clean woody feel, while Dark Musk has oud-like depth through cypriol.", ar: "العود داكن ودخاني ومعقد — مكون عربي ثمين. الأرز أخف ونظيف وجاف. دارك وود يتميز بخشب الأرز لإحساس خشبي نظيف، بينما المسك الداكن يملك عمقاً شبيهاً بالعود من خلال السيبريول." } },
+    ],
+    relatedGuideSlugs: ["best-woody-perfumes", "best-arabian-oud-perfumes", "best-sandalwood-perfumes"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 37. BEST ROSE PERFUMES — FLORAL & ROMANTIC FRAGRANCES
+  // ==========================================================================
+  {
+    slug: "best-rose-perfumes",
+    title: {
+      en: "Best Rose Perfumes UAE – Romantic Floral & Rose Scents 2025",
+      ar: "أفضل عطور الورد في الإمارات – روائح وردية رومانسية 2025",
+    },
+    metaDescription: {
+      en: "Discover the best rose perfumes in UAE. Romantic, elegant rose fragrances featuring Black Vanilla (Rose heart), floral blends & more from Aromatic Scents Lab.",
+      ar: "اكتشف أفضل عطور الورد في الإمارات. عطور وردية رومانسية وأنيقة من بلاك فانيليا والمزيد من Aromatic Scents Lab.",
+    },
+    keywords: {
+      en: [
+        "rose perfume UAE",
+        "best rose fragrance",
+        "rose scent Dubai",
+        "romantic rose perfume",
+        "flower smell perfume",
+        "rose oud perfume",
+        "Taif rose fragrance",
+        "rose smell perfume UAE",
+        "floral rose scent",
+        "aromatic rose perfume",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر ورد الإمارات",
+        "أفضل عطر ورد",
+        "رائحة ورد دبي",
+        "عطر ورد رومانسي",
+        "عطر برائحة الزهور",
+        "عطر ورد وعود",
+        "عطر ورد الطائف",
+        "رائحة ورد الإمارات",
+        "رائحة وردية زهرية",
+        "عطر ورد أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Rose Fragrances 2025", ar: "عطور الورد 2025" },
+    intro: {
+      en: "Rose is the queen of flowers in perfumery — a timeless ingredient that speaks of romance, elegance, and Arabian heritage. From the legendary Taif roses of Saudi Arabia to the Damask roses of Bulgaria, this flower has inspired perfumers for millennia. Aromatic Scents Lab incorporates rose notes into sophisticated compositions that honour this noble flower while adding modern depth and complexity.",
+      ar: "الورد ملكة الأزهار في صناعة العطور — مكون خالد يتحدث عن الرومانسية والأناقة والتراث العربي. من ورد الطائف الأسطوري في السعودية إلى ورد الدمشقي في بلغاريا، ألهمت هذه الزهرة صانعي العطور لآلاف السنين. يدمج Aromatic Scents Lab نفحات الورد في تركيبات راقية تحترم هذه الزهرة النبيلة مع إضافة عمق وتعقيد عصري.",
+    },
+    products: [
+      { slug: "black-vanilla-perfume", rank: 1, pickReason: { en: "Dark Rose — Black Vanilla | Gourmand | Rose Heart with Vanilla & Patchouli", ar: "ورد داكن — بلاك فانيليا" }, description: { en: "Black Vanilla | Gourmand | Top: Bergamot, Cinnamon | Heart: Rose, Tonka | Base: Vanilla, Patchouli. Rose takes center stage in the heart — wrapped in dark spices and earthy patchouli for a mysterious, intoxicating floral experience.", ar: "بلاك فانيليا يضع الورد في مركز الصدارة في القلب — ملفوفاً بالتوابل الداكنة والباتشولي الترابي لتجربة وردية غامضة ومُسكرة. تركيبة حلوة تبدأ بالبرغموت والقرفة، مع قلب من الورد والتونكا، وقاعدة من الفانيليا والباتشولي." } },
+      { slug: "velvet-amber-perfume", rank: 2, pickReason: { en: "Soft Floral — Velvet Amber | Ambry | Lily of the Valley Opening", ar: "زهري ناعم — فلفت أمبر" }, description: { en: "Velvet Amber | Ambry | Top: Lily of the Valley | Heart: Cedarwood, Dry Amber | Base: Sandalwood, Musk. Opens with a soft white floral note that complements rose lovers' palettes — elegant and refined.", ar: "فلفت أمبر يفتتح بنفحة زهرية بيضاء ناعمة من زنبق الوادي تكمّل ذائقة محبي الورد. تركيبة أنيقة تبدأ بزنبق الوادي، مع قلب من خشب الأرز والعنبر الجاف، وقاعدة من خشب الصندل والمسك. راقي ومصقول." } },
+      { slug: "rich-vanilla-perfume", rank: 3, pickReason: { en: "Sweet Floral — Rich Vanilla | Oriental | Heliotrope & Soft Florals", ar: "زهري حلو — ريتش فانيليا" }, description: { en: "Rich Vanilla | Oriental | Top: Bergamot, Heliotrope | Heart: Tonka Bean, Amber | Base: Vanilla, Benzoin. The heliotrope opening brings a powdery, floral sweetness that pairs beautifully with rose-centric wardrobes.", ar: "ريتش فانيليا يبدأ بالهيليوتروب الذي يجلب حلاوة زهرية بودرية تتناسب بجمال مع خزائن عطور الورد. تركيبة شرقية تبدأ بالبرغموت والهيليوتروب، مع قلب من حبوب التونكا والعنبر، وقاعدة من الفانيليا والبنزوين." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Rose in Arabian Fragrance Tradition", ar: "الورد في تقاليد العطور العربية" }, body: { en: "Rose has been sacred in Arabian culture for centuries. Taif roses from Saudi Arabia are among the world's most prized — their oil is worth more per ounce than gold. In the Gulf, rose water is used in hospitality, cooking, and religious ceremonies. Rose oud — the pairing of rose with oud wood — is perhaps the most iconic Arabian fragrance combination, blending feminine elegance with masculine depth.", ar: "الورد مقدس في الثقافة العربية منذ قرون. ورد الطائف من السعودية من أثمن الأنواع في العالم — زيته يفوق الذهب قيمة. في الخليج، يُستخدم ماء الورد في الضيافة والطبخ والمراسم الدينية. ورد العود — مزج الورد مع خشب العود — ربما أكثر تركيبات العطور العربية شهرة، يجمع بين الأناقة الأنثوية والعمق الذكوري." } },
+    ],
+    faqs: [
+      { question: { en: "What does rose perfume smell like?", ar: "كيف تبدو رائحة عطر الورد؟" }, answer: { en: "Rose in perfumery ranges from fresh and dewy to deep and jammy. Modern rose perfumes often blend rose with oud, vanilla, or musk for added depth. Black Vanilla features a rich rose heart wrapped in spices and dark vanilla.", ar: "الورد في العطور يتراوح من المنعش والندي إلى العميق والمربّى. عطور الورد الحديثة غالباً تمزج الورد مع العود أو الفانيلا أو المسك. بلاك فانيليا يتميز بقلب ورد غني ملفوف بالتوابل والفانيلا الداكنة." } },
+      { question: { en: "Is rose perfume only for women?", ar: "هل عطر الورد للنساء فقط؟" }, answer: { en: "Not at all! Rose is traditionally unisex in Arabian perfumery. Rose oud combinations are popular among men in the Gulf. Black Vanilla's rose-spice-patchouli blend appeals to all genders.", ar: "أبداً! الورد تقليدياً للجنسين في العطور العربية. تركيبات ورد العود شائعة بين الرجال في الخليج. مزيج بلاك فانيليا من الورد والتوابل والباتشولي يعجب الجميع." } },
+    ],
+    relatedGuideSlugs: ["best-floral-perfumes", "best-arabian-oud-perfumes", "best-perfumes-for-date-night"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 38. BEST CITRUS & FRESH PERFUMES — ZESTY & ENERGIZING SCENTS
+  // ==========================================================================
+  {
+    slug: "best-citrus-fresh-perfumes",
+    title: {
+      en: "Best Citrus & Fresh Perfumes UAE – Zesty, Clean & Energizing Scents 2025",
+      ar: "أفضل عطور الحمضيات والمنعشة في الإمارات – روائح منشطة ونظيفة 2025",
+    },
+    metaDescription: {
+      en: "Discover the best citrus & fresh perfumes in UAE. Zesty bergamot, mandarin & energizing fragrances from Aromatic Scents Lab. Perfect for UAE heat.",
+      ar: "اكتشف أفضل عطور الحمضيات والمنعشة في الإمارات. روائح البرغموت والماندرين المنشطة من Aromatic Scents Lab. مثالية لحرارة الإمارات.",
+    },
+    keywords: {
+      en: [
+        "citrus perfume UAE",
+        "fresh perfume Dubai",
+        "bergamot fragrance",
+        "mandarin perfume UAE",
+        "zesty scent",
+        "clean smell perfume",
+        "energizing fragrance",
+        "fresh smell perfume UAE",
+        "summer perfume Dubai",
+        "light citrus scent",
+        "aromatic citrus perfume",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر حمضيات الإمارات",
+        "عطر منعش دبي",
+        "عطر برغموت",
+        "عطر ماندرين الإمارات",
+        "رائحة حمضية منعشة",
+        "عطر برائحة نظيفة",
+        "عطر منشط",
+        "رائحة منعشة الإمارات",
+        "عطر صيفي دبي",
+        "رائحة حمضيات خفيفة",
+        "عطر حمضيات أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Citrus & Fresh Scents 2025", ar: "روائح حمضية ومنعشة 2025" },
+    intro: {
+      en: "When the UAE heat hits, nothing beats the uplifting burst of a citrus fragrance. Fresh, zesty, and energizing — citrus notes like bergamot, mandarin, and lemon are the perfect way to start any perfume. Aromatic Scents Lab opens many of its compositions with bright citrus top notes that cut through the heat and leave you feeling refreshed, clean, and invigorated all day.",
+      ar: "عندما تضرب حرارة الإمارات، لا شيء يتفوق على الانتعاش المنشط لعطر حمضي. منعش وحيوي ومنشط — النفحات الحمضية مثل البرغموت والماندرين والليمون هي الطريقة المثالية لبدء أي عطر. يفتتح Aromatic Scents Lab العديد من تركيباته بنفحات حمضية مشرقة تخترق الحرارة وتتركك منتعشاً ونظيفاً ومنشطاً طوال اليوم.",
+    },
+    products: [
+      { slug: "dark-musk-perfume", rank: 1, pickReason: { en: "Citrus Opening — Dark Musk | Oriental Musky | Mandarin, Praline Top", ar: "افتتاحية حمضية — المسك الداكن" }, description: { en: "Dark Musk | Oriental Musky | Top: Mandarin, Praline | Heart: Cypriol, Guaiac wood | Base: Ambergris, Musk. Opens with a bright mandarin burst that gradually deepens into musky warmth — the best of both fresh and oriental worlds.", ar: "المسك الداكن يفتتح بانفجار ماندرين مشرق يتعمق تدريجياً إلى دفء مسكي. تركيبته تبدأ بالماندرين والبرالين، مع قلب من السيبريول والجواياك، وقاعدة من العنبر الأشهب والمسك. أفضل ما في العالمين المنعش والشرقي." } },
+      { slug: "patchouli-glow-perfume", rank: 2, pickReason: { en: "Bergamot Fresh — Patchouli Glow | Woody Oriental | Bright Bergamot Opening", ar: "انتعاش البرغموت — باتشولي جلو" }, description: { en: "Patchouli Glow | Woody Oriental | Top: Bergamot | Heart: Patchouli, Sandalwood | Base: Amber, Musk. A sparkling bergamot opening that's perfect for hot UAE days — it transitions into earthy warmth over hours.", ar: "باتشولي جلو يفتتح ببرغموت متلألئ مثالي لأيام الإمارات الحارة — ينتقل إلى دفء ترابي على مدار الساعات. تركيبته تبدأ بالبرغموت المنعش، مع قلب من الباتشولي وخشب الصندل، وقاعدة من العنبر والمسك." } },
+      { slug: "dark-wood", rank: 3, pickReason: { en: "Fresh Woody — Dark Wood | Woody | Bergamot Start, Cedarwood Finish", ar: "خشبي منعش — دارك وود" }, description: { en: "Dark Wood | Woody | Top: Bergamot | Heart: Caramel, Cardamom | Base: Cedarwood, Vetiver. Bergamot opens this woody fragrance with a clean, citrusy brightness before settling into warm cedarwood.", ar: "دارك وود يفتتح بالبرغموت بإشراقة حمضية نظيفة قبل الاستقرار في دفء خشب الأرز. تركيبته تبدأ بالبرغموت، مع قلب من الكراميل والهيل، وقاعدة من خشب الأرز والفيتيفر." } },
+      { slug: "royal-tobacco-perfume", rank: 4, pickReason: { en: "Mandarin Spice — Royal Tobacco | Oriental Spicy | Citrus & Incense", ar: "ماندرين متبل — رويال توباكو" }, description: { en: "Royal Tobacco | Oriental Spicy | Top: Mandarin | Heart: Incense, Vanilla | Base: Vetiver, Tobacco. Mandarin opens with a bright, juicy citrus note that contrasts beautifully with the smoky incense heart.", ar: "رويال توباكو يفتتح بالماندرين بنفحة حمضية مشرقة وعصيرية تتناقض بجمال مع قلب البخور الدخاني. تركيبته تبدأ بالماندرين، مع قلب من البخور والفانيلا، وقاعدة من الفيتيفر والتبغ." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Why Citrus Perfumes Work Best in Hot Climates", ar: "لماذا عطور الحمضيات تعمل أفضل في المناخات الحارة" }, body: { en: "Citrus notes are volatile — they evaporate quickly, which means they create an immediate burst of freshness when applied. In the UAE heat, this cooling effect is invaluable. The warmth of your skin amplifies citrus notes, making them project more beautifully. While citrus fades faster than heavier notes, modern perfumery anchors fresh openings to long-lasting bases, giving you hours of evolved fragrance.", ar: "النفحات الحمضية متطايرة — تتبخر بسرعة مما يعني أنها تخلق انتعاشاً فورياً عند وضعها. في حرارة الإمارات، هذا التأثير المنعش لا يُقدر بثمن. دفء بشرتك يضخم النفحات الحمضية ويجعلها تنتشر بجمال أكثر. وبينما تتلاشى الحمضيات أسرع من النفحات الثقيلة، العطور الحديثة ترسّخ الافتتاحيات المنعشة على قواعد طويلة الأمد." } },
+    ],
+    faqs: [
+      { question: { en: "What is the best fresh perfume for UAE summer?", ar: "ما أفضل عطر منعش لصيف الإمارات؟" }, answer: { en: "Patchouli Glow's bright bergamot opening makes it perfect for hot UAE days. Dark Musk's mandarin top also provides a refreshing start. Both transition into warm, long-lasting bases.", ar: "افتتاحية باتشولي جلو بالبرغموت المشرق تجعله مثالياً لأيام الإمارات الحارة. كما أن افتتاحية المسك الداكن بالماندرين توفر بداية منعشة. كلاهما ينتقل إلى قواعد دافئة وطويلة الأمد." } },
+      { question: { en: "Do citrus perfumes last long?", ar: "هل تدوم عطور الحمضيات طويلاً؟" }, answer: { en: "Pure citrus colognes fade fast, but our perfumes anchor citrus openings to heavy bases like musk, amber, and oud. Dark Musk's mandarin opening lasts because the musky base keeps evolving for 10+ hours.", ar: "كولونيات الحمضيات النقية تتلاشى بسرعة، لكن عطورنا ترسّخ الافتتاحيات الحمضية على قواعد ثقيلة مثل المسك والعنبر والعود. افتتاحية المسك الداكن بالماندرين تدوم لأن القاعدة المسكية تستمر في التطور لأكثر من 10 ساعات." } },
+    ],
+    relatedGuideSlugs: ["long-lasting-perfumes", "best-perfumes-uae", "best-aromatic-perfumes-under-200-aed"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
+
+  // ==========================================================================
+  // 39. BEST SPICY PERFUMES — WARM & BOLD ORIENTAL FRAGRANCES
+  // ==========================================================================
+  {
+    slug: "best-spicy-perfumes",
+    title: {
+      en: "Best Spicy Perfumes UAE – Warm, Bold & Oriental Spice Scents 2025",
+      ar: "أفضل العطور الحارة في الإمارات – روائح توابل شرقية جريئة 2025",
+    },
+    metaDescription: {
+      en: "Discover the best spicy perfumes in UAE. Bold oriental spice fragrances with cinnamon, cardamom, incense & pepper from Aromatic Scents Lab.",
+      ar: "اكتشف أفضل العطور الحارة في الإمارات. عطور توابل شرقية جريئة بالقرفة والهيل والبخور والفلفل من Aromatic Scents Lab.",
+    },
+    keywords: {
+      en: [
+        "spicy perfume UAE",
+        "best spicy fragrance",
+        "cinnamon perfume Dubai",
+        "cardamom scent",
+        "warm spice perfume",
+        "oriental spicy fragrance",
+        "bold perfume UAE",
+        "incense perfume",
+        "spicy smell perfume",
+        "pepper perfume",
+        "aromatic spicy perfume",
+        "Aromatic Scents Lab",
+      ],
+      ar: [
+        "عطر حار الإمارات",
+        "أفضل عطر حار",
+        "عطر قرفة دبي",
+        "رائحة الهيل",
+        "عطر توابل دافئ",
+        "عطر شرقي حار",
+        "عطر جريء الإمارات",
+        "عطر بخور",
+        "رائحة عطر حارة",
+        "عطر فلفل",
+        "عطر حار أروماتيك",
+        "Aromatic Scents Lab",
+      ],
+    },
+    eyebrow: { en: "Spicy Fragrances 2025", ar: "عطور حارة 2025" },
+    intro: {
+      en: "Spice has been the soul of Arabian perfumery since the ancient incense routes. From warming cinnamon and cardamom to smoky incense and bold pepper, spicy fragrances command attention and exude confidence. Aromatic Scents Lab weaves these precious spices into oriental compositions that honour centuries of Gulf tradition while feeling distinctly modern and wearable.",
+      ar: "التوابل كانت روح العطور العربية منذ طرق البخور القديمة. من القرفة والهيل الدافئين إلى البخور الدخاني والفلفل الجريء، العطور الحارة تفرض حضورها وتنضح بالثقة. ينسج Aromatic Scents Lab هذه التوابل الثمينة في تركيبات شرقية تحترم قروناً من تقاليد الخليج مع الشعور بالعصرية والقابلية للارتداء.",
+    },
+    products: [
+      { slug: "royal-tobacco-perfume", rank: 1, pickReason: { en: "Most Spicy — Royal Tobacco | Oriental Spicy | Mandarin, Incense, Vanilla, Tobacco", ar: "الأكثر حرارة — رويال توباكو" }, description: { en: "Royal Tobacco | Oriental Spicy | Top: Mandarin | Heart: Incense, Vanilla | Base: Vetiver, Tobacco. The quintessential spicy oriental — incense and tobacco create a warm, smoky spice cloud that's pure Arabian luxury.", ar: "رويال توباكو هو الحار الشرقي المثالي — البخور والتبغ يخلقان سحابة توابل دافئة ودخانية هي الفخامة العربية بذاتها. تركيبته تبدأ بالماندرين، مع قلب من البخور والفانيلا، وقاعدة من الفيتيفر والتبغ." } },
+      { slug: "black-vanilla-perfume", rank: 2, pickReason: { en: "Cinnamon Fire — Black Vanilla | Gourmand | Bergamot, Cinnamon, Rose, Vanilla", ar: "نار القرفة — بلاك فانيليا" }, description: { en: "Black Vanilla | Gourmand | Top: Bergamot, Cinnamon | Heart: Rose, Tonka | Base: Vanilla, Patchouli. Cinnamon hits immediately with a warm, spicy punch — then softens into a dark, gourmand sweetness. The perfect sweet-spice balance.", ar: "بلاك فانيليا يضرب فوراً بلكمة حارة من القرفة — ثم يلين إلى حلاوة داكنة. تركيبته تبدأ بالبرغموت والقرفة، مع قلب من الورد والتونكا، وقاعدة من الفانيلا والباتشولي. التوازن المثالي بين الحلو والحار." } },
+      { slug: "dark-wood", rank: 3, pickReason: { en: "Cardamom Warmth — Dark Wood | Woody | Bergamot, Cardamom, Cedarwood", ar: "دفء الهيل — دارك وود" }, description: { en: "Dark Wood | Woody | Top: Bergamot | Heart: Caramel, Cardamom | Base: Cedarwood, Vetiver. Cardamom in the heart adds an aromatic, green spice that's quintessentially Middle Eastern — warm without being heavy.", ar: "دارك وود يضيف الهيل في القلب توابل عطرية خضراء هي جوهر الشرق الأوسط — دافئ دون أن يكون ثقيلاً. تركيبته تبدأ بالبرغموت، مع قلب من الكراميل والهيل، وقاعدة من خشب الأرز والفيتيفر." } },
+      { slug: "dark-musk-perfume", rank: 4, pickReason: { en: "Sweet Spice — Dark Musk | Oriental Musky | Praline & Cypriol Heat", ar: "توابل حلوة — المسك الداكن" }, description: { en: "Dark Musk | Oriental Musky | Top: Mandarin, Praline | Heart: Cypriol, Guaiac wood | Base: Ambergris, Musk. Praline's caramelized sweetness meets cypriol's peppery warmth — a subtly spicy undercurrent beneath the musky surface.", ar: "المسك الداكن يجمع بين حلاوة البرالين المكرملة ودفء السيبريول الفلفلي — تيار حار خفي تحت السطح المسكي. تركيبته تبدأ بالماندرين والبرالين، مع قلب من السيبريول والجواياك، وقاعدة من العنبر الأشهب والمسك." } },
+    ],
+    contentBlocks: [
+      { heading: { en: "Spices in Arabian Perfumery: A Heritage of Centuries", ar: "التوابل في العطور العربية: تراث قرون" }, body: { en: "The Arabian Peninsula sat at the crossroads of the ancient spice trade routes — cardamom from India, cinnamon from Sri Lanka, saffron from Iran, and frankincense from Oman. These precious spices were burned as incense, blended into perfume oils, and woven into the fabric of Arabian hospitality. Today, spicy perfumes carry that heritage forward — every spray is a journey along those ancient routes.", ar: "شبه الجزيرة العربية كانت على مفترق طرق التوابل القديمة — الهيل من الهند والقرفة من سريلانكا والزعفران من إيران واللبان من عُمان. هذه التوابل الثمينة كانت تُحرق كبخور وتُمزج في زيوت العطور وتُنسج في نسيج الضيافة العربية. اليوم، العطور الحارة تحمل هذا التراث — كل رشة هي رحلة على تلك الطرق القديمة." } },
+    ],
+    faqs: [
+      { question: { en: "What does spicy perfume smell like?", ar: "كيف تبدو رائحة العطر الحار؟" }, answer: { en: "Spicy perfumes feature warming notes like cinnamon, cardamom, pepper, incense, and clove. They create a sensation of heat and depth. Royal Tobacco is our boldest spicy fragrance — smoky incense and tobacco create an intensely warm experience.", ar: "العطور الحارة تتميز بنفحات دافئة مثل القرفة والهيل والفلفل والبخور والقرنفل. تخلق إحساساً بالحرارة والعمق. رويال توباكو أجرأ عطر حار لدينا — البخور الدخاني والتبغ يخلقان تجربة دافئة بشكل مكثف." } },
+      { question: { en: "Are spicy perfumes good for winter?", ar: "هل العطور الحارة جيدة للشتاء؟" }, answer: { en: "Spicy perfumes shine in cooler weather — the warmth of spice notes pairs perfectly with cold air. In the UAE, cooler evenings from October to March are ideal for wearing spicy oriental fragrances like Royal Tobacco or Black Vanilla.", ar: "العطور الحارة تتألق في الطقس الأبرد — دفء التوابل يتناسب مثالياً مع الهواء البارد. في الإمارات، الأمسيات الباردة من أكتوبر إلى مارس مثالية لارتداء عطور شرقية حارة مثل رويال توباكو أو بلاك فانيليا." } },
+    ],
+    relatedGuideSlugs: ["best-arabian-oud-perfumes", "best-perfumes-for-ramadan", "best-perfumes-for-weddings"],
+    publishedAt: "2025-03-20T00:00:00Z",
+    updatedAt: "2025-03-20T00:00:00Z",
+  },
 ];
 
 /**
