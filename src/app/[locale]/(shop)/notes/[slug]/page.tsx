@@ -72,7 +72,7 @@ export default async function NotePage({ params }: NotePageProps) {
 
   // Fetch products with this note and supporting data in parallel
   const [{ products: allProducts }, giftProductInfo, bundleProductSlugs] = await Promise.all([
-    getProductsByNote(slug, { per_page: 100, locale: locale as Locale }),
+    getProductsByNote(slug, { locale: locale as Locale }),
     getFreeGiftProductInfo(),
     getBundleEnabledProductSlugs(),
   ]);

@@ -614,22 +614,31 @@ export async function getProductsByCategory(
 }
 
 // Get products filtered by a fragrance note attribute term slug
-// Fetches all products and filters client-side by the "Notes" attribute
+// Fetches all products (paginated) and filters client-side by the "Notes" attribute
 export async function getProductsByNote(
   noteSlug: string,
   params?: {
-    per_page?: number;
     locale?: Locale;
     currency?: Currency;
   }
 ): Promise<WCProductsResponse> {
-  const { products } = await getProducts({
-    per_page: params?.per_page || 100,
-    locale: params?.locale,
-    currency: params?.currency,
-  });
+  let allProducts: WCProduct[] = [];
+  let page = 1;
+  let totalPages = 1;
 
-  const filtered = products.filter((product) =>
+  do {
+    const result = await getProducts({
+      page,
+      per_page: 100,
+      locale: params?.locale,
+      currency: params?.currency,
+    });
+    allProducts = allProducts.concat(result.products);
+    totalPages = result.totalPages;
+    page++;
+  } while (page <= totalPages);
+
+  const filtered = allProducts.filter((product) =>
     product.attributes?.some(
       (attr) =>
         attr.taxonomy === "pa_notes" &&
