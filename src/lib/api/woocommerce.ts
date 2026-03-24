@@ -613,6 +613,46 @@ export async function getProductsByCategory(
   });
 }
 
+// Get products filtered by a fragrance note attribute term slug
+// Fetches all products (paginated) and filters client-side by the "Notes" attribute
+export async function getProductsByNote(
+  noteSlug: string,
+  params?: {
+    locale?: Locale;
+    currency?: Currency;
+  }
+): Promise<WCProductsResponse> {
+  let allProducts: WCProduct[] = [];
+  let page = 1;
+  let totalPages = 1;
+
+  do {
+    const result = await getProducts({
+      page,
+      per_page: 100,
+      locale: params?.locale,
+      currency: params?.currency,
+    });
+    allProducts = allProducts.concat(result.products);
+    totalPages = result.totalPages;
+    page++;
+  } while (page <= totalPages);
+
+  const filtered = allProducts.filter((product) =>
+    product.attributes?.some(
+      (attr) =>
+        attr.taxonomy === "pa_notes" &&
+        attr.terms?.some((term) => term.slug === noteSlug)
+    )
+  );
+
+  return {
+    products: filtered,
+    total: filtered.length,
+    totalPages: 1,
+  };
+}
+
 // Get related products by category - Memoized for request deduplication
 export const getRelatedProducts = cache(async function getRelatedProducts(
   product: WCProduct,
