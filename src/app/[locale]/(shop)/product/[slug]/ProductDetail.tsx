@@ -862,6 +862,9 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
             {(product.tags?.some(tag => tag.slug === "bestseller") || BESTSELLER_PRODUCT_SLUGS.includes(product.slug)) && (
               <Badge variant="bestseller">{isRTL ? "الأكثر مبيعاً" : "Bestseller"}</Badge>
             )}
+            {product.tags?.some(tag => tag.slug === "new") && (
+              <Badge variant="new">{isRTL ? "جديد" : "New"}</Badge>
+            )}
           </div>
 
 
