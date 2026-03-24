@@ -27,8 +27,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     pathname: "/new-products",
     keywords: locale === "ar"
-      ? ["عطور جديدة", "أحدث العطور", "عطور فاخرة", "منتجات عطرية جديدة", "إصدارات جديدة", "عطور الإمارات", "عود عربي جديد", "عطور دبي الجديدة", "شراء عطور جديدة", "عطور نسائية جديدة", "عطور رجالية جديدة", "عطور مسك جديدة", "عطور عنبر جديدة", "أحدث عطور عربية", "عطور فانيلا جديدة", "عطور جديدة اون لاين", "معطرات منزل جديدة"]
-      : ["new perfumes", "latest fragrances", "new arrivals perfume", "premium fragrance", "aromatic products", "UAE perfume", "new oud perfume", "latest Dubai perfume", "new women perfume", "new men cologne", "luxury perfume new arrival", "new musk perfume", "new amber fragrance", "latest Arabian perfume", "new vanilla perfume", "new perfume online", "new home fragrance"],
+      ? ["عطور جديدة", "أحدث العطور", "عطور فاخرة", "منتجات عطرية جديدة", "إصدارات جديدة", "عطور الإمارات", "عود عربي جديد", "عطور دبي الجديدة", "شراء عطور جديدة", "عطور نسائية جديدة", "عطور رجالية جديدة", "عطور مسك جديدة", "عطور عنبر جديدة", "أحدث عطور عربية", "عطور فانيلا جديدة", "عطور جديدة اون لاين", "معطرات منزل جديدة", "عطور أروماتيك جديدة", "أحدث إصدارات أروماتيك", "وصل حديثاً أروماتيك", "إطلاق عطور أروماتيك الإمارات"]
+      : ["new perfumes", "latest fragrances", "new arrivals perfume", "premium fragrance", "aromatic products", "UAE perfume", "new oud perfume", "latest Dubai perfume", "new women perfume", "new men cologne", "luxury perfume new arrival", "new musk perfume", "new amber fragrance", "latest Arabian perfume", "new vanilla perfume", "new perfume online", "new home fragrance", "new aromatic perfumes", "latest aromatic scents", "aromatic new arrivals", "new fragrance launch aromatic UAE"],
   });
 }
 
