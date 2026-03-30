@@ -5,11 +5,25 @@ import type { Metadata } from "next";
 import { SearchResultsClient } from "./SearchResultsClient";
 import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { getFreeGiftProductIds, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
+import { getPageSeo } from "@/lib/api/wordpress";
 
 interface SearchPageProps {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
+
+// Default SEO values (fallback when WordPress page doesn't exist)
+const defaultSeo = {
+  title: { en: "Search Fragrances & Perfumes", ar: "البحث في العطور" },
+  description: {
+    en: "Search our extensive collection of premium fragrances, aromatic oils, body care products, and home fragrances",
+    ar: "ابحث في مجموعتنا الواسعة من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم ومعطرات المنزل",
+  },
+  keywords: {
+    en: ["search perfumes", "find fragrances", "aromatic products", "perfume search", "search aromatic perfumes", "find aromatic scents", "aromatic fragrance finder", "discover aromatic products UAE"],
+    ar: ["بحث عطور", "عطور فاخرة", "زيوت عطرية", "منتجات عطرية", "بحث عطور أروماتيك", "اعثر على روائح أروماتيك", "دليل عطور أروماتيك", "اكتشف منتجات أروماتيك الإمارات"],
+  },
+};
 
 export async function generateMetadata({
   params,
@@ -18,21 +32,24 @@ export async function generateMetadata({
   const { locale } = await params;
   const { q } = await searchParams;
   const query = typeof q === "string" ? q : "";
-  
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+
+  const wpSeo = await getPageSeo("search", lang);
+
+  // For search pages with a query, use dynamic title; for base search page, use WordPress or fallback
+  const title = query
+    ? (isAr ? `نتائج البحث عن: ${query}` : `Search results for: ${query}`)
+    : (wpSeo?.title || (isAr ? defaultSeo.title.ar : defaultSeo.title.en));
+
   return generateSeoMetadata({
-    title: locale === "ar" 
-      ? query ? `نتائج البحث عن: ${query}` : "البحث في العطور"
-      : query ? `Search results for: ${query}` : "Search Fragrances & Perfumes",
-    description:
-      locale === "ar"
-        ? "ابحث في مجموعتنا الواسعة من العطور الفاخرة والزيوت العطرية ومنتجات العناية بالجسم ومعطرات المنزل"
-        : "Search our extensive collection of premium fragrances, aromatic oils, body care products, and home fragrances",
-    locale: locale as Locale,
+    title,
+    description: wpSeo?.description || (isAr ? defaultSeo.description.ar : defaultSeo.description.en),
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/search",
     noIndex: true,
-    keywords: locale === "ar"
-      ? ["بحث عطور", "عطور فاخرة", "زيوت عطرية", "منتجات عطرية", "بحث عطور أروماتيك", "اعثر على روائح أروماتيك", "دليل عطور أروماتيك", "اكتشف منتجات أروماتيك الإمارات"]
-      : ["search perfumes", "find fragrances", "aromatic products", "perfume search", "search aromatic perfumes", "find aromatic scents", "aromatic fragrance finder", "discover aromatic products UAE"],
+    keywords: isAr ? defaultSeo.keywords.ar : defaultSeo.keywords.en,
   });
 }
 

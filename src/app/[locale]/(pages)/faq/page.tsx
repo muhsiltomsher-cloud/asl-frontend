@@ -3,6 +3,7 @@ import { FAQAccordion, type FAQItem } from "@/components/common/FAQAccordion";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -10,21 +11,30 @@ interface FAQPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["FAQ", "frequently asked questions", "perfume FAQ", "fragrance help", "shipping UAE", "returns", "payment methods", "Arabian oud", "luxury perfumes", "Aromatic Scents Lab", "how to order perfume", "delivery time UAE", "exchange policy", "order tracking", "aromatic perfume FAQ", "aromatic scents help", "aromatic scents lab questions", "how to order from aromatic"],
+  ar: ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع", "توصيل الإمارات", "عود عربي", "عطور فاخرة", "Aromatic Scents Lab", "كيف اطلب عطور", "مدة التوصيل", "طريقة الاستبدال", "تتبع الطلب", "أسئلة عطور أروماتيك", "مساعدة أروماتيك سنتس لاب", "أسئلة شائعة أروماتيك", "كيف اطلب من أروماتيك"],
+};
+
 export async function generateMetadata({
   params,
 }: FAQPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.faq;
 
+  const wpSeo = await getPageSeo("faq", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/faq",
-    keywords: locale === "ar"
-      ? ["أسئلة شائعة", "مساعدة", "عطور", "شحن", "إرجاع", "طرق الدفع", "توصيل الإمارات", "عود عربي", "عطور فاخرة", "Aromatic Scents Lab", "كيف اطلب عطور", "مدة التوصيل", "طريقة الاستبدال", "تتبع الطلب", "أسئلة عطور أروماتيك", "مساعدة أروماتيك سنتس لاب", "أسئلة شائعة أروماتيك", "كيف اطلب من أروماتيك"]
-      : ["FAQ", "frequently asked questions", "perfume FAQ", "fragrance help", "shipping UAE", "returns", "payment methods", "Arabian oud", "luxury perfumes", "Aromatic Scents Lab", "how to order perfume", "delivery time UAE", "exchange policy", "order tracking", "aromatic perfume FAQ", "aromatic scents help", "aromatic scents lab questions", "how to order from aromatic"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 

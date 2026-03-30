@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
 import { getProducts, getCategories } from "@/lib/api/woocommerce";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { BundleManagerClient } from "./BundleManagerClient";
@@ -13,22 +14,35 @@ interface BundleManagerPageProps {
   searchParams: Promise<{ productId?: string }>;
 }
 
+// Default SEO values (fallback when WordPress page doesn't exist)
+const defaultSeo = {
+  title: { en: "Fragrance Bundle Creator", ar: "منشئ حزم العطور" },
+  description: {
+    en: "Create custom fragrance bundles and save more. Choose from a wide range of premium perfumes and aromatic oils",
+    ar: "أنشئ حزم عطور مخصصة واستمتع بتوفير أكبر. اختر من مجموعة واسعة من العطور الفاخرة والزيوت العطرية",
+  },
+  keywords: {
+    en: ["perfume bundles", "fragrance deals", "perfume offers", "fragrance collection", "bulk perfume"],
+    ar: ["حزم عطور", "عروض عطور", "توفير عطور", "مجموعة عطور", "عطور بالجملة"],
+  },
+};
+
 export async function generateMetadata({
   params,
 }: BundleManagerPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const isRTL = locale === "ar";
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+
+  const wpSeo = await getPageSeo("bundle-manager", lang);
 
   return generateSeoMetadata({
-    title: isRTL ? "منشئ حزم العطور" : "Fragrance Bundle Creator",
-    description: isRTL
-      ? "أنشئ حزم عطور مخصصة واستمتع بتوفير أكبر. اختر من مجموعة واسعة من العطور الفاخرة والزيوت العطرية"
-      : "Create custom fragrance bundles and save more. Choose from a wide range of premium perfumes and aromatic oils",
-    locale: locale as Locale,
+    title: wpSeo?.title || (isAr ? defaultSeo.title.ar : defaultSeo.title.en),
+    description: wpSeo?.description || (isAr ? defaultSeo.description.ar : defaultSeo.description.en),
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/bundle-manager",
-    keywords: isRTL
-      ? ["حزم عطور", "عروض عطور", "توفير عطور", "مجموعة عطور", "عطور بالجملة"]
-      : ["perfume bundles", "fragrance deals", "perfume offers", "fragrance collection", "bulk perfume"],
+    keywords: isAr ? defaultSeo.keywords.ar : defaultSeo.keywords.en,
   });
 }
 

@@ -16,6 +16,7 @@ import { QuickContactButtons } from "@/components/common/QuickContactButtons";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateContactPageJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getPageSeo } from "@/lib/api/wordpress";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -23,21 +24,30 @@ interface ContactPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["contact us", "customer service", "perfume support", "inquiries", "Aromatic Scents Lab", "contact Dubai perfume", "WhatsApp fragrance", "perfume store locations", "UAE fragrance help", "perfume phone number", "perfume email", "UAE customer support", "Dubai perfume store", "contact aromatic scents lab", "aromatic perfume support", "aromatic customer service UAE", "aromatic store location Dubai"],
+  ar: ["تواصل معنا", "خدمة العملاء", "دعم العطور", "استفسارات", "Aromatic Scents Lab", "اتصل بنا دبي", "واتساب عطور", "مواقع متاجر العطور", "مساعدة عطور الإمارات", "رقم هاتف عطور", "بريد إلكتروني عطور", "دعم عملاء الإمارات", "فروع عطور دبي", "تواصل أروماتيك سنتس لاب", "دعم عطور أروماتيك", "خدمة عملاء أروماتيك الإمارات", "موقع متجر أروماتيك دبي"],
+};
+
 export async function generateMetadata({
   params,
 }: ContactPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.contact;
 
+  const wpSeo = await getPageSeo("contact", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/contact",
-    keywords: locale === "ar"
-      ? ["تواصل معنا", "خدمة العملاء", "دعم العطور", "استفسارات", "Aromatic Scents Lab", "اتصل بنا دبي", "واتساب عطور", "مواقع متاجر العطور", "مساعدة عطور الإمارات", "رقم هاتف عطور", "بريد إلكتروني عطور", "دعم عملاء الإمارات", "فروع عطور دبي", "تواصل أروماتيك سنتس لاب", "دعم عطور أروماتيك", "خدمة عملاء أروماتيك الإمارات", "موقع متجر أروماتيك دبي"]
-      : ["contact us", "customer service", "perfume support", "inquiries", "Aromatic Scents Lab", "contact Dubai perfume", "WhatsApp fragrance", "perfume store locations", "UAE fragrance help", "perfume phone number", "perfume email", "UAE customer support", "Dubai perfume store", "contact aromatic scents lab", "aromatic perfume support", "aromatic customer service UAE", "aromatic store location Dubai"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 

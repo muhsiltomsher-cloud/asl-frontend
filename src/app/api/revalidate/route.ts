@@ -13,7 +13,7 @@ import { revalidateTag, revalidatePath } from "next/cache";
  *   x-revalidate-token: <REVALIDATE_SECRET_TOKEN>
  * Body (JSON):
  *   {
- *     "type": "products" | "categories" | "pages" | "free-gifts" | "all",
+ *     "type": "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "all",
  *     "slug": "optional-product-slug",
  *     "id": "optional-product-id",
  *     "path": "optional-path-to-revalidate"
@@ -28,6 +28,7 @@ const CACHE_TAGS = {
   products: "products",
   categories: "categories",
   pages: "pages",
+  pageSeo: "page-seo",
   bundleConfig: "bundle-config",
   freeGifts: "free-gifts",
 } as const;
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Parse the request body
     const body = await request.json().catch(() => ({}));
     const { type, slug, id, path } = body as {
-      type?: "products" | "categories" | "pages" | "free-gifts" | "all";
+      type?: "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "all";
       slug?: string;
       id?: string | number;
       path?: string;
@@ -136,6 +137,23 @@ export async function POST(request: NextRequest) {
         }
         break;
 
+      case "page-seo":
+        // Revalidate page SEO data fetched from WordPress
+        revalidateTag(CACHE_TAGS.pageSeo, revalidateOptions);
+        revalidatedTags.push(CACHE_TAGS.pageSeo);
+
+        // If a specific slug is provided, revalidate that page's SEO
+        if (slug) {
+          revalidateTag(`page-seo-${slug}`, revalidateOptions);
+          revalidateTag(`page-seo-${slug}-en`, revalidateOptions);
+          revalidateTag(`page-seo-${slug}-ar`, revalidateOptions);
+          revalidatedTags.push(`page-seo-${slug}`, `page-seo-${slug}-en`, `page-seo-${slug}-ar`);
+          revalidatePath(`/en/${slug}`);
+          revalidatePath(`/ar/${slug}`);
+          revalidatedPaths.push(`/en/${slug}`, `/ar/${slug}`);
+        }
+        break;
+
       case "free-gifts":
         // Revalidate free gift rules cache
         revalidateTag(CACHE_TAGS.freeGifts, revalidateOptions);
@@ -169,7 +187,7 @@ export async function POST(request: NextRequest) {
           revalidatedPaths.push(path);
         } else {
           return NextResponse.json(
-            { error: "Invalid revalidation type. Use: products, categories, pages, free-gifts, all, or provide a path" },
+            { error: "Invalid revalidation type. Use: products, categories, pages, page-seo, free-gifts, all, or provide a path" },
             { status: 400 }
           );
         }
@@ -198,7 +216,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const token = searchParams.get("token");
-  const type = searchParams.get("type") as "products" | "categories" | "pages" | "free-gifts" | "all" | undefined;
+  const type = searchParams.get("type") as "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "all" | undefined;
   const slug = searchParams.get("slug") || undefined;
   const id = searchParams.get("id") || undefined;
   const path = searchParams.get("path") || undefined;

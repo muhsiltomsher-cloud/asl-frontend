@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
 import { getFeaturedProducts, getFreeGiftProductIds, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { FeaturedProductsClient } from "./FeaturedProductsClient";
@@ -14,21 +15,35 @@ interface FeaturedProductsPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default SEO values (fallback when WordPress page doesn't exist)
+const defaultSeo = {
+  title: { en: "Best Sellers | Top Rated Luxury Perfumes & Oud Fragrances", ar: "الأكثر مبيعاً | أفضل العطور الفاخرة والمميزة" },
+  description: {
+    en: "Shop our best-selling luxury perfumes, Arabian oud & aromatic oils from Aromatic Scents Lab. Handcrafted in the UAE. Free delivery on orders over 500 AED.",
+    ar: "تسوق أفضل العطور المميزة والأكثر مبيعاً من Aromatic Scents Lab. عطور فاخرة وعود عربي وزيوت عطرية مصنوعة يدوياً في الإمارات. توصيل مجاني للطلبات فوق 500 درهم.",
+  },
+  keywords: {
+    en: ["featured perfumes", "best sellers", "top fragrances", "luxury perfume", "Arabian perfume", "fragrance gifts", "popular Dubai perfume", "best UAE perfume", "top rated oud", "luxury gift sets", "bestselling cologne", "best musk perfume", "best amber perfume", "top Arabian fragrance", "luxury perfume online", "trending perfume", "premium Dubai fragrance", "aromatic bestsellers", "top aromatic perfumes UAE", "most popular aromatic scents", "best aromatic fragrance"],
+    ar: ["عطور مميزة", "الأكثر مبيعاً", "أفضل العطور", "عطور فاخرة", "عطور عربية", "هدايا عطرية", "عطور دبي المميزة", "أفضل عطور الإمارات", "عطور شعبية", "عود فاخر", "مجموعات هدايا", "عطور مسك مميزة", "عطور عنبر فاخرة", "أفضل عطور عربية", "عطور فاخرة أون لاين", "عطور رائجة", "عطور فخمة دبي", "أفضل عطور أروماتيك", "عطور أروماتيك الأكثر مبيعاً", "أشهر روائح أروماتيك", "عطور أروماتيك المميزة"],
+  },
+};
+
 export async function generateMetadata({
   params,
 }: FeaturedProductsPageProps): Promise<Metadata> {
   const { locale } = await params;
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+
+  const wpSeo = await getPageSeo("featured-products", lang);
+
   return generateSeoMetadata({
-    title: locale === "ar" ? "الأكثر مبيعاً | أفضل العطور الفاخرة والمميزة" : "Best Sellers | Top Rated Luxury Perfumes & Oud Fragrances",
-    description:
-      locale === "ar"
-        ? "تسوق أفضل العطور المميزة والأكثر مبيعاً من Aromatic Scents Lab. عطور فاخرة وعود عربي وزيوت عطرية مصنوعة يدوياً في الإمارات. توصيل مجاني للطلبات فوق 500 درهم."
-        : "Shop our best-selling luxury perfumes, Arabian oud & aromatic oils from Aromatic Scents Lab. Handcrafted in the UAE. Free delivery on orders over 500 AED.",
-    locale: locale as Locale,
+    title: wpSeo?.title || (isAr ? defaultSeo.title.ar : defaultSeo.title.en),
+    description: wpSeo?.description || (isAr ? defaultSeo.description.ar : defaultSeo.description.en),
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/featured-products",
-    keywords: locale === "ar"
-      ? ["عطور مميزة", "الأكثر مبيعاً", "أفضل العطور", "عطور فاخرة", "عطور عربية", "هدايا عطرية", "عطور دبي المميزة", "أفضل عطور الإمارات", "عطور شعبية", "عود فاخر", "مجموعات هدايا", "عطور مسك مميزة", "عطور عنبر فاخرة", "أفضل عطور عربية", "عطور فاخرة أون لاين", "عطور رائجة", "عطور فخمة دبي", "أفضل عطور أروماتيك", "عطور أروماتيك الأكثر مبيعاً", "أشهر روائح أروماتيك", "عطور أروماتيك المميزة"]
-      : ["featured perfumes", "best sellers", "top fragrances", "luxury perfume", "Arabian perfume", "fragrance gifts", "popular Dubai perfume", "best UAE perfume", "top rated oud", "luxury gift sets", "bestselling cologne", "best musk perfume", "best amber perfume", "top Arabian fragrance", "luxury perfume online", "trending perfume", "premium Dubai fragrance", "aromatic bestsellers", "top aromatic perfumes UAE", "most popular aromatic scents", "best aromatic fragrance"],
+    keywords: isAr ? defaultSeo.keywords.ar : defaultSeo.keywords.en,
   });
 }
 

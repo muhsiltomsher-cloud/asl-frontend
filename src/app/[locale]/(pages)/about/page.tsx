@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import {
@@ -19,21 +20,30 @@ interface AboutPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances", "handcrafted perfume Dubai", "natural fragrance ingredients", "UAE perfume house", "authentic Arabian oud", "luxury perfume brand UAE", "Dubai fragrance house", "musk and amber perfume", "French rose perfume", "sandalwood fragrance", "aromatic perfume brand", "aromatic scents UAE", "fragrance crafting Dubai", "aromatic scents lab story", "aromatic perfume house UAE"],
+  ar: ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية", "عطور يدوية دبي", "مكونات عطرية طبيعية", "بيت عطور الإمارات", "عود عربي أصلي", "عطور عربية أصلية", "عطور دبي فاخرة", "عطور مسك وعنبر", "عطور ورد فرنسي", "عطور خشب الصندل", "علامة أروماتيك للعطور", "عطور أروماتيك الإمارات", "صناعة العطور أروماتيك دبي", "قصة أروماتيك سنتس لاب", "بيت عطور أروماتيك"],
+};
+
 export async function generateMetadata({
   params,
 }: AboutPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.about;
 
+  const wpSeo = await getPageSeo("about", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/about",
-    keywords: locale === "ar"
-      ? ["عن Aromatic Scents Lab", "عطور إماراتية", "صناعة العطور", "عطور فاخرة", "قصتنا", "عطور طبيعية", "عطور يدوية دبي", "مكونات عطرية طبيعية", "بيت عطور الإمارات", "عود عربي أصلي", "عطور عربية أصلية", "عطور دبي فاخرة", "عطور مسك وعنبر", "عطور ورد فرنسي", "عطور خشب الصندل", "علامة أروماتيك للعطور", "عطور أروماتيك الإمارات", "صناعة العطور أروماتيك دبي", "قصة أروماتيك سنتس لاب", "بيت عطور أروماتيك"]
-      : ["about Aromatic Scents Lab", "UAE perfumery", "fragrance crafting", "premium perfumes", "our story", "natural fragrances", "handcrafted perfume Dubai", "natural fragrance ingredients", "UAE perfume house", "authentic Arabian oud", "luxury perfume brand UAE", "Dubai fragrance house", "musk and amber perfume", "French rose perfume", "sandalwood fragrance", "aromatic perfume brand", "aromatic scents UAE", "fragrance crafting Dubai", "aromatic scents lab story", "aromatic perfume house UAE"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 
