@@ -1064,7 +1064,7 @@ export async function getPageSeo(slug: string, locale?: Locale): Promise<PageSeo
   const data = await fetchWPAPI<WPPage[]>(
     `/wp/v2/pages?slug=${encodeURIComponent(slug)}&_embed`,
     {
-      tags: ["pages", `page-${slug}`],
+      tags: ["pages", "page-seo", `page-${slug}`, `page-seo-${slug}`],
       locale,
       revalidate: 300,
     }
