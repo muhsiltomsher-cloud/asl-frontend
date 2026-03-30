@@ -1,0 +1,175 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, Grid3X3, Search, Heart, User } from "lucide-react";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
+import type { Locale } from "@/config/site";
+import type { MobileBarSettings } from "@/lib/api/wordpress";
+import type { WPMenuItem } from "@/types/wordpress";
+import type { Dictionary } from "@/i18n";
+import { CategoriesDrawer } from "@/components/layout/CategoriesDrawer";
+import { SearchDrawer } from "@/components/layout/SearchDrawer";
+import { triggerHaptic } from "@/lib/utils/haptics";
+
+interface MobileBottomBarProps {
+  locale: Locale;
+  settings: MobileBarSettings;
+  dictionary: Dictionary;
+  menuItems?: WPMenuItem[] | null;
+}
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  home: Home,
+  grid: Grid3X3,
+  search: Search,
+  heart: Heart,
+  user: User,
+};
+
+export function MobileBottomBar({ locale, settings, dictionary, menuItems }: MobileBottomBarProps) {
+  const { wishlistItemsCount } = useWishlist();
+  const { setIsAccountDrawerOpen } = useAuth();
+  const isKeyboardVisible = useKeyboardVisible();
+  const [isCategoriesDrawerOpen, setIsCategoriesDrawerOpen] = useState(false);
+  const [isSearchDrawerOpen, setIsSearchDrawerOpen] = useState(false);
+  const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
+  const pathname = usePathname();
+
+  if (!settings.enabled || settings.items.length === 0) {
+    return null;
+  }
+
+  const isRTL = locale === "ar";
+
+  const isItemActive = (item: MobileBarSettings["items"][0]) => {
+    const itemPath = item.url.startsWith("/") ? `/${locale}${item.url}` : item.url;
+    
+    if (item.icon === "home" || item.url === "/" || item.url === "") {
+      return pathname === `/${locale}` || pathname === `/${locale}/`;
+    }
+    if (item.icon === "grid" || item.url.includes("categories")) {
+      return activeDrawer === "categories";
+    }
+    if (item.icon === "search") {
+      return activeDrawer === "search";
+    }
+    if (item.icon === "user" || item.url.includes("account")) {
+      return activeDrawer === "account" || pathname.includes("/account");
+    }
+    if (item.icon === "heart" || item.url.includes("wishlist")) {
+      return pathname.includes("/wishlist");
+    }
+    return pathname.startsWith(itemPath);
+  };
+
+  const handleItemClick = (item: MobileBarSettings["items"][0], e: React.MouseEvent) => {
+    triggerHaptic();
+    if (item.icon === "grid" || item.url.includes("categories")) {
+      e.preventDefault();
+      setActiveDrawer("categories");
+      setIsCategoriesDrawerOpen(true);
+    } else if (item.icon === "search") {
+      e.preventDefault();
+      setActiveDrawer("search");
+      setIsSearchDrawerOpen(true);
+    } else if (item.icon === "user" || item.url.includes("account")) {
+      e.preventDefault();
+      setActiveDrawer("account");
+      setIsAccountDrawerOpen(true);
+    }
+  };
+
+  return (
+    <>
+      <nav className={`fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] xl:hidden transition-transform duration-200 ${isKeyboardVisible ? "translate-y-full" : "translate-y-0"}`}>
+        <div className="flex items-center justify-around px-3 py-2 pb-safe">
+          {settings.items.map((item, index) => {
+            const IconComponent = iconMap[item.icon] || Home;
+            // Override "Categories" label with "Menu" / "القائمة"
+            // Also handled server-side in getMobileBarSettings for SSR consistency
+            const rawLabel = isRTL && item.labelAr ? item.labelAr : item.label;
+            const isCategoriesItem = item.icon === "grid" || item.url.includes("categories") || 
+              item.label?.toLowerCase() === "categories" || item.labelAr === "الفئات";
+            const label = isCategoriesItem
+              ? (isRTL ? "القائمة" : "Menu")
+              : rawLabel;
+            const href = item.url.startsWith("/") ? `/${locale}${item.url}` : item.url || `/${locale}`;
+
+            const isWishlist = item.icon === "heart" || item.url.includes("wishlist");
+            const showBadge = isWishlist && wishlistItemsCount > 0;
+            const isActive = isItemActive(item);
+
+            const isDrawerItem = item.icon === "grid" || item.icon === "search" || item.icon === "user" || 
+                                 item.url.includes("categories") || item.url.includes("account");
+
+            const activeClasses = isActive 
+              ? "text-[#C4885B]" 
+              : "text-gray-600";
+
+            if (isDrawerItem) {
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={(e) => handleItemClick(item, e)}
+                  className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 mx-1 transition-all hover:text-[#C4885B] active:scale-95 ${activeClasses}`}
+                >
+                  <div className="relative">
+                    <IconComponent className="h-5 w-5" />
+                  </div>
+                  {label && (
+                    <span className="text-[9px] font-medium leading-tight">{label}</span>
+                  )}
+                </button>
+              );
+            }
+
+            return (
+              <Link
+                key={index}
+                href={href}
+                className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 mx-1 transition-all hover:text-[#C4885B] active:scale-95 ${activeClasses}`}
+              >
+                <div className="relative">
+                  <IconComponent className="h-5 w-5" />
+                  {showBadge && (
+                    <span className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#C4885B] text-[10px] font-medium text-white">
+                      {wishlistItemsCount > 9 ? "9+" : wishlistItemsCount}
+                    </span>
+                  )}
+                </div>
+                {label && (
+                  <span className="text-[9px] font-medium leading-tight">{label}</span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+
+      <CategoriesDrawer
+        isOpen={isCategoriesDrawerOpen}
+        onClose={() => {
+          setIsCategoriesDrawerOpen(false);
+          setActiveDrawer(null);
+        }}
+        locale={locale}
+        dictionary={dictionary}
+        menuItems={menuItems}
+      />
+      <SearchDrawer
+        isOpen={isSearchDrawerOpen}
+        onClose={() => {
+          setIsSearchDrawerOpen(false);
+          setActiveDrawer(null);
+        }}
+        locale={locale}
+        dictionary={dictionary}
+      />
+    </>
+  );
+}

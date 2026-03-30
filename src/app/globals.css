@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+@media (width >= 96rem) {
+  .container {
+    max-width: 80rem;
+  }
+}
+
+:root {
+  --background: #f7f6f2;
+  --foreground: #171717;
+  --color-primary: #92400e;
+  --color-primary-dark: #78350f;
+  --color-primary-light: #b45309;
+  --color-beige: #F5F0E8;
+  --color-beige-dark: #E8E0D5;
+  --color-brown: #5C4A3D;
+  --color-brown-light: #8B7355;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  /* --font-sans: var(--font-questrial); */ /* Hidden - can switch to Questrial if needed */
+  --font-title: var(--font-accent-graphic);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+  /* font-family: var(--font-questrial), Arial, Helvetica, sans-serif; */ /* Hidden - can switch to Questrial if needed */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-accent-graphic), Arial, Helvetica, sans-serif;
+}
+
+/* Arabic font styles - Noto Sans Arabic is a clean, modern Arabic font from Google */
+/* Target the [lang="ar"] attribute on the wrapper div, not html element */
+[lang="ar"] {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-noto-sans-arabic);
+}
+
+[lang="ar"] * {
+  font-family: inherit;
+}
+
+[lang="ar"] h1,
+[lang="ar"] h2,
+[lang="ar"] h3,
+[lang="ar"] h4,
+[lang="ar"] h5,
+[lang="ar"] h6 {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif;
+}
+
+/* Global cursor pointer for interactive elements */
+a,
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select,
+.cursor-pointer {
+  cursor: pointer;
+}
+
+/* Ensure disabled elements show not-allowed cursor */
+button:disabled,
+input:disabled,
+select:disabled,
+[disabled] {
+  cursor: not-allowed;
+}
+
+/* Tabby and Tamara widget styling - beige backgrounds, smaller font, website font */
+#tabby-promo-widget,
+#tabby-promo-widget * {
+  background: #e7e2d6 !important;
+  background-color: #e7e2d6 !important;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+}
+
+tamara-widget,
+tamara-widget * {
+  background: #e7e2d6 !important;
+  background-color: #e7e2d6 !important;
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+}
+
+/* Arabic font for payment widgets */
+[lang="ar"] #tabby-promo-widget,
+[lang="ar"] #tabby-promo-widget * {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif !important;
+}
+
+[lang="ar"] tamara-widget,
+[lang="ar"] tamara-widget * {
+  font-family: var(--font-noto-sans-arabic), Arial, Helvetica, sans-serif !important;
+}
+
+/* Fix Safari showing dropdown/autofill icons on text input fields */
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  right: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Skeleton placeholder */
+.skeleton-shimmer {
+  background: #e5e1da;
+}
+
+/* Mobile font size reduction - smaller text on screens below 1024px */
+/* Note: h1, h2, h3 font sizes are controlled by Tailwind classes for flexibility */
+@media (max-width: 1023px) {
+  body {
+    font-size: 14px;
+  }
+  
+  p, span, a, li, label, input, button, select, textarea {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.1); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out both;
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.img-lazy-load {
+  opacity: 0;
+  transition: opacity 0.4s ease-in;
+}
+
+.img-lazy-loaded {
+  opacity: 1;
+}
+
+/* Hero slider - force Swiper to auto-size on mobile so banner images are not cropped */
+@media (max-width: 767px) {
+  .hero-slider.swiper {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  .hero-slider .swiper-wrapper {
+    height: auto !important;
+  }
+  .hero-slider .swiper-slide {
+    height: auto !important;
+  }
+}

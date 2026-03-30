@@ -1,0 +1,77 @@
+import { Suspense } from "react";
+import { ProductGridSkeleton } from "@/components/common/Skeleton";
+import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
+import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getProducts, getProductBySlug, getBundleConfig } from "@/lib/api/woocommerce";
+import type { Locale } from "@/config/site";
+import type { Metadata } from "next";
+import { BuildYourOwnSetClient } from "./BuildYourOwnSetClient";
+
+export const revalidate = 300;
+
+interface BuildYourOwnSetPageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: BuildYourOwnSetPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const isRTL = locale === "ar";
+
+  return generateSeoMetadata({
+    title: isRTL ? "اصنع مجموعتك | طقم عطور مخصص هدية فاخرة" : "Build Your Own Set | Custom Luxury Perfume Gift Bundle",
+    description: isRTL
+      ? "أنشئ مجموعة عطور فريدة من اختيارك. اختر 3 منتجات أو أكثر من العطور والزيوت واللوشن ومعطرات المنزل. هدية مثالية من Aromatic Scents Lab. توصيل مجاني للطلبات فوق 500 درهم."
+      : "Create a unique fragrance gift set. Pick 3+ products from perfumes, oud, oils & home fragrances. The perfect luxury gift from Aromatic Scents Lab. Free delivery over 500 AED.",
+    locale: locale as Locale,
+    pathname: "/build-your-own-set",
+    keywords: isRTL
+      ? ["مجموعة عطور", "هدايا عطور", "عطور مخصصة", "حزمة عطور", "طقم عطور", "هدية عطرية", "هدية عطور فاخرة", "طقم عطور هدية", "مجموعة عطور مخصصة", "هدية عيد عطور", "هدية عيد ميلاد", "هدية زواج عطور", "عطور إماراتية هدية", "طقم عود عربي", "طقم عطور أروماتيك مخصص", "اصنع هدية أروماتيك", "مجموعة عطور أروماتيك شخصية", "علبة هدايا أروماتيك الإمارات"]
+      : ["custom fragrance set", "perfume gift set", "build your own perfume", "fragrance bundle", "perfume collection", "gift set", "luxury perfume gift", "perfume gift box", "custom perfume bundle", "birthday perfume gift", "wedding fragrance gift", "anniversary perfume set", "UAE perfume gift set", "oud gift set", "aromatic custom perfume set", "build your own aromatic gift", "personalized aromatic fragrance", "create aromatic gift box UAE"],
+  });
+}
+
+export default async function BuildYourOwnSetPage({
+  params,
+}: BuildYourOwnSetPageProps) {
+  const { locale } = await params;
+  const isRTL = locale === "ar";
+
+  const breadcrumbItems = [
+    {
+      name: isRTL ? "المتجر" : "Shop",
+      href: `/${locale}/shop`,
+    },
+    {
+      name: isRTL ? "اصنع مجموعتك الخاصة" : "Build Your Own Set",
+      href: `/${locale}/build-your-own-set`,
+    },
+  ];
+
+  // Fetch all products for selection and bundle configuration in parallel
+  // Pass locale to getBundleConfig to get correct product/category IDs for the current language
+  const [{ products }, bundleProduct, bundleConfig] = await Promise.all([
+    getProducts({
+      per_page: 100,
+      locale: locale as Locale,
+    }),
+    getProductBySlug("build-your-own-set", locale as Locale),
+    getBundleConfig("build-your-own-set", locale as Locale),
+  ]);
+
+  return (
+    <div className="container mx-auto px-4 py-3">
+      <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
+
+      <Suspense fallback={<ProductGridSkeleton count={1} />}>
+        <BuildYourOwnSetClient
+          products={products}
+          locale={locale as Locale}
+          bundleProduct={bundleProduct}
+          bundleConfig={bundleConfig}
+        />
+      </Suspense>
+    </div>
+  );
+}
