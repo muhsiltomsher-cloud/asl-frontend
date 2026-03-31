@@ -28,8 +28,11 @@ const WP_API_BASE = `${siteConfig.apiUrl}/wp-json`;
 
 // Types for WordPress Plugin API Response (camelCase format)
 interface WPPluginHeroSlide {
+  enabled?: boolean;
   image: string;
   mobileImage: string;
+  imageAr?: string;
+  mobileImageAr?: string;
   link: string;
 }
 
@@ -302,12 +305,13 @@ function createWPLink(url: string, title: string = ""): WPLink | undefined {
 }
 
 // Transform WordPress Plugin hero settings to frontend format
-function transformHeroSettings(pluginHero: WPPluginHeroSettings): HeroSliderSettings {
+function transformHeroSettings(pluginHero: WPPluginHeroSettings, locale?: Locale): HeroSliderSettings {
+  const isArabic = locale === 'ar';
   const slides: HeroSlide[] = pluginHero.slides
-    .filter(slide => slide.image)
+    .filter(slide => slide.enabled !== false && slide.image)
     .map((slide, index) => ({
-      image: createWPImage(slide.image, `Slide ${index + 1}`) as WPImage,
-      mobile_image: createWPImage(slide.mobileImage, `Slide ${index + 1} Mobile`) || undefined,
+      image: createWPImage(isArabic && slide.imageAr ? slide.imageAr : slide.image, `Slide ${index + 1}`) as WPImage,
+      mobile_image: createWPImage(isArabic && slide.mobileImageAr ? slide.mobileImageAr : (slide.mobileImage || slide.image), `Slide ${index + 1} Mobile`) || undefined,
       link: createWPLink(slide.link),
     }));
 
@@ -596,7 +600,7 @@ export async function getHomePageSettings(locale?: Locale): Promise<HomePageACF>
   // If plugin data is available, transform it to the expected format
   if (pluginData) {
     return {
-      hero_slider: transformHeroSettings(pluginData.hero),
+      hero_slider: transformHeroSettings(pluginData.hero, locale),
       new_products: transformProductSectionSettings(pluginData.newProducts, locale),
       bestseller_products: transformProductSectionSettings(pluginData.bestseller, locale),
       shop_by_category: transformCategorySectionSettings(pluginData.categories, locale),
