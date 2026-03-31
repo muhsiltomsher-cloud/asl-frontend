@@ -18,6 +18,10 @@ import type {
   HeroSlide,
   Banner,
   Collection,
+  ProductPage,
+  CategorySeoContent,
+  HomeSections,
+  GuidePage,
 } from "@/types/wordpress";
 
 const WP_API_BASE = `${siteConfig.apiUrl}/wp-json`;
@@ -1231,4 +1235,90 @@ export async function getMegaMenuData(locale?: Locale): Promise<MegaMenuData | n
     columns,
     featuredProductIds,
   };
+}
+
+// ─── Product Pages (asl_product_page CPT) ─────────────────────────
+
+/**
+ * Fetch all published product pages from the custom REST endpoint.
+ * Used by generateStaticParams to pre-render all product pages at build time.
+ */
+export async function getProductPages(): Promise<ProductPage[]> {
+  const data = await fetchWPAPI<ProductPage[]>(
+    "/asl/v1/product-pages",
+    {
+      tags: ["product-pages"],
+      revalidate: 300,
+    }
+  );
+  return data ?? [];
+}
+
+/**
+ * Fetch a single product page by slug.
+ * Returns null if the page is not found or an error occurs.
+ */
+export async function getProductPageBySlug(slug: string, locale?: Locale): Promise<ProductPage | null> {
+  const data = await fetchWPAPI<ProductPage>(
+    `/asl/v1/product-pages/${encodeURIComponent(slug)}`,
+    {
+      tags: ["product-pages", `product-page-${slug}`],
+      locale,
+      revalidate: 60,
+    }
+  );
+  return data;
+}
+
+// ─── Category SEO Content ─────────────────────────────────────────
+
+export async function getCategorySeoContent(slug: string): Promise<CategorySeoContent | null> {
+  const data = await fetchWPAPI<CategorySeoContent>(
+    `/asl/v1/category-seo/${encodeURIComponent(slug)}`,
+    { tags: ["category-seo", `category-seo-${slug}`], revalidate: 300 }
+  );
+  return data;
+}
+
+export async function getAllCategorySeoContent(): Promise<Record<string, CategorySeoContent>> {
+  const data = await fetchWPAPI<Record<string, CategorySeoContent>>(
+    "/asl/v1/category-seo",
+    { tags: ["category-seo"], revalidate: 300 }
+  );
+  return data ?? {};
+}
+
+// ─── Home Sections (Why Choose Us, Our Story, FAQ, SEO) ──────────
+
+const defaultHomeSections: HomeSections = {
+  whyChooseUs: { enabled: true, eyebrow: { en: 'Our Promise', ar: 'تميزنا' }, title: { en: '', ar: '' }, subtitle: { en: '', ar: '' }, items: [] },
+  ourStory: { enabled: true, eyebrow: { en: 'Discover Our Journey', ar: 'اكتشف قصتنا' }, title: { en: '', ar: '' }, description1: { en: '', ar: '' }, description2: { en: '', ar: '' }, image: '', stats: [] },
+  faq: { enabled: true, eyebrow: { en: 'Help', ar: 'مساعدة' }, title: { en: '', ar: '' }, subtitle: { en: '', ar: '' }, items: [] },
+  seoContent: { enabled: true, title: { en: 'Shop Premium Perfumes Online in the UAE', ar: 'تسوق العطور الفاخرة اون لاين في الإمارات' }, paragraphs: [] },
+};
+
+export async function getHomeSections(): Promise<HomeSections> {
+  const data = await fetchWPAPI<HomeSections>(
+    "/asl/v1/home-sections",
+    { tags: ["home-sections"], revalidate: 60 }
+  );
+  return data ?? defaultHomeSections;
+}
+
+// ─── Guide Pages (asl_guide CPT) ─────────────────────────────────
+
+export async function getGuidePages(): Promise<GuidePage[]> {
+  const data = await fetchWPAPI<GuidePage[]>(
+    "/asl/v1/guides",
+    { tags: ["guides"], revalidate: 300 }
+  );
+  return data ?? [];
+}
+
+export async function getGuidePageBySlug(slug: string): Promise<GuidePage | null> {
+  const data = await fetchWPAPI<GuidePage>(
+    `/asl/v1/guides/${encodeURIComponent(slug)}`,
+    { tags: ["guides", `guide-${slug}`], revalidate: 60 }
+  );
+  return data;
 }
