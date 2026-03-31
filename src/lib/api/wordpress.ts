@@ -952,9 +952,23 @@ export interface WPPage {
   yoast_head_json?: {
     title?: string;
     description?: string;
+    robots?: {
+      index?: string;
+      follow?: string;
+    };
+    canonical?: string;
     og_title?: string;
     og_description?: string;
-    og_image?: Array<{ url: string }>;
+    og_image?: Array<{ url: string; width?: number; height?: number }>;
+    og_url?: string;
+    og_type?: string;
+    og_locale?: string;
+    og_site_name?: string;
+    twitter_card?: string;
+    twitter_title?: string;
+    twitter_description?: string;
+    twitter_image?: string;
+    schema?: Record<string, unknown>;
   };
 }
 
@@ -963,7 +977,6 @@ export interface WPPage {
 const FUNCTIONAL_PAGE_SLUGS = [
   "cart",
   "checkout",
-  "shop",
   "account",
   "my-account",
   "wishlist",
@@ -1027,6 +1040,57 @@ export async function getPages(locale?: Locale): Promise<WPPage[]> {
 // Helper function to strip HTML tags from a string (for SEO metadata)
 export function stripHtmlTags(html: string): string {
   return html.replace(/<[^>]*>/g, "").trim();
+}
+
+// Extracted Yoast SEO data from a WordPress page
+export interface PageSeoData {
+  title: string | null;
+  description: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
+  canonical: string | null;
+  pageTitle: string | null;
+  pageExcerpt: string | null;
+  pageContent: string | null;
+}
+
+// Fetch SEO data for a page by its slug from WordPress
+// Used by frontend pages to get dynamic SEO content from WordPress Pages editor + Yoast
+export async function getPageSeo(slug: string, locale?: Locale): Promise<PageSeoData | null> {
+  const data = await fetchWPAPI<WPPage[]>(
+    `/wp/v2/pages?slug=${encodeURIComponent(slug)}&_embed`,
+    {
+      tags: ["pages", "page-seo", `page-${slug}`, `page-seo-${slug}`],
+      locale,
+      revalidate: 300,
+    }
+  );
+
+  if (!data || data.length === 0) {
+    return null;
+  }
+
+  const page = data[0];
+  const yoast = page.yoast_head_json;
+
+  return {
+    title: yoast?.title ? decodeHtmlEntities(yoast.title) : null,
+    description: yoast?.description || null,
+    ogTitle: yoast?.og_title ? decodeHtmlEntities(yoast.og_title) : null,
+    ogDescription: yoast?.og_description || null,
+    ogImage: yoast?.og_image?.[0]?.url || null,
+    twitterTitle: yoast?.twitter_title ? decodeHtmlEntities(yoast.twitter_title) : null,
+    twitterDescription: yoast?.twitter_description || null,
+    twitterImage: yoast?.twitter_image || null,
+    canonical: yoast?.canonical || null,
+    pageTitle: page.title.rendered ? stripHtmlTags(page.title.rendered) : null,
+    pageExcerpt: page.excerpt.rendered ? stripHtmlTags(page.excerpt.rendered) : null,
+    pageContent: page.content.rendered || null,
+  };
 }
 
 // Mega Menu Types

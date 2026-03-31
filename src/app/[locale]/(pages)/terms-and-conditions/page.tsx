@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -8,21 +9,30 @@ interface TermsPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["terms and conditions", "terms of use", "user agreement", "store policies", "Aromatic Scents Lab", "purchase terms", "online store policy", "shopping terms"],
+  ar: ["الشروط والأحكام", "شروط الاستخدام", "اتفاقية المستخدم", "سياسات المتجر", "Aromatic Scents Lab", "شروط الشراء", "سياسة المتجر الإلكتروني", "أحكام التسوق"],
+};
+
 export async function generateMetadata({
   params,
 }: TermsPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.terms;
 
+  const wpSeo = await getPageSeo("terms-and-conditions", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/terms-and-conditions",
-    keywords: locale === "ar"
-      ? ["الشروط والأحكام", "شروط الاستخدام", "اتفاقية المستخدم", "سياسات المتجر", "Aromatic Scents Lab", "شروط الشراء", "سياسة المتجر الإلكتروني", "أحكام التسوق"]
-      : ["terms and conditions", "terms of use", "user agreement", "store policies", "Aromatic Scents Lab", "purchase terms", "online store policy", "shopping terms"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 

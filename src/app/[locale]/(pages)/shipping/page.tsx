@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -8,21 +9,30 @@ interface ShippingPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["perfume shipping", "fragrance delivery", "UAE shipping", "Dubai delivery", "GCC shipping", "free delivery", "express delivery", "shipping policy", "Aromatic Scents Lab", "free shipping 500 AED", "delivery time", "Saudi Arabia perfume shipping", "Oman perfume delivery", "order tracking"],
+  ar: ["شحن عطور", "توصيل عطور", "شحن الإمارات", "توصيل مجاني", "سياسة الشحن", "شحن دبي", "شحن دول الخليج", "توصيل سريع", "Aromatic Scents Lab", "شحن مجاني 500 درهم", "مدة التوصيل", "شحن عطور السعودية", "شحن عطور عمان", "تتبع الشحن"],
+};
+
 export async function generateMetadata({
   params,
 }: ShippingPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.shipping;
 
+  const wpSeo = await getPageSeo("shipping", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/shipping",
-    keywords: locale === "ar"
-      ? ["شحن عطور", "توصيل عطور", "شحن الإمارات", "توصيل مجاني", "سياسة الشحن", "شحن دبي", "شحن دول الخليج", "توصيل سريع", "Aromatic Scents Lab", "شحن مجاني 500 درهم", "مدة التوصيل", "شحن عطور السعودية", "شحن عطور عمان", "تتبع الشحن"]
-      : ["perfume shipping", "fragrance delivery", "UAE shipping", "Dubai delivery", "GCC shipping", "free delivery", "express delivery", "shipping policy", "Aromatic Scents Lab", "free shipping 500 AED", "delivery time", "Saudi Arabia perfume shipping", "Oman perfume delivery", "order tracking"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 

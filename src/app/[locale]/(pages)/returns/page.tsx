@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -8,21 +9,30 @@ interface ReturnsPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["return policy", "perfume exchange", "product returns", "returns and exchanges", "order help", "quality guarantee", "Aromatic Scents Lab", "UAE perfume returns", "refund policy", "return conditions", "Dubai perfume exchange"],
+  ar: ["سياسة الإرجاع", "استبدال عطور", "إرجاع منتجات", "ضمان الجودة", "إرجاع عطور", "استبدال منتجات", "مساعدة الطلبات", "Aromatic Scents Lab", "إرجاع عطور الإمارات", "استرجاع الأموال", "شروط الإرجاع", "استبدال عطور دبي"],
+};
+
 export async function generateMetadata({
   params,
 }: ReturnsPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.returns;
 
+  const wpSeo = await getPageSeo("returns", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/returns",
-    keywords: locale === "ar"
-      ? ["سياسة الإرجاع", "استبدال عطور", "إرجاع منتجات", "ضمان الجودة", "إرجاع عطور", "استبدال منتجات", "مساعدة الطلبات", "Aromatic Scents Lab", "إرجاع عطور الإمارات", "استرجاع الأموال", "شروط الإرجاع", "استبدال عطور دبي"]
-      : ["return policy", "perfume exchange", "product returns", "returns and exchanges", "order help", "quality guarantee", "Aromatic Scents Lab", "UAE perfume returns", "refund policy", "return conditions", "Dubai perfume exchange"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 

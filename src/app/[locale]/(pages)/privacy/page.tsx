@@ -1,6 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { getPageSeo } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -8,21 +9,30 @@ interface PrivacyPageProps {
   params: Promise<{ locale: string }>;
 }
 
+// Default keywords (fallback when WordPress page doesn't exist)
+const defaultKeywords = {
+  en: ["privacy policy", "data protection", "customer privacy", "information security", "Aromatic Scents Lab", "customer data protection", "UAE data policy", "personal information security"],
+  ar: ["سياسة الخصوصية", "حماية البيانات", "أمان المعلومات", "خصوصية العملاء", "Aromatic Scents Lab", "حماية بيانات العملاء", "سياسة البيانات الإمارات", "أمان المعلومات الشخصية"],
+};
+
 export async function generateMetadata({
   params,
 }: PrivacyPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const dictionary = await getDictionary(locale as Locale);
+  const lang = locale as Locale;
+  const isAr = lang === "ar";
+  const dictionary = await getDictionary(lang);
   const pageContent = dictionary.pages.privacy;
 
+  const wpSeo = await getPageSeo("privacy", lang);
+
   return generateSeoMetadata({
-    title: pageContent.seo.title,
-    description: pageContent.seo.description,
-    locale: locale as Locale,
+    title: wpSeo?.title || pageContent.seo.title,
+    description: wpSeo?.description || pageContent.seo.description,
+    image: wpSeo?.ogImage || undefined,
+    locale: lang,
     pathname: "/privacy",
-    keywords: locale === "ar"
-      ? ["سياسة الخصوصية", "حماية البيانات", "أمان المعلومات", "خصوصية العملاء", "Aromatic Scents Lab", "حماية بيانات العملاء", "سياسة البيانات الإمارات", "أمان المعلومات الشخصية"]
-      : ["privacy policy", "data protection", "customer privacy", "information security", "Aromatic Scents Lab", "customer data protection", "UAE data policy", "personal information security"],
+    keywords: isAr ? defaultKeywords.ar : defaultKeywords.en,
   });
 }
 
