@@ -60,14 +60,16 @@ function asl_settings_register_menus() {
 
 /**
  * Image field helper
+ * Note: ID uses underscores instead of brackets so jQuery selectors work correctly
  */
 function asl_image_field($name, $value = '') {
     $has = !empty($value);
+    $safe_id = str_replace(array('[',']'), array('_',''), $name);
     echo '<div class="asl-image-field">';
-    echo '<input type="hidden" name="'.esc_attr($name).'" id="'.esc_attr($name).'" value="'.esc_url($value).'">';
-    echo '<button type="button" class="button asl-upload-btn" data-target="#'.esc_attr($name).'" data-preview="#'.esc_attr($name).'_preview">Upload Image</button>';
-    echo '<button type="button" class="button asl-remove-btn" data-target="#'.esc_attr($name).'" data-preview="#'.esc_attr($name).'_preview" style="'.($has ? '' : 'display:none;').'">Remove</button>';
-    echo '<div id="'.esc_attr($name).'_preview" class="asl-preview">';
+    echo '<input type="hidden" name="'.esc_attr($name).'" id="'.esc_attr($safe_id).'" value="'.esc_url($value).'">';
+    echo '<button type="button" class="button asl-upload-btn" data-target="#'.esc_attr($safe_id).'" data-preview="#'.esc_attr($safe_id).'_preview">Upload Image</button>';
+    echo '<button type="button" class="button asl-remove-btn" data-target="#'.esc_attr($safe_id).'" data-preview="#'.esc_attr($safe_id).'_preview" style="'.($has ? '' : 'display:none;').'">Remove</button>';
+    echo '<div id="'.esc_attr($safe_id).'_preview" class="asl-preview">';
     if ($has) echo '<img src="'.esc_url($value).'" style="max-width:300px;max-height:150px;display:block;margin-top:10px;">';
     echo '</div></div>';
 }
