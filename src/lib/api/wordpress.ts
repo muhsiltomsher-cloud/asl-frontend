@@ -18,6 +18,7 @@ import type {
   HeroSlide,
   Banner,
   Collection,
+  ProductPage,
 } from "@/types/wordpress";
 
 const WP_API_BASE = `${siteConfig.apiUrl}/wp-json`;
@@ -1231,4 +1232,37 @@ export async function getMegaMenuData(locale?: Locale): Promise<MegaMenuData | n
     columns,
     featuredProductIds,
   };
+}
+
+// ─── Product Pages (asl_product_page CPT) ─────────────────────────
+
+/**
+ * Fetch all published product pages from the custom REST endpoint.
+ * Used by generateStaticParams to pre-render all product pages at build time.
+ */
+export async function getProductPages(): Promise<ProductPage[]> {
+  const data = await fetchWPAPI<ProductPage[]>(
+    "/asl/v1/product-pages",
+    {
+      tags: ["product-pages"],
+      revalidate: 300,
+    }
+  );
+  return data ?? [];
+}
+
+/**
+ * Fetch a single product page by slug.
+ * Returns null if the page is not found or an error occurs.
+ */
+export async function getProductPageBySlug(slug: string, locale?: Locale): Promise<ProductPage | null> {
+  const data = await fetchWPAPI<ProductPage>(
+    `/asl/v1/product-pages/${encodeURIComponent(slug)}`,
+    {
+      tags: ["product-pages", `product-page-${slug}`],
+      locale,
+      revalidate: 60,
+    }
+  );
+  return data;
 }

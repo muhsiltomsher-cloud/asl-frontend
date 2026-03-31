@@ -202,6 +202,118 @@ export interface CustomizerSettings {
   banners_enabled?: boolean;
 }
 
+// Product Page Types (from asl_product_page CPT)
+export interface ProductPageHero {
+  enabled: boolean;
+  image: string;
+  mobileImage: string;
+  title: string;
+  titleAr: string;
+  subtitle: string;
+  subtitleAr: string;
+  description: string;
+  descriptionAr: string;
+  ctaText: string;
+  ctaTextAr: string;
+  ctaLink: string;
+}
+
+export interface ProductPageProducts {
+  enabled: boolean;
+  title: string;
+  titleAr: string;
+  subtitle: string;
+  subtitleAr: string;
+  source: "category" | "featured" | "latest" | "bestseller";
+  categorySlug: string;
+  count: number;
+  display: "grid" | "slider";
+  showViewAll: boolean;
+  viewAllLink: string;
+  hideOnMobile: boolean;
+  hideOnDesktop: boolean;
+}
+
+export interface ProductPageBannerItem {
+  image: string;
+  mobileImage: string;
+  title: string;
+  titleAr: string;
+  subtitle: string;
+  subtitleAr: string;
+  link: string;
+}
+
+export interface ProductPageBanners {
+  enabled: boolean;
+  hideOnMobile: boolean;
+  hideOnDesktop: boolean;
+  items: ProductPageBannerItem[];
+}
+
+export interface ProductPageFeatureItem {
+  icon: string;
+  title: string;
+  titleAr: string;
+  description: string;
+  descriptionAr: string;
+}
+
+export interface ProductPageFeatures {
+  enabled: boolean;
+  title: string;
+  titleAr: string;
+  hideOnMobile: boolean;
+  hideOnDesktop: boolean;
+  items: ProductPageFeatureItem[];
+}
+
+export interface ProductPageFAQItem {
+  question: string;
+  questionAr: string;
+  answer: string;
+  answerAr: string;
+}
+
+export interface ProductPageFAQ {
+  enabled: boolean;
+  title: string;
+  titleAr: string;
+  items: ProductPageFAQItem[];
+}
+
+export interface ProductPageSEO {
+  title: string;
+  titleAr: string;
+  description: string;
+  descriptionAr: string;
+  keywords: string;
+  keywordsAr: string;
+  ogImage: string;
+}
+
+export interface ProductPageLayout {
+  sectionOrder: string;
+  template: "default" | "product-showcase" | "landing" | "minimal";
+  bgStyle: "default" | "warm" | "dark";
+}
+
+export interface ProductPage {
+  id: number;
+  slug: string;
+  title: string;
+  date: string;
+  modified: string;
+  thumbnail: string;
+  hero: ProductPageHero;
+  products: ProductPageProducts;
+  banners: ProductPageBanners;
+  features: ProductPageFeatures;
+  faq: ProductPageFAQ;
+  seo: ProductPageSEO;
+  layout: ProductPageLayout;
+}
+
 // WordPress Site Info from /wp-json (root endpoint)
 export interface WPSiteInfo {
   name: string;

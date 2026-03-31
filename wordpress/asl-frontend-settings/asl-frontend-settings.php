@@ -3,7 +3,7 @@
  * Plugin Name: ASL Frontend Settings
  * Plugin URI: https://aromaticscentslab.com
  * Description: Admin dashboard and REST API endpoints for ASL Frontend with Media Library upload, dynamic slides, layout options, ASL Bundles Creator, and Free Gift functionality.
- * Version: 5.9.0
+ * Version: 6.0.0
  * Author: Aromatic Scents Lab
  * License: GPL v2 or later
  */
@@ -18,7 +18,7 @@ if (defined('ASL_FRONTEND_SETTINGS_LOADED')) {
     return;
 }
 define('ASL_FRONTEND_SETTINGS_LOADED', true);
-define('ASL_SETTINGS_VERSION', '5.9.0');
+define('ASL_SETTINGS_VERSION', '6.0.0');
 define('ASL_SETTINGS_PATH', plugin_dir_path(__FILE__));
 
 /**
@@ -44,11 +44,12 @@ add_action('admin_enqueue_scripts', function($hook) {
 /**
  * Include separate module files
  * 
- * The plugin is organized into four main modules:
+ * The plugin is organized into five main modules:
  * 1. ASL Settings - Core settings for homepage, header, SEO, mobile
  * 2. Bundle Builder - Product bundle creation and management
  * 3. Free Gift - Automatic free gift rules based on cart value
  * 4. Forms - Contact form and newsletter REST API endpoints
+ * 5. Product Pages - Dynamic product-type page creation with bilingual support
  */
 
 // Include ASL Settings module (homepage, header, SEO, mobile settings)
@@ -74,3 +75,6 @@ require_once ASL_SETTINGS_PATH . 'includes/class-asl-security.php';
 
 // Include Customer Tracking module (order tracking data display in admin)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-customer-tracking.php';
+
+// Include Product Pages module (dynamic product-type pages with EN/AR support)
+require_once ASL_SETTINGS_PATH . 'includes/class-asl-product-pages.php';
