@@ -31,6 +31,8 @@ function SlideContent({ slide, index, locale }: { slide: HeroSliderSettings["sli
             alt={slide.image.alt || `Slide ${index + 1}`}
             width={2560}
             height={1024}
+            quality={100}
+            unoptimized={false}
             priority={index === 0}
             loading={index === 0 ? "eager" : "lazy"}
             fetchPriority={index === 0 ? "high" : "low"}
@@ -45,6 +47,8 @@ function SlideContent({ slide, index, locale }: { slide: HeroSliderSettings["sli
             alt={slide.mobile_image?.alt || slide.image.alt || `Slide ${index + 1}`}
             width={1080}
             height={1475}
+            quality={100}
+            unoptimized={false}
             priority={index === 0}
             loading={index === 0 ? "eager" : "lazy"}
             fetchPriority={index === 0 ? "high" : "low"}

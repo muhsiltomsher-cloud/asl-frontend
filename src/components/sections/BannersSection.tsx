@@ -97,6 +97,7 @@ export function BannersSection({
                         src={banner.image.url}
                         alt={banner.image.alt || banner.title || `Banner ${index + 1}`}
                         fill
+                        quality={100}
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="hidden object-cover transition-transform duration-300 group-hover:scale-105 md:block"
                         loading="lazy"
@@ -107,6 +108,7 @@ export function BannersSection({
                         src={banner.mobile_image?.url || banner.image.url}
                         alt={banner.mobile_image?.alt || banner.image.alt || banner.title || `Banner ${index + 1}`}
                         fill
+                        quality={100}
                         sizes="100vw"
                         className="object-cover transition-transform duration-300 group-hover:scale-105 md:hidden"
                         loading="lazy"
