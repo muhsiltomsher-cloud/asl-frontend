@@ -60,14 +60,16 @@ function asl_settings_register_menus() {
 
 /**
  * Image field helper
+ * Note: ID uses underscores instead of brackets so jQuery selectors work correctly
  */
 function asl_image_field($name, $value = '') {
     $has = !empty($value);
+    $safe_id = str_replace(array('[',']'), array('_',''), $name);
     echo '<div class="asl-image-field">';
-    echo '<input type="hidden" name="'.esc_attr($name).'" id="'.esc_attr($name).'" value="'.esc_url($value).'">';
-    echo '<button type="button" class="button asl-upload-btn" data-target="#'.esc_attr($name).'" data-preview="#'.esc_attr($name).'_preview">Upload Image</button>';
-    echo '<button type="button" class="button asl-remove-btn" data-target="#'.esc_attr($name).'" data-preview="#'.esc_attr($name).'_preview" style="'.($has ? '' : 'display:none;').'">Remove</button>';
-    echo '<div id="'.esc_attr($name).'_preview" class="asl-preview">';
+    echo '<input type="hidden" name="'.esc_attr($name).'" id="'.esc_attr($safe_id).'" value="'.esc_url($value).'">';
+    echo '<button type="button" class="button asl-upload-btn" data-target="#'.esc_attr($safe_id).'" data-preview="#'.esc_attr($safe_id).'_preview">Upload Image</button>';
+    echo '<button type="button" class="button asl-remove-btn" data-target="#'.esc_attr($safe_id).'" data-preview="#'.esc_attr($safe_id).'_preview" style="'.($has ? '' : 'display:none;').'">Remove</button>';
+    echo '<div id="'.esc_attr($safe_id).'_preview" class="asl-preview">';
     if ($has) echo '<img src="'.esc_url($value).'" style="max-width:300px;max-height:150px;display:block;margin-top:10px;">';
     echo '</div></div>';
 }
@@ -102,7 +104,7 @@ function asl_render_admin_page() {
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <nav class="nav-tab-wrapper">
-            <?php foreach (['hero'=>'Hero Slider','new-products'=>'New Products','bestseller'=>'Bestsellers','categories'=>'Categories','featured'=>'Featured','collections'=>'Collections','banners'=>'Banners'] as $k=>$l): ?>
+            <?php foreach (['hero'=>'Hero Slider','new-products'=>'New Products','bestseller'=>'Bestsellers','categories'=>'Categories','featured'=>'Featured','collections'=>'Collections','banners'=>'Banners','why-choose-us'=>'Why Choose Us','our-story'=>'Our Story','faq'=>'FAQ','seo-content'=>'SEO Content'] as $k=>$l): ?>
                 <a href="?page=asl-settings&tab=<?php echo $k; ?>" class="nav-tab <?php echo $tab===$k?'nav-tab-active':''; ?>"><?php echo $l; ?></a>
             <?php endforeach; ?>
         </nav>
@@ -119,6 +121,10 @@ function asl_render_admin_page() {
                     case 'featured': asl_render_products_tab('featured','Featured'); break;
                     case 'collections': asl_render_collections_tab(); break;
                     case 'banners': asl_render_banners_tab(); break;
+                    case 'why-choose-us': asl_render_why_choose_us_tab(); break;
+                    case 'our-story': asl_render_our_story_tab(); break;
+                    case 'faq': asl_render_faq_tab(); break;
+                    case 'seo-content': asl_render_seo_content_tab(); break;
                 }
                 ?>
             </div>
@@ -136,9 +142,9 @@ function asl_render_hero_tab() {
     if (empty($slides)) {
         for ($i=1; $i<=5; $i++) {
             $img = get_theme_mod("asl_hero_slide_{$i}_image",'');
-            if (!empty($img)) $slides[] = array('image'=>$img,'mobile'=>get_theme_mod("asl_hero_slide_{$i}_mobile",''),'link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
+            if (!empty($img)) $slides[] = array('image'=>$img,'mobile'=>get_theme_mod("asl_hero_slide_{$i}_mobile",''),'image_ar'=>'','mobile_ar'=>'','link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
         }
-        if (empty($slides)) $slides[] = array('image'=>'','mobile'=>'','link'=>'');
+        if (empty($slides)) $slides[] = array('image'=>'','mobile'=>'','image_ar'=>'','mobile_ar'=>'','link'=>'');
     }
     ?>
     <h2>Hero Slider Settings</h2>
@@ -156,8 +162,11 @@ function asl_render_hero_tab() {
         <div class="asl-slide-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">
             <h4>Slide <?php echo $i+1; ?> <button type="button" class="button asl-remove-slide" style="float:right;color:red;">Remove</button></h4>
             <table class="form-table">
-                <tr><th>Desktop Image</th><td><?php asl_image_field("asl_hero_slides[{$i}][image]",$s['image']??''); ?></td></tr>
-                <tr><th>Mobile Image</th><td><?php asl_image_field("asl_hero_slides[{$i}][mobile]",$s['mobile']??''); ?></td></tr>
+                <tr><th>Enable</th><td><label><input type="checkbox" name="asl_hero_slides[<?php echo $i; ?>][enabled]" value="1" <?php checked($s['enabled']??true); ?>> Show this slide</label></td></tr>
+                <tr><th>Desktop Image (EN)</th><td><?php asl_image_field("asl_hero_slides[{$i}][image]",$s['image']??''); ?></td></tr>
+                <tr><th>Mobile Image (EN)</th><td><?php asl_image_field("asl_hero_slides[{$i}][mobile]",$s['mobile']??''); ?></td></tr>
+                <tr><th>Desktop Image (AR)</th><td><?php asl_image_field("asl_hero_slides[{$i}][image_ar]",$s['image_ar']??''); ?><p class="description">Arabic version. Falls back to EN image if empty.</p></td></tr>
+                <tr><th>Mobile Image (AR)</th><td><?php asl_image_field("asl_hero_slides[{$i}][mobile_ar]",$s['mobile_ar']??''); ?><p class="description">Arabic version. Falls back to EN mobile image if empty.</p></td></tr>
                 <tr><th>Link URL</th><td><input type="text" name="asl_hero_slides[<?php echo $i; ?>][link]" value="<?php echo esc_attr($s['link']??''); ?>" class="large-text" placeholder="/shop or https://example.com"></td></tr>
             </table>
         </div>
@@ -513,7 +522,7 @@ function asl_save_home_settings() {
             $slides = array();
             if (isset($_POST['asl_hero_slides']) && is_array($_POST['asl_hero_slides'])) {
                 foreach ($_POST['asl_hero_slides'] as $s) {
-                    $slides[] = array('image'=>esc_url_raw($s['image']??''),'mobile'=>esc_url_raw($s['mobile']??''),'link'=>asl_sanitize_link($s['link']??''));
+                    $slides[] = array('enabled'=>isset($s['enabled']),'image'=>esc_url_raw($s['image']??''),'mobile'=>esc_url_raw($s['mobile']??''),'image_ar'=>esc_url_raw($s['image_ar']??''),'mobile_ar'=>esc_url_raw($s['mobile_ar']??''),'link'=>asl_sanitize_link($s['link']??''));
                 }
             }
             set_theme_mod('asl_hero_slides', $slides);
@@ -577,6 +586,16 @@ function asl_save_home_settings() {
                 }
             }
             set_theme_mod('asl_banners_items', $banners);
+            break;
+
+        // Home Sections tabs (delegated to class-asl-home-sections.php)
+        case 'why-choose-us':
+        case 'our-story':
+        case 'faq':
+        case 'seo-content':
+            if (function_exists('asl_save_home_sections_tab')) {
+                asl_save_home_sections_tab($tab);
+            }
             break;
     }
 }
@@ -806,10 +825,14 @@ function asl_get_hero_settings() {
     if (empty($slides)) {
         for ($i=1; $i<=5; $i++) {
             $img = get_theme_mod("asl_hero_slide_{$i}_image",'');
-            if (!empty($img)) $slides[] = array('image'=>$img,'mobileImage'=>get_theme_mod("asl_hero_slide_{$i}_mobile",$img),'link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
+            if (!empty($img)) $slides[] = array('enabled'=>true,'image'=>$img,'mobileImage'=>get_theme_mod("asl_hero_slide_{$i}_mobile",$img),'imageAr'=>'','mobileImageAr'=>'','link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
         }
     } else {
-        $slides = array_map(function($s) { return array('image'=>$s['image']??'','mobileImage'=>$s['mobile']??$s['image']??'','link'=>$s['link']??''); }, $slides);
+        $slides = array_map(function($s) {
+            $img = $s['image']??'';
+            $mob = $s['mobile']??$img;
+            return array('enabled'=>$s['enabled']??true,'image'=>$img,'mobileImage'=>$mob,'imageAr'=>$s['image_ar']??'','mobileImageAr'=>$s['mobile_ar']??'','link'=>$s['link']??'');
+        }, $slides);
     }
     return array('enabled'=>get_theme_mod('asl_hero_enabled',true),'hideOnMobile'=>get_theme_mod('asl_hero_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_hero_hide_desktop',false),'autoplay'=>get_theme_mod('asl_hero_autoplay',true),'autoplayDelay'=>get_theme_mod('asl_hero_autoplay_delay',5000),'loop'=>get_theme_mod('asl_hero_loop',true),'slides'=>$slides);
 }

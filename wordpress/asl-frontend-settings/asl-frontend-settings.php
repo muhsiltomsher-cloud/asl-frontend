@@ -23,13 +23,14 @@ define('ASL_SETTINGS_PATH', plugin_dir_path(__FILE__));
 
 /**
  * Sanitize link URL (allows relative paths starting with /)
+ * Wrapped in function_exists check since class-asl-settings.php may define it too
  */
-function asl_sanitize_link($url) {
-    if (empty($url)) return '';
-    if (strpos($url, '/') === 0) {
-        return sanitize_text_field($url);
+if (!function_exists('asl_sanitize_link')) {
+    function asl_sanitize_link($url) {
+        if (empty($url)) return '';
+        if (strpos($url, '/') === 0) return sanitize_text_field($url);
+        return esc_url_raw($url);
     }
-    return esc_url_raw($url);
 }
 
 /**
@@ -75,8 +76,7 @@ require_once ASL_SETTINGS_PATH . 'includes/class-asl-frontend-urls.php';
 // Include Email Templates module (custom WooCommerce email templates)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-email-templates.php';
 
-// Include Security module (XML-RPC blocking, user enumeration prevention, noindex WP frontend, login rate limiting)
-require_once ASL_SETTINGS_PATH . 'includes/class-asl-security.php';
+// Security module skipped - standalone asl-security plugin provides same functionality
 
 // Include Customer Tracking module (order tracking data display in admin)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-customer-tracking.php';
