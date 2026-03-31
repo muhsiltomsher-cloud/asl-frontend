@@ -140,14 +140,15 @@ function asl_render_hero_tab() {
     if (empty($slides)) {
         for ($i=1; $i<=5; $i++) {
             $img = get_theme_mod("asl_hero_slide_{$i}_image",'');
-            if (!empty($img)) $slides[] = array('image'=>$img,'mobile'=>get_theme_mod("asl_hero_slide_{$i}_mobile",''),'link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
+            if (!empty($img)) $slides[] = array('image'=>$img,'mobile'=>get_theme_mod("asl_hero_slide_{$i}_mobile",''),'image_ar'=>'','mobile_ar'=>'','link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
         }
-        if (empty($slides)) $slides[] = array('image'=>'','mobile'=>'','link'=>'');
+        if (empty($slides)) $slides[] = array('image'=>'','mobile'=>'','image_ar'=>'','mobile_ar'=>'','link'=>'');
     }
     ?>
     <h2>Hero Slider Settings</h2>
     <table class="form-table">
         <tr><th>Enable</th><td><label><input type="checkbox" name="asl_hero_enabled" value="1" <?php checked(get_theme_mod('asl_hero_enabled',true)); ?>> Show hero slider</label></td></tr>
+        <tr><th>Disable Slider</th><td><label><input type="checkbox" name="asl_hero_disable_slider" value="1" <?php checked(get_theme_mod('asl_hero_disable_slider',false)); ?>> Show as static image (no sliding animation)</label><p class="description">Enable when using a single image. Disables autoplay, loop, and slide transitions.</p></td></tr>
         <tr><th>Hide on Mobile</th><td><label><input type="checkbox" name="asl_hero_hide_mobile" value="1" <?php checked(get_theme_mod('asl_hero_hide_mobile',false)); ?>> Hide on mobile</label></td></tr>
         <tr><th>Hide on Desktop</th><td><label><input type="checkbox" name="asl_hero_hide_desktop" value="1" <?php checked(get_theme_mod('asl_hero_hide_desktop',false)); ?>> Hide on desktop</label></td></tr>
         <tr><th>Autoplay</th><td><label><input type="checkbox" name="asl_hero_autoplay" value="1" <?php checked(get_theme_mod('asl_hero_autoplay',true)); ?>> Enable</label></td></tr>
@@ -160,8 +161,10 @@ function asl_render_hero_tab() {
         <div class="asl-slide-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">
             <h4>Slide <?php echo $i+1; ?> <button type="button" class="button asl-remove-slide" style="float:right;color:red;">Remove</button></h4>
             <table class="form-table">
-                <tr><th>Desktop Image</th><td><?php asl_image_field("asl_hero_slides[{$i}][image]",$s['image']??''); ?></td></tr>
-                <tr><th>Mobile Image</th><td><?php asl_image_field("asl_hero_slides[{$i}][mobile]",$s['mobile']??''); ?></td></tr>
+                <tr><th>Desktop Image (EN)</th><td><?php asl_image_field("asl_hero_slides[{$i}][image]",$s['image']??''); ?></td></tr>
+                <tr><th>Mobile Image (EN)</th><td><?php asl_image_field("asl_hero_slides[{$i}][mobile]",$s['mobile']??''); ?></td></tr>
+                <tr><th>Desktop Image (AR)</th><td><?php asl_image_field("asl_hero_slides[{$i}][image_ar]",$s['image_ar']??''); ?><p class="description">Arabic version. Falls back to EN image if empty.</p></td></tr>
+                <tr><th>Mobile Image (AR)</th><td><?php asl_image_field("asl_hero_slides[{$i}][mobile_ar]",$s['mobile_ar']??''); ?><p class="description">Arabic version. Falls back to EN mobile image if empty.</p></td></tr>
                 <tr><th>Link URL</th><td><input type="text" name="asl_hero_slides[<?php echo $i; ?>][link]" value="<?php echo esc_attr($s['link']??''); ?>" class="large-text" placeholder="/shop or https://example.com"></td></tr>
             </table>
         </div>
@@ -509,6 +512,7 @@ function asl_save_home_settings() {
     switch ($tab) {
         case 'hero':
             set_theme_mod('asl_hero_enabled', isset($_POST['asl_hero_enabled']));
+            set_theme_mod('asl_hero_disable_slider', isset($_POST['asl_hero_disable_slider']));
             set_theme_mod('asl_hero_hide_mobile', isset($_POST['asl_hero_hide_mobile']));
             set_theme_mod('asl_hero_hide_desktop', isset($_POST['asl_hero_hide_desktop']));
             set_theme_mod('asl_hero_autoplay', isset($_POST['asl_hero_autoplay']));
@@ -517,7 +521,7 @@ function asl_save_home_settings() {
             $slides = array();
             if (isset($_POST['asl_hero_slides']) && is_array($_POST['asl_hero_slides'])) {
                 foreach ($_POST['asl_hero_slides'] as $s) {
-                    $slides[] = array('image'=>esc_url_raw($s['image']??''),'mobile'=>esc_url_raw($s['mobile']??''),'link'=>asl_sanitize_link($s['link']??''));
+                    $slides[] = array('image'=>esc_url_raw($s['image']??''),'mobile'=>esc_url_raw($s['mobile']??''),'image_ar'=>esc_url_raw($s['image_ar']??''),'mobile_ar'=>esc_url_raw($s['mobile_ar']??''),'link'=>asl_sanitize_link($s['link']??''));
                 }
             }
             set_theme_mod('asl_hero_slides', $slides);
@@ -820,12 +824,17 @@ function asl_get_hero_settings() {
     if (empty($slides)) {
         for ($i=1; $i<=5; $i++) {
             $img = get_theme_mod("asl_hero_slide_{$i}_image",'');
-            if (!empty($img)) $slides[] = array('image'=>$img,'mobileImage'=>get_theme_mod("asl_hero_slide_{$i}_mobile",$img),'link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
+            if (!empty($img)) $slides[] = array('image'=>$img,'mobileImage'=>get_theme_mod("asl_hero_slide_{$i}_mobile",$img),'imageAr'=>'','mobileImageAr'=>'','link'=>get_theme_mod("asl_hero_slide_{$i}_link",''));
         }
     } else {
-        $slides = array_map(function($s) { return array('image'=>$s['image']??'','mobileImage'=>$s['mobile']??$s['image']??'','link'=>$s['link']??''); }, $slides);
+        $slides = array_map(function($s) {
+            $img = $s['image']??'';
+            $mob = $s['mobile']??$img;
+            return array('image'=>$img,'mobileImage'=>$mob,'imageAr'=>$s['image_ar']??'','mobileImageAr'=>$s['mobile_ar']??'','link'=>$s['link']??'');
+        }, $slides);
     }
-    return array('enabled'=>get_theme_mod('asl_hero_enabled',true),'hideOnMobile'=>get_theme_mod('asl_hero_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_hero_hide_desktop',false),'autoplay'=>get_theme_mod('asl_hero_autoplay',true),'autoplayDelay'=>get_theme_mod('asl_hero_autoplay_delay',5000),'loop'=>get_theme_mod('asl_hero_loop',true),'slides'=>$slides);
+    $disable = get_theme_mod('asl_hero_disable_slider',false);
+    return array('enabled'=>get_theme_mod('asl_hero_enabled',true),'disableSlider'=>$disable,'hideOnMobile'=>get_theme_mod('asl_hero_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_hero_hide_desktop',false),'autoplay'=>$disable?false:get_theme_mod('asl_hero_autoplay',true),'autoplayDelay'=>get_theme_mod('asl_hero_autoplay_delay',5000),'loop'=>$disable?false:get_theme_mod('asl_hero_loop',true),'slides'=>$slides);
 }
 
 /**
