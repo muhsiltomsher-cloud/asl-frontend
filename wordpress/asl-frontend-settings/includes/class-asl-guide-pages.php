@@ -46,12 +46,13 @@ function asl_register_guide_cpt() {
         ),
         'public'             => false,
         'show_ui'            => true,
-        'show_in_menu'       => 'asl-settings',
+        'show_in_menu'       => true,
         'supports'           => array('title'),
         'has_archive'        => false,
         'rewrite'            => false,
         'capability_type'    => 'post',
         'menu_icon'          => 'dashicons-book-alt',
+        'menu_position'      => 25,
     ));
 }
 
