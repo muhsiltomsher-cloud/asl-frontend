@@ -4,10 +4,12 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd } from "@/lib/utils/seo";
 import { getProductBySlug } from "@/lib/api/woocommerce";
-import { getGuideBySlug, getAllGuideSlugs, getRelatedGuides } from "@/data/guides";
+import { getGuideBySlug as getHardcodedGuide, getAllGuideSlugs as getHardcodedSlugs } from "@/data/guides";
+import { getGuidePages, getGuidePageBySlug } from "@/lib/api/wordpress";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import type { WCProduct } from "@/types/woocommerce";
+import type { GuidePage as WPGuidePage } from "@/types/wordpress";
 import type { GuideProduct } from "@/data/guides";
 import { GuideProductCard } from "./GuideProductCard";
 import {
@@ -19,6 +21,61 @@ import {
   BookOpen,
 } from "lucide-react";
 
+// Unified shape used by the page component
+interface GuideData {
+  slug: string;
+  title: { en: string; ar: string };
+  metaDescription: { en: string; ar: string };
+  keywords: { en: string[]; ar: string[] };
+  eyebrow: { en: string; ar: string };
+  intro: { en: string; ar: string };
+  products: GuideProduct[];
+  contentBlocks: Array<{ heading: { en: string; ar: string }; body: { en: string; ar: string } }>;
+  faqs: Array<{ question: { en: string; ar: string }; answer: { en: string; ar: string } }>;
+  relatedGuideSlugs: string[];
+  ogImage?: string;
+  publishedAt: string;
+  updatedAt: string;
+}
+
+function wpToGuideData(wp: WPGuidePage): GuideData {
+  return {
+    slug: wp.slug,
+    title: wp.title,
+    metaDescription: wp.metaDescription,
+    keywords: wp.keywords,
+    eyebrow: wp.eyebrow,
+    intro: wp.intro,
+    products: wp.products.map(p => ({
+      slug: p.slug,
+      rank: p.rank,
+      pickReason: p.pickReason,
+      description: p.description,
+    })),
+    contentBlocks: wp.contentBlocks,
+    faqs: wp.faqs,
+    relatedGuideSlugs: wp.relatedGuideSlugs,
+    ogImage: wp.ogImage,
+    publishedAt: wp.publishedAt,
+    updatedAt: wp.updatedAt,
+  };
+}
+
+async function resolveGuide(slug: string): Promise<GuideData | null> {
+  // Try WP API first, fall back to hardcoded
+  const wp = await getGuidePageBySlug(slug);
+  if (wp) return wpToGuideData(wp);
+  const hc = getHardcodedGuide(slug);
+  return hc ?? null;
+}
+
+async function resolveAllSlugs(): Promise<string[]> {
+  const wpGuides = await getGuidePages();
+  const wpSlugs = wpGuides.map(g => g.slug);
+  const hcSlugs = getHardcodedSlugs();
+  return [...new Set([...wpSlugs, ...hcSlugs])];
+}
+
 export const revalidate = 3600; // Revalidate every hour
 
 interface GuidePageProps {
@@ -26,15 +83,13 @@ interface GuidePageProps {
 }
 
 export async function generateStaticParams() {
-  const slugs = getAllGuideSlugs();
+  const slugs = await resolveAllSlugs();
   const allParams: { locale: string; slug: string }[] = [];
-
   for (const locale of siteConfig.locales) {
     for (const slug of slugs) {
       allParams.push({ locale, slug });
     }
   }
-
   return allParams;
 }
 
@@ -42,7 +97,7 @@ export async function generateMetadata({
   params,
 }: GuidePageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const guide = getGuideBySlug(slug);
+  const guide = await resolveGuide(slug);
 
   if (!guide) {
     return {};
@@ -95,7 +150,7 @@ export async function generateMetadata({
 
 export default async function GuidePage({ params }: GuidePageProps) {
   const { locale, slug } = await params;
-  const guide = getGuideBySlug(slug);
+  const guide = await resolveGuide(slug);
 
   if (!guide) {
     notFound();
@@ -164,8 +219,13 @@ export default async function GuidePage({ params }: GuidePageProps) {
     inLanguage: locale === "ar" ? "ar" : "en",
   };
 
-  // Get related guides
-  const relatedGuides = getRelatedGuides(guide);
+  // Get related guides (try WP first for each slug, fall back to hardcoded)
+  const relatedGuideData: GuideData[] = [];
+  for (const relSlug of guide.relatedGuideSlugs) {
+    const rel = await resolveGuide(relSlug);
+    if (rel) relatedGuideData.push(rel);
+  }
+  const relatedGuides = relatedGuideData;
 
   const breadcrumbItems = [
     {
@@ -397,11 +457,11 @@ export default async function GuidePage({ params }: GuidePageProps) {
                     <p className="mt-2 text-sm text-amber-700/70 line-clamp-2">
                       {related.metaDescription[validLocale]}
                     </p>
-                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#C4885B]">
-                      {isRTL ? "اقرأ المزيد" : "Read More"}
-                      <ChevronRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
-                    </span>
-                  </Link>
+                                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#C4885B]">
+                                    {isRTL ? "اقرأ المزيد" : "Read More"}
+                                    <ChevronRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
+                                  </span>
+                                </Link>
                 ))}
               </div>
             </div>

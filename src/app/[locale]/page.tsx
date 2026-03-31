@@ -5,7 +5,7 @@ import { Button } from "@/components/common/Button";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
 import { getNewProducts, getFeaturedProducts, getBestsellerProducts, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs, getEnglishSlugFromLocalizedSlug } from "@/lib/api/woocommerce";
-import { getHomePageSettings, getSeoSettings } from "@/lib/api/wordpress";
+import { getHomePageSettings, getSeoSettings, getHomeSections } from "@/lib/api/wordpress";
 import {
   HeroSlider,
   ProductSection,
@@ -283,10 +283,13 @@ export default async function HomePage({ params }: HomePageProps) {
 
   // Only fetch what's needed for above-the-fold content (hero + banners + dictionary)
   // Product data is fetched independently by each Suspense-wrapped section below
-  const [dictionary, homeSettings] = await Promise.all([
+  const [dictionary, homeSettings, homeSections] = await Promise.all([
     getDictionary(validLocale),
     getHomePageSettings(validLocale),
+    getHomeSections(),
   ]);
+
+  const t = (bi: { en: string; ar: string }) => isRTL ? bi.ar : bi.en;
 
   const collectionsSettings = {
     ...homeSettings.collections,
@@ -354,179 +357,178 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Our Collections — no API call needed, renders from homeSettings */}
       <CollectionsSection settings={collectionsSettings} />
 
-      {/* Why Choose Us Section */}
-            <section className="relative overflow-hidden bg-white py-7 md:py-10">
-              <div className="container mx-auto px-4">
-                <div className="mb-5 text-center md:mb-7">
-                  <div className="mb-4 flex items-center justify-center gap-4">
-                    <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-                    <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
-                      {isRTL ? "تميزنا" : "Our Promise"}
-              </span>
-              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
-            </div>
-            <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
-              {dictionary.sections.whyChooseUs.title}
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-amber-700/70">
-              {dictionary.sections.whyChooseUs.subtitle}
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {dictionary.sections.whyChooseUs.items.map((item: { title: string; description: string }, idx: number) => (
-              <div key={idx} className="group rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
-                  <span className="text-xl font-bold">{idx + 1}</span>
-                </div>
-                <h3 className="mb-2 text-lg font-bold text-amber-900">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-amber-700/70">{item.description}</p>
+      {/* Why Choose Us Section — editable from WP Admin → Home Sections */}
+      {homeSections.whyChooseUs.enabled !== false && (
+        <section className="relative overflow-hidden bg-white py-7 md:py-10">
+          <div className="container mx-auto px-4">
+            <div className="mb-5 text-center md:mb-7">
+              <div className="mb-4 flex items-center justify-center gap-4">
+                <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+                <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                  {t(homeSections.whyChooseUs.eyebrow) || (isRTL ? "تميزنا" : "Our Promise")}
+                </span>
+                <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About Section - Creative Design */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-[#f7f6f2] to-stone-50 py-8 md:py-12">
-        {/* Decorative background elements */}
-        <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-amber-100/40 blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-stone-100/60 blur-3xl" />
-        <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-50/30 blur-3xl" />
-        
-        <div className="container relative mx-auto px-4">
-          {/* Section header with decorative line */}
-          <div className="mb-12 text-center md:mb-16">
-            <div className="mb-4 flex items-center justify-center gap-4">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
-                {isRTL ? "اكتشف قصتنا" : "Discover Our Journey"}
-              </span>
-              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+              <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
+                {t(homeSections.whyChooseUs.title) || dictionary.sections.whyChooseUs.title}
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-amber-700/70">
+                {t(homeSections.whyChooseUs.subtitle) || dictionary.sections.whyChooseUs.subtitle}
+              </p>
             </div>
-            <h2 className="text-3xl font-bold text-amber-900 md:text-4xl lg:text-5xl">
-              {dictionary.sections.ourStory.title}
-            </h2>
-          </div>
-
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Image side with decorative frame */}
-            <div className="relative">
-              <div className="absolute -inset-4 rounded-2xl bg-gradient-to-br from-amber-200/20 to-stone-200/20 blur-sm" />
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-xl lg:aspect-square">
-                <Image
-                  src="https://cms.aromaticscentslab.com/wp-content/uploads/2025/12/ASL-Website-Images-Patchouli-Glow-06.webp"
-                  alt={isRTL ? "قصتنا" : "Our Story"}
-                  fill
-                  loading="lazy"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-              {/* Floating accent */}
-              <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full border-4 border-amber-200/50 bg-white/80 shadow-lg backdrop-blur-sm" />
-            </div>
-
-            {/* Content side */}
-            <div className="relative">
-              <div className="space-y-6">
-                <p className="text-lg leading-relaxed text-amber-800/80 md:text-xl">
-                  {dictionary.sections.ourStory.description1}
-                </p>
-                <p className="leading-relaxed text-amber-700/70">
-                  {dictionary.sections.ourStory.description2}
-                </p>
-                
-                {/* Feature highlights */}
-                <div className="grid grid-cols-2 gap-4 pt-4">
-                  <div className="rounded-xl bg-white/60 p-4 shadow-sm backdrop-blur-sm">
-                    <div className="mb-2 text-2xl font-bold text-amber-900">100%</div>
-                    <div className="text-sm text-amber-700/70">{isRTL ? "مكونات طبيعية" : "Natural Ingredients"}</div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {(homeSections.whyChooseUs.items.length > 0
+                ? homeSections.whyChooseUs.items.map((item, idx) => ({ title: t(item.title), description: t(item.description), idx }))
+                : dictionary.sections.whyChooseUs.items.map((item: { title: string; description: string }, idx: number) => ({ ...item, idx }))
+              ).map(({ title, description, idx }) => (
+                <div key={idx} className="group rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
+                    <span className="text-xl font-bold">{idx + 1}</span>
                   </div>
-                  <div className="rounded-xl bg-white/60 p-4 shadow-sm backdrop-blur-sm">
-                    <div className="mb-2 text-2xl font-bold text-amber-900">10+</div>
-                    <div className="text-sm text-amber-700/70">{isRTL ? "سنوات من الخبرة" : "Years of Excellence"}</div>
+                  <h3 className="mb-2 text-lg font-bold text-amber-900">{title}</h3>
+                  <p className="text-sm leading-relaxed text-amber-700/70">{description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Our Story Section — editable from WP Admin → Home Sections */}
+      {homeSections.ourStory.enabled !== false && (
+        <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-[#f7f6f2] to-stone-50 py-8 md:py-12">
+          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-amber-100/40 blur-3xl" />
+          <div className="absolute -bottom-20 -right-20 h-80 w-80 rounded-full bg-stone-100/60 blur-3xl" />
+          <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-50/30 blur-3xl" />
+          <div className="container relative mx-auto px-4">
+            <div className="mb-12 text-center md:mb-16">
+              <div className="mb-4 flex items-center justify-center gap-4">
+                <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+                <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                  {t(homeSections.ourStory.eyebrow) || (isRTL ? "اكتشف قصتنا" : "Discover Our Journey")}
+                </span>
+                <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+              </div>
+              <h2 className="text-3xl font-bold text-amber-900 md:text-4xl lg:text-5xl">
+                {t(homeSections.ourStory.title) || dictionary.sections.ourStory.title}
+              </h2>
+            </div>
+            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+              <div className="relative">
+                <div className="absolute -inset-4 rounded-2xl bg-gradient-to-br from-amber-200/20 to-stone-200/20 blur-sm" />
+                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-xl lg:aspect-square">
+                  <Image
+                    src={homeSections.ourStory.image || "https://cms.aromaticscentslab.com/wp-content/uploads/2025/12/ASL-Website-Images-Patchouli-Glow-06.webp"}
+                    alt={isRTL ? "قصتنا" : "Our Story"}
+                    fill
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full border-4 border-amber-200/50 bg-white/80 shadow-lg backdrop-blur-sm" />
+              </div>
+              <div className="relative">
+                <div className="space-y-6">
+                  <p className="text-lg leading-relaxed text-amber-800/80 md:text-xl">
+                    {t(homeSections.ourStory.description1) || dictionary.sections.ourStory.description1}
+                  </p>
+                  <p className="leading-relaxed text-amber-700/70">
+                    {t(homeSections.ourStory.description2) || dictionary.sections.ourStory.description2}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 pt-4">
+                    {(homeSections.ourStory.stats.length > 0
+                      ? homeSections.ourStory.stats
+                      : [{ value: '100%', label: { en: 'Natural Ingredients', ar: 'مكونات طبيعية' } }, { value: '10+', label: { en: 'Years of Excellence', ar: 'سنوات من الخبرة' } }]
+                    ).map((stat, idx) => (
+                      <div key={idx} className="rounded-xl bg-white/60 p-4 shadow-sm backdrop-blur-sm">
+                        <div className="mb-2 text-2xl font-bold text-amber-900">{stat.value}</div>
+                        <div className="text-sm text-amber-700/70">{t(stat.label)}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-4">
+                    <Button variant="outline" className="group border-2 border-amber-900 px-8 py-3 text-amber-900 transition-all duration-300 hover:bg-amber-900 hover:text-white hover:shadow-lg" asChild>
+                      <Link href={`/${locale}/about`}>
+                        {dictionary.common.learnMore}
+                        <svg className="ml-2 inline-block h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </Link>
+                    </Button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
-                <div className="pt-4">
-                  <Button 
-                    variant="outline" 
-                    className="group border-2 border-amber-900 px-8 py-3 text-amber-900 transition-all duration-300 hover:bg-amber-900 hover:text-white hover:shadow-lg" 
-                    asChild
-                  >
-                    <Link href={`/${locale}/about`}>
-                      {dictionary.common.learnMore}
-                      <svg className="ml-2 inline-block h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      {/* FAQ Section — editable from WP Admin → Home Sections */}
+      {homeSections.faq.enabled !== false && (() => {
+        const faqItems = homeSections.faq.items.length > 0
+          ? homeSections.faq.items.map(f => ({ question: t(f.question), answer: t(f.answer) }))
+          : dictionary.sections.faq.items;
+        return (
+          <section className="relative overflow-hidden bg-white py-7 md:py-10">
+            <JsonLd data={generateFAQJsonLd(faqItems)} />
+            <div className="container mx-auto px-4">
+              <div className="mb-5 text-center md:mb-7">
+                <div className="mb-4 flex items-center justify-center gap-4">
+                  <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
+                  <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                    {t(homeSections.faq.eyebrow) || (isRTL ? "مساعدة" : "Help")}
+                  </span>
+                  <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+                </div>
+                <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
+                  {t(homeSections.faq.title) || dictionary.sections.faq.title}
+                </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-amber-700/70">
+                  {t(homeSections.faq.subtitle) || dictionary.sections.faq.subtitle}
+                </p>
+              </div>
+              <div className="mx-auto max-w-3xl space-y-4">
+                {faqItems.map((item: { question: string; answer: string }, idx: number) => (
+                  <details key={idx} className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
+                    <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
+                      <span>{item.question}</span>
+                      <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
-                    </Link>
-                  </Button>
-                </div>
+                    </summary>
+                    <div className="px-5 pb-5 text-amber-700/80 leading-relaxed">{item.answer}</div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
+      {/* SEO Content Section — editable from WP Admin → Home Sections */}
+      {homeSections.seoContent.enabled !== false && (
+        <section className="bg-gradient-to-b from-[#f7f6f2] to-amber-50/30 py-6 md:py-8">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-4xl">
+              <h2 className="mb-6 text-center text-2xl font-bold text-amber-900 md:text-3xl">
+                {t(homeSections.seoContent.title) || (isRTL ? "تسوق العطور الفاخرة اون لاين في الإمارات" : "Shop Premium Perfumes Online in the UAE")}
+              </h2>
+              <div className="space-y-4 text-center leading-relaxed text-amber-800/70">
+                {homeSections.seoContent.paragraphs.length > 0
+                  ? homeSections.seoContent.paragraphs.map((p, idx) => (
+                      <p key={idx}>{t(p)}</p>
+                    ))
+                  : <>
+                      <p>{isRTL ? "أروماتيك سينتس لاب هو وجهتك المثالية لشراء العطور الفاخرة والعود العربي الأصيل ومنتجات العناية بالجسم ومعطرات المنزل والزيوت العطرية في الإمارات العربية المتحدة. نقدم مجموعة واسعة من العطور النسائية والرجالية المصنوعة يدوياً بأجود المكونات الطبيعية." : "Aromatic Scents Lab is your premier destination for buying luxury perfumes, authentic Arabian oud, body care products, home fragrances, and aromatic oils in the United Arab Emirates. We offer an extensive collection of handcrafted women's and men's fragrances made with the finest natural ingredients."}</p>
+                      <p>{isRTL ? "اكتشف مجموعتنا المتنوعة من عطور الإمارات الفاخرة، بما في ذلك البخور والمسك والعنبر وخشب الصندل والورد. سواء كنت تبحث عن عطر يومي أنيق أو هدية فاخرة لشخص مميز، ستجد في متجرنا ما يناسب كل الأذواق والمناسبات مع توصيل مجاني للطلبات فوق 500 درهم." : "Explore our diverse collection of luxury UAE fragrances, including bakhoor, musk, amber, sandalwood, and rose. Whether you're looking for an elegant everyday scent or a luxurious gift for someone special, our store has something for every taste and occasion, with free delivery on orders over 500 AED."}</p>
+                    </>
+                }
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* FAQ Section with JSON-LD */}
-            <section className="relative overflow-hidden bg-white py-7 md:py-10">
-              <JsonLd data={generateFAQJsonLd(dictionary.sections.faq.items)} />
-              <div className="container mx-auto px-4">
-                <div className="mb-5 text-center md:mb-7">
-            <div className="mb-4 flex items-center justify-center gap-4">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
-                {isRTL ? "مساعدة" : "Help"}
-              </span>
-              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
-            </div>
-            <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">
-              {dictionary.sections.faq.title}
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-amber-700/70">
-              {dictionary.sections.faq.subtitle}
-            </p>
-          </div>
-          <div className="mx-auto max-w-3xl space-y-4">
-            {dictionary.sections.faq.items.map((item: { question: string; answer: string }, idx: number) => (
-              <details key={idx} className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
-                  <span>{item.question}</span>
-                  <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="px-5 pb-5 text-amber-700/80 leading-relaxed">
-                  {item.answer}
-                </div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SEO Content Section */}
-      <section className="bg-gradient-to-b from-[#f7f6f2] to-amber-50/30 py-6 md:py-8">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="mb-6 text-center text-2xl font-bold text-amber-900 md:text-3xl">
-              {isRTL ? "تسوق العطور الفاخرة اون لاين في الإمارات" : "Shop Premium Perfumes Online in the UAE"}
-            </h2>
-            <div className="space-y-4 text-center leading-relaxed text-amber-800/70">
-              <p>
-                {isRTL
-                  ? "أروماتيك سينتس لاب هو وجهتك المثالية لشراء العطور الفاخرة والعود العربي الأصيل ومنتجات العناية بالجسم ومعطرات المنزل والزيوت العطرية في الإمارات العربية المتحدة. نقدم مجموعة واسعة من العطور النسائية والرجالية المصنوعة يدوياً بأجود المكونات الطبيعية."
-                  : "Aromatic Scents Lab is your premier destination for buying luxury perfumes, authentic Arabian oud, body care products, home fragrances, and aromatic oils in the United Arab Emirates. We offer an extensive collection of handcrafted women's and men's fragrances made with the finest natural ingredients."}
-              </p>
-              <p>
-                {isRTL
-                  ? "اكتشف مجموعتنا المتنوعة من عطور الإمارات الفاخرة، بما في ذلك البخور والمسك والعنبر وخشب الصندل والورد. سواء كنت تبحث عن عطر يومي أنيق أو هدية فاخرة لشخص مميز، ستجد في متجرنا ما يناسب كل الأذواق والمناسبات مع توصيل مجاني للطلبات فوق 500 درهم."
-                  : "Explore our diverse collection of luxury UAE fragrances, including bakhoor, musk, amber, sandalwood, and rose. Whether you're looking for an elegant everyday scent or a luxurious gift for someone special, our store has something for every taste and occasion, with free delivery on orders over 500 AED."}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
       </div>
     </div>
   );

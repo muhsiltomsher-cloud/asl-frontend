@@ -10,6 +10,7 @@ import type { Metadata } from "next";
 import { CategoryClient } from "./CategoryClient";
 import { decodeHtmlEntities } from "@/lib/utils";
 import { categorySeoContent } from "@/data/category-seo-content";
+import { getCategorySeoContent } from "@/lib/api/wordpress";
 
 // Helper to check if a slug contains non-ASCII characters (e.g., Arabic)
 function isNonAsciiSlug(slug: string): boolean {
@@ -73,6 +74,26 @@ export async function generateMetadata({
       ? [categoryName, "عطور", "عطور فاخرة", "منتجات عطرية", "Aromatic Scents Lab", "عطور الإمارات", "شراء عطور اون لاين", "عود عربي", "هدايا عطرية", "عطور مسك", "عطور عنبر", "عطور دبي", "أفضل عطور", "عطور نسائية", "عطور رجالية", `أروماتيك ${categoryName}`, `أفضل ${categoryName} الإمارات`, `${categoryName} بأسعار مناسبة`, "عطور أروماتيك أصلية", "روائح عطرية فاخرة", "تسوق عطور أروماتيك"]
       : [categoryName, "perfume", "premium fragrance", "aromatic products", "Aromatic Scents Lab", "UAE perfume shop", "buy perfume online", "Arabian oud", "fragrance gifts", "musk perfume", "amber fragrance", "Dubai perfume", "best perfume", "women perfume", "men cologne", `aromatic ${categoryName.toLowerCase()}`, `best ${categoryName.toLowerCase()} UAE`, `${categoryName.toLowerCase()} affordable price`, "aromatic original perfume", "luxury aromatic scents", "shop aromatic fragrances"],
   });
+}
+
+// Async component: fetches SEO content from WP, falls back to hardcoded
+async function CategorySeoSection({ slug, locale }: { slug: string; locale: Locale }) {
+  const wpContent = await getCategorySeoContent(slug);
+  const title = wpContent
+    ? (locale === "ar" ? wpContent.title.ar : wpContent.title.en)
+    : categorySeoContent[slug]?.title?.[locale === "ar" ? "ar" : "en"];
+  const description = wpContent
+    ? (locale === "ar" ? wpContent.description.ar : wpContent.description.en)
+    : categorySeoContent[slug]?.description?.[locale === "ar" ? "ar" : "en"];
+
+  if (!title && !description) return null;
+
+  return (
+    <div className="mt-8 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+      {title && <h2 className="text-xl font-bold text-gray-900 mb-3">{title}</h2>}
+      {description && <p className="text-gray-600 leading-relaxed">{description}</p>}
+    </div>
+  );
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
@@ -172,17 +193,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         </div>
       )}
 
-      {/* SEO keyword-rich content section unique per category */}
-      {categorySeoContent[slug] && (
-        <div className="mt-8 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-          <h2 className="text-xl font-bold text-gray-900 mb-3">
-            {locale === "ar" ? categorySeoContent[slug].title.ar : categorySeoContent[slug].title.en}
-          </h2>
-          <p className="text-gray-600 leading-relaxed">
-            {locale === "ar" ? categorySeoContent[slug].description.ar : categorySeoContent[slug].description.en}
-          </p>
-        </div>
-      )}
+      {/* SEO content — fetched from WP backend, falls back to hardcoded */}
+      <CategorySeoSection slug={slug} locale={locale as Locale} />
     </div>
   );
 }

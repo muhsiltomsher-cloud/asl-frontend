@@ -314,6 +314,91 @@ export interface ProductPage {
   layout: ProductPageLayout;
 }
 
+// ─── Bilingual helper ───
+export interface BilingualText { en: string; ar: string; }
+
+// ─── Category SEO Content (from /asl/v1/category-seo) ───
+export interface CategorySeoContent {
+  slug?: string;
+  title: BilingualText;
+  description: BilingualText;
+}
+
+// ─── Home Sections (from /asl/v1/home-sections) ───
+export interface HomeSectionWhyChooseUs {
+  enabled: boolean;
+  eyebrow: BilingualText;
+  title: BilingualText;
+  subtitle: BilingualText;
+  items: Array<{ title: BilingualText; description: BilingualText }>;
+}
+
+export interface HomeSectionOurStory {
+  enabled: boolean;
+  eyebrow: BilingualText;
+  title: BilingualText;
+  description1: BilingualText;
+  description2: BilingualText;
+  image: string;
+  stats: Array<{ value: string; label: BilingualText }>;
+}
+
+export interface HomeSectionFAQ {
+  enabled: boolean;
+  eyebrow: BilingualText;
+  title: BilingualText;
+  subtitle: BilingualText;
+  items: Array<{ question: BilingualText; answer: BilingualText }>;
+}
+
+export interface HomeSectionSEO {
+  enabled: boolean;
+  title: BilingualText;
+  paragraphs: BilingualText[];
+}
+
+export interface HomeSections {
+  whyChooseUs: HomeSectionWhyChooseUs;
+  ourStory: HomeSectionOurStory;
+  faq: HomeSectionFAQ;
+  seoContent: HomeSectionSEO;
+}
+
+// ─── Guide Pages (from /asl/v1/guides) ───
+export interface GuideProduct {
+  slug: string;
+  rank: number;
+  pickReason: BilingualText;
+  description: BilingualText;
+}
+
+export interface GuideContentBlock {
+  heading: BilingualText;
+  body: BilingualText;
+}
+
+export interface GuideFAQ {
+  question: BilingualText;
+  answer: BilingualText;
+}
+
+export interface GuidePage {
+  id: number;
+  slug: string;
+  title: BilingualText;
+  metaDescription: BilingualText;
+  keywords: { en: string[]; ar: string[] };
+  eyebrow: BilingualText;
+  intro: BilingualText;
+  products: GuideProduct[];
+  contentBlocks: GuideContentBlock[];
+  faqs: GuideFAQ[];
+  relatedGuideSlugs: string[];
+  ogImage: string;
+  publishedAt: string;
+  updatedAt: string;
+}
+
 // WordPress Site Info from /wp-json (root endpoint)
 export interface WPSiteInfo {
   name: string;
