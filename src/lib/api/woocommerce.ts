@@ -622,7 +622,9 @@ export async function getProductsByNote(
     currency?: Currency;
   }
 ): Promise<WCProductsResponse> {
-  let allProducts: WCProduct[] = [];
+  // Always fetch in English first for reliable attribute slug matching,
+  // since WPML may translate pa_notes term slugs in other locales.
+  let allEnglishProducts: WCProduct[] = [];
   let page = 1;
   let totalPages = 1;
 
@@ -630,25 +632,45 @@ export async function getProductsByNote(
     const result = await getProducts({
       page,
       per_page: 100,
-      locale: params?.locale,
+      locale: "en",
       currency: params?.currency,
     });
-    allProducts = allProducts.concat(result.products);
+    allEnglishProducts = allEnglishProducts.concat(result.products);
     totalPages = result.totalPages;
     page++;
   } while (page <= totalPages);
 
-  const filtered = allProducts.filter((product) =>
-    product.attributes?.some(
-      (attr) =>
-        attr.taxonomy === "pa_notes" &&
-        attr.terms?.some((term) => term.slug === noteSlug)
+  const matchedIds = allEnglishProducts
+    .filter((product) =>
+      product.attributes?.some(
+        (attr) =>
+          attr.taxonomy === "pa_notes" &&
+          attr.terms?.some((term) => term.slug === noteSlug)
+      )
     )
-  );
+    .map((p) => p.id);
+
+  if (matchedIds.length === 0) {
+    return { products: [], total: 0, totalPages: 1 };
+  }
+
+  // If the requested locale is English, return the already-fetched products
+  if (!params?.locale || params.locale === "en") {
+    const filtered = allEnglishProducts.filter((p) => matchedIds.includes(p.id));
+    return { products: filtered, total: filtered.length, totalPages: 1 };
+  }
+
+  // For non-English locales, re-fetch the matched products in the target locale
+  const localizedResult = await getProducts({
+    per_page: 100,
+    include: matchedIds,
+    locale: params.locale,
+    currency: params?.currency,
+  });
 
   return {
-    products: filtered,
-    total: filtered.length,
+    products: localizedResult.products,
+    total: localizedResult.products.length,
     totalPages: 1,
   };
 }
