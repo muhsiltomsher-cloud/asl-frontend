@@ -4,13 +4,12 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd } from "@/lib/utils/seo";
 import { getProductBySlug } from "@/lib/api/woocommerce";
-import { getGuideBySlug as getHardcodedGuide, getAllGuideSlugs as getHardcodedSlugs } from "@/data/guides";
 import { getGuidePages, getGuidePageBySlug } from "@/lib/api/wordpress";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import type { WCProduct } from "@/types/woocommerce";
 import type { GuidePage as WPGuidePage } from "@/types/wordpress";
-import type { GuideProduct } from "@/data/guides";
+import type { GuideProduct } from "@/types/wordpress";
 import { GuideProductCard } from "./GuideProductCard";
 import {
   Sparkles,
@@ -62,18 +61,14 @@ function wpToGuideData(wp: WPGuidePage): GuideData {
 }
 
 async function resolveGuide(slug: string): Promise<GuideData | null> {
-  // Try WP API first, fall back to hardcoded
   const wp = await getGuidePageBySlug(slug);
   if (wp) return wpToGuideData(wp);
-  const hc = getHardcodedGuide(slug);
-  return hc ?? null;
+  return null;
 }
 
 async function resolveAllSlugs(): Promise<string[]> {
   const wpGuides = await getGuidePages();
-  const wpSlugs = wpGuides.map(g => g.slug);
-  const hcSlugs = getHardcodedSlugs();
-  return [...new Set([...wpSlugs, ...hcSlugs])];
+  return wpGuides.map(g => g.slug);
 }
 
 export const revalidate = 3600; // Revalidate every hour
@@ -219,7 +214,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
     inLanguage: locale === "ar" ? "ar" : "en",
   };
 
-  // Get related guides (try WP first for each slug, fall back to hardcoded)
+  // Get related guides from WordPress
   const relatedGuideData: GuideData[] = [];
   for (const relSlug of guide.relatedGuideSlugs) {
     const rel = await resolveGuide(relSlug);
