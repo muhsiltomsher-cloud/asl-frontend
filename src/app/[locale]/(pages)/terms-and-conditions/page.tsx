@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getPageSeo } from "@/lib/api/wordpress";
+import { getPageSeo, getStaticPageContent, pickLocale, mapRepeater } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -39,7 +39,19 @@ export async function generateMetadata({
 export default async function TermsPage({ params }: TermsPageProps) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
-  const pageContent = dictionary.pages.terms;
+  const dict = dictionary.pages.terms;
+  const wp = await getStaticPageContent("terms");
+
+  const title = pickLocale(wp?.title, locale, dict.title);
+  const subtitle = pickLocale(wp?.subtitle, locale, dict.subtitle);
+  const lastUpdated = pickLocale(wp?.last_updated, locale, dict.lastUpdated);
+  const agreement = pickLocale(wp?.agreement, locale, dict.agreement);
+
+  const wpSections = mapRepeater(wp?.sections, locale, (item) => ({
+    title: locale === 'ar' ? (item.title?.ar || item.title_ar || '') : (item.title?.en || item.title_en || ''),
+    content: locale === 'ar' ? (item.content?.ar || item.content_ar || '') : (item.content?.en || item.content_en || ''),
+  }));
+  const sections = wpSections.length > 0 ? wpSections : dict.sections;
 
   const breadcrumbItems = [
     { name: dictionary.footer.termsConditions, href: `/${locale}/terms-and-conditions` },
@@ -51,17 +63,17 @@ export default async function TermsPage({ params }: TermsPageProps) {
 
       <div className="mx-auto max-w-3xl">
         <h1 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
-          {pageContent.title}
+          {title}
         </h1>
         <p className="mb-2 text-lg text-gray-600">
-          {pageContent.subtitle}
+          {subtitle}
         </p>
         <p className="mb-8 text-sm text-gray-500">
-          {pageContent.lastUpdated}
+          {lastUpdated}
         </p>
 
         <div className="space-y-8">
-          {pageContent.sections.map((section, index) => (
+          {sections.map((section, index) => (
             <div key={index}>
               <h2 className="mb-3 text-xl font-semibold text-gray-900">
                 {index + 1}. {section.title}
@@ -75,7 +87,7 @@ export default async function TermsPage({ params }: TermsPageProps) {
 
         <div className="mt-12 border-t border-gray-200 pt-8">
           <p className="mb-4 text-gray-600">
-            {pageContent.agreement}
+            {agreement}
           </p>
           <a
             href={`/${locale}/contact`}

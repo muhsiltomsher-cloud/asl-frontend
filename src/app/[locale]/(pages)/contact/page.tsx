@@ -16,7 +16,7 @@ import { QuickContactButtons } from "@/components/common/QuickContactButtons";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateContactPageJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getPageSeo } from "@/lib/api/wordpress";
+import { getPageSeo, getStaticPageContent, pickLocale, mapRepeater } from "@/lib/api/wordpress";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -54,14 +54,16 @@ export async function generateMetadata({
 export default async function ContactPage({ params }: ContactPageProps) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
-  const pageContent = dictionary.pages.contact;
+  const dict = dictionary.pages.contact;
   const isRTL = locale === "ar";
+  const wp = await getStaticPageContent("contact");
 
   const breadcrumbItems = [
-    { name: pageContent.title, href: `/${locale}/contact` },
+    { name: dict.title, href: `/${locale}/contact` },
   ];
 
-  const content = {
+  // Default fallback values
+  const defaultContent = {
     heroTitle: isRTL ? "تواصل معنا" : "Get in Touch",
     heroSubtitle: isRTL ? "اتصل بنا" : "Contact Us",
     heroDescription: isRTL
@@ -77,6 +79,25 @@ export default async function ContactPage({ params }: ContactPageProps) {
       : "Come and enjoy a unique aromatic experience at one of our branches",
     ctaButton: isRTL ? "مواقع المتاجر" : "Store Locator",
   };
+
+  const content = {
+    heroTitle: pickLocale(wp?.hero_title, locale, defaultContent.heroTitle),
+    heroSubtitle: pickLocale(wp?.hero_subtitle, locale, defaultContent.heroSubtitle),
+    heroDescription: pickLocale(wp?.hero_description, locale, defaultContent.heroDescription),
+    quickContact: pickLocale(wp?.quick_contact, locale, defaultContent.quickContact),
+    whatsapp: pickLocale(wp?.whatsapp, locale, defaultContent.whatsapp),
+    callUs: pickLocale(wp?.call_us, locale, defaultContent.callUs),
+    emailUs: pickLocale(wp?.email_us, locale, defaultContent.emailUs),
+    ctaTitle: pickLocale(wp?.cta_title, locale, defaultContent.ctaTitle),
+    ctaSubtitle: pickLocale(wp?.cta_subtitle, locale, defaultContent.ctaSubtitle),
+    ctaButton: pickLocale(wp?.cta_button, locale, defaultContent.ctaButton),
+  };
+
+  const sendMessage = pickLocale(wp?.send_message, locale, dict.sendMessage);
+  const sendMessageSub = pickLocale(wp?.send_message_sub, locale, isRTL ? "سنرد عليك في أقرب وقت" : "We'll respond as soon as possible");
+  const contactInfoLabel = pickLocale(wp?.contact_info_label, locale, dict.contactInfo);
+  const contactInfoTitle = pickLocale(wp?.contact_info_title, locale, isRTL ? "معلومات التواصل" : "How to Reach Us");
+  const followUs = pickLocale(wp?.follow_us, locale, isRTL ? "تابعنا على" : "Follow Us");
 
   // Map info keys to icons and colors
   const infoConfig: Record<string, { icon: typeof MapPin; gradient: string; hoverGradient: string }> = {
@@ -107,13 +128,26 @@ export default async function ContactPage({ params }: ContactPageProps) {
     },
   };
 
-  const contactInfoItems = Object.entries(pageContent.info).map(([key, value]) => ({
+  // Contact info items from WP repeater or dictionary fallback
+  const wpInfoItems = mapRepeater(wp?.info_items, locale, (item) => ({
+    key: item.key || '',
+    title: locale === 'ar' ? (item.title?.ar || item.title_ar || '') : (item.title?.en || item.title_en || ''),
+    content: locale === 'ar' ? (item.content?.ar || item.content_ar || '') : (item.content?.en || item.content_en || ''),
+  }));
+
+  const dictInfoItems = Object.entries(dict.info).map(([key, value]) => ({
     key,
-    icon: infoConfig[key]?.icon || MapPin,
-    gradient: infoConfig[key]?.gradient || "from-amber-500 to-amber-600",
-    hoverGradient: infoConfig[key]?.hoverGradient || "group-hover:from-amber-600 group-hover:to-amber-700",
     title: value.title,
     content: value.content,
+  }));
+
+  const infoItems = wpInfoItems.length > 0 ? wpInfoItems : dictInfoItems;
+
+  const contactInfoItems = infoItems.map((item) => ({
+    ...item,
+    icon: infoConfig[item.key]?.icon || MapPin,
+    gradient: infoConfig[item.key]?.gradient || "from-amber-500 to-amber-600",
+    hoverGradient: infoConfig[item.key]?.hoverGradient || "group-hover:from-amber-600 group-hover:to-amber-700",
   }));
 
   return (
@@ -231,10 +265,10 @@ export default async function ContactPage({ params }: ContactPageProps) {
                     </div>
                     <div>
                       <h2 className="text-2xl font-bold text-amber-900">
-                        {pageContent.sendMessage}
+                        {sendMessage}
                       </h2>
                       <p className="text-sm text-amber-600">
-                        {isRTL ? "سنرد عليك في أقرب وقت" : "We'll respond as soon as possible"}
+                        {sendMessageSub}
                       </p>
                     </div>
                   </div>
@@ -249,11 +283,11 @@ export default async function ContactPage({ params }: ContactPageProps) {
                 <div className="mb-4 flex items-center gap-3">
                   <div className="h-1 w-12 rounded-full bg-gradient-to-r from-amber-600 to-amber-400" />
                   <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
-                    {pageContent.contactInfo}
+                    {contactInfoLabel}
                   </span>
                 </div>
                 <h2 className="text-3xl font-bold text-amber-900">
-                  {isRTL ? "معلومات التواصل" : "How to Reach Us"}
+                  {contactInfoTitle}
                 </h2>
               </div>
 
@@ -294,7 +328,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               {/* Social Links */}
               <div className="mt-8 rounded-2xl bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 p-6">
                 <h3 className="mb-4 text-lg font-semibold text-white">
-                  {isRTL ? "تابعنا على" : "Follow Us"}
+                  {followUs}
                 </h3>
                 <div className="flex gap-4">
                   <a

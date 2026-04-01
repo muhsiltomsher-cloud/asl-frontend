@@ -4,7 +4,7 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
 import { getProducts, getFreeGiftProductInfo, getBundleEnabledProductSlugs } from "@/lib/api/woocommerce";
-import { getPageSeo } from "@/lib/api/wordpress";
+import { getPageSeo, getStaticPageContent, pickLocale } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { ShopClient } from "./ShopClient";
@@ -54,6 +54,11 @@ export default async function ShopPage({ params }: ShopPageProps) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
   const isRTL = locale === "ar";
+  const wp = await getStaticPageContent("shop");
+
+  const subtitle = pickLocale(wp?.subtitle, locale,
+    isRTL ? "اكتشف مجموعتنا الكاملة من المنتجات" : "Discover our complete collection of products"
+  );
 
   const breadcrumbItems = [
     { name: dictionary.common.shop, href: `/${locale}/shop` },
@@ -87,9 +92,7 @@ export default async function ShopPage({ params }: ShopPageProps) {
           {dictionary.common.shop}
         </h1>
         <p className="mt-2 text-gray-600">
-          {isRTL
-            ? "اكتشف مجموعتنا الكاملة من المنتجات"
-            : "Discover our complete collection of products"}
+          {subtitle}
         </p>
       </div>
 

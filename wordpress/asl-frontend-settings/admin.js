@@ -169,6 +169,47 @@ jQuery(document).ready(function($) {
         });
     }
     
+    // Generic repeater Add (for Static Pages module)
+    $(document).on('click', '.asl-sp-add', function() {
+        var targetId = $(this).data('target');
+        var container = $('#' + targetId);
+        var items = container.find('.asl-repeater-item');
+        var count = items.length;
+        if (count === 0) return; // Need at least one template
+        var last = items.last();
+        var clone = last.clone();
+        // Update index in names and clear values
+        clone.find('input, textarea').each(function() {
+            var name = $(this).attr('name');
+            if (name) {
+                $(this).attr('name', name.replace(/\[\d+\]/, '[' + count + ']'));
+            }
+            $(this).val('');
+        });
+        clone.find('h4').contents().first().replaceWith(
+            clone.find('h4').contents().first().text().replace(/\d+/, count + 1)
+        );
+        container.append(clone);
+    });
+
+    // Generic repeater Remove
+    $(document).on('click', '.asl-remove-repeater-item', function() {
+        var item = $(this).closest('.asl-repeater-item');
+        var container = item.parent();
+        if (container.find('.asl-repeater-item').length > 1) {
+            item.remove();
+            // Reindex
+            container.find('.asl-repeater-item').each(function(i) {
+                $(this).find('input, textarea').each(function() {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        $(this).attr('name', name.replace(/\[\d+\]/, '[' + i + ']'));
+                    }
+                });
+            });
+        }
+    });
+
     // Add Banner
     $('#asl-add-banner').on('click', function() {
         var container = $('#asl-banners-items');

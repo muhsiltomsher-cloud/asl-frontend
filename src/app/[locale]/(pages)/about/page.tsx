@@ -4,7 +4,7 @@ import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata, generateFAQJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getPageSeo } from "@/lib/api/wordpress";
+import { getPageSeo, getStaticPageContent, pickLocale, mapRepeater } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 import {
@@ -50,14 +50,52 @@ export async function generateMetadata({
 export default async function AboutPage({ params }: AboutPageProps) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
-  const pageContent = dictionary.pages.about;
+  const dict = dictionary.pages.about;
   const isRTL = locale === "ar";
+  const wp = await getStaticPageContent("about");
+
+  // Pick locale-aware values with dictionary fallback
+  const heroSubtitle = pickLocale(wp?.hero_subtitle, locale, dict.heroSubtitle);
+  const title = pickLocale(wp?.title, locale, dict.title);
+  const heroDescription = pickLocale(wp?.hero_description, locale, dict.heroDescription);
+
+  // Stats
+  const statSince = pickLocale(wp?.stats_since, locale, dict.stats.since);
+  const statLocation = pickLocale(wp?.stats_location, locale, dict.stats.location);
+  const statHandcrafted = pickLocale(wp?.stats_handcrafted, locale, dict.stats.handcrafted);
+  const statSustainable = pickLocale(wp?.stats_sustainable, locale, dict.stats.sustainable);
+
+  // Main content
+  const mainTitle = pickLocale(wp?.main_title, locale, dict.mainContent.title);
+  const mainP1 = pickLocale(wp?.main_paragraph1, locale, dict.mainContent.paragraph1);
+  const mainP2 = pickLocale(wp?.main_paragraph2, locale, dict.mainContent.paragraph2);
+  const mainP3 = pickLocale(wp?.main_paragraph3, locale, dict.mainContent.paragraph3);
+
+  // Uniqueness
+  const uniqueTitle = pickLocale(wp?.uniqueness_title, locale, dict.uniqueness.title);
+  const uniqueSubtitle = pickLocale(wp?.uniqueness_subtitle, locale, dict.uniqueness.subtitle);
+  const uniqueContent = pickLocale(wp?.uniqueness_content, locale, dict.uniqueness.content);
+
+  // Journey
+  const journeyTitle = pickLocale(wp?.journey_title, locale, dict.journey.title);
+  const journeyContent = pickLocale(wp?.journey_content, locale, dict.journey.content);
+
+  // Ingredients
+  const ingredientsTitle = pickLocale(wp?.ingredients_title, locale, dict.ingredients.title);
+  const ingredientsSubtitle = pickLocale(wp?.ingredients_subtitle, locale, dict.ingredients.subtitle);
+  const ingredientsDesc = pickLocale(wp?.ingredients_description, locale, dict.ingredients.description);
+
+  // CTA
+  const ctaTitle = pickLocale(wp?.cta_title, locale, dict.cta.title);
+  const ctaSubtitle = pickLocale(wp?.cta_subtitle, locale, dict.cta.subtitle);
+  const ctaButton = pickLocale(wp?.cta_button, locale, dict.cta.button);
 
   const breadcrumbItems = [
     { name: dictionary.common.about, href: `/${locale}/about` },
   ];
 
-  const brandFaqItems = isRTL
+  // FAQ items from WP repeater or hardcoded fallback
+  const defaultFaqItems = isRTL
     ? [
         { question: "ما هو أروماتيك سينتس لاب؟", answer: "أروماتيك سينتس لاب هو بيت عطور فاخر مقره الإمارات العربية المتحدة، يقدم عطوراً يدوية الصنع من أجود المكونات الطبيعية منذ عام 2021." },
         { question: "أين يقع أروماتيك سينتس لاب؟", answer: "مقرنا في دبي، الإمارات العربية المتحدة، ونقدم خدمة التوصيل في جميع أنحاء الإمارات ودول مجلس التعاون الخليجي." },
@@ -70,6 +108,12 @@ export default async function AboutPage({ params }: AboutPageProps) {
         { question: "What ingredients do you use in your fragrances?", answer: "We use premium natural ingredients including authentic Arabian oud, French rose, Indian sandalwood, musk, amber, and vanilla." },
         { question: "Do you offer gift wrapping?", answer: "Yes, we offer complimentary luxury gift wrapping. You can select this at checkout and add a personal message." },
       ];
+
+  const wpFaqItems = mapRepeater(wp?.faq_items, locale, (item) => ({
+    question: locale === 'ar' ? (item.q?.ar || item.q_ar || '') : (item.q?.en || item.q_en || ''),
+    answer: locale === 'ar' ? (item.a?.ar || item.a_ar || '') : (item.a?.en || item.a_en || ''),
+  }));
+  const brandFaqItems = wpFaqItems.length > 0 ? wpFaqItems : defaultFaqItems;
 
   return (
     <div className="flex flex-col">
@@ -123,34 +167,34 @@ export default async function AboutPage({ params }: AboutPageProps) {
             </div>
 
             <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
-              {pageContent.heroSubtitle}
+              {heroSubtitle}
             </span>
 
             <h1 className="mb-8 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-7xl">
-              {pageContent.title}
+              {title}
             </h1>
 
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-amber-100/90 md:text-xl">
-              {pageContent.heroDescription}
+              {heroDescription}
             </p>
 
             {/* Stats Row */}
             <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
               <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <Calendar className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{pageContent.stats.since}</div>
+                <div className="text-sm font-medium text-amber-100">{statSince}</div>
               </div>
               <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <MapPin className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{pageContent.stats.location}</div>
+                <div className="text-sm font-medium text-amber-100">{statLocation}</div>
               </div>
               <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <Sparkles className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{pageContent.stats.handcrafted}</div>
+                <div className="text-sm font-medium text-amber-100">{statHandcrafted}</div>
               </div>
               <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <Leaf className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{pageContent.stats.sustainable}</div>
+                <div className="text-sm font-medium text-amber-100">{statSustainable}</div>
               </div>
             </div>
           </div>
@@ -202,7 +246,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
               <div className="mb-6 flex items-center gap-3">
                 <div className="h-1 w-12 rounded-full bg-gradient-to-r from-amber-600 to-amber-400" />
                 <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
-                  {pageContent.mainContent.title}
+                  {mainTitle}
                 </span>
               </div>
 
@@ -212,13 +256,13 @@ export default async function AboutPage({ params }: AboutPageProps) {
 
               <div className="space-y-6">
                 <p className="text-lg leading-relaxed text-amber-800/80">
-                  {pageContent.mainContent.paragraph1}
+                  {mainP1}
                 </p>
                 <p className="leading-relaxed text-amber-700/70">
-                  {pageContent.mainContent.paragraph2}
+                  {mainP2}
                 </p>
                 <p className="leading-relaxed text-amber-700/70">
-                  {pageContent.mainContent.paragraph3}
+                  {mainP3}
                 </p>
               </div>
             </div>
@@ -244,13 +288,13 @@ export default async function AboutPage({ params }: AboutPageProps) {
             </div>
 
             <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
-              {pageContent.uniqueness.title}
+              {uniqueTitle}
             </h2>
             <p className="mb-8 text-lg text-amber-300">
-              {pageContent.uniqueness.subtitle}
+              {uniqueSubtitle}
             </p>
             <p className="mx-auto max-w-3xl text-lg leading-relaxed text-amber-100/80">
-              {pageContent.uniqueness.content}
+              {uniqueContent}
             </p>
           </div>
         </div>
@@ -273,10 +317,10 @@ export default async function AboutPage({ params }: AboutPageProps) {
           <div className="mx-auto max-w-3xl text-center">
             <div className="mb-8 text-6xl text-amber-300">&ldquo;</div>
             <h3 className="mb-4 text-2xl font-bold text-amber-900 md:text-3xl">
-              {pageContent.journey.title}
+              {journeyTitle}
             </h3>
             <p className="text-xl italic leading-relaxed text-amber-700/80 md:text-2xl">
-              {pageContent.journey.content}
+              {journeyContent}
             </p>
             <div className="mt-8 text-6xl text-amber-300">&rdquo;</div>
           </div>
@@ -299,23 +343,23 @@ export default async function AboutPage({ params }: AboutPageProps) {
               <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
             </div>
             <h2 className="mb-4 text-3xl font-bold text-amber-900 md:text-4xl lg:text-5xl">
-              {pageContent.ingredients.title}
+              {ingredientsTitle}
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-amber-700/70">
-              {pageContent.ingredients.subtitle}
+              {ingredientsSubtitle}
             </p>
           </div>
 
           {/* Description */}
           <div className="mx-auto mb-12 max-w-4xl">
             <p className="text-center leading-relaxed text-amber-700/80">
-              {pageContent.ingredients.description}
+              {ingredientsDesc}
             </p>
           </div>
 
           {/* Ingredients Carousel */}
           <IngredientsCarousel
-            items={pageContent.ingredients.items}
+            items={dict.ingredients.items}
             isRTL={isRTL}
           />
         </div>
@@ -376,16 +420,16 @@ export default async function AboutPage({ params }: AboutPageProps) {
           </div>
 
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
-            {pageContent.cta.title}
+            {ctaTitle}
           </h2>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-amber-100/80">
-            {pageContent.cta.subtitle}
+            {ctaSubtitle}
           </p>
           <Link
             href={`/${locale}/shop`}
             className="group inline-flex items-center gap-3 rounded-full bg-white px-10 py-5 text-lg font-semibold text-amber-900 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-2xl hover:shadow-amber-900/20"
           >
-            <span>{pageContent.cta.button}</span>
+            <span>{ctaButton}</span>
             <ChevronRight
               className={`h-5 w-5 transition-transform duration-300 group-hover:translate-x-1 ${isRTL ? "rotate-180 group-hover:-translate-x-1" : ""}`}
             />

@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
 import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
-import { getPageSeo } from "@/lib/api/wordpress";
+import { getPageSeo, getStaticPageContent, pickLocale, mapRepeater } from "@/lib/api/wordpress";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
@@ -39,7 +39,35 @@ export async function generateMetadata({
 export default async function ShippingPage({ params }: ShippingPageProps) {
   const { locale } = await params;
   const dictionary = await getDictionary(locale as Locale);
-  const pageContent = dictionary.pages.shipping;
+  const dict = dictionary.pages.shipping;
+  const wp = await getStaticPageContent("shipping");
+
+  const title = pickLocale(wp?.title, locale, dict.title);
+  const haveQuestions = pickLocale(wp?.have_questions, locale, dict.haveQuestions);
+  const haveQuestionsText = pickLocale(wp?.have_questions_text, locale, dict.haveQuestionsText);
+
+  // Sections from WP repeater or dictionary fallback
+  const wpSections = mapRepeater(wp?.sections, locale, (item) => ({
+    title: locale === 'ar' ? (item.title?.ar || item.title_ar || '') : (item.title?.en || item.title_en || ''),
+    content: locale === 'ar' ? (item.content?.ar || item.content_ar || '') : (item.content?.en || item.content_en || ''),
+    key: item.key || '',
+  }));
+  const sections = wpSections.length > 0 ? wpSections : dict.sections;
+
+  // Shipping rates from WP or dictionary fallback
+  const ratesTitle = pickLocale(wp?.rates_title, locale, dict.shippingRates?.title || '');
+  const ratesDestination = pickLocale(wp?.rates_destination, locale, dict.shippingRates?.destination || '');
+  const ratesCost = pickLocale(wp?.rates_cost, locale, dict.shippingRates?.shippingCost || '');
+  const ratesDelivery = pickLocale(wp?.rates_delivery, locale, dict.shippingRates?.estimatedDelivery || '');
+  const ratesCurrency = pickLocale(wp?.rates_currency, locale, dict.shippingRates?.currency || '');
+  const ratesNote = pickLocale(wp?.rates_note, locale, dict.shippingRates?.note || '');
+
+  const wpRates = mapRepeater(wp?.rates, locale, (item) => ({
+    location: locale === 'ar' ? (item.location?.ar || item.location_ar || '') : (item.location?.en || item.location_en || ''),
+    cost: locale === 'ar' ? (item.cost?.ar || item.cost_ar || '') : (item.cost?.en || item.cost_en || ''),
+    delivery: locale === 'ar' ? (item.delivery?.ar || item.delivery_ar || '') : (item.delivery?.en || item.delivery_en || ''),
+  }));
+  const rates = wpRates.length > 0 ? wpRates : (dict.shippingRates?.rates || []);
 
   const breadcrumbItems = [
     { name: dictionary.footer.shippingInfo, href: `/${locale}/shipping` },
@@ -51,11 +79,11 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
 
       <div className="mx-auto max-w-3xl">
         <h1 className="mb-8 text-3xl font-bold text-gray-900 md:text-4xl">
-          {pageContent.title}
+          {title}
         </h1>
 
         <div className="space-y-8">
-          {pageContent.sections.map((section, index) => (
+          {sections.map((section, index) => (
             <div key={index}>
               <h2 className="mb-3 text-xl font-semibold text-gray-900">
                 {section.title}
@@ -63,34 +91,34 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
               <p className="leading-relaxed text-gray-600">
                 {section.content}
               </p>
-              {section.key === "shipping_costs" && pageContent.shippingRates && (
+              {section.key === "shipping_costs" && rates.length > 0 && (
                 <div className="mt-6">
                   <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                    {pageContent.shippingRates.title}
+                    {ratesTitle}
                   </h3>
                   <div className="overflow-x-auto rounded-lg border border-gray-200">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 font-semibold text-gray-900">
-                            {pageContent.shippingRates.destination}
+                            {ratesDestination}
                           </th>
                           <th className="px-4 py-3 font-semibold text-gray-900">
-                            {pageContent.shippingRates.shippingCost}
+                            {ratesCost}
                           </th>
                           <th className="px-4 py-3 font-semibold text-gray-900">
-                            {pageContent.shippingRates.estimatedDelivery}
+                            {ratesDelivery}
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {pageContent.shippingRates.rates.map((rate, rateIndex) => (
+                        {rates.map((rate, rateIndex) => (
                           <tr key={rateIndex} className="hover:bg-gray-50">
                             <td className="px-4 py-3 text-gray-700">
                               {rate.location}
                             </td>
                             <td className="px-4 py-3 font-medium text-gray-900">
-                              {rate.cost} {pageContent.shippingRates.currency}
+                              {rate.cost} {ratesCurrency}
                             </td>
                             <td className="px-4 py-3 text-gray-600">
                               {rate.delivery}
@@ -101,7 +129,7 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
                     </table>
                   </div>
                   <p className="mt-3 text-sm text-gray-500">
-                    {pageContent.shippingRates.note}
+                    {ratesNote}
                   </p>
                 </div>
               )}
@@ -111,10 +139,10 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
 
         <div className="mt-12 border-t border-gray-200 pt-8">
           <h2 className="mb-3 text-xl font-semibold text-gray-900">
-            {pageContent.haveQuestions}
+            {haveQuestions}
           </h2>
           <p className="mb-4 text-gray-600">
-            {pageContent.haveQuestionsText}
+            {haveQuestionsText}
           </p>
           <a
             href={`/${locale}/contact`}

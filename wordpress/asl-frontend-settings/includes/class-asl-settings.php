@@ -104,7 +104,7 @@ function asl_render_admin_page() {
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
         <nav class="nav-tab-wrapper">
-            <?php foreach (['hero'=>'Hero Slider','new-products'=>'New Products','bestseller'=>'Bestsellers','categories'=>'Categories','featured'=>'Featured','collections'=>'Collections','banners'=>'Banners','why-choose-us'=>'Why Choose Us','our-story'=>'Our Story','faq'=>'FAQ','seo-content'=>'SEO Content'] as $k=>$l): ?>
+            <?php foreach (['hero'=>'Hero Slider','new-products'=>'New Products','bestseller'=>'Bestsellers','categories'=>'Categories','featured'=>'Featured','collections'=>'Collections','banners'=>'Banners'] as $k=>$l): ?>
                 <a href="?page=asl-settings&tab=<?php echo $k; ?>" class="nav-tab <?php echo $tab===$k?'nav-tab-active':''; ?>"><?php echo $l; ?></a>
             <?php endforeach; ?>
         </nav>
@@ -121,10 +121,6 @@ function asl_render_admin_page() {
                     case 'featured': asl_render_products_tab('featured','Featured'); break;
                     case 'collections': asl_render_collections_tab(); break;
                     case 'banners': asl_render_banners_tab(); break;
-                    case 'why-choose-us': asl_render_why_choose_us_tab(); break;
-                    case 'our-story': asl_render_our_story_tab(); break;
-                    case 'faq': asl_render_faq_tab(); break;
-                    case 'seo-content': asl_render_seo_content_tab(); break;
                 }
                 ?>
             </div>
@@ -588,15 +584,6 @@ function asl_save_home_settings() {
             set_theme_mod('asl_banners_items', $banners);
             break;
 
-        // Home Sections tabs (delegated to class-asl-home-sections.php)
-        case 'why-choose-us':
-        case 'our-story':
-        case 'faq':
-        case 'seo-content':
-            if (function_exists('asl_save_home_sections_tab')) {
-                asl_save_home_sections_tab($tab);
-            }
-            break;
     }
 }
 
