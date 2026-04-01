@@ -278,7 +278,7 @@ function FullscreenGallery({ images, selectedIndex, onClose, onSelectImage, prod
                 onSelectImage(index);
                 handleResetZoom();
               }}
-              className={`relative h-14 w-14 overflow-hidden rounded-lg border-2 transition-all hover:scale-105 ${
+              className={`relative h-14 w-14 overflow-hidden border-2 transition-all hover:scale-105 ${
                 selectedIndex === index 
                   ? "border-white shadow-lg shadow-white/20" 
                   : "border-transparent opacity-60 hover:opacity-100"
@@ -435,8 +435,8 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
   const renderImageGallery = () => {
     if (imageCount === 0) {
       return (
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
-          <div className="flex h-full items-center justify-center">
+                <div className="relative aspect-square overflow-hidden bg-gray-100">
+                  <div className="flex h-full items-center justify-center">
             <span className="text-gray-400">{isRTL ? "لا توجد صورة" : "No image"}</span>
           </div>
         </div>
@@ -482,8 +482,8 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
           <div>
             <ViewToggle />
             <div 
-              className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-gray-100"
-              onClick={() => setIsFullscreen(true)}
+                            className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
+                            onClick={() => setIsFullscreen(true)}
             >
               <Image
                 src={images[0].src}
@@ -511,7 +511,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               {images.map((image, index) => (
                 <div 
                   key={image.id}
-                  className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-gray-100"
+                  className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
                   onClick={() => {
                     setSelectedImage(index);
                     setIsFullscreen(true);
@@ -546,7 +546,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               {images.map((image, index) => (
                 <div 
                   key={image.id}
-                  className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-gray-100"
+                  className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
                   onClick={() => {
                     setSelectedImage(index);
                     setIsFullscreen(true);
@@ -579,9 +579,9 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
           <div className="space-y-3">
             {/* Main Image - Full Width */}
             <div 
-              className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-gray-100"
-              onClick={() => {
-                setSelectedImage(0);
+                            className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
+                            onClick={() => {
+                              setSelectedImage(0);
                 setIsFullscreen(true);
               }}
             >
@@ -605,9 +605,9 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               {images.slice(1, 3).map((image, index) => (
                 <div 
                   key={image.id}
-                  className="group relative aspect-square cursor-pointer overflow-hidden rounded-lg bg-gray-100"
-                  onClick={() => {
-                    setSelectedImage(index + 1);
+                                    className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
+                                    onClick={() => {
+                                      setSelectedImage(index + 1);
                     setIsFullscreen(true);
                   }}
                 >
@@ -675,7 +675,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 nextEl: ".gallery-next",
               }}
               onSlideChange={(swiper) => setSelectedImage(swiper.realIndex)}
-              className="product-gallery-swiper w-full overflow-hidden rounded-xl bg-gray-100 shadow-sm"
+              className="product-gallery-swiper w-full overflow-hidden bg-gray-100 shadow-sm"
             >
               {images.map((image, index) => (
                 <SwiperSlide key={image.id}>
@@ -769,7 +769,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 <SwiperSlide key={image.id}>
                   <button
                     type="button"
-                    className={`relative aspect-square w-full overflow-hidden rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
+                    className={`relative aspect-square w-full overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
                       selectedImage === index 
                         ? "border-amber-800 ring-2 ring-amber-800/30 shadow-md" 
                         : "border-gray-200 hover:border-gray-400"
@@ -1119,7 +1119,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
         <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-3">
           <div className="flex items-center gap-3 min-w-0">
             {images.length > 0 && (
-              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden">
                 <Image
                   src={images[0].src}
                   alt={product.name}

@@ -384,7 +384,7 @@ export default function CartPage() {
                                 <li key={item.item_key} className={`p-4 ${isGiftItem ? "bg-gradient-to-r from-amber-50 to-orange-50" : ""}`}>
                                   <div className="grid items-center gap-4 md:grid-cols-12">
                                     <div className="flex gap-4 md:col-span-6">
-                                      <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                                      <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden bg-gray-100">
                                         {item.featured_image ? (
                                           <Image
                                             src={item.featured_image}

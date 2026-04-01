@@ -24,7 +24,7 @@ export function CartItem({
       className={`p-4 transition-all duration-500 ${isGiftItem ? "bg-gradient-to-r from-amber-50 to-orange-50" : ""} ${isNewlyAddedGift ? "animate-pulse ring-2 ring-amber-400 ring-inset" : ""}`}
     >
       <div className="flex gap-4">
-        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden bg-gray-100">
           {item.featured_image ? (
             <Image
               src={item.featured_image}

@@ -254,7 +254,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
             {/* Contact Form */}
             <div className="relative">
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-200/30 to-stone-200/30 blur-xl" />
-              <div className="relative overflow-hidden rounded-2xl bg-white p-8 shadow-xl shadow-amber-900/5">
+              <div className="relative overflow-hidden bg-white p-8 shadow-xl shadow-amber-900/5">
                 {/* Decorative Corner */}
                 <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-100/50" />
                 
@@ -295,7 +295,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
                 {contactInfoItems.map((item, index) => (
                   <div
                     key={index}
-                    className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-900/10"
+                    className="group relative overflow-hidden bg-white p-6 shadow-lg transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-900/10"
                   >
                     {/* Decorative Corner */}
                     <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-amber-50 transition-transform duration-500 group-hover:scale-150" />
@@ -326,7 +326,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               </div>
 
               {/* Social Links */}
-              <div className="mt-8 rounded-2xl bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 p-6">
+              <div className="mt-8 bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 p-6">
                 <h3 className="mb-4 text-lg font-semibold text-white">
                   {followUs}
                 </h3>
