@@ -10,6 +10,7 @@ import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import { CategoryClient } from "../../category/[slug]/CategoryClient";
 import { notesSeoContent, ALL_NOTE_SLUGS } from "@/data/notes-seo-content";
+import { getNoteSeo } from "@/lib/api/wordpress";
 
 // Revalidate every 5 minutes
 export const revalidate = 300;
@@ -99,10 +100,23 @@ export default async function NotePage({ params }: NotePageProps) {
     return 0;
   });
 
+  // Try WP API first, then fall back to hardcoded SEO content
+  const wpNote = await getNoteSeo(slug);
   const noteData = notesSeoContent[slug];
-  const noteName = noteData
-    ? (isRTL ? noteData.name.ar : noteData.name.en)
-    : slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const noteName = wpNote?.name
+    ? (isRTL ? wpNote.name.ar : wpNote.name.en)
+    : noteData
+      ? (isRTL ? noteData.name.ar : noteData.name.en)
+      : slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const noteTitle = wpNote?.title
+    ? (isRTL ? wpNote.title.ar : wpNote.title.en)
+    : noteData ? (isRTL ? noteData.title.ar : noteData.title.en) : '';
+
+  const noteDescription = wpNote?.description
+    ? (isRTL ? wpNote.description.ar : wpNote.description.en)
+    : noteData ? (isRTL ? noteData.description.ar : noteData.description.en) : '';
 
   const pageTitle = isRTL
     ? `عطور ${noteName}`
@@ -128,9 +142,9 @@ export default async function NotePage({ params }: NotePageProps) {
 
         <div className="mb-3">
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">{pageTitle}</h1>
-          {noteData && (
+          {noteDescription && (
             <p className="mt-2 text-gray-500 text-sm">
-              {isRTL ? noteData.description.ar : noteData.description.en}
+              {noteDescription}
             </p>
           )}
         </div>
@@ -140,14 +154,18 @@ export default async function NotePage({ params }: NotePageProps) {
         </Suspense>
 
         {/* SEO content section */}
-        {noteData && (
+        {(noteTitle || noteDescription) && (
           <div className="mt-8 bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-            <h2 className="text-xl font-bold text-gray-900 mb-3">
-              {isRTL ? noteData.title.ar : noteData.title.en}
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              {isRTL ? noteData.description.ar : noteData.description.en}
-            </p>
+            {noteTitle && (
+              <h2 className="text-xl font-bold text-gray-900 mb-3">
+                {noteTitle}
+              </h2>
+            )}
+            {noteDescription && (
+              <p className="text-gray-600 leading-relaxed">
+                {noteDescription}
+              </p>
+            )}
           </div>
         )}
       </div>

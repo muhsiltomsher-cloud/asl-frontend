@@ -37,7 +37,7 @@ if (!function_exists('asl_sanitize_link')) {
  * Enqueue admin scripts and media library
  */
 add_action('admin_enqueue_scripts', function($hook) {
-    $is_asl = strpos($hook, 'asl-settings') !== false || strpos($hook, 'asl-home-sections') !== false;
+    $is_asl = strpos($hook, 'asl-settings') !== false || strpos($hook, 'asl-home-sections') !== false || strpos($hook, 'asl-pages') !== false || strpos($hook, 'asl-notes-seo') !== false;
     $is_guide = (get_post_type() === 'asl_guide' || get_post_type() === 'asl_product_page');
     if (!$is_asl && !$is_guide) return;
     wp_enqueue_media();
@@ -92,3 +92,6 @@ require_once ASL_SETTINGS_PATH . 'includes/class-asl-home-sections.php';
 
 // Include Guide Pages module (dynamic guide/article CPT with bilingual support)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-guide-pages.php';
+
+// Include Static Pages module (About, Contact, FAQ, Privacy, Terms, Shipping, Returns + Notes SEO)
+require_once ASL_SETTINGS_PATH . 'includes/class-asl-static-pages.php';

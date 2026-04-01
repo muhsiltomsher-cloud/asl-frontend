@@ -1326,3 +1326,57 @@ export async function getGuidePageBySlug(slug: string): Promise<GuidePage | null
   );
   return data;
 }
+
+// ─── Static Pages (About, Contact, FAQ, Privacy, Terms, Shipping, Returns) ───
+
+// Bilingual field from API: { en: string, ar: string }
+interface BilingualField { en: string; ar: string; }
+
+// Generic static page API response — all fields are bilingual objects or repeater arrays
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type StaticPageResponse = Record<string, BilingualField | any[]>;
+
+/**
+ * Fetch static page content from /asl/v1/pages/{slug}.
+ * Returns null if API is unreachable — caller should fall back to dictionary.
+ */
+export async function getStaticPageContent(slug: string): Promise<StaticPageResponse | null> {
+  return fetchWPAPI<StaticPageResponse>(
+    `/asl/v1/pages/${encodeURIComponent(slug)}`,
+    { tags: ["static-pages", `page-${slug}`], revalidate: 60 }
+  );
+}
+
+/**
+ * Helper: pick locale value from a bilingual field, fallback to dictionary value.
+ */
+export function pickLocale(field: BilingualField | undefined, locale: string, fallback: string): string {
+  if (!field) return fallback;
+  const val = locale === 'ar' ? field.ar : field.en;
+  return val || fallback;
+}
+
+/**
+ * Helper: map a bilingual repeater array to locale-specific items.
+ * Each repeater item has fields like { title: {en,ar}, content: {en,ar} } or { title_en, title_ar }.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function mapRepeater<T>(items: any[] | undefined, locale: string, mapper: (item: any, locale: string) => T): T[] {
+  if (!items || !Array.isArray(items) || items.length === 0) return [];
+  return items.map(item => mapper(item, locale));
+}
+
+// ─── Notes SEO ────────────────────────────────────────────────────
+
+interface NoteSeoResponse {
+  name: BilingualField;
+  title: BilingualField;
+  description: BilingualField;
+}
+
+export async function getNoteSeo(slug: string): Promise<NoteSeoResponse | null> {
+  return fetchWPAPI<NoteSeoResponse>(
+    `/asl/v1/notes-seo/${encodeURIComponent(slug)}`,
+    { tags: ["notes-seo", `note-${slug}`], revalidate: 300 }
+  );
+}
