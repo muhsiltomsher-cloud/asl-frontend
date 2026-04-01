@@ -111,6 +111,18 @@ function asl_f_save_check($post_id, $meta_key) {
     update_post_meta($post_id, $meta_key, isset($_POST[$meta_key]) ? '1' : '0');
 }
 
+/* ── Product selector helper ────────────────────────────── */
+
+/** Render a product selector with AJAX search + preview */
+function asl_f_product($name, $slug = '') {
+    echo '<div class="asl-product-selector" style="position:relative;">';
+    echo '<input type="hidden" name="'.esc_attr($name).'" value="'.esc_attr($slug).'" class="asl-product-slug-input">';
+    echo '<input type="text" class="asl-product-search regular-text" placeholder="Search products..." autocomplete="off">';
+    echo '<div class="asl-product-results" style="display:none;position:absolute;z-index:999;background:#fff;border:1px solid #ddd;max-height:250px;overflow-y:auto;width:100%;box-shadow:0 2px 8px rgba(0,0,0,0.1);"></div>';
+    echo '<div class="asl-product-preview"></div>';
+    echo '</div>';
+}
+
 /* ── API helpers ────────────────────────────────────────── */
 
 /** Get bilingual value from post_meta for API response */

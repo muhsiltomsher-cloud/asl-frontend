@@ -106,13 +106,13 @@ function asl_guide_products_metabox($post) {
         $products = array(array('slug'=>'','rank'=>1,'pick_reason_en'=>'','pick_reason_ar'=>'','desc_en'=>'','desc_ar'=>''));
     }
     ?>
-    <p class="description">Featured products with editorial content. Product slug must match a WooCommerce product.</p>
+    <p class="description">Search and select WooCommerce products. Product details are shown automatically.</p>
     <div id="asl-guide-products">
         <?php foreach ($products as $i => $p): ?>
         <div class="asl-repeater-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">
             <h4>Product <?php echo $i+1; ?> <button type="button" class="button asl-remove-repeater-item" style="float:right;color:red;">Remove</button></h4>
             <table class="form-table">
-                <tr><th>Product Slug</th><td><input type="text" name="asl_guide_products[<?php echo $i; ?>][slug]" value="<?php echo esc_attr($p['slug']??''); ?>" class="regular-text" placeholder="e.g. dark-musk-perfume"></td></tr>
+                <tr><th>Product</th><td><?php asl_f_product("asl_guide_products[{$i}][slug]", $p['slug']??''); ?></td></tr>
                 <tr><th>Rank</th><td><input type="number" name="asl_guide_products[<?php echo $i; ?>][rank]" value="<?php echo esc_attr($p['rank']??($i+1)); ?>" class="small-text" min="1"></td></tr>
                 <tr><th>Pick Reason (EN)</th><td><input type="text" name="asl_guide_products[<?php echo $i; ?>][pick_reason_en]" value="<?php echo esc_attr($p['pick_reason_en']??''); ?>" class="large-text" placeholder="e.g. Best Overall — Signature Dark Musk"></td></tr>
                 <tr><th>Pick Reason (AR)</th><td><input type="text" name="asl_guide_products[<?php echo $i; ?>][pick_reason_ar]" value="<?php echo esc_attr($p['pick_reason_ar']??''); ?>" class="large-text" dir="rtl"></td></tr>

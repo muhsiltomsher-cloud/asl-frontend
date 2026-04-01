@@ -1,4 +1,98 @@
 jQuery(document).ready(function($) {
+
+    /* ================================================================
+       PRODUCT SELECTOR — AJAX search with preview
+       ================================================================ */
+    var searchTimer = null;
+
+    // Search input handler
+    $(document).on('input', '.asl-product-search', function() {
+        var input = $(this);
+        var wrap = input.closest('.asl-product-selector');
+        var results = wrap.find('.asl-product-results');
+        var q = input.val().trim();
+        clearTimeout(searchTimer);
+        if (q.length < 2) { results.hide().empty(); return; }
+        searchTimer = setTimeout(function() {
+            $.get(aslAdmin.ajaxurl, {
+                action: 'asl_search_products', nonce: aslAdmin.nonce, q: q
+            }, function(res) {
+                if (!res.success || !res.data.length) {
+                    results.html('<div style="padding:8px;color:#999;">No products found</div>').show();
+                    return;
+                }
+                var html = '';
+                $.each(res.data, function(i, p) {
+                    html += '<div class="asl-product-result" data-slug="' + p.slug + '" data-name="' + $('<span>').text(p.name).html() + '" data-price="' + p.price + '" data-sku="' + (p.sku||'') + '" data-image="' + (p.image||'') + '" data-stock="' + p.stock + '" style="display:flex;align-items:center;padding:8px;cursor:pointer;border-bottom:1px solid #eee;">';
+                    html += '<img src="' + (p.image || '') + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:10px;' + (p.image ? '' : 'display:none;') + '">';
+                    html += '<div style="flex:1;"><strong>' + p.name + '</strong><br><small style="color:#666;">' + p.price + (p.sku ? ' &middot; SKU: ' + p.sku : '') + ' &middot; ' + p.stock + '</small></div>';
+                    html += '</div>';
+                });
+                results.html(html).show();
+            });
+        }, 300);
+    });
+
+    // Select a product from results
+    $(document).on('click', '.asl-product-result', function() {
+        var el = $(this);
+        var wrap = el.closest('.asl-product-selector');
+        var slug = el.data('slug');
+        wrap.find('.asl-product-slug-input').val(slug);
+        wrap.find('.asl-product-search').val('');
+        wrap.find('.asl-product-results').hide().empty();
+        // Update preview
+        var preview = wrap.find('.asl-product-preview');
+        var img = el.data('image');
+        preview.html(
+            '<div style="display:flex;align-items:center;padding:10px;background:#f0f7ff;border:1px solid #c5d9ed;border-radius:4px;margin-top:8px;">' +
+            (img ? '<img src="' + img + '" style="width:50px;height:50px;object-fit:cover;border-radius:4px;margin-right:12px;">' : '') +
+            '<div><strong>' + el.data('name') + '</strong><br>' +
+            '<small style="color:#666;">Slug: ' + slug + ' &middot; ' + el.data('price') + (el.data('sku') ? ' &middot; SKU: ' + el.data('sku') : '') + '</small></div>' +
+            '<button type="button" class="button asl-product-clear" style="margin-left:auto;color:red;">✕</button>' +
+            '</div>'
+        );
+    });
+
+    // Clear selected product
+    $(document).on('click', '.asl-product-clear', function(e) {
+        e.preventDefault();
+        var wrap = $(this).closest('.asl-product-selector');
+        wrap.find('.asl-product-slug-input').val('');
+        wrap.find('.asl-product-preview').empty();
+    });
+
+    // Hide results when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.asl-product-selector').length) {
+            $('.asl-product-results').hide();
+        }
+    });
+
+    // On page load, fetch product details for pre-filled slugs
+    $('.asl-product-selector').each(function() {
+        var wrap = $(this);
+        var slug = wrap.find('.asl-product-slug-input').val();
+        if (!slug) return;
+        $.get(aslAdmin.ajaxurl, {
+            action: 'asl_search_products', nonce: aslAdmin.nonce, q: slug
+        }, function(res) {
+            if (!res.success) return;
+            var match = null;
+            $.each(res.data, function(i, p) { if (p.slug === slug) { match = p; return false; } });
+            if (!match) return;
+            var preview = wrap.find('.asl-product-preview');
+            preview.html(
+                '<div style="display:flex;align-items:center;padding:10px;background:#f0f7ff;border:1px solid #c5d9ed;border-radius:4px;margin-top:8px;">' +
+                (match.image ? '<img src="' + match.image + '" style="width:50px;height:50px;object-fit:cover;border-radius:4px;margin-right:12px;">' : '') +
+                '<div><strong>' + match.name + '</strong><br>' +
+                '<small style="color:#666;">Slug: ' + match.slug + ' &middot; ' + match.price + (match.sku ? ' &middot; SKU: ' + match.sku : '') + '</small></div>' +
+                '<button type="button" class="button asl-product-clear" style="margin-left:auto;color:red;">✕</button>' +
+                '</div>'
+            );
+        });
+    });
+
     // Media Library Upload
     $(document).on('click', '.asl-upload-btn', function(e) {
         e.preventDefault();

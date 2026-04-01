@@ -42,6 +42,41 @@ add_action('admin_enqueue_scripts', function($hook) {
     if (!$is_asl && !$is_cpt) return;
     wp_enqueue_media();
     wp_enqueue_script('asl-admin', plugins_url('admin.js', __FILE__), array('jquery'), ASL_SETTINGS_VERSION, true);
+    wp_localize_script('asl-admin', 'aslAdmin', [
+        'ajaxurl' => admin_url('admin-ajax.php'),
+        'nonce'   => wp_create_nonce('asl_product_search'),
+    ]);
+});
+
+/**
+ * AJAX: Search WooCommerce products (for product selector)
+ */
+add_action('wp_ajax_asl_search_products', function() {
+    check_ajax_referer('asl_product_search', 'nonce');
+    $q = sanitize_text_field($_GET['q'] ?? '');
+    if (strlen($q) < 2) { wp_send_json_success([]); }
+
+    $args = [
+        'post_type' => 'product', 'post_status' => 'publish',
+        'posts_per_page' => 20, 's' => $q,
+    ];
+    $posts = get_posts($args);
+    $results = [];
+    foreach ($posts as $p) {
+        $product = wc_get_product($p->ID);
+        if (!$product) continue;
+        $img = wp_get_attachment_image_url($product->get_image_id(), 'thumbnail') ?: '';
+        $results[] = [
+            'id'    => $p->ID,
+            'slug'  => $product->get_slug(),
+            'name'  => $product->get_name(),
+            'price' => strip_tags(wc_price($product->get_price())),
+            'sku'   => $product->get_sku(),
+            'image' => $img,
+            'stock' => $product->get_stock_status(),
+        ];
+    }
+    wp_send_json_success($results);
 });
 
 /**
