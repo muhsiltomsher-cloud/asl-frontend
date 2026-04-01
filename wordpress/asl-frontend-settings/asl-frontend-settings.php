@@ -66,14 +66,18 @@ add_action('wp_ajax_asl_search_products', function() {
         $product = wc_get_product($p->ID);
         if (!$product) continue;
         $img = wp_get_attachment_image_url($product->get_image_id(), 'thumbnail') ?: '';
+        // Get product categories
+        $cats = wp_get_post_terms($p->ID, 'product_cat', ['fields' => 'names']);
+        $category = is_array($cats) && !is_wp_error($cats) ? implode(', ', $cats) : '';
         $results[] = [
-            'id'    => $p->ID,
-            'slug'  => $product->get_slug(),
-            'name'  => $product->get_name(),
-            'price' => strip_tags(wc_price($product->get_price())),
-            'sku'   => $product->get_sku(),
-            'image' => $img,
-            'stock' => $product->get_stock_status(),
+            'id'       => $p->ID,
+            'slug'     => $product->get_slug(),
+            'name'     => $product->get_name(),
+            'price'    => strip_tags(wc_price($product->get_price())),
+            'sku'      => $product->get_sku(),
+            'image'    => $img,
+            'stock'    => $product->get_stock_status(),
+            'category' => $category,
         ];
     }
     wp_send_json_success($results);

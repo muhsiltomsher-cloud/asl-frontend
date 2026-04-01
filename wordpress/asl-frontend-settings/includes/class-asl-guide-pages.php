@@ -106,7 +106,10 @@ function asl_guide_products_metabox($post) {
         $products = array(array('slug'=>'','rank'=>1,'pick_reason_en'=>'','pick_reason_ar'=>'','desc_en'=>'','desc_ar'=>''));
     }
     ?>
-    <p class="description">Search and select WooCommerce products. Product details are shown automatically.</p>
+    <p class="description">Search and select WooCommerce products. Product name, image, price, and category are shown automatically.</p>
+    <div class="notice notice-info inline" style="margin:10px 0;padding:10px 15px;">
+        <strong>Arabic product details (name, image, price) are loaded automatically</strong> from WooCommerce/WPML based on the selected product slug. You only need to enter the Pick Reason and Description in both English and Arabic below.
+    </div>
     <div id="asl-guide-products">
         <?php foreach ($products as $i => $p): ?>
         <div class="asl-repeater-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">

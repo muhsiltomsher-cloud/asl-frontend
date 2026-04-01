@@ -23,9 +23,9 @@ jQuery(document).ready(function($) {
                 }
                 var html = '';
                 $.each(res.data, function(i, p) {
-                    html += '<div class="asl-product-result" data-slug="' + p.slug + '" data-name="' + $('<span>').text(p.name).html() + '" data-price="' + p.price + '" data-sku="' + (p.sku||'') + '" data-image="' + (p.image||'') + '" data-stock="' + p.stock + '" style="display:flex;align-items:center;padding:8px;cursor:pointer;border-bottom:1px solid #eee;">';
+                    html += '<div class="asl-product-result" data-slug="' + p.slug + '" data-name="' + $('<span>').text(p.name).html() + '" data-price="' + p.price + '" data-sku="' + (p.sku||'') + '" data-image="' + (p.image||'') + '" data-stock="' + p.stock + '" data-category="' + (p.category||'') + '" style="display:flex;align-items:center;padding:8px;cursor:pointer;border-bottom:1px solid #eee;">';
                     html += '<img src="' + (p.image || '') + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:10px;' + (p.image ? '' : 'display:none;') + '">';
-                    html += '<div style="flex:1;"><strong>' + p.name + '</strong><br><small style="color:#666;">' + p.price + (p.sku ? ' &middot; SKU: ' + p.sku : '') + ' &middot; ' + p.stock + '</small></div>';
+                    html += '<div style="flex:1;"><strong>' + p.name + '</strong>' + (p.category ? '<br><small style="color:#0073aa;">Category: ' + p.category + '</small>' : '') + '<br><small style="color:#666;">' + p.price + (p.sku ? ' &middot; SKU: ' + p.sku : '') + ' &middot; ' + p.stock + '</small></div>';
                     html += '</div>';
                 });
                 results.html(html).show();
@@ -44,10 +44,11 @@ jQuery(document).ready(function($) {
         // Update preview
         var preview = wrap.find('.asl-product-preview');
         var img = el.data('image');
+        var cat = el.data('category') || '';
         preview.html(
             '<div style="display:flex;align-items:center;padding:10px;background:#f0f7ff;border:1px solid #c5d9ed;border-radius:4px;margin-top:8px;">' +
             (img ? '<img src="' + img + '" style="width:50px;height:50px;object-fit:cover;border-radius:4px;margin-right:12px;">' : '') +
-            '<div><strong>' + el.data('name') + '</strong><br>' +
+            '<div><strong>' + el.data('name') + '</strong>' + (cat ? '<br><small style="color:#0073aa;">Category: ' + cat + '</small>' : '') + '<br>' +
             '<small style="color:#666;">Slug: ' + slug + ' &middot; ' + el.data('price') + (el.data('sku') ? ' &middot; SKU: ' + el.data('sku') : '') + '</small></div>' +
             '<button type="button" class="button asl-product-clear" style="margin-left:auto;color:red;">✕</button>' +
             '</div>'
@@ -82,10 +83,11 @@ jQuery(document).ready(function($) {
             $.each(res.data, function(i, p) { if (p.slug === slug) { match = p; return false; } });
             if (!match) return;
             var preview = wrap.find('.asl-product-preview');
+            var cat = match.category || '';
             preview.html(
                 '<div style="display:flex;align-items:center;padding:10px;background:#f0f7ff;border:1px solid #c5d9ed;border-radius:4px;margin-top:8px;">' +
                 (match.image ? '<img src="' + match.image + '" style="width:50px;height:50px;object-fit:cover;border-radius:4px;margin-right:12px;">' : '') +
-                '<div><strong>' + match.name + '</strong><br>' +
+                '<div><strong>' + match.name + '</strong>' + (cat ? '<br><small style="color:#0073aa;">Category: ' + cat + '</small>' : '') + '<br>' +
                 '<small style="color:#666;">Slug: ' + match.slug + ' &middot; ' + match.price + (match.sku ? ' &middot; SKU: ' + match.sku : '') + '</small></div>' +
                 '<button type="button" class="button asl-product-clear" style="margin-left:auto;color:red;">✕</button>' +
                 '</div>'
