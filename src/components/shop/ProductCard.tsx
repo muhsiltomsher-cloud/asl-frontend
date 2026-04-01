@@ -46,7 +46,7 @@ export function ProductCard({ product, locale, className }: ProductCardProps) {
     <article className={cn("group relative", className)}>
       <Link href={`/${locale}/product/${product.slug}`} className="block">
         {/* Image container */}
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+        <div className="relative aspect-square overflow-hidden bg-gray-100">
           {product.image ? (
             <Image
               src={product.image.sourceUrl}

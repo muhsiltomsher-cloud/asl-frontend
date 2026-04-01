@@ -43,7 +43,7 @@ function CountryFlag({ currencyCode, size = 20 }: { currencyCode: string; size?:
       alt={currencyCode}
       width={size}
       height={height}
-      className="rounded-sm object-cover"
+      className="object-cover"
       unoptimized
       style={{ width: size, height: height }}
     />
