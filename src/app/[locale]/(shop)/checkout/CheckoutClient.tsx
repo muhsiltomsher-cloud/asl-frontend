@@ -22,6 +22,7 @@ import { useProductCategories } from "@/hooks/useProductCategories";
 import { useKeyboardVisible } from "@/hooks/useKeyboardVisible";
 import { useCustomerTracking } from "@/hooks/useCustomerTracking";
 import { omnisendIdentify, omnisendTrackStartedCheckout, type OmnisendLineItem } from "@/lib/utils/omnisend";
+import { fbTrackInitiateCheckout } from "@/lib/utils/fbpixel";
 import type { CoCartItem } from "@/lib/api/cocart";
 
 interface ShippingRate {
@@ -782,6 +783,14 @@ export default function CheckoutClient() {
             currency: cart.currency?.currency_code || "AED",
             cartID: cart.cart_key || "",
             email,
+          });
+
+          // Facebook Pixel: InitiateCheckout
+          fbTrackInitiateCheckout({
+            contentIds: cartItems.map((ci: CoCartItem) => String(ci.id)),
+            value: cartValue,
+            currency: cart.currency?.currency_code || "AED",
+            numItems: cartItems.reduce((sum: number, ci: CoCartItem) => sum + ci.quantity.value, 0),
           });
         }
       }

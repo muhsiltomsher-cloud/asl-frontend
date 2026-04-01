@@ -26,6 +26,7 @@ import { decodeHtmlEntities, BLUR_DATA_URL } from "@/lib/utils";
 import { BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 import { useSwipeBack } from "@/hooks/useSwipeBack";
 import { triggerHaptic } from "@/lib/utils/haptics";
+import { fbTrackViewContent } from "@/lib/utils/fbpixel";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -358,6 +359,18 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
     observer.observe(target);
     return () => observer.disconnect();
   }, [handleStickyObserver]);
+
+  // Facebook Pixel: ViewContent
+  useEffect(() => {
+    const price = parseFloat(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit);
+    fbTrackViewContent({
+      productId: product.id,
+      productName: decodeHtmlEntities(product.name),
+      category: product.categories?.[0]?.name || "",
+      value: price,
+      currency: product.prices.currency_code || "AED",
+    });
+  }, [product.id, product.name, product.prices.price, product.prices.currency_minor_unit, product.prices.currency_code, product.categories]);
 
   const primaryCategory = product.categories?.[0];
   // Use English category slug for URLs (falls back to localized slug if English slug not available)

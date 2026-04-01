@@ -7,6 +7,7 @@ import { Button } from "@/components/common/Button";
 import { OrderPrice, OrderCurrencyBadge } from "@/components/common/OrderPrice";
 import { useCart } from "@/contexts/CartContext";
 import { OrderBundleItemsList, isOrderBundleProduct, isOrderFreeGift } from "@/components/cart/OrderBundleItemsList";
+import { fbTrackPurchase } from "@/lib/utils/fbpixel";
 import type { OrderLineItem } from "@/lib/api/customer";
 
 interface OrderMetaData {
@@ -108,6 +109,7 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
   const { clearCart, setIsCartOpen } = useCart();
   const cartClearedRef = useRef(false);
   const paymentVerifiedRef = useRef(false);
+  const purchaseTrackedRef = useRef(false);
 
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -397,7 +399,21 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
         }
 
         setOrder(data.data);
-        
+
+        // Facebook Pixel: Purchase (fire once for successful payments)
+        const fetchedOrder = data.data as OrderData;
+        const fetchedStatus = fetchedOrder?.status;
+        const isSuccessOrder = fetchedStatus === "processing" || fetchedStatus === "completed" || fetchedStatus === "on-hold";
+        if (!purchaseTrackedRef.current && fetchedOrder && isSuccessOrder) {
+          purchaseTrackedRef.current = true;
+          fbTrackPurchase({
+            contentIds: fetchedOrder.line_items.map((item) => String(item.product_id)),
+            value: parseFloat(fetchedOrder.total),
+            currency: fetchedOrder.currency || "AED",
+            numItems: fetchedOrder.line_items.reduce((sum, item) => sum + item.quantity, 0),
+          });
+        }
+
         // Only clear cart if payment was successful or if it's a non-external payment (like COD)
         // For failed payments, keep the cart so user can retry
         const hasExternalPaymentParams = myFatoorahPaymentId || tabbyPaymentId || tamaraOrderId;
