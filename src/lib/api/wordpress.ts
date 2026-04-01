@@ -510,7 +510,7 @@ export async function getSiteSettings(locale?: Locale): Promise<SiteSettings> {
     {
       tags: ["site-settings"],
       locale,
-      revalidate: 60, // Cache for 1 minute for faster updates
+      revalidate: 600, // Cache for 10 minutes - site settings rarely change
     }
   );
 
@@ -520,7 +520,7 @@ export async function getSiteSettings(locale?: Locale): Promise<SiteSettings> {
     {
       tags: ["site-settings"],
       locale,
-      revalidate: 60,
+      revalidate: 600,
     }
   );
 
@@ -531,7 +531,7 @@ export async function getSiteSettings(locale?: Locale): Promise<SiteSettings> {
       `/wp/v2/media/${siteInfo.site_logo}`,
       {
         tags: ["site-settings", "logo"],
-        revalidate: 60,
+        revalidate: 600,
       }
     );
     logoUrl = mediaData?.source_url || null;
@@ -593,7 +593,7 @@ export async function getHomePageSettings(locale?: Locale): Promise<HomePageACF>
     {
       tags: ["home-page-settings"],
       locale,
-      revalidate: 60,
+      revalidate: 300,
     }
   );
 
@@ -616,7 +616,7 @@ export async function getHomePageSettings(locale?: Locale): Promise<HomePageACF>
     {
       tags: ["home-page-settings"],
       locale,
-      revalidate: 60,
+      revalidate: 300,
     }
   );
 
@@ -733,7 +733,7 @@ export async function getMenu(location: string, locale?: Locale): Promise<WPMenu
     {
       tags: ["menus", `menu-${location}`],
       locale,
-      revalidate: 60,
+      revalidate: 600,
     }
   );
 
@@ -770,7 +770,7 @@ export async function getSeoSettings(locale?: Locale): Promise<SeoSettings> {
     {
       tags: ["seo-settings"],
       locale,
-      revalidate: 60,
+      revalidate: 600,
     }
   );
 
@@ -830,7 +830,7 @@ export async function getHeaderSettings(): Promise<HeaderSettings> {
     "/asl/v1/header-settings",
     {
       tags: ["header-settings"],
-      revalidate: 60,
+      revalidate: 600,
     }
   );
 
@@ -849,7 +849,7 @@ export async function getMobileBarSettings(locale?: Locale): Promise<MobileBarSe
     {
       tags: ["mobile-bar-settings"],
       locale,
-      revalidate: 60,
+      revalidate: 600,
     }
   );
 
@@ -909,7 +909,7 @@ export async function getTopbarSettings(locale?: Locale): Promise<TopbarSettings
     {
       tags: ["topbar-settings"],
       locale,
-      revalidate: 60,
+      revalidate: 600,
     }
   );
 
@@ -1268,7 +1268,7 @@ export async function getProductPageBySlug(slug: string, locale?: Locale): Promi
     {
       tags: ["product-pages", `product-page-${slug}`],
       locale,
-      revalidate: 60,
+      revalidate: 300,
     }
   );
   return data;
@@ -1304,7 +1304,7 @@ const defaultHomeSections: HomeSections = {
 export async function getHomeSections(): Promise<HomeSections> {
   const data = await fetchWPAPI<HomeSections>(
     "/asl/v1/home-sections",
-    { tags: ["home-sections"], revalidate: 60 }
+    { tags: ["home-sections"], revalidate: 300 }
   );
   return data ?? defaultHomeSections;
 }
@@ -1322,7 +1322,7 @@ export async function getGuidePages(): Promise<GuidePage[]> {
 export async function getGuidePageBySlug(slug: string): Promise<GuidePage | null> {
   const data = await fetchWPAPI<GuidePage>(
     `/asl/v1/guides/${encodeURIComponent(slug)}`,
-    { tags: ["guides", `guide-${slug}`], revalidate: 60 }
+    { tags: ["guides", `guide-${slug}`], revalidate: 300 }
   );
   return data;
 }
@@ -1343,7 +1343,7 @@ type StaticPageResponse = Record<string, BilingualField | any[]>;
 export async function getStaticPageContent(slug: string): Promise<StaticPageResponse | null> {
   return fetchWPAPI<StaticPageResponse>(
     `/asl/v1/pages/${encodeURIComponent(slug)}`,
-    { tags: ["static-pages", `page-${slug}`], revalidate: 60 }
+    { tags: ["static-pages", `page-${slug}`], revalidate: 300 }
   );
 }
 

@@ -571,7 +571,7 @@ export function BuildYourOwnSetClient({
     <>
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
         {/* Product Image */}
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+        <div className="relative aspect-square overflow-hidden bg-gray-100">
           <Image
             src={bundleImage}
             alt={bundleProduct?.name || t.title}
@@ -621,51 +621,51 @@ export function BuildYourOwnSetClient({
               {Array.from({ length: requiredSlots }, (_, i) => i).map((index) => (
                 <div
                   key={`slot-${index}`}
-                  className={`relative flex items-center gap-4 rounded-xl border-2 p-3 transition-all ${
-                    selections[index]
-                      ? "border-amber-500 bg-amber-50"
-                      : "border-dashed border-gray-300 bg-gray-50 hover:border-amber-400 hover:bg-amber-50/50"
-                  }`}
+                                    className={`relative flex items-center gap-4 border-2 p-3 transition-all ${
+                                      selections[index]
+                                        ? "border-amber-500 bg-amber-50"
+                                        : "border-dashed border-gray-300 bg-gray-50 hover:border-amber-400 hover:bg-amber-50/50"
+                                    }`}
                 >
                   {selections[index] ? (
                     <>
-                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-white">
-                        <Image
-                          src={selections[index]!.image}
-                          alt={selections[index]!.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                                            <div className="flex-1 min-w-0 overflow-hidden">
-                                              <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
-                                                {selections[index]!.name}
-                                              </p>
-                                              <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
-                                                {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
-                                              </p>
-                                            </div>
-                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => handleSlotClick(index)}
-                          className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
-                        >
-                          {t.change}
-                        </button>
-                        <button
-                          onClick={() => handleRemoveSelection(index)}
-                          className="rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleSlotClick(index)}
-                      className="flex w-full items-center gap-4 text-left"
-                    >
-                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white">
+                                        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden bg-white">
+                                          <Image
+                                            src={selections[index]!.image}
+                                            alt={selections[index]!.name}
+                                            fill
+                                            className="object-cover"
+                                          />
+                                        </div>
+                                                              <div className="flex-1 min-w-0 overflow-hidden">
+                                                                <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
+                                                                  {selections[index]!.name}
+                                                                </p>
+                                                                <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
+                                                                  {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
+                                                                </p>
+                                                              </div>
+                                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                                          <button
+                                            onClick={() => handleSlotClick(index)}
+                                            className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
+                                          >
+                                            {t.change}
+                                          </button>
+                                          <button
+                                            onClick={() => handleRemoveSelection(index)}
+                                            className="p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <button
+                                        onClick={() => handleSlotClick(index)}
+                                        className="flex w-full items-center gap-4 text-left"
+                                      >
+                                        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center border-2 border-dashed border-gray-300 bg-white">
                         <Plus className="h-6 w-6 text-gray-400" />
                       </div>
                       <div>
@@ -676,7 +676,7 @@ export function BuildYourOwnSetClient({
                       </div>
                     </button>
                   )}
-                  <div className="absolute -top-2 left-3 rounded bg-amber-600 px-2 py-0.5 text-xs font-medium text-white">
+                  <div className="absolute -top-2 left-3 bg-amber-600 px-2 py-0.5 text-xs font-medium text-white">
                     {index + 1}
                   </div>
                 </div>
@@ -690,51 +690,51 @@ export function BuildYourOwnSetClient({
               {Array.from({ length: optionalSlots }, (_, i) => requiredSlots + i).map((index) => (
                 <div
                   key={`slot-${index}`}
-                  className={`relative flex items-center gap-4 rounded-xl border-2 p-3 transition-all ${
-                    selections[index]
-                      ? "border-amber-500 bg-amber-50"
-                      : "border-dashed border-gray-200 bg-gray-50/50 hover:border-amber-300 hover:bg-amber-50/30"
-                  }`}
+                                    className={`relative flex items-center gap-4 border-2 p-3 transition-all ${
+                                      selections[index]
+                                        ? "border-amber-500 bg-amber-50"
+                                        : "border-dashed border-gray-200 bg-gray-50/50 hover:border-amber-300 hover:bg-amber-50/30"
+                                    }`}
                 >
                   {selections[index] ? (
                     <>
-                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-white">
-                        <Image
-                          src={selections[index]!.image}
-                          alt={selections[index]!.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                                            <div className="flex-1 min-w-0 overflow-hidden">
-                                              <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
-                                                {selections[index]!.name}
-                                              </p>
-                                              <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
-                                                {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
-                                              </p>
-                                            </div>
-                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => handleSlotClick(index)}
-                          className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
-                        >
-                          {t.change}
-                        </button>
-                        <button
-                          onClick={() => handleRemoveSelection(index)}
-                          className="rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => handleSlotClick(index)}
-                      className="flex w-full items-center gap-4 text-left"
-                    >
-                      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-gray-200 bg-white">
+                                        <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden bg-white">
+                                          <Image
+                                            src={selections[index]!.image}
+                                            alt={selections[index]!.name}
+                                            fill
+                                            className="object-cover"
+                                          />
+                                        </div>
+                                                              <div className="flex-1 min-w-0 overflow-hidden">
+                                                                <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
+                                                                  {selections[index]!.name}
+                                                                </p>
+                                                                <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
+                                                                  {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
+                                                                </p>
+                                                              </div>
+                                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                                          <button
+                                            onClick={() => handleSlotClick(index)}
+                                            className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
+                                          >
+                                            {t.change}
+                                          </button>
+                                          <button
+                                            onClick={() => handleRemoveSelection(index)}
+                                            className="p-1 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </button>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <button
+                                        onClick={() => handleSlotClick(index)}
+                                        className="flex w-full items-center gap-4 text-left"
+                                      >
+                                        <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center border-2 border-dashed border-gray-200 bg-white">
                         <Plus className="h-6 w-6 text-gray-300" />
                       </div>
                       <div>
@@ -904,7 +904,7 @@ export function BuildYourOwnSetClient({
             {/* Product Picker Modal */}
       {activeSlot !== null && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
-          <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-t-2xl bg-white sm:rounded-2xl">
+          <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden bg-white">
             {/* Modal Header */}
             <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4">
               <div className="flex items-center justify-between">
@@ -927,7 +927,7 @@ export function BuildYourOwnSetClient({
                   placeholder={t.searchProducts}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
@@ -965,7 +965,7 @@ export function BuildYourOwnSetClient({
                       key={product.id}
                       onClick={() => handleProductSelect(product)}
                       disabled={isDisabled}
-                      className={`group relative flex flex-col overflow-hidden rounded-xl border-2 bg-white text-left transition-all ${
+                      className={`group relative flex flex-col overflow-hidden border-2 bg-white text-left transition-all ${
                         isDisabled
                           ? "cursor-not-allowed border-gray-200 opacity-50"
                           : "border-transparent hover:border-amber-500 hover:shadow-lg"

@@ -21,7 +21,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import type { Locale } from "@/config/site";
 import type { Metadata } from "next";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 interface HomePageProps {
   params: Promise<{ locale: string }>;
