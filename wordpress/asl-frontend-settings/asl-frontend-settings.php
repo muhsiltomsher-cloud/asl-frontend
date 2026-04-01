@@ -18,7 +18,7 @@ if (defined('ASL_FRONTEND_SETTINGS_LOADED')) {
     return;
 }
 define('ASL_FRONTEND_SETTINGS_LOADED', true);
-define('ASL_SETTINGS_VERSION', '6.1.0');
+define('ASL_SETTINGS_VERSION', '6.3.0');
 define('ASL_SETTINGS_PATH', plugin_dir_path(__FILE__));
 
 /**
@@ -37,9 +37,9 @@ if (!function_exists('asl_sanitize_link')) {
  * Enqueue admin scripts and media library
  */
 add_action('admin_enqueue_scripts', function($hook) {
-    $is_asl = strpos($hook, 'asl-settings') !== false || strpos($hook, 'asl-home-sections') !== false || strpos($hook, 'asl-pages') !== false || strpos($hook, 'asl-notes-seo') !== false;
-    $is_guide = (get_post_type() === 'asl_guide' || get_post_type() === 'asl_product_page');
-    if (!$is_asl && !$is_guide) return;
+    $is_asl = strpos($hook, 'asl-settings') !== false;
+    $is_cpt = in_array(get_post_type(), ['asl_guide','asl_product_page','asl_note','page']);
+    if (!$is_asl && !$is_cpt) return;
     wp_enqueue_media();
     wp_enqueue_script('asl-admin', plugins_url('admin.js', __FILE__), array('jquery'), ASL_SETTINGS_VERSION, true);
 });
@@ -48,14 +48,16 @@ add_action('admin_enqueue_scripts', function($hook) {
  * Include separate module files
  * 
  * The plugin is organized into modules:
- * 1. ASL Settings - Core settings for homepage, header, SEO, mobile
+ * 1. ASL Settings - Core settings for homepage hero/products, header, SEO, mobile
  * 2. Bundle Builder - Product bundle creation and management
  * 3. Free Gift - Automatic free gift rules based on cart value
  * 4. Forms - Contact form and newsletter REST API endpoints
  * 5. Product Pages - Dynamic product-type page creation with bilingual support
  * 6. Category SEO - Per-category SEO content fields (EN/AR)
- * 7. Home Sections - Editable homepage content sections (Why Choose Us, Our Story, FAQ, SEO)
- * 8. Guide Pages - Dynamic guide/article pages CPT with bilingual support
+ * 7. Guide Pages - Dynamic guide/article CPT with bilingual support
+ * 8. Field Helpers - Shared reusable field components
+ * 9. Page Fields - Metaboxes on native WP Pages (replaces static-pages + home-sections)
+ * 10. Notes CPT - Fragrance notes as CPT (replaces notes-seo submenu)
  */
 
 // Include ASL Settings module (homepage, header, SEO, mobile settings)
@@ -87,11 +89,14 @@ require_once ASL_SETTINGS_PATH . 'includes/class-asl-product-pages.php';
 // Include Category SEO module (per-category SEO content fields EN/AR)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-category-seo.php';
 
-// Include Home Sections module (editable homepage content: Why Choose Us, Our Story, FAQ, SEO)
-require_once ASL_SETTINGS_PATH . 'includes/class-asl-home-sections.php';
-
 // Include Guide Pages module (dynamic guide/article CPT with bilingual support)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-guide-pages.php';
 
-// Include Static Pages module (About, Contact, FAQ, Privacy, Terms, Shipping, Returns + Notes SEO)
-require_once ASL_SETTINGS_PATH . 'includes/class-asl-static-pages.php';
+// Include Field Helpers (shared reusable field components)
+require_once ASL_SETTINGS_PATH . 'includes/asl-field-helpers.php';
+
+// Include Page Fields module (metaboxes on native WP Pages: About, Contact, FAQ, etc. + Home sections)
+require_once ASL_SETTINGS_PATH . 'includes/class-asl-page-fields.php';
+
+// Include Notes CPT module (fragrance notes as individual posts, like Guides)
+require_once ASL_SETTINGS_PATH . 'includes/class-asl-notes-cpt.php';
