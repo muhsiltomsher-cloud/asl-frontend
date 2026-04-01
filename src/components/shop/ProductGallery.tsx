@@ -16,7 +16,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-square w-full rounded-lg bg-gray-100 flex items-center justify-center">
+      <div className="aspect-square w-full bg-gray-100 flex items-center justify-center">
         <span className="text-gray-400">No image available</span>
       </div>
     );
@@ -35,7 +35,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   return (
     <div className="space-y-4">
       {/* Main image */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+      <div className="relative aspect-square overflow-hidden bg-gray-100">
         <Image
           src={selectedImage.sourceUrl}
           alt={selectedImage.altText || productName}
