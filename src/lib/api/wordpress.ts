@@ -1350,8 +1350,9 @@ export async function getStaticPageContent(slug: string): Promise<StaticPageResp
 /**
  * Helper: pick locale value from a bilingual field, fallback to dictionary value.
  */
-export function pickLocale(field: BilingualField | undefined, locale: string, fallback: string): string {
-  if (!field) return fallback;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function pickLocale(field: BilingualField | any[] | undefined, locale: string, fallback: string): string {
+  if (!field || Array.isArray(field)) return fallback;
   const val = locale === 'ar' ? field.ar : field.en;
   return val || fallback;
 }
@@ -1361,7 +1362,7 @@ export function pickLocale(field: BilingualField | undefined, locale: string, fa
  * Each repeater item has fields like { title: {en,ar}, content: {en,ar} } or { title_en, title_ar }.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mapRepeater<T>(items: any[] | undefined, locale: string, mapper: (item: any, locale: string) => T): T[] {
+export function mapRepeater<T>(items: BilingualField | any[] | undefined, locale: string, mapper: (item: any, locale: string) => T): T[] {
   if (!items || !Array.isArray(items) || items.length === 0) return [];
   return items.map(item => mapper(item, locale));
 }
