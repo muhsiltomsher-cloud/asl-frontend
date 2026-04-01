@@ -15,7 +15,7 @@ import { Sparkles, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import type { ProductPage, ProductPageFAQItem } from "@/types/wordpress";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
 interface ProductPageProps {
   params: Promise<{ locale: string; slug: string }>;

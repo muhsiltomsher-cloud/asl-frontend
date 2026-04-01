@@ -217,7 +217,7 @@ export default function CartPage() {
 
         {/* Login Status Indicator */}
         {!isEmpty && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg border border-black/10 bg-white p-4">
+          <div className="mb-6 flex items-center gap-3 border border-black/10 bg-white p-4">
             {isAuthenticated ? (
               <>
                 <UserCheck className="h-5 w-5 text-green-600" />
@@ -259,7 +259,7 @@ export default function CartPage() {
       ) : (
         <>
         {/* Free Gift Progress & Messages Section - At Top */}
-        <div className="mb-6 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 overflow-hidden">
+        <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 overflow-hidden">
           {/* Gift Progress - Show how much more to spend */}
           {giftProgress.hasNextGift && (
             <div className="p-4 border-b border-amber-200 bg-white/50">
@@ -283,9 +283,9 @@ export default function CartPage() {
                 </div>
               </div>
               {/* Progress Bar */}
-              <div className="mt-3 h-2 bg-amber-100 rounded-full overflow-hidden">
+              <div className="mt-3 h-2 bg-amber-100 overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
                   style={{ 
                     width: `${Math.min(100, (giftProgress.currentSubtotal / (giftProgress.nextGiftRule?.min_cart_value || 1)) * 100)}%` 
                   }}
@@ -307,7 +307,7 @@ export default function CartPage() {
                   </h3>
                   <div className="space-y-2">
                     {activeGifts.map((gift, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-white/60 rounded-lg px-3 py-2">
+                      <div key={index} className="flex items-center gap-2 bg-white/60 px-3 py-2">
                         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
                           <Gift className="h-3 w-3 text-amber-600" />
                         </div>
@@ -361,7 +361,7 @@ export default function CartPage() {
 
         <div className="grid gap-8 lg:grid-cols-3 lg:items-start">
           <div className="lg:col-span-2">
-            <div className="rounded-lg bg-white shadow-sm">
+            <div className="bg-white shadow-sm">
               <div className="hidden border-b p-4 md:grid md:grid-cols-12 md:gap-4">
                 <div className="col-span-6 text-sm font-medium text-gray-500">
                   {texts.product}
@@ -534,7 +534,7 @@ export default function CartPage() {
           </div>
 
           <div className="lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
-            <div className="rounded-lg border border-black/10 bg-white p-6 shadow-sm">
+            <div className="border border-black/10 bg-white p-6 shadow-sm">
               <h2 className="mb-4 text-lg font-semibold text-gray-900">
                 {texts.orderSummary}
               </h2>
@@ -574,7 +574,7 @@ export default function CartPage() {
                     {selectedCoupons.map((coupon) => (
                       <div
                         key={coupon.code}
-                        className="flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-3 py-2"
+                        className="flex items-center justify-between border border-green-200 bg-green-50 px-3 py-2"
                       >
                         <div className="flex items-center gap-2">
                           <Tag className="h-4 w-4 text-green-600" />
@@ -698,7 +698,7 @@ export default function CartPage() {
               </Link>
 
               {/* WhatsApp Help */}
-              <div className="mt-6 rounded-lg border border-green-200 bg-green-50 p-4 text-center">
+              <div className="mt-6 border border-green-200 bg-green-50 p-4 text-center">
                 <p className="text-sm text-gray-700">
                   {isRTL ? "هل تحتاج مساعدة في طلبك؟" : "Need help with your order?"}
                 </p>

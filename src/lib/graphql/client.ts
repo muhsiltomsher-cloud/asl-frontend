@@ -77,7 +77,7 @@ export async function fetchGraphQL<T>(
       variables,
     }),
     next: {
-      revalidate: 60,
+      revalidate: 300,
     },
   });
 
