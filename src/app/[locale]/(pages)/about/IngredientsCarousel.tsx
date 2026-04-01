@@ -64,7 +64,7 @@ export function IngredientsCarousel({
       >
         {items.map((item) => (
           <SwiperSlide key={item.key}>
-            <div className="overflow-hidden rounded-2xl bg-white shadow-lg">
+            <div className="overflow-hidden bg-white shadow-lg">
               <div className="relative aspect-square overflow-hidden">
                 <Image
                   src={item.image}

@@ -355,7 +355,7 @@ export default function StoreLocatorPage() {
                   region.stores.map((store) => (
                     <div
                       key={store.id}
-                      className="group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-900/10"
+                      className="group relative overflow-hidden bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-900/10"
                     >
                       {/* Store Image */}
                       <div className="relative h-48 overflow-hidden">
@@ -398,7 +398,7 @@ export default function StoreLocatorPage() {
                           href={store.googleMapsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700 hover:shadow-xl hover:shadow-amber-500/30"
+                          className="flex w-full items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700 hover:shadow-xl hover:shadow-amber-500/30"
                         >
                           <Navigation className="h-4 w-4" />
                           {content.getDirections}

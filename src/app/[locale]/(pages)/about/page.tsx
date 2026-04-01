@@ -180,19 +180,19 @@ export default async function AboutPage({ params }: AboutPageProps) {
 
             {/* Stats Row */}
             <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
-              <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
+              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <Calendar className="mx-auto mb-2 h-6 w-6 text-amber-400" />
                 <div className="text-sm font-medium text-amber-100">{statSince}</div>
               </div>
-              <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
+              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <MapPin className="mx-auto mb-2 h-6 w-6 text-amber-400" />
                 <div className="text-sm font-medium text-amber-100">{statLocation}</div>
               </div>
-              <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
+              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <Sparkles className="mx-auto mb-2 h-6 w-6 text-amber-400" />
                 <div className="text-sm font-medium text-amber-100">{statHandcrafted}</div>
               </div>
-              <div className="rounded-xl border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
+              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
                 <Leaf className="mx-auto mb-2 h-6 w-6 text-amber-400" />
                 <div className="text-sm font-medium text-amber-100">{statSustainable}</div>
               </div>
@@ -226,7 +226,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-200/30 to-stone-200/30 blur-xl" />
               <div className="relative">
                 {/* Main Image */}
-                <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl">
+                <div className="relative aspect-[4/5] overflow-hidden shadow-2xl">
                   <Image
                     src="https://cms.aromaticscentslab.com/wp-content/uploads/2025/12/ASL-Website-Images-Patchouli-Glow-06.webp"
                     alt={isRTL ? "قصتنا" : "Our Story"}
@@ -385,7 +385,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
           </div>
           <div className="mx-auto max-w-3xl space-y-4">
             {brandFaqItems.map((item, idx) => (
-              <details key={idx} className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
+              <details key={idx} className="group border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
                 <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
                   <span>{item.question}</span>
                   <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
