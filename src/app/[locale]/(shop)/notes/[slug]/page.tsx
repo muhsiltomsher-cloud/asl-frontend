@@ -71,9 +71,15 @@ export default async function NotePage({ params }: NotePageProps) {
   const dictionary = await getDictionary(locale as Locale);
   const isRTL = locale === "ar";
 
+  // Try WP API first to get attribute mapping, then fall back to hardcoded SEO content
+  const wpNote = await getNoteSeo(slug);
+
+  // Use mapped attribute slug from WP if available, otherwise use page slug
+  const noteAttributeSlug = wpNote?.attributeSlug || slug;
+
   // Fetch products with this note and supporting data in parallel
   const [{ products: allProducts }, giftProductInfo, bundleProductSlugs] = await Promise.all([
-    getProductsByNote(slug, { locale: locale as Locale }),
+    getProductsByNote(noteAttributeSlug, { locale: locale as Locale }),
     getFreeGiftProductInfo(),
     getBundleEnabledProductSlugs(),
   ]);
@@ -99,9 +105,6 @@ export default async function NotePage({ params }: NotePageProps) {
     if (!aIsBestseller && bIsBestseller) return 1;
     return 0;
   });
-
-  // Try WP API first, then fall back to hardcoded SEO content
-  const wpNote = await getNoteSeo(slug);
   const noteData = notesSeoContent[slug];
 
   const noteName = wpNote?.name
