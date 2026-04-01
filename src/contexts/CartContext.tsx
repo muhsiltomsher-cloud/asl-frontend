@@ -9,6 +9,7 @@ import { useAuth } from "./AuthContext";
 import { getBundleItems, getBundleItemsTotal } from "@/components/cart/BundleItemsList";
 import { getBundleData } from "@/lib/utils/bundleStorage";
 import { omnisendTrackAddToCart, type OmnisendLineItem } from "@/lib/utils/omnisend";
+import { fbTrackAddToCart } from "@/lib/utils/fbpixel";
 
 // Cache key now includes locale for proper multilingual support
 const getCartCacheKey = (locale: string) => `/api/cart?locale=${locale}`;
@@ -293,6 +294,15 @@ export function CartProvider({ children, locale }: CartProviderProps) {
               ? `${typeof window !== "undefined" ? window.location.origin : ""}/en/product/${ci.slug}`
               : "",
           }));
+
+          // Facebook Pixel: AddToCart
+          fbTrackAddToCart({
+            productId: addedItem.id,
+            productName: addedItem.name || addedItem.title || "",
+            value: itemPrice * (addedItem.quantity?.value ?? quantity),
+            currency: updatedCart.currency?.currency_code || "AED",
+            quantity: addedItem.quantity?.value ?? quantity,
+          });
 
           // 1. Fire JS snippet event (shows in Omnisend Live View)
           omnisendTrackAddToCart({
