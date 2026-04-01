@@ -64,6 +64,7 @@ function asl_register_guide_cpt() {
 function asl_guide_add_meta_boxes() {
     add_meta_box('asl_guide_hero', 'Hero Section', 'asl_guide_hero_metabox', 'asl_guide', 'normal', 'high');
     add_meta_box('asl_guide_products', 'Products', 'asl_guide_products_metabox', 'asl_guide', 'normal', 'high');
+    add_meta_box('asl_guide_notes', 'Notes', 'asl_guide_notes_metabox', 'asl_guide', 'normal', 'high');
     add_meta_box('asl_guide_content', 'Content Blocks', 'asl_guide_content_metabox', 'asl_guide', 'normal', 'default');
     add_meta_box('asl_guide_faqs', 'FAQs', 'asl_guide_faqs_metabox', 'asl_guide', 'normal', 'default');
     add_meta_box('asl_guide_seo', 'SEO Settings', 'asl_guide_seo_metabox', 'asl_guide', 'normal', 'default');
@@ -126,6 +127,33 @@ function asl_guide_products_metabox($post) {
         <?php endforeach; ?>
     </div>
     <button type="button" class="button" id="asl-add-guide-product">+ Add Product</button>
+    <?php
+}
+
+/**
+ * Notes metabox
+ */
+function asl_guide_notes_metabox($post) {
+    $notes = get_post_meta($post->ID, '_asl_guide_notes', true);
+    if (!is_array($notes) || empty($notes)) {
+        $notes = [['title_en'=>'','title_ar'=>'','body_en'=>'','body_ar'=>'']];
+    }
+    ?>
+    <p class="description">Add editorial notes for this guide (tips, warnings, extra info).</p>
+    <div id="asl-guide-notes">
+        <?php foreach ($notes as $i => $n): ?>
+        <div class="asl-repeater-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">
+            <h4>Note <?php echo $i+1; ?> <button type="button" class="button asl-remove-repeater-item" style="float:right;color:red;">Remove</button></h4>
+            <table class="form-table">
+                <tr><th>Title (EN)</th><td><input type="text" name="asl_guide_notes[<?php echo $i; ?>][title_en]" value="<?php echo esc_attr($n['title_en']??''); ?>" class="large-text"></td></tr>
+                <tr><th>Title (AR)</th><td><input type="text" name="asl_guide_notes[<?php echo $i; ?>][title_ar]" value="<?php echo esc_attr($n['title_ar']??''); ?>" class="large-text" dir="rtl"></td></tr>
+                <tr><th>Body (EN)</th><td><textarea name="asl_guide_notes[<?php echo $i; ?>][body_en]" rows="3" class="large-text"><?php echo esc_textarea($n['body_en']??''); ?></textarea></td></tr>
+                <tr><th>Body (AR)</th><td><textarea name="asl_guide_notes[<?php echo $i; ?>][body_ar]" rows="3" class="large-text" dir="rtl"><?php echo esc_textarea($n['body_ar']??''); ?></textarea></td></tr>
+            </table>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <button type="button" class="button asl-sp-add" data-target="asl-guide-notes">+ Add Note</button>
     <?php
 }
 
@@ -261,6 +289,22 @@ function asl_guide_save_meta($post_id, $post) {
     }
     update_post_meta($post_id, '_asl_guide_products', $products);
 
+    // Notes
+    $notes = [];
+    if (isset($_POST['asl_guide_notes']) && is_array($_POST['asl_guide_notes'])) {
+        foreach ($_POST['asl_guide_notes'] as $n) {
+            if (!empty($n['title_en']) || !empty($n['title_ar']) || !empty($n['body_en'])) {
+                $notes[] = [
+                    'title_en' => sanitize_text_field($n['title_en']??''),
+                    'title_ar' => sanitize_text_field($n['title_ar']??''),
+                    'body_en'  => sanitize_textarea_field($n['body_en']??''),
+                    'body_ar'  => sanitize_textarea_field($n['body_ar']??''),
+                ];
+            }
+        }
+    }
+    update_post_meta($post_id, '_asl_guide_notes', $notes);
+
     // Content Blocks
     $blocks = array();
     if (isset($_POST['asl_guide_content_blocks']) && is_array($_POST['asl_guide_content_blocks'])) {
@@ -349,6 +393,18 @@ function asl_format_guide($post) {
         }
     }
 
+    // Notes
+    $notes_raw = get_post_meta($id, '_asl_guide_notes', true);
+    $notes = [];
+    if (is_array($notes_raw)) {
+        foreach ($notes_raw as $n) {
+            $notes[] = [
+                'title' => ['en' => $n['title_en']??'', 'ar' => $n['title_ar']??''],
+                'body'  => ['en' => $n['body_en']??'',  'ar' => $n['body_ar']??''],
+            ];
+        }
+    }
+
     // Content Blocks
     $blocks_raw = get_post_meta($id, '_asl_guide_content_blocks', true);
     $blocks = array();
@@ -398,6 +454,7 @@ function asl_format_guide($post) {
         'eyebrow'         => array('en' => get_post_meta($id, '_asl_guide_eyebrow_en', true) ?: '', 'ar' => get_post_meta($id, '_asl_guide_eyebrow_ar', true) ?: ''),
         'intro'           => array('en' => get_post_meta($id, '_asl_guide_intro_en', true) ?: '', 'ar' => get_post_meta($id, '_asl_guide_intro_ar', true) ?: ''),
         'products'        => $products,
+        'notes'           => $notes,
         'contentBlocks'   => $blocks,
         'faqs'            => $faqs,
         'relatedGuideSlugs' => $related_slugs,

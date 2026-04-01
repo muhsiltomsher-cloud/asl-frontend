@@ -51,34 +51,42 @@ add_action('admin_enqueue_scripts', function($hook) {
 /**
  * AJAX: Search WooCommerce products (for product selector)
  */
+/** Format a WC product for JSON response */
+function asl_format_wc_product($product) {
+    $id  = $product->get_id();
+    $img = wp_get_attachment_image_url($product->get_image_id(), 'thumbnail') ?: '';
+    $cats = wp_get_post_terms($id, 'product_cat', ['fields' => 'names']);
+    return [
+        'id'       => $id,
+        'slug'     => $product->get_slug(),
+        'name'     => $product->get_name(),
+        'price'    => strip_tags(wc_price($product->get_price())),
+        'sku'      => $product->get_sku(),
+        'image'    => $img,
+        'stock'    => $product->get_stock_status(),
+        'category' => is_array($cats) && !is_wp_error($cats) ? implode(', ', $cats) : '',
+    ];
+}
+
 add_action('wp_ajax_asl_search_products', function() {
     check_ajax_referer('asl_product_search', 'nonce');
     $q = sanitize_text_field($_GET['q'] ?? '');
     if (strlen($q) < 2) { wp_send_json_success([]); }
 
-    $args = [
-        'post_type' => 'product', 'post_status' => 'publish',
-        'posts_per_page' => 20, 's' => $q,
-    ];
-    $posts = get_posts($args);
+    // Search by title
+    $posts = get_posts(['post_type'=>'product','post_status'=>'publish','posts_per_page'=>20,'s'=>$q]);
+
+    // Also search by slug (for page-load preview)
+    $slug_posts = get_posts(['post_type'=>'product','post_status'=>'publish','posts_per_page'=>5,'name'=>$q]);
+    $seen = array_map(function($p){ return $p->ID; }, $posts);
+    foreach ($slug_posts as $sp) {
+        if (!in_array($sp->ID, $seen)) { $posts[] = $sp; }
+    }
+
     $results = [];
     foreach ($posts as $p) {
         $product = wc_get_product($p->ID);
-        if (!$product) continue;
-        $img = wp_get_attachment_image_url($product->get_image_id(), 'thumbnail') ?: '';
-        // Get product categories
-        $cats = wp_get_post_terms($p->ID, 'product_cat', ['fields' => 'names']);
-        $category = is_array($cats) && !is_wp_error($cats) ? implode(', ', $cats) : '';
-        $results[] = [
-            'id'       => $p->ID,
-            'slug'     => $product->get_slug(),
-            'name'     => $product->get_name(),
-            'price'    => strip_tags(wc_price($product->get_price())),
-            'sku'      => $product->get_sku(),
-            'image'    => $img,
-            'stock'    => $product->get_stock_status(),
-            'category' => $category,
-        ];
+        if ($product) { $results[] = asl_format_wc_product($product); }
     }
     wp_send_json_success($results);
 });
