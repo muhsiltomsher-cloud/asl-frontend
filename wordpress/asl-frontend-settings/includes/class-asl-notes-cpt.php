@@ -21,6 +21,8 @@ function asl_note_cpt_init() {
     add_action('add_meta_boxes', 'asl_note_add_meta_boxes');
     add_action('save_post_asl_note', 'asl_note_save_meta', 10, 2);
     add_action('rest_api_init', 'asl_note_register_routes');
+    add_filter('post_row_actions', 'asl_note_row_actions', 10, 2);
+    add_action('edit_form_after_title', 'asl_note_view_links');
 }
 
 function asl_register_note_cpt() {
@@ -142,6 +144,32 @@ function asl_note_rest_all() {
         }
     }
     return new WP_REST_Response($notes, 200);
+}
+
+/* ================================================================
+   VIEW LINKS
+   ================================================================ */
+
+/** Add View EN/AR links to Notes list row actions */
+function asl_note_row_actions($actions, $post) {
+    if ($post->post_type !== 'asl_note') return $actions;
+    $slug = get_post_meta($post->ID, '_asl_note_slug', true) ?: sanitize_title($post->post_title);
+    $base = defined('ASL_FRONTEND_URL') ? ASL_FRONTEND_URL : 'https://aromaticscentslab.com';
+    $actions['view_en'] = '<a href="' . esc_url($base . '/en/notes/' . $slug) . '" target="_blank">View EN</a>';
+    $actions['view_ar'] = '<a href="' . esc_url($base . '/ar/notes/' . $slug) . '" target="_blank">View AR</a>';
+    return $actions;
+}
+
+/** Show view links banner on Note edit page */
+function asl_note_view_links($post) {
+    if ($post->post_type !== 'asl_note') return;
+    $slug = get_post_meta($post->ID, '_asl_note_slug', true) ?: sanitize_title($post->post_title);
+    $base = defined('ASL_FRONTEND_URL') ? ASL_FRONTEND_URL : 'https://aromaticscentslab.com';
+    echo '<div class="notice notice-info inline" style="margin:10px 0;padding:10px 15px;">';
+    echo '<strong>View on site:</strong> ';
+    echo '<a href="' . esc_url($base . '/en/notes/' . $slug) . '" target="_blank" class="button button-small" style="margin-left:8px;">View EN</a> ';
+    echo '<a href="' . esc_url($base . '/ar/notes/' . $slug) . '" target="_blank" class="button button-small" style="margin-left:4px;">View AR</a>';
+    echo '</div>';
 }
 
 /* ================================================================

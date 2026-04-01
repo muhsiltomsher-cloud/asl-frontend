@@ -23,6 +23,8 @@ function asl_guide_pages_init() {
     add_action('add_meta_boxes', 'asl_guide_add_meta_boxes');
     add_action('save_post_asl_guide', 'asl_guide_save_meta', 10, 2);
     add_action('rest_api_init', 'asl_guide_register_routes');
+    add_filter('post_row_actions', 'asl_guide_row_actions', 10, 2);
+    add_action('edit_form_after_title', 'asl_guide_view_links');
 }
 
 /**
@@ -452,6 +454,32 @@ function asl_get_guide_by_slug($request) {
     }
 
     return new WP_REST_Response(asl_format_guide($posts[0]), 200);
+}
+
+/* ================================================================
+   VIEW LINKS
+   ================================================================ */
+
+/** Add View EN/AR links to Guides list row actions */
+function asl_guide_row_actions($actions, $post) {
+    if ($post->post_type !== 'asl_guide') return $actions;
+    $slug = get_post_meta($post->ID, '_asl_guide_slug', true) ?: sanitize_title($post->post_title);
+    $base = defined('ASL_FRONTEND_URL') ? ASL_FRONTEND_URL : 'https://aromaticscentslab.com';
+    $actions['view_en'] = '<a href="' . esc_url($base . '/en/guides/' . $slug) . '" target="_blank">View EN</a>';
+    $actions['view_ar'] = '<a href="' . esc_url($base . '/ar/guides/' . $slug) . '" target="_blank">View AR</a>';
+    return $actions;
+}
+
+/** Show view links banner on Guide edit page */
+function asl_guide_view_links($post) {
+    if ($post->post_type !== 'asl_guide') return;
+    $slug = get_post_meta($post->ID, '_asl_guide_slug', true) ?: sanitize_title($post->post_title);
+    $base = defined('ASL_FRONTEND_URL') ? ASL_FRONTEND_URL : 'https://aromaticscentslab.com';
+    echo '<div class="notice notice-info inline" style="margin:10px 0;padding:10px 15px;">';
+    echo '<strong>View on site:</strong> ';
+    echo '<a href="' . esc_url($base . '/en/guides/' . $slug) . '" target="_blank" class="button button-small" style="margin-left:8px;">View EN</a> ';
+    echo '<a href="' . esc_url($base . '/ar/guides/' . $slug) . '" target="_blank" class="button button-small" style="margin-left:4px;">View AR</a>';
+    echo '</div>';
 }
 
 // Initialize
