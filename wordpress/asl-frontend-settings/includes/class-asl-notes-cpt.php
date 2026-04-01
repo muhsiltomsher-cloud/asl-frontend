@@ -45,7 +45,62 @@ function asl_register_note_cpt() {
    ================================================================ */
 
 function asl_note_add_meta_boxes() {
+    add_meta_box('asl_note_mapping', 'Product Mapping', 'asl_note_mapping_metabox', 'asl_note', 'normal', 'high');
     add_meta_box('asl_note_fields', 'Note SEO Content', 'asl_note_render_metabox', 'asl_note', 'normal', 'high');
+}
+
+/**
+ * Product Mapping metabox — links this Note to a WooCommerce pa_notes attribute
+ */
+function asl_note_mapping_metabox($post) {
+    $id = $post->ID;
+    $saved_attr = get_post_meta($id, '_asl_note_attribute_slug', true);
+
+    // Info banner
+    echo '<div style="background:#e7f5ff;border:1px solid #b6d4fe;border-radius:4px;padding:12px 15px;margin-bottom:15px;">';
+    echo '<strong>How product mapping works:</strong><br>';
+    echo '&bull; Products are loaded <strong>automatically</strong> from WooCommerce based on the <code>pa_notes</code> product attribute.<br>';
+    echo '&bull; Select the matching attribute value below to link this Note page to the correct products.<br>';
+    echo '&bull; Arabic product details (name, image, price) come <strong>automatically</strong> from WooCommerce/WPML — no need to select them separately.<br>';
+    echo '&bull; To add/remove products from this page, edit each product in <strong>WooCommerce &rarr; Products</strong> and change its Notes attribute.';
+    echo '</div>';
+
+    // Fetch all pa_notes terms
+    $terms = get_terms(['taxonomy' => 'pa_notes', 'hide_empty' => false, 'orderby' => 'name']);
+    if (is_wp_error($terms)) $terms = [];
+
+    echo '<table class="form-table">';
+    echo '<tr><th>WooCommerce Attribute</th><td>';
+    echo '<select name="_asl_note_attribute_slug" style="min-width:300px;">';
+    echo '<option value="">(auto — use page slug)</option>';
+    foreach ($terms as $term) {
+        $count = $term->count;
+        $sel = selected($saved_attr, $term->slug, false);
+        echo '<option value="' . esc_attr($term->slug) . '"' . $sel . '>';
+        echo esc_html($term->name) . ' (' . $term->slug . ') — ' . $count . ' product' . ($count !== 1 ? 's' : '');
+        echo '</option>';
+    }
+    echo '</select>';
+    echo '<p class="description">Select the <code>pa_notes</code> attribute value that maps to this Note page. If set to "auto", the page slug will be used to match products.</p>';
+    echo '</td></tr>';
+
+    // Show matched product count
+    $attr_slug = $saved_attr ?: (get_post_meta($id, '_asl_note_slug', true) ?: sanitize_title($post->post_title));
+    $matched = new WP_Query([
+        'post_type' => 'product', 'post_status' => 'publish',
+        'posts_per_page' => -1, 'fields' => 'ids',
+        'tax_query' => [['taxonomy' => 'pa_notes', 'field' => 'slug', 'terms' => $attr_slug]],
+    ]);
+    $pcount = $matched->found_posts;
+    $color = $pcount > 0 ? '#00a32a' : '#d63638';
+    echo '<tr><th>Matched Products</th><td>';
+    echo '<span style="font-size:16px;font-weight:bold;color:' . $color . ';">' . $pcount . ' product' . ($pcount !== 1 ? 's' : '') . '</span>';
+    echo ' <span style="color:#666;">(attribute: <code>' . esc_html($attr_slug) . '</code>)</span>';
+    if ($pcount === 0) {
+        echo '<p style="color:#d63638;">No products have this note attribute. Add it to products in WooCommerce &rarr; Products.</p>';
+    }
+    echo '</td></tr>';
+    echo '</table>';
 }
 
 function asl_note_render_metabox($post) {
@@ -58,7 +113,7 @@ function asl_note_render_metabox($post) {
     $slug = get_post_meta($id, '_asl_note_slug', true) ?: sanitize_title($post->post_title);
     echo '<tr><th>Slug</th><td>';
     asl_f_text('_asl_note_slug', $slug, ['class'=>'regular-text','placeholder'=>'e.g. amber, rose, oud']);
-    echo '<p class="description">URL slug used in /notes/{slug}. Usually auto-generated from title.</p>';
+    echo '<p class="description">URL slug used in /notes/{slug}. This is the page URL, not the product attribute. The attribute mapping is set above.</p>';
     echo '</td></tr>';
 
     // Bilingual fields
@@ -78,6 +133,7 @@ function asl_note_save_meta($post_id, $post) {
     if (!current_user_can('edit_post', $post_id)) return;
 
     update_post_meta($post_id, '_asl_note_slug', sanitize_title($_POST['_asl_note_slug'] ?? ''));
+    update_post_meta($post_id, '_asl_note_attribute_slug', sanitize_text_field($_POST['_asl_note_attribute_slug'] ?? ''));
     asl_f_save_bi($post_id, '_asl_note', 'name');
     asl_f_save_bi($post_id, '_asl_note', 'title');
     asl_f_save_bi($post_id, '_asl_note', 'desc', 'textarea');
@@ -100,10 +156,13 @@ function asl_note_register_routes() {
 /** Format a note post for API */
 function asl_note_format($post) {
     $id = $post->ID;
+    $slug = get_post_meta($id, '_asl_note_slug', true) ?: sanitize_title($post->post_title);
+    $attr = get_post_meta($id, '_asl_note_attribute_slug', true);
     return [
-        'name' => asl_f_api_bi($id, '_asl_note', 'name'),
-        'title' => asl_f_api_bi($id, '_asl_note', 'title'),
-        'description' => asl_f_api_bi($id, '_asl_note', 'desc'),
+        'name'          => asl_f_api_bi($id, '_asl_note', 'name'),
+        'title'         => asl_f_api_bi($id, '_asl_note', 'title'),
+        'description'   => asl_f_api_bi($id, '_asl_note', 'desc'),
+        'attributeSlug' => $attr ?: $slug,
     ];
 }
 

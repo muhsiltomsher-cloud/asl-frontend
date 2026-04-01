@@ -1373,6 +1373,7 @@ interface NoteSeoResponse {
   name: BilingualField;
   title: BilingualField;
   description: BilingualField;
+  attributeSlug?: string;
 }
 
 export async function getNoteSeo(slug: string): Promise<NoteSeoResponse | null> {
