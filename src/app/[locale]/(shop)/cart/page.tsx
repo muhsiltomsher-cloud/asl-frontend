@@ -229,7 +229,7 @@ export default function CartPage() {
               </>
             ) : (
               <>
-                <User className="h-5 w-5 text-amber-600" />
+                <User className="h-5 w-5 text-[#c67a46]" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-800">{texts.guestCheckout}</p>
                   <Link href={`/${locale}/login`} className="text-sm text-gray-600 underline hover:text-gray-900">
@@ -259,22 +259,22 @@ export default function CartPage() {
       ) : (
         <>
         {/* Free Gift Progress & Messages Section - At Top */}
-        <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 overflow-hidden">
+        <div className="mb-6 bg-gradient-to-r from-[#f7f6f2] to-orange-50 border border-[#b2a896] overflow-hidden">
           {/* Gift Progress - Show how much more to spend */}
           {giftProgress.hasNextGift && (
-            <div className="p-4 border-b border-amber-200 bg-white/50">
+            <div className="p-4 border-b border-[#b2a896] bg-white/50">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-400 to-orange-400 flex-shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#c67a46] to-orange-400 flex-shrink-0">
                   <Gift className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1">
-                                    <p className="text-sm font-semibold text-amber-900">
+                                    <p className="text-sm font-semibold text-[#633d1f]">
                                       {isRTL 
                                         ? `أضف ${Math.ceil(convertPrice(giftProgress.amountNeeded))} ${currency} للحصول على هدية مجانية!`
                                         : `Add ${Math.ceil(convertPrice(giftProgress.amountNeeded))} ${currency} more to get a free gift!`
                                       }
                                     </p>
-                  <p className="text-xs text-amber-700">
+                  <p className="text-xs text-[#b2a896]">
                     {isRTL 
                       ? `الهدية التالية: ${(giftProgress.nextGiftRule && getLocalizedProduct(giftProgress.nextGiftRule, locale as string)?.name) || giftProgress.nextGiftRule?.name || "هدية مجانية"}`
                       : `Next gift: ${(giftProgress.nextGiftRule && getLocalizedProduct(giftProgress.nextGiftRule, locale as string)?.name) || ((giftProgress.nextGiftRule?.name && !containsArabic(giftProgress.nextGiftRule.name)) ? giftProgress.nextGiftRule.name : "Free Gift")}`
@@ -283,9 +283,9 @@ export default function CartPage() {
                 </div>
               </div>
               {/* Progress Bar */}
-              <div className="mt-3 h-2 bg-amber-100 overflow-hidden">
+              <div className="mt-3 h-2 bg-[#f7f6f2] overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#c67a46] to-orange-500 transition-all duration-500"
                   style={{ 
                     width: `${Math.min(100, (giftProgress.currentSubtotal / (giftProgress.nextGiftRule?.min_cart_value || 1)) * 100)}%` 
                   }}
@@ -298,25 +298,25 @@ export default function CartPage() {
           {activeGifts.length > 0 && (
             <div className="p-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex-shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#c67a46] to-orange-500 flex-shrink-0">
                   <Gift className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-semibold text-amber-900 mb-2">
+                  <h3 className="text-base font-semibold text-[#633d1f] mb-2">
                     {isRTL ? "تهانينا! لقد حصلت على هدايا مجانية" : "Congratulations! You've unlocked free gifts"}
                   </h3>
                   <div className="space-y-2">
                     {activeGifts.map((gift, index) => (
                       <div key={index} className="flex items-center gap-2 bg-white/60 px-3 py-2">
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-100">
-                          <Gift className="h-3 w-3 text-amber-600" />
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#f7f6f2]">
+                          <Gift className="h-3 w-3 text-[#c67a46]" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-amber-900">
+                          <p className="text-sm font-medium text-[#633d1f]">
                             {getLocalizedProduct(gift, locale as string)?.name || (isRTL ? "هدية مجانية" : "Free Gift")}
                           </p>
                           {(isRTL ? gift.message_ar : gift.message_en) && (
-                            <p className="text-xs text-amber-700">
+                            <p className="text-xs text-[#b2a896]">
                               {isRTL ? gift.message_ar : gift.message_en}
                             </p>
                           )}
@@ -336,14 +336,14 @@ export default function CartPage() {
           {activeGifts.length === 0 && hasGiftItemsInCart && (
             <div className="p-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-amber-500 to-orange-500 flex-shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[#c67a46] to-orange-500 flex-shrink-0">
                   <Gift className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-semibold text-amber-900 mb-2">
+                  <h3 className="text-base font-semibold text-[#633d1f] mb-2">
                     {isRTL ? "تهانينا! لقد حصلت على هدايا مجانية" : "Congratulations! You've unlocked free gifts"}
                   </h3>
-                  <p className="text-sm text-amber-700">
+                  <p className="text-sm text-[#b2a896]">
                     {isRTL ? "هديتك المجانية موجودة في سلة التسوق" : "Your free gift is in your cart"}
                   </p>
                 </div>
@@ -353,7 +353,7 @@ export default function CartPage() {
 
           {/* Show message when no gifts and no progress - but not if there are gift items in cart or rules are loading */}
           {!giftProgress.hasNextGift && activeGifts.length === 0 && !hasGiftItemsInCart && !isLoadingGiftRules && rules.length > 0 && (
-            <div className="p-4 text-center text-amber-700 text-sm">
+            <div className="p-4 text-center text-[#b2a896] text-sm">
               {isRTL ? "لا توجد هدايا متاحة حالياً" : "No gifts available at this time"}
             </div>
           )}
@@ -381,7 +381,7 @@ export default function CartPage() {
                               {cartItems.map((item) => {
                                 const isGiftItem = isFreeGiftItem(item.item_key);
                                 return (
-                                <li key={item.item_key} className={`p-4 ${isGiftItem ? "bg-gradient-to-r from-amber-50 to-orange-50" : ""}`}>
+                                <li key={item.item_key} className={`p-4 ${isGiftItem ? "bg-gradient-to-r from-[#f7f6f2] to-orange-50" : ""}`}>
                                   <div className="grid items-center gap-4 md:grid-cols-12">
                                     <div className="flex gap-4 md:col-span-6">
                                       <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden bg-gray-100">
@@ -400,7 +400,7 @@ export default function CartPage() {
                                           </div>
                                         )}
                                         {isGiftItem && (
-                                          <div className="absolute top-0 left-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg flex items-center gap-0.5">
+                                          <div className="absolute top-0 left-0 bg-gradient-to-r from-[#c67a46] to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg flex items-center gap-0.5">
                                             <Gift className="h-3 w-3" />
                                             FREE
                                           </div>
@@ -414,12 +414,12 @@ export default function CartPage() {
                                           {item.name}
                                         </Link>
                                         {productCategories[item.id] && (
-                                          <p className="font-medium uppercase tracking-wider text-amber-600 mt-0.5" style={{ fontSize: '9px' }}>
+                                          <p className="font-medium uppercase tracking-wider text-[#c67a46] mt-0.5" style={{ fontSize: '9px' }}>
                                             {productCategories[item.id]}
                                           </p>
                                         )}
                                         {isGiftItem && (
-                                          <p className="mt-1 text-sm font-medium text-amber-600 inline-flex items-center gap-1">
+                                          <p className="mt-1 text-sm font-medium text-[#c67a46] inline-flex items-center gap-1">
                                             <Gift className="h-3 w-3" />
                                             {isRTL ? "هدية مجانية" : "Free Gift"}
                                           </p>
@@ -445,7 +445,7 @@ export default function CartPage() {
 
                                     <div className="hidden text-center md:col-span-2 md:block">
                                       {isGiftItem ? (
-                                        <span className="text-amber-600 font-medium">{isRTL ? "مجاني" : "FREE"}</span>
+                                        <span className="text-[#c67a46] font-medium">{isRTL ? "مجاني" : "FREE"}</span>
                                       ) : (
                                         <FormattedPrice
                                           price={parseFloat(item.price) / divisor}
@@ -503,7 +503,7 @@ export default function CartPage() {
                                         {texts.total}:
                                       </span>
                                       {isGiftItem ? (
-                                        <span className="text-amber-600 font-semibold">{isRTL ? "مجاني" : "FREE"}</span>
+                                        <span className="text-[#c67a46] font-semibold">{isRTL ? "مجاني" : "FREE"}</span>
                                       ) : (
                                         <FormattedPrice
                                           price={parseFloat(item.price) * item.quantity.value / divisor}
@@ -609,12 +609,12 @@ export default function CartPage() {
                           key={coupon.code}
                           type="button"
                           onClick={() => handleSelectCoupon(coupon.code)}
-                          className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-100"
+                          className="inline-flex items-center gap-1 rounded-full border border-[#b2a896] bg-[#f7f6f2] px-3 py-1 text-xs font-medium text-[#633d1f] transition-colors hover:bg-[#f7f6f2]"
                           title={coupon.description || `${formatCouponDiscount(coupon)} off`}
                         >
                           <Tag className="h-3 w-3" />
                           {coupon.code}
-                          <span className="text-amber-600">({formatCouponDiscount(coupon)})</span>
+                          <span className="text-[#c67a46]">({formatCouponDiscount(coupon)})</span>
                         </button>
                       ))}
                     </div>

@@ -73,10 +73,10 @@ export function RecentlyViewed({
   }
 
   return (
-    <section className="mt-16 border-t border-amber-100 pt-12">
+    <section className="mt-16 border-t border-[#e8e0d5] pt-12">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-amber-900">
+          <h2 className="text-2xl font-bold text-[#633d1f]">
             {isRTL ? "شوهدت مؤخراً" : "Recently Viewed"}
           </h2>
           <p className="mt-1 text-sm text-gray-500">
@@ -86,14 +86,14 @@ export function RecentlyViewed({
         <div className="flex gap-2">
           <button
             type="button"
-            className="recently-viewed-slider-prev rounded-full border border-amber-200 p-2 text-amber-700 transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+            className="recently-viewed-slider-prev rounded-full border border-[#b2a896] p-2 text-[#b2a896] transition-all duration-300 hover:bg-[#f7f6f2] hover:border-[#b2a896] hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label={isRTL ? "التالي" : "Previous"}
           >
             {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </button>
           <button
             type="button"
-            className="recently-viewed-slider-next rounded-full border border-amber-200 p-2 text-amber-700 transition-all duration-300 hover:bg-amber-50 hover:border-amber-300 hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+            className="recently-viewed-slider-next rounded-full border border-[#b2a896] p-2 text-[#b2a896] transition-all duration-300 hover:bg-[#f7f6f2] hover:border-[#b2a896] hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label={isRTL ? "السابق" : "Next"}
           >
             {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}

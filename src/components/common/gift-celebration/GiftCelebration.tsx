@@ -122,8 +122,8 @@ export function GiftCelebration({ isVisible, onComplete, giftName, locale = "en"
             relative w-32 h-32 flex items-center justify-center
             ${animationPhase === "explode" || animationPhase === "celebrate" ? "animate-gift-open" : ""}
           `}>
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 rounded-2xl shadow-2xl transform rotate-3" />
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-300 via-orange-400 to-red-400 rounded-2xl shadow-xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#c67a46] via-orange-500 to-red-500 rounded-2xl shadow-2xl transform rotate-3" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#b2a896] via-orange-400 to-red-400 rounded-2xl shadow-xl" />
             
             <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-t-2xl" />
             <div className="absolute inset-y-0 left-1/2 w-4 -translate-x-1/2 bg-gradient-to-b from-red-600 via-red-500 to-red-600" />
@@ -144,10 +144,10 @@ export function GiftCelebration({ isVisible, onComplete, giftName, locale = "en"
 
           {(animationPhase === "celebrate") && (
             <div className="mt-6 text-center animate-slide-up">
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-2xl border border-amber-200">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-2xl border border-[#b2a896]">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <span className="text-2xl">🎁</span>
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-[#c67a46] to-orange-600 bg-clip-text text-transparent">
                     {isRTL ? "مبروك!" : "Congratulations!"}
                   </h3>
                   <span className="text-2xl">🎉</span>
@@ -156,7 +156,7 @@ export function GiftCelebration({ isVisible, onComplete, giftName, locale = "en"
                   {isRTL ? "لقد حصلت على هدية مجانية!" : "You unlocked a free gift!"}
                 </p>
                 {giftName && (
-                  <p className="text-amber-600 font-semibold mt-1 text-sm">
+                  <p className="text-[#c67a46] font-semibold mt-1 text-sm">
                     {giftName}
                   </p>
                 )}

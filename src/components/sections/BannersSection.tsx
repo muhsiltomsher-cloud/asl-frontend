@@ -12,7 +12,7 @@ interface BannersSectionProps {
 
 function BannerSkeleton() {
   return (
-    <div className="relative aspect-[2/1] w-full rounded-xl overflow-hidden md:aspect-[3/1]">
+    <div className="relative aspect-[2/1] w-full overflow-hidden md:aspect-[3/1]">
       <Skeleton className="absolute inset-0" />
       <div className="absolute inset-0 flex items-center justify-center">
         <Image
@@ -90,7 +90,7 @@ export function BannersSection({
         <div className={`grid gap-4 md:gap-6 ${getGridClass()}`}>
           {settings.banners.map((banner, index) => {
             const BannerContent = (
-              <div className="group relative aspect-[2/1] overflow-hidden rounded-xl md:aspect-[3/1]">
+              <div className="group relative aspect-[2/1] overflow-hidden md:aspect-[3/1]">
                 {banner.image?.url ? (
                   <>
                       <Image

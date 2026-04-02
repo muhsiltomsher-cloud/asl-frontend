@@ -42,8 +42,8 @@ export function IngredientsCarousel({
         }}
         pagination={{
           clickable: true,
-          bulletClass: "swiper-pagination-bullet !bg-amber-300 !opacity-50",
-          bulletActiveClass: "!bg-amber-600 !opacity-100",
+          bulletClass: "swiper-pagination-bullet !bg-[#b2a896] !opacity-50",
+          bulletActiveClass: "!bg-[#c67a46] !opacity-100",
         }}
         navigation={{
           prevEl: ".ingredients-slider-prev",
@@ -75,10 +75,10 @@ export function IngredientsCarousel({
                 />
               </div>
               <div className="p-6">
-                <h3 className="mb-3 text-xl font-bold text-amber-900">
+                <h3 className="mb-3 text-xl font-bold text-[#633d1f]">
                   {item.title}
                 </h3>
-                <p className="line-clamp-3 text-sm leading-relaxed text-amber-700/70">
+                <p className="line-clamp-3 text-sm leading-relaxed text-[#b2a896]">
                   {item.excerpt}
                 </p>
               </div>
@@ -92,11 +92,11 @@ export function IngredientsCarousel({
         <>
           <button
             type="button"
-            className="ingredients-slider-prev absolute -left-4 top-[40%] z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-amber-50 hover:shadow-xl lg:block"
+            className="ingredients-slider-prev absolute -left-4 top-[40%] z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-[#f7f6f2] hover:shadow-xl lg:block"
             aria-label="Previous ingredient"
           >
             <svg
-              className="h-5 w-5 text-amber-900"
+              className="h-5 w-5 text-[#633d1f]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -111,11 +111,11 @@ export function IngredientsCarousel({
           </button>
           <button
             type="button"
-            className="ingredients-slider-next absolute -right-4 top-[40%] z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-amber-50 hover:shadow-xl lg:block"
+            className="ingredients-slider-next absolute -right-4 top-[40%] z-10 hidden -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-[#f7f6f2] hover:shadow-xl lg:block"
             aria-label="Next ingredient"
           >
             <svg
-              className="h-5 w-5 text-amber-900"
+              className="h-5 w-5 text-[#633d1f]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

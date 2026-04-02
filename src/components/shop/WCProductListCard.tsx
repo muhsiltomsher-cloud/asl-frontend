@@ -93,10 +93,10 @@ export function WCProductListCard({
     <article className={cn("group relative", className)}>
       <Link 
         href={`/${locale}/product/${productSlug}`} 
-        className="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-amber-200 hover:shadow-md md:gap-6"
+        className="flex gap-4 border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-[#b2a896] hover:shadow-md md:gap-6"
       >
         {/* Product Image */}
-        <div className="relative h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 md:h-40 md:w-40">
+        <div className="relative h-32 w-32 flex-shrink-0 overflow-hidden bg-gray-100 md:h-40 md:w-40">
           {mainImage ? (
             <Image
               src={mainImage.src}
@@ -147,13 +147,13 @@ export function WCProductListCard({
           <div>
                         {/* Category */}
                         {product.categories?.[0] && (
-                          <p className="mb-1 text-xs font-medium uppercase tracking-wider text-amber-600">
+                          <p className="mb-1 text-xs font-medium uppercase tracking-wider text-[#c67a46]">
                             {decodeHtmlEntities(product.categories[0].name)}
                           </p>
                         )}
 
             {/* Name */}
-            <h3 className="mb-2 text-base font-semibold text-gray-900 transition-colors group-hover:text-amber-800 md:text-lg uppercase">
+            <h3 className="mb-2 text-base font-semibold text-gray-900 transition-colors group-hover:text-[#633d1f] md:text-lg uppercase">
               {product.name}
             </h3>
 
@@ -170,7 +170,7 @@ export function WCProductListCard({
                 <>
                   <FormattedPrice
                     price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                    className="text-base font-bold text-amber-900 md:text-lg"
+                    className="text-base font-bold text-[#633d1f] md:text-lg"
                     iconSize="sm"
                   />
                   <FormattedPrice
@@ -183,7 +183,7 @@ export function WCProductListCard({
               ) : (
                 <FormattedPrice
                   price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                  className="text-base font-bold text-amber-900 md:text-lg"
+                  className="text-base font-bold text-[#633d1f] md:text-lg"
                   iconSize="sm"
                 />
               )}
@@ -219,7 +219,7 @@ export function WCProductListCard({
               onClick={handleWishlistToggle}
               disabled={isAddingToWishlist}
               className={cn(
-                "rounded-lg border p-2 transition-all",
+                "border p-2 transition-all",
                 isWishlisted
                   ? "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
                   : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700",

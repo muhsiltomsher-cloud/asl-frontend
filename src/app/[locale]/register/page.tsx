@@ -231,7 +231,7 @@ export default function RegisterPage({ params }: RegisterPageProps) {
             <div className={`mb-6 ${isRTL ? "text-right" : "text-left"}`}>
               <div className="inline-block">
                 <h1 className="text-sm font-bold tracking-widest text-[#92400e] uppercase">{texts.register}</h1>
-                <div className="mt-2 h-0.5 bg-gradient-to-r from-[#92400e] to-[#d4a574]"></div>
+                <div className="mt-2 h-0.5 bg-gradient-to-r from-[#92400e] to-[#d4956b]"></div>
               </div>
             </div>
 

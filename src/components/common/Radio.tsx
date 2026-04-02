@@ -32,14 +32,14 @@ const Radio = forwardRef<HTMLInputElement, RadioProps>(
             className={cn(
               "flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all duration-200",
               "border-gray-300 bg-white",
-              "peer-checked:border-[#C4885B]",
-              "peer-focus-visible:ring-2 peer-focus-visible:ring-[#C4885B] peer-focus-visible:ring-offset-2",
+              "peer-checked:border-[#c67a46]",
+              "peer-focus-visible:ring-2 peer-focus-visible:ring-[#c67a46] peer-focus-visible:ring-offset-2",
               "peer-disabled:cursor-not-allowed peer-disabled:opacity-50"
             )}
           >
             <div
               className={cn(
-                "h-2.5 w-2.5 rounded-full bg-[#C4885B] transition-all duration-200",
+                "h-2.5 w-2.5 rounded-full bg-[#c67a46] transition-all duration-200",
                 checked ? "scale-100 opacity-100" : "scale-0 opacity-0"
               )}
             />

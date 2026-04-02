@@ -107,7 +107,7 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
                                  item.url.includes("categories") || item.url.includes("account");
 
             const activeClasses = isActive 
-              ? "text-[#C4885B]" 
+              ? "text-[#c67a46]" 
               : "text-gray-600";
 
             if (isDrawerItem) {
@@ -116,7 +116,7 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
                   key={index}
                   type="button"
                   onClick={(e) => handleItemClick(item, e)}
-                  className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 mx-1 transition-all hover:text-[#C4885B] active:scale-95 ${activeClasses}`}
+                  className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 mx-1 transition-all hover:text-[#c67a46] active:scale-95 ${activeClasses}`}
                 >
                   <div className="relative">
                     <IconComponent className="h-5 w-5" />
@@ -132,12 +132,12 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
               <Link
                 key={index}
                 href={href}
-                className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 mx-1 transition-all hover:text-[#C4885B] active:scale-95 ${activeClasses}`}
+                className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 mx-1 transition-all hover:text-[#c67a46] active:scale-95 ${activeClasses}`}
               >
                 <div className="relative">
                   <IconComponent className="h-5 w-5" />
                   {showBadge && (
-                    <span className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#C4885B] text-[10px] font-medium text-white">
+                    <span className="absolute -right-2 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#c67a46] text-[10px] font-medium text-white">
                       {wishlistItemsCount > 9 ? "9+" : wishlistItemsCount}
                     </span>
                   )}

@@ -386,13 +386,13 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                                   </p>
                                 )}
                                 {isFreeGift && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-amber-600">
+                                  <span className="inline-flex items-center gap-1 text-xs text-[#c67a46]">
                                     <Gift className="h-3 w-3" />
                                     {t.freeGift}
                                   </span>
                                 )}
                                 {isBundle && bundleItems && bundleItems.length > 0 && (
-                                  <p className="text-xs text-amber-600 mt-1">
+                                  <p className="text-xs text-[#c67a46] mt-1">
                                     {isRTL ? `يحتوي على ${bundleItems.length} منتجات` : `Contains ${bundleItems.length} products`}
                                   </p>
                                 )}
@@ -404,7 +404,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                           </td>
                           <td className={`py-4 ${isRTL ? "text-left" : "text-right"} text-gray-600`}>
                             {isFreeGift ? (
-                              <span className="text-amber-600">-</span>
+                              <span className="text-[#c67a46]">-</span>
                             ) : (
                               <OrderPrice 
                                 price={item.price} 
@@ -416,7 +416,7 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                           </td>
                           <td className={`py-4 ${isRTL ? "text-left" : "text-right"} font-medium text-gray-900`}>
                             {isFreeGift ? (
-                              <span className="text-amber-600 inline-flex items-center gap-1">
+                              <span className="text-[#c67a46] inline-flex items-center gap-1">
                                 {order.currency === "AED" ? <AEDIcon size="xs" /> : <span>{order.currency_symbol}</span>}
                                 0.00
                               </span>
@@ -442,12 +442,12 @@ export default function InvoicePage({ params }: InvoicePageProps) {
                             <tr key={`${item.id}-bundle-${bi.product_id}-${idx}`} className="bg-gray-50/50">
                               <td className={`py-2 ${isRTL ? "text-right pr-8" : "text-left pl-8"}`}>
                                 <div className="flex items-center gap-2">
-                                  <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${biIsFree ? "bg-green-500" : biIsAddon ? "bg-amber-600" : "bg-amber-500"}`}></span>
+                                  <span className={`h-1.5 w-1.5 rounded-full flex-shrink-0 ${biIsFree ? "bg-green-500" : biIsAddon ? "bg-[#c67a46]" : "bg-[#c67a46]"}`}></span>
                                   <div>
                                     <p className="text-sm text-gray-700">
                                       {bi.name || `Product #${bi.product_id}`}
                                       {biIsAddon && (
-                                        <span className={`text-xs text-amber-600 ${isRTL ? "mr-1" : "ml-1"}`}>({isRTL ? "إضافة" : "Add-on"})</span>
+                                        <span className={`text-xs text-[#c67a46] ${isRTL ? "mr-1" : "ml-1"}`}>({isRTL ? "إضافة" : "Add-on"})</span>
                                       )}
                                     </p>
                                     {biIsFree && (

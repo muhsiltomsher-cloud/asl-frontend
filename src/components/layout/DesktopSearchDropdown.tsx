@@ -163,7 +163,7 @@ export function DesktopSearchDropdown({
             onKeyDown={handleKeyDown}
             placeholder={dictionary.common.searchPlaceholder || "Search products..."}
             className={cn(
-              "w-48 rounded-full border border-gray-200 bg-gray-50 py-2 text-sm text-gray-900 placeholder-gray-500 transition-all focus:w-64 focus:border-amber-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-amber-800 lg:w-56 lg:focus:w-72",
+              "w-48 rounded-full border border-gray-200 bg-gray-50 py-2 text-sm text-gray-900 placeholder-gray-500 transition-all focus:w-64 focus:border-[#633d1f] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#633d1f] lg:w-56 lg:focus:w-72",
               isRTL ? "pr-10 pl-10" : "pl-10 pr-10"
             )}
             dir={isRTL ? "rtl" : "ltr"}
@@ -204,7 +204,7 @@ export function DesktopSearchDropdown({
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex flex-col items-center gap-3">
-                <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-amber-800" />
+                <div className="h-8 w-8 animate-spin rounded-full border-3 border-gray-200 border-t-[#633d1f]" />
                 <p className="text-sm text-gray-500">
                   {isRTL ? "جاري البحث..." : "Searching..."}
                 </p>
@@ -248,7 +248,7 @@ export function DesktopSearchDropdown({
                       onClick={handleProductClick}
                       className={cn(
                         "flex items-center gap-4 px-4 py-3 transition-all hover:bg-gray-50",
-                        highlightedIndex === index && "bg-amber-50"
+                        highlightedIndex === index && "bg-[#f7f6f2]"
                       )}
                     >
                       {product.images[0] ? (
@@ -269,7 +269,7 @@ export function DesktopSearchDropdown({
                       )}
                       <div className="flex-1 min-w-0">
                         {product.categories?.[0] && (
-                          <p className="text-[10px] font-medium uppercase tracking-wider text-amber-600 truncate">
+                          <p className="text-[10px] font-medium uppercase tracking-wider text-[#c67a46] truncate">
                             {decodeHtmlEntities(product.categories[0].name)}
                           </p>
                         )}
@@ -278,7 +278,7 @@ export function DesktopSearchDropdown({
                         </h3>
                         <FormattedPrice
                           price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                          className="text-sm font-semibold text-amber-800"
+                          className="text-sm font-semibold text-[#633d1f]"
                           iconSize="xs"
                         />
                         {product.attributes && product.attributes.length > 0 && (

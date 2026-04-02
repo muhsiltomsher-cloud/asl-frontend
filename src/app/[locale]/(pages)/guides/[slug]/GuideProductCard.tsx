@@ -95,7 +95,7 @@ export function GuideProductCard({
     product.tags?.some((tag) => tag.slug === "bestseller");
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
+    <article className="group overflow-hidden border border-[#e8e0d5] bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
       {/* Mobile: Compact horizontal layout */}
       <div className="flex flex-col md:flex-row">
         {/* Rank Badge + Image */}
@@ -103,7 +103,7 @@ export function GuideProductCard({
           {/* Rank Number */}
           <div
             className={cn(
-              "absolute top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-sm font-bold text-white shadow-lg md:top-4 md:h-10 md:w-10 md:text-lg",
+              "absolute top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#c67a46] to-[#c67a46] text-sm font-bold text-white shadow-lg md:top-4 md:h-10 md:w-10 md:text-lg",
               isRTL ? "right-3 md:right-4" : "left-3 md:left-4"
             )}
           >
@@ -165,33 +165,33 @@ export function GuideProductCard({
         <div className="flex flex-1 flex-col justify-between p-4 sm:p-5 md:p-8">
           <div>
             {/* Pick Reason / Award */}
-            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-amber-700 sm:mb-3 sm:gap-2 sm:px-3 sm:text-xs">
-              <span className="h-1 w-1 rounded-full bg-amber-500 sm:h-1.5 sm:w-1.5" />
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-[#f7f6f2] px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide text-[#b2a896] sm:mb-3 sm:gap-2 sm:px-3 sm:text-xs">
+              <span className="h-1 w-1 rounded-full bg-[#c67a46] sm:h-1.5 sm:w-1.5" />
               {pickReason}
             </div>
 
             {/* Product Name */}
             <Link href={`/${locale}/product/${productSlug}`}>
-              <h3 className="mb-1 text-lg font-bold text-amber-900 transition-colors hover:text-amber-700 sm:mb-2 sm:text-xl md:text-2xl">
+              <h3 className="mb-1 text-lg font-bold text-[#633d1f] transition-colors hover:text-[#b2a896] sm:mb-2 sm:text-xl md:text-2xl">
                 {product.name}
               </h3>
             </Link>
 
             {/* Category */}
             {product.categories?.[0] && (
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-amber-600 sm:mb-3 sm:text-xs">
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-[#c67a46] sm:mb-3 sm:text-xs">
                 {decodeHtmlEntities(product.categories[0].name)}
               </p>
             )}
 
             {/* Editorial Description */}
-            <p className="mb-3 text-sm leading-relaxed text-amber-800/80 sm:mb-4 sm:text-base">
+            <p className="mb-3 text-sm leading-relaxed text-[#633d1f]/80 sm:mb-4 sm:text-base">
               {description}
             </p>
           </div>
 
           {/* Price + Actions */}
-          <div className="flex flex-wrap items-center gap-3 border-t border-amber-100 pt-3 sm:gap-4 sm:pt-4">
+          <div className="flex flex-wrap items-center gap-3 border-t border-[#e8e0d5] pt-3 sm:gap-4 sm:pt-4">
             {/* Price */}
             <div className="flex items-center gap-2">
               {product.on_sale ? (
@@ -201,7 +201,7 @@ export function GuideProductCard({
                       parseInt(product.prices.price) /
                       Math.pow(10, product.prices.currency_minor_unit)
                     }
-                    className="text-lg font-bold text-amber-900"
+                    className="text-lg font-bold text-[#633d1f]"
                     iconSize="sm"
                   />
                   <FormattedPrice
@@ -220,7 +220,7 @@ export function GuideProductCard({
                     parseInt(product.prices.price) /
                     Math.pow(10, product.prices.currency_minor_unit)
                   }
-                  className="text-lg font-bold text-amber-900"
+                  className="text-lg font-bold text-[#633d1f]"
                   iconSize="sm"
                 />
               )}
@@ -236,7 +236,7 @@ export function GuideProductCard({
                     "inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium uppercase tracking-wide transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed sm:gap-2 sm:px-6 sm:py-2.5 sm:text-sm",
                     isAddedToCart
                       ? "bg-green-500 text-white"
-                      : "bg-[#C4885B] text-white hover:bg-[#D4A574]"
+                      : "bg-[#c67a46] text-white hover:bg-[#d4956b]"
                   )}
                 >
                   {isAddedToCart ? (
@@ -302,7 +302,7 @@ export function GuideProductCard({
             {/* View Product Link */}
             <Link
               href={`/${locale}/product/${productSlug}`}
-              className="text-sm font-medium text-[#C4885B] underline-offset-4 transition-colors hover:text-amber-700 hover:underline"
+              className="text-sm font-medium text-[#c67a46] underline-offset-4 transition-colors hover:text-[#b2a896] hover:underline"
             >
               {isRTL ? "عرض التفاصيل" : "View Details"}
             </Link>

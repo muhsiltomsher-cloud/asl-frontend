@@ -187,26 +187,26 @@ function HeroSection({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
               priority
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-950/90 via-amber-900/80 to-stone-900/70" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2a1a0e]/90 via-[#633d1f]/80 to-stone-900/70" />
         </div>
       )}
 
       {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-amber-600/10 blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-amber-400/10 blur-3xl" style={{ animationDelay: "1s" }} />
+        <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl" />
+        <div className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl" style={{ animationDelay: "1s" }} />
       </div>
 
       <div className="container relative mx-auto flex min-h-[50vh] items-center px-4 py-16">
         <div className="mx-auto max-w-4xl text-center">
           <div className="mb-6 flex items-center justify-center gap-4">
-            <div className="h-px w-20 bg-gradient-to-r from-transparent to-amber-400" />
-            <Sparkles className="h-6 w-6 text-amber-400" />
-            <div className="h-px w-20 bg-gradient-to-l from-transparent to-amber-400" />
+            <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#c67a46]" />
+            <Sparkles className="h-6 w-6 text-[#c67a46]" />
+            <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#c67a46]" />
           </div>
 
           {subtitle && (
-            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
+            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-[#b2a896]">
               {subtitle}
             </span>
           )}
@@ -216,7 +216,7 @@ function HeroSection({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
           </h1>
 
           {description && (
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-amber-100/90">
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#f7f6f2]/90">
               {description}
             </p>
           )}
@@ -225,7 +225,7 @@ function HeroSection({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
             <div className="mt-8">
               <Link
                 href={page.hero.ctaLink}
-                className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-amber-600"
+                className="inline-flex items-center gap-2 rounded-full bg-[#c67a46] px-8 py-3 text-sm font-semibold text-white transition-all hover:bg-[#c67a46]"
               >
                 {ctaText}
                 <ChevronRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
@@ -251,7 +251,7 @@ function BannersBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
             const bannerSubtitle = isRTL ? (banner.subtitleAr || banner.subtitle) : banner.subtitle;
 
             const content = (
-              <div className="group relative overflow-hidden rounded-2xl">
+              <div className="group relative overflow-hidden">
                 {banner.image && (
                   <div className="relative aspect-[16/9]">
                     <Image
@@ -305,11 +305,11 @@ function FeaturesBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
         {sectionTitle && (
           <div className="mb-8 text-center">
             <div className="mb-4 flex items-center justify-center gap-4">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-              <Sparkles className="h-5 w-5 text-amber-600" />
-              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <Sparkles className="h-5 w-5 text-[#c67a46]" />
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
-            <h2 className="text-3xl font-bold text-amber-900 md:text-4xl">{sectionTitle}</h2>
+            <h2 className="text-3xl font-bold text-[#633d1f] md:text-4xl">{sectionTitle}</h2>
           </div>
         )}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -318,12 +318,12 @@ function FeaturesBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
             const featureDesc = isRTL ? (feature.descriptionAr || feature.description) : feature.description;
 
             return (
-              <div key={idx} className="group rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
+              <div key={idx} className="group border border-[#e8e0d5] bg-gradient-to-b from-[#f7f6f2] to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center bg-gradient-to-br from-[#c67a46] to-[#c67a46] text-white shadow-md">
                   <span className="text-xl font-bold">{idx + 1}</span>
                 </div>
-                {featureTitle && <h3 className="mb-2 text-lg font-bold text-amber-900">{featureTitle}</h3>}
-                {featureDesc && <p className="text-sm leading-relaxed text-amber-700/70">{featureDesc}</p>}
+                {featureTitle && <h3 className="mb-2 text-lg font-bold text-[#633d1f]">{featureTitle}</h3>}
+                {featureDesc && <p className="text-sm leading-relaxed text-[#b2a896]">{featureDesc}</p>}
               </div>
             );
           })}
@@ -345,7 +345,7 @@ function FAQBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
         <div className="mx-auto max-w-4xl">
           {sectionTitle && (
             <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-amber-900 md:text-3xl">{sectionTitle}</h2>
+              <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">{sectionTitle}</h2>
             </div>
           )}
           <div className="space-y-3 sm:space-y-4">
@@ -355,12 +355,12 @@ function FAQBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
               if (!question) return null;
 
               return (
-                <details key={idx} className="group rounded-lg border border-amber-100 bg-white shadow-sm sm:rounded-xl">
-                  <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-amber-900 transition-colors hover:text-amber-700 sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
+                <details key={idx} className="group border border-[#e8e0d5] bg-white shadow-sm">
+                  <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-[#633d1f] transition-colors hover:text-[#b2a896] sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
                     <span>{question}</span>
-                    <ChevronRight className="h-5 w-5 shrink-0 text-amber-400 transition-transform group-open:rotate-90" />
+                    <ChevronRight className="h-5 w-5 shrink-0 text-[#c67a46] transition-transform group-open:rotate-90" />
                   </summary>
-                  <div className="px-4 pb-4 text-sm leading-relaxed text-amber-800/80 sm:px-6 sm:pb-5 sm:text-base">
+                  <div className="px-4 pb-4 text-sm leading-relaxed text-[#633d1f]/80 sm:px-6 sm:pb-5 sm:text-base">
                     {answer}
                   </div>
                 </details>

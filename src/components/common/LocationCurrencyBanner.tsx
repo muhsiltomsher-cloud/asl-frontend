@@ -197,7 +197,7 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
     <div
       className={cn(
         "fixed transform transition-transform duration-300 ease-out",
-        "bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200 shadow-lg",
+        "bg-gradient-to-r from-[#f7f6f2] to-[#f7f6f2] border-[#b2a896] shadow-lg",
         // On mobile: position well above bottom area to avoid overlapping cookie consent banner
         // Cookie banner sits at bottom 4rem and is ~130px tall, so we need bottom ~216px+ to clear it
         isGulfBanner
@@ -212,7 +212,7 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
         <button
           onClick={handleDismiss}
           className={cn(
-            "absolute top-2 p-1 rounded-full text-amber-600 hover:bg-amber-200 transition-colors",
+            "absolute top-2 p-1 rounded-full text-[#c67a46] hover:bg-[#b2a896] transition-colors",
             isRTL ? "left-2" : "right-2"
           )}
           aria-label="Close"
@@ -221,24 +221,24 @@ export function LocationCurrencyBanner({ locale = "en" }: LocationCurrencyBanner
         </button>
 
         <div className="flex items-start gap-3 pr-6">
-          <div className="flex-shrink-0 rounded-full bg-amber-200 p-2">
-            <MapPin className="h-5 w-5 text-amber-700" />
+          <div className="flex-shrink-0 rounded-full bg-[#b2a896] p-2">
+            <MapPin className="h-5 w-5 text-[#b2a896]" />
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-amber-900">{t.detected}</p>
-            <p className="text-xs text-amber-700 mt-0.5">{t.suggestion}</p>
+            <p className="text-sm font-medium text-[#633d1f]">{t.detected}</p>
+            <p className="text-xs text-[#b2a896] mt-0.5">{t.suggestion}</p>
 
             <div className="flex items-center gap-2 mt-2">
               <button
                 onClick={handleAccept}
-                className="px-3 py-1.5 text-xs font-medium text-white bg-amber-700 rounded-full hover:bg-amber-800 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-white bg-[#633d1f] rounded-full hover:bg-[#633d1f] transition-colors"
               >
                 {t.accept}
               </button>
               <button
                 onClick={handleDismiss}
-                className="px-3 py-1.5 text-xs font-medium text-amber-700 hover:text-amber-900 transition-colors"
+                className="px-3 py-1.5 text-xs font-medium text-[#b2a896] hover:text-[#633d1f] transition-colors"
               >
                 {t.dismiss}
               </button>

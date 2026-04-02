@@ -623,8 +623,8 @@ export function BuildYourOwnSetClient({
                   key={`slot-${index}`}
                                     className={`relative flex items-center gap-4 border-2 p-3 transition-all ${
                                       selections[index]
-                                        ? "border-amber-500 bg-amber-50"
-                                        : "border-dashed border-gray-300 bg-gray-50 hover:border-amber-400 hover:bg-amber-50/50"
+                                        ? "border-[#c67a46] bg-[#f7f6f2]"
+                                        : "border-dashed border-gray-300 bg-gray-50 hover:border-[#c67a46] hover:bg-[#f7f6f2]"
                                     }`}
                 >
                   {selections[index] ? (
@@ -641,14 +641,14 @@ export function BuildYourOwnSetClient({
                                                                 <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
                                                                   {selections[index]!.name}
                                                                 </p>
-                                                                <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
+                                                                <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-[#b2a896]"}`}>
                                                                   {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
                                                                 </p>
                                                               </div>
                                         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                                           <button
                                             onClick={() => handleSlotClick(index)}
-                                            className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
+                                            className="text-xs text-[#c67a46] hover:text-[#633d1f] hover:underline whitespace-nowrap"
                                           >
                                             {t.change}
                                           </button>
@@ -676,7 +676,7 @@ export function BuildYourOwnSetClient({
                       </div>
                     </button>
                   )}
-                  <div className="absolute -top-2 left-3 bg-amber-600 px-2 py-0.5 text-xs font-medium text-white">
+                  <div className="absolute -top-2 left-3 bg-[#c67a46] px-2 py-0.5 text-xs font-medium text-white">
                     {index + 1}
                   </div>
                 </div>
@@ -692,8 +692,8 @@ export function BuildYourOwnSetClient({
                   key={`slot-${index}`}
                                     className={`relative flex items-center gap-4 border-2 p-3 transition-all ${
                                       selections[index]
-                                        ? "border-amber-500 bg-amber-50"
-                                        : "border-dashed border-gray-200 bg-gray-50/50 hover:border-amber-300 hover:bg-amber-50/30"
+                                        ? "border-[#c67a46] bg-[#f7f6f2]"
+                                        : "border-dashed border-gray-200 bg-gray-50/50 hover:border-[#b2a896] hover:bg-[#f7f6f2]"
                                     }`}
                 >
                   {selections[index] ? (
@@ -710,14 +710,14 @@ export function BuildYourOwnSetClient({
                                                                 <p className="line-clamp-2 break-words font-medium text-gray-900 text-xs sm:text-sm uppercase">
                                                                   {selections[index]!.name}
                                                                 </p>
-                                                                <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-amber-700"}`}>
+                                                                <p className={`text-xs sm:text-sm ${isSlotFree(index) ? "text-green-600 font-semibold" : "text-[#b2a896]"}`}>
                                                                   {isSlotFree(index) ? t.free : <FormattedPrice price={selections[index]!.price} iconSize="sm" />}
                                                                 </p>
                                                               </div>
                                         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                                           <button
                                             onClick={() => handleSlotClick(index)}
-                                            className="text-xs text-amber-600 hover:text-amber-800 hover:underline whitespace-nowrap"
+                                            className="text-xs text-[#c67a46] hover:text-[#633d1f] hover:underline whitespace-nowrap"
                                           >
                                             {t.change}
                                           </button>
@@ -770,7 +770,7 @@ export function BuildYourOwnSetClient({
                 )}
                 {/* Add-ons Price */}
                 {hasAddOns && addOnProductsTotal > 0 && (
-                  <div className="flex items-center justify-between text-sm text-amber-600">
+                  <div className="flex items-center justify-between text-sm text-[#c67a46]">
                     <span>{t.addOns}</span>
                     <span>+<FormattedPrice price={addOnProductsTotal} iconSize="sm" /></span>
                   </div>
@@ -826,7 +826,7 @@ export function BuildYourOwnSetClient({
                 type="button"
                 onClick={() => setQuantity(Math.min(quantity + 1, 99))}
                 disabled={quantity >= 99}
-                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#C4885B] text-white transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#c67a46] text-white transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={isRTL ? "زيادة الكمية" : "Increase quantity"}
               >
                 <Plus className="h-4 w-4" />
@@ -838,7 +838,7 @@ export function BuildYourOwnSetClient({
               type="button"
               onClick={handleAddToCart}
               disabled={!isValid || isAddingToCart}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-[#C4885B] bg-[#C4885B] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 hover:bg-transparent hover:text-[#C4885B] disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-400"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-[#c67a46] bg-[#c67a46] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all duration-300 hover:bg-transparent hover:text-[#c67a46] disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-400"
             >
                     {isAddingToCart ? t.adding : t.addToCart}
                   </button>
@@ -927,7 +927,7 @@ export function BuildYourOwnSetClient({
                   placeholder={t.searchProducts}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-[#c67a46] focus:outline-none focus:ring-1 focus:ring-[#c67a46]"
                 />
               </div>
 
@@ -939,7 +939,7 @@ export function BuildYourOwnSetClient({
                     onClick={() => setCategoryFilter(cat.key)}
                     className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                       categoryFilter === cat.key
-                        ? "bg-amber-600 text-white"
+                        ? "bg-[#c67a46] text-white"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
@@ -968,7 +968,7 @@ export function BuildYourOwnSetClient({
                       className={`group relative flex flex-col overflow-hidden border-2 bg-white text-left transition-all ${
                         isDisabled
                           ? "cursor-not-allowed border-gray-200 opacity-50"
-                          : "border-transparent hover:border-amber-500 hover:shadow-lg"
+                          : "border-transparent hover:border-[#c67a46] hover:shadow-lg"
                       }`}
                     >
                       <div className="relative aspect-square overflow-hidden bg-gray-100">
@@ -981,7 +981,7 @@ export function BuildYourOwnSetClient({
                         {isDisabled && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                             <div className="rounded-full bg-white p-2">
-                              <Check className="h-5 w-5 text-amber-600" />
+                              <Check className="h-5 w-5 text-[#c67a46]" />
                             </div>
                           </div>
                         )}
@@ -991,16 +991,16 @@ export function BuildYourOwnSetClient({
                           {product.name}
                         </p>
                         {product.categoryName && (
-                          <p className="font-medium uppercase tracking-wider text-amber-600 mt-0.5" style={{ fontSize: '9px' }}>
+                          <p className="font-medium uppercase tracking-wider text-[#c67a46] mt-0.5" style={{ fontSize: '9px' }}>
                             {product.categoryName}
                           </p>
                         )}
-                        <p className={`mt-1 text-xs sm:text-sm font-semibold ${activeSlot !== null && isSlotFree(activeSlot) ? "text-green-600" : "text-amber-700"}`}>
+                        <p className={`mt-1 text-xs sm:text-sm font-semibold ${activeSlot !== null && isSlotFree(activeSlot) ? "text-green-600" : "text-[#b2a896]"}`}>
                           {activeSlot !== null && isSlotFree(activeSlot) ? t.free : <FormattedPrice price={product.price} iconSize="sm" />}
                         </p>
                       </div>
                       {!isDisabled && (
-                        <div className="absolute bottom-3 right-3 rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        <div className="absolute bottom-3 right-3 rounded-full bg-[#c67a46] px-3 py-1 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
                           {t.select}
                         </div>
                       )}

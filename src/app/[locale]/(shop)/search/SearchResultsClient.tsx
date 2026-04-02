@@ -118,14 +118,14 @@ export function SearchResultsClient({
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white" dir={isRTL ? "rtl" : "ltr"}>
       {/* Hero Search Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-amber-900 via-amber-800 to-amber-900">
+      <div className="relative overflow-hidden bg-gradient-to-r from-[#633d1f] via-[#633d1f] to-[#633d1f]">
         <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
         <div className="container mx-auto px-4 py-4 md:py-5">
           <div className="relative z-10 mx-auto max-w-3xl text-center">
             <h1 className="mb-6 text-3xl font-bold text-white md:text-4xl">
               {query ? (
                 <>
-                  <span className="text-amber-200">{t.resultsFor}</span>{" "}
+                  <span className="text-[#b2a896]">{t.resultsFor}</span>{" "}
                   <span className="italic">&ldquo;{query}&rdquo;</span>
                 </>
               ) : (
@@ -142,7 +142,7 @@ export function SearchResultsClient({
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder={t.searchPlaceholder}
                   className={cn(
-                    "w-full rounded-2xl border-0 bg-white/95 py-4 text-lg text-gray-900 shadow-xl backdrop-blur placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-400",
+                    "w-full rounded-2xl border-0 bg-white/95 py-4 text-lg text-gray-900 shadow-xl backdrop-blur placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#c67a46]",
                     isRTL ? "pr-14 pl-14" : "pl-14 pr-14"
                   )}
                 />
@@ -167,7 +167,7 @@ export function SearchResultsClient({
 
             {/* Results Count */}
             {query && !loading && (
-              <p className="mt-4 text-amber-100">
+              <p className="mt-4 text-[#f7f6f2]">
                 {products.length} {products.length === 1 ? t.productFound : t.productsFound}
               </p>
             )}
@@ -182,7 +182,7 @@ export function SearchResultsClient({
           <div className="mb-6">
             <Link
               href={`/${locale}/shop`}
-              className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-amber-800"
+              className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 transition-colors hover:text-[#633d1f]"
             >
               <ArrowLeft className={cn("h-4 w-4", isRTL && "rotate-180")} />
               {t.backToShop}
@@ -200,14 +200,14 @@ export function SearchResultsClient({
         {/* Empty Query State */}
         {!loading && !query && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-6 rounded-full bg-amber-100 p-6">
-              <Sparkles className="h-12 w-12 text-amber-600" />
+            <div className="mb-6 rounded-full bg-[#f7f6f2] p-6">
+              <Sparkles className="h-12 w-12 text-[#c67a46]" />
             </div>
             <h2 className="mb-2 text-2xl font-bold text-gray-900">{t.startSearching}</h2>
             <p className="mb-8 max-w-md text-gray-500">{t.startSearchingDesc}</p>
             <Link
               href={`/${locale}/shop`}
-              className="inline-flex items-center gap-2 rounded-full bg-amber-800 px-8 py-3 font-medium text-white transition-all hover:bg-amber-900"
+              className="inline-flex items-center gap-2 rounded-full bg-[#633d1f] px-8 py-3 font-medium text-white transition-all hover:bg-[#633d1f]"
             >
               {t.browseAll}
             </Link>
@@ -226,7 +226,7 @@ export function SearchResultsClient({
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href={`/${locale}/shop`}
-                className="inline-flex items-center gap-2 rounded-full bg-amber-800 px-8 py-3 font-medium text-white transition-all hover:bg-amber-900"
+                className="inline-flex items-center gap-2 rounded-full bg-[#633d1f] px-8 py-3 font-medium text-white transition-all hover:bg-[#633d1f]"
               >
                 {t.browseAll}
               </Link>

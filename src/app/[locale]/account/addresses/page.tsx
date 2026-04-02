@@ -138,10 +138,10 @@ function SavedAddressCard({
   isRTL: boolean;
 }) {
   return (
-    <div className={`rounded-xl border ${address.is_default ? "border-amber-400 bg-amber-50/50" : "border-gray-200 bg-white"} p-5 relative`}>
+    <div className={`rounded-xl border ${address.is_default ? "border-[#c67a46] bg-[#f7f6f2]" : "border-gray-200 bg-white"} p-5 relative`}>
       {address.is_default && (
-        <div className={`absolute top-3 ${isRTL ? "left-3" : "right-3"} flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700`}>
-          <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+        <div className={`absolute top-3 ${isRTL ? "left-3" : "right-3"} flex items-center gap-1 rounded-full bg-[#f7f6f2] px-2 py-1 text-xs font-medium text-[#b2a896]`}>
+          <Star className="h-3 w-3 fill-[#c67a46] text-[#c67a46]" />
           {t.defaultAddress}
         </div>
       )}

@@ -56,8 +56,8 @@ export default function Error({
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16">
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-amber-900 border-t-transparent mx-auto"></div>
-          <p className="text-lg text-amber-700/70">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-[#633d1f] border-t-transparent mx-auto"></div>
+          <p className="text-lg text-[#b2a896]">
             Updating application...
           </p>
         </div>
@@ -68,28 +68,28 @@ export default function Error({
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16">
       <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold text-amber-900">
+        <h1 className="mb-4 text-4xl font-bold text-[#633d1f]">
           Something went wrong
         </h1>
-        <p className="mb-8 text-lg text-amber-700/70">
+        <p className="mb-8 text-lg text-[#b2a896]">
           We apologize for the inconvenience. Please try again.
         </p>
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
           <button
             onClick={() => reset()}
-            className="rounded-lg bg-amber-900 px-6 py-3 text-white transition-colors hover:bg-amber-800"
+            className="rounded-lg bg-[#633d1f] px-6 py-3 text-white transition-colors hover:bg-[#633d1f]"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="rounded-lg border-2 border-amber-900 px-6 py-3 text-amber-900 transition-colors hover:bg-amber-900 hover:text-white"
+            className="rounded-lg border-2 border-[#633d1f] px-6 py-3 text-[#633d1f] transition-colors hover:bg-[#633d1f] hover:text-white"
           >
             Go to Homepage
           </Link>
         </div>
         {error.digest && (
-          <p className="mt-8 text-sm text-amber-600/50">
+          <p className="mt-8 text-sm text-[#c67a46]/50">
             Error ID: {error.digest}
           </p>
         )}

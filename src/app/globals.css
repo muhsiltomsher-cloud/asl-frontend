@@ -9,13 +9,17 @@
 :root {
   --background: #f7f6f2;
   --foreground: #171717;
-  --color-primary: #92400e;
-  --color-primary-dark: #78350f;
-  --color-primary-light: #b45309;
+  --color-primary: #633d1f;
+  --color-primary-dark: #4a2d17;
+  --color-primary-light: #c67a46;
   --color-beige: #F5F0E8;
   --color-beige-dark: #E8E0D5;
-  --color-brown: #5C4A3D;
-  --color-brown-light: #8B7355;
+  --color-brown: #633d1f;
+  --color-brown-light: #b2a896;
+  --color-ivory: #f7f6f2;
+  --color-grey-beige: #b2a896;
+  --color-dark-brown: #633d1f;
+  --color-orange: #c67a46;
 }
 
 @theme inline {

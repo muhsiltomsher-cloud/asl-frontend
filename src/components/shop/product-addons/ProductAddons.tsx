@@ -107,7 +107,7 @@ export function ProductAddons({
           <span className="text-sm font-medium text-gray-700">
             {t.addPrice}:
           </span>
-          <span className="text-lg font-bold text-amber-700">
+          <span className="text-lg font-bold text-[#b2a896]">
             <FormattedPrice price={addonPrice} iconSize="sm" />
           </span>
         </div>

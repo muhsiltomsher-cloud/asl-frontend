@@ -30,7 +30,7 @@ interface ProductSectionProps {
 function ProductCardSkeleton() {
   return (
     <div className="flex flex-col">
-      <Skeleton className="aspect-square w-full rounded-lg" />
+      <Skeleton className="aspect-square w-full" />
       <div className="mt-3 space-y-2">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/2" />
@@ -97,11 +97,11 @@ export function ProductSection({
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center justify-between md:mb-10">
           <div>
-            <h2 className="mb-2 text-2xl font-bold text-amber-900 md:text-3xl">
+            <h2 className="mb-2 text-2xl font-bold text-[#633d1f] md:text-3xl">
               {settings.section_title}
             </h2>
             {settings.section_subtitle && (
-              <p className="text-amber-700/70">
+              <p className="text-[#b2a896]">
                 {settings.section_subtitle}
               </p>
             )}
@@ -109,7 +109,7 @@ export function ProductSection({
           {settings.show_view_all && (
             <Link
               href={viewAllLink}
-              className="hidden items-center text-sm font-medium text-amber-900 hover:text-amber-700 hover:underline md:flex"
+              className="hidden items-center text-sm font-medium text-[#633d1f] hover:text-[#b2a896] hover:underline md:flex"
             >
               {viewAllText}
               <ArrowRight className={`ml-1 h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
@@ -129,8 +129,8 @@ export function ProductSection({
             }}
             pagination={{
               clickable: true,
-              bulletClass: "swiper-pagination-bullet !bg-amber-900/30",
-              bulletActiveClass: "swiper-pagination-bullet-active !bg-amber-900",
+              bulletClass: "swiper-pagination-bullet !bg-[#633d1f]/30",
+              bulletActiveClass: "swiper-pagination-bullet-active !bg-[#633d1f]",
             }}
             breakpoints={{
               640: {
@@ -168,14 +168,14 @@ export function ProductSection({
                 className={`product-slider-prev-${settings.section_title?.replace(/\s+/g, '-').toLowerCase() || 'default'} absolute ${isRTL ? 'right-0' : 'left-0'} top-[32%] z-10 -translate-y-1/2 -translate-x-2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-stone-100 disabled:opacity-50 hidden md:flex items-center justify-center`}
                 aria-label="Previous"
               >
-                <ChevronLeft className={`h-5 w-5 text-amber-900 ${isRTL ? 'rotate-180' : ''}`} />
+                <ChevronLeft className={`h-5 w-5 text-[#633d1f] ${isRTL ? 'rotate-180' : ''}`} />
               </button>
               <button
                 type="button"
                 className={`product-slider-next-${settings.section_title?.replace(/\s+/g, '-').toLowerCase() || 'default'} absolute ${isRTL ? 'left-0' : 'right-0'} top-[32%] z-10 -translate-y-1/2 translate-x-2 rounded-full bg-white p-3 shadow-lg transition-all hover:bg-stone-100 disabled:opacity-50 hidden md:flex items-center justify-center`}
                 aria-label="Next"
               >
-                <ChevronRight className={`h-5 w-5 text-amber-900 ${isRTL ? 'rotate-180' : ''}`} />
+                <ChevronRight className={`h-5 w-5 text-[#633d1f] ${isRTL ? 'rotate-180' : ''}`} />
               </button>
             </>
           )}
@@ -183,7 +183,7 @@ export function ProductSection({
 
         {settings.show_view_all && (
           <div className="mt-4 text-center md:hidden">
-            <Button variant="outline" className="border-amber-900 text-amber-900 hover:bg-amber-900 hover:text-white" asChild>
+            <Button variant="outline" className="border-[#633d1f] text-[#633d1f] hover:bg-[#633d1f] hover:text-white" asChild>
               <Link href={viewAllLink}>{viewAllText}</Link>
             </Button>
           </div>

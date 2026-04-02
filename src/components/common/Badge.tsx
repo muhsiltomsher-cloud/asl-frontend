@@ -9,11 +9,11 @@ export function Badge({ className, variant = "default", children, ...props }: Ba
     default: "bg-gray-100 text-gray-800",
     success: "bg-green-100 text-green-800",
     warning: "bg-yellow-100 text-yellow-800",
-    error: "bg-[#C4885B] text-white",
+    error: "bg-[#c67a46] text-white",
     info: "bg-blue-100 text-blue-800",
-    new: "bg-[#C4885B] text-white",
-    special: "bg-gradient-to-r from-[#C4885B] to-[#D4A574] text-white",
-    bestseller: "bg-gradient-to-r from-[#C4885B] to-[#D4A574] text-white",
+    new: "bg-[#c67a46] text-white",
+    special: "bg-gradient-to-r from-[#c67a46] to-[#d4956b] text-white",
+    bestseller: "bg-gradient-to-r from-[#c67a46] to-[#d4956b] text-white",
   };
 
   return (

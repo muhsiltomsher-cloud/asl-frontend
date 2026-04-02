@@ -32,8 +32,8 @@ export function ProductTabs({
   }
 
   return (
-    <div className="mt-12 border-t border-amber-100 pt-8">
-      <div className="flex border-b border-amber-200">
+    <div className="mt-12 border-t border-[#e8e0d5] pt-8">
+      <div className="flex border-b border-[#b2a896]">
         {tabs.map((tab) => {
           if (tab.id === "description" && !hasDescription) return null;
           if (tab.id === "additional" && !hasAttributes) return null;
@@ -46,13 +46,13 @@ export function ProductTabs({
               className={cn(
                 "relative px-6 py-3 text-sm font-medium transition-colors",
                 activeTab === tab.id
-                  ? "text-amber-900"
+                  ? "text-[#633d1f]"
                   : "text-gray-500 hover:text-gray-700"
               )}
             >
               {isRTL ? tab.labelAr : tab.label}
               {activeTab === tab.id && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-700" />
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#633d1f]" />
               )}
             </button>
           );
@@ -62,7 +62,7 @@ export function ProductTabs({
       <div className="py-6">
         {activeTab === "description" && hasDescription && (
           <div
-            className="prose prose-amber max-w-none prose-headings:text-amber-900 prose-p:text-gray-700 prose-strong:text-amber-800 prose-li:text-gray-700"
+            className="prose prose-stone max-w-none prose-headings:text-[#633d1f] prose-p:text-gray-700 prose-strong:text-[#633d1f] prose-li:text-gray-700"
             dangerouslySetInnerHTML={{ __html: description }}
           />
         )}
@@ -70,10 +70,10 @@ export function ProductTabs({
         {activeTab === "additional" && hasAttributes && (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <tbody className="divide-y divide-amber-100">
+              <tbody className="divide-y divide-[#e8e0d5]">
                 {attributes.map((attr) => (
                   <tr key={attr.id}>
-                    <th className="py-3 pe-4 text-start text-sm font-medium text-amber-900 w-1/3">
+                    <th className="py-3 pe-4 text-start text-sm font-medium text-[#633d1f] w-1/3">
                       {attr.name}
                     </th>
                     <td className="py-3 text-sm text-gray-700">

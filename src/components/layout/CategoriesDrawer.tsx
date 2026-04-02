@@ -273,8 +273,8 @@ export function CategoriesDrawer({
                               />
                             </div>
                           ) : (
-                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-amber-50">
-                              <Grid3X3 className="h-5 w-5 text-amber-600" />
+                            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#f7f6f2]">
+                              <Grid3X3 className="h-5 w-5 text-[#c67a46]" />
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
@@ -312,9 +312,9 @@ export function CategoriesDrawer({
                                                             <Link
                                                               href={`/${locale}/category/${child.slug}`}
                                                               onClick={handleClose}
-                                                              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-600 transition-all hover:bg-amber-50 hover:text-amber-700"
+                                                              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-600 transition-all hover:bg-[#f7f6f2] hover:text-[#b2a896]"
                                                             >
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#b2a896]" />
                                 <span className="flex-1">{decodeHtmlEntities(child.name)}</span>
                               </Link>
                             </li>

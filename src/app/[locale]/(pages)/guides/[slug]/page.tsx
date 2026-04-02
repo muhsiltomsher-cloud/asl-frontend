@@ -246,12 +246,12 @@ export default async function GuidePage({ params }: GuidePageProps) {
       <JsonLd data={articleJsonLd} />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-950 via-amber-900 to-stone-900">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#2a1a0e] via-[#633d1f] to-stone-900">
         {/* Decorative Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-amber-600/10 blur-3xl" />
+          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl" />
           <div
-            className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-amber-400/10 blur-3xl"
+            className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl"
             style={{ animationDelay: "1s" }}
           />
         </div>
@@ -270,12 +270,12 @@ export default async function GuidePage({ params }: GuidePageProps) {
           <div className="mx-auto max-w-4xl text-center">
             {/* Decorative Line */}
             <div className="mb-8 flex items-center justify-center gap-4">
-              <div className="h-px w-20 bg-gradient-to-r from-transparent to-amber-400" />
-              <Sparkles className="h-6 w-6 text-amber-400" />
-              <div className="h-px w-20 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <Sparkles className="h-6 w-6 text-[#c67a46]" />
+              <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
 
-            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
+            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-[#b2a896]">
               {guide.eyebrow[validLocale]}
             </span>
 
@@ -283,12 +283,12 @@ export default async function GuidePage({ params }: GuidePageProps) {
               {guide.title[validLocale]}
             </h1>
 
-            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-amber-100/90 sm:text-base md:text-lg">
+            <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#f7f6f2]/90 sm:text-base md:text-lg">
               {guide.intro[validLocale]}
             </p>
 
             {/* Meta Info */}
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-amber-300/80 sm:mt-8 sm:gap-6 sm:text-sm">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-[#b2a896]/80 sm:mt-8 sm:gap-6 sm:text-sm">
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 <span>
@@ -327,13 +327,13 @@ export default async function GuidePage({ params }: GuidePageProps) {
             {/* Section Header */}
             <div className="mb-10 text-center">
               <div className="mb-4 flex items-center justify-center gap-4">
-                <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-                <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
+                <span className="text-sm font-medium uppercase tracking-widest text-[#c67a46]">
                   {isRTL ? "اختياراتنا" : "Our Picks"}
                 </span>
-                <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+                <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
               </div>
-              <h2 className="text-2xl font-bold text-amber-900 md:text-3xl">
+              <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">
                 {isRTL ? "المنتجات المختارة" : "Top Picks"}
               </h2>
             </div>
@@ -363,11 +363,11 @@ export default async function GuidePage({ params }: GuidePageProps) {
             <div className="mx-auto max-w-4xl">
               <div className="mb-6 text-center sm:mb-10">
                 <div className="mb-4 flex items-center justify-center gap-4">
-                  <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-                  <BookOpen className="h-5 w-5 text-amber-600" />
-                  <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+                  <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
+                  <BookOpen className="h-5 w-5 text-[#c67a46]" />
+                  <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
                 </div>
-                <h2 className="text-2xl font-bold text-amber-900 md:text-3xl">
+                <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">
                   {isRTL ? "دليل الشراء" : "Buying Guide"}
                 </h2>
               </div>
@@ -376,12 +376,12 @@ export default async function GuidePage({ params }: GuidePageProps) {
                 {guide.contentBlocks.map((block, index) => (
                   <div
                     key={index}
-                    className="rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-4 shadow-sm sm:rounded-2xl sm:p-6 md:p-8"
+                    className="border border-[#e8e0d5] bg-gradient-to-b from-[#f7f6f2] to-white p-4 shadow-sm sm:p-6 md:p-8"
                   >
-                    <h3 className="mb-3 text-lg font-bold text-amber-900 sm:mb-4 sm:text-xl md:text-2xl">
+                    <h3 className="mb-3 text-lg font-bold text-[#633d1f] sm:mb-4 sm:text-xl md:text-2xl">
                       {block.heading[validLocale]}
                     </h3>
-                    <p className="text-sm leading-relaxed text-amber-800/80 sm:text-base">
+                    <p className="text-sm leading-relaxed text-[#633d1f]/80 sm:text-base">
                       {block.body[validLocale]}
                     </p>
                   </div>
@@ -398,12 +398,12 @@ export default async function GuidePage({ params }: GuidePageProps) {
           <div className="container mx-auto px-3 sm:px-4">
             <div className="mx-auto max-w-4xl">
               <div className="mb-6 text-center sm:mb-10">
-                <h2 className="text-2xl font-bold text-amber-900 md:text-3xl">
+                <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">
                   {isRTL
                     ? "الأسئلة الشائعة"
                     : "Frequently Asked Questions"}
                 </h2>
-                <p className="mt-2 text-amber-700/70">
+                <p className="mt-2 text-[#b2a896]">
                   {isRTL
                     ? "إجابات على أسئلتك الأكثر شيوعاً"
                     : "Answers to your most common questions"}
@@ -414,13 +414,13 @@ export default async function GuidePage({ params }: GuidePageProps) {
                 {guide.faqs.map((faq, index) => (
                   <details
                     key={index}
-                    className="group rounded-lg border border-amber-100 bg-white shadow-sm sm:rounded-xl"
+                    className="group border border-[#e8e0d5] bg-white shadow-sm"
                   >
-                    <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-amber-900 transition-colors hover:text-amber-700 sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
+                    <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-[#633d1f] transition-colors hover:text-[#b2a896] sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
                       <span>{faq.question[validLocale]}</span>
-                      <ChevronRight className="h-5 w-5 shrink-0 text-amber-400 transition-transform group-open:rotate-90" />
+                      <ChevronRight className="h-5 w-5 shrink-0 text-[#c67a46] transition-transform group-open:rotate-90" />
                     </summary>
-                    <div className="px-4 pb-4 text-sm leading-relaxed text-amber-800/80 sm:px-6 sm:pb-5 sm:text-base">
+                    <div className="px-4 pb-4 text-sm leading-relaxed text-[#633d1f]/80 sm:px-6 sm:pb-5 sm:text-base">
                       {faq.answer[validLocale]}
                     </div>
                   </details>
@@ -436,7 +436,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
         <section className="bg-white py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-4xl">
-              <h2 className="mb-8 text-center text-2xl font-bold text-amber-900 md:text-3xl">
+              <h2 className="mb-8 text-center text-2xl font-bold text-[#633d1f] md:text-3xl">
                 {isRTL ? "أدلة ذات صلة" : "Related Guides"}
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
@@ -444,15 +444,15 @@ export default async function GuidePage({ params }: GuidePageProps) {
                   <Link
                     key={related.slug}
                     href={`/${locale}/guides/${related.slug}`}
-                    className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+                    className="group border border-[#e8e0d5] bg-gradient-to-b from-[#f7f6f2] to-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
                   >
-                    <h3 className="font-bold text-amber-900 transition-colors group-hover:text-amber-700">
+                    <h3 className="font-bold text-[#633d1f] transition-colors group-hover:text-[#b2a896]">
                       {related.title[validLocale]}
                     </h3>
-                    <p className="mt-2 text-sm text-amber-700/70 line-clamp-2">
+                    <p className="mt-2 text-sm text-[#b2a896] line-clamp-2">
                       {related.metaDescription[validLocale]}
                     </p>
-                                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#C4885B]">
+                                  <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#c67a46]">
                                     {isRTL ? "اقرأ المزيد" : "Read More"}
                                     <ChevronRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
                                   </span>
@@ -465,14 +465,14 @@ export default async function GuidePage({ params }: GuidePageProps) {
       )}
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 py-8 sm:py-12 md:py-16">
+      <section className="bg-gradient-to-r from-[#633d1f] via-[#633d1f] to-stone-900 py-8 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="mb-3 text-xl font-bold text-white sm:mb-4 sm:text-2xl md:text-3xl">
             {isRTL
               ? "مستعد لاكتشاف عطرك المثالي؟"
               : "Ready to Find Your Perfect Scent?"}
           </h2>
-          <p className="mx-auto mb-6 max-w-xl text-sm text-amber-100/80 sm:mb-8 sm:text-base">
+          <p className="mx-auto mb-6 max-w-xl text-sm text-[#f7f6f2] sm:mb-8 sm:text-base">
             {isRTL
               ? "تصفح مجموعتنا الكاملة من العطور الفاخرة المصنوعة يدوياً في الإمارات. توصيل مجاني للطلبات فوق 500 درهم."
               : "Browse our full collection of premium, handcrafted fragrances made in the UAE. Free delivery on orders over 500 AED."}
@@ -480,13 +480,13 @@ export default async function GuidePage({ params }: GuidePageProps) {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href={`/${locale}/shop`}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#C4885B] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all hover:bg-[#D4A574] hover:shadow-lg"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c67a46] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all hover:bg-[#d4956b] hover:shadow-lg"
             >
               {isRTL ? "تسوق الآن" : "Shop Now"}
             </Link>
             <Link
               href={`/${locale}/category/perfumes`}
-              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-amber-400/50 px-8 py-3 text-sm font-medium uppercase tracking-wide text-amber-200 transition-all hover:border-amber-300 hover:text-white"
+              className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#c67a46]/50 px-8 py-3 text-sm font-medium uppercase tracking-wide text-[#b2a896] transition-all hover:border-[#b2a896] hover:text-white"
             >
               {isRTL ? "تصفح العطور" : "Browse Perfumes"}
             </Link>

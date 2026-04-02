@@ -21,7 +21,7 @@ export function CategoryCard({
     <Link
       href={`/${locale}/category/${category.slug}`}
       className={cn(
-        "group relative block overflow-hidden rounded-lg",
+        "group relative block overflow-hidden",
         variant === "featured" ? "aspect-[4/3]" : "aspect-square",
         className
       )}

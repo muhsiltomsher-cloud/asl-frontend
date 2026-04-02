@@ -50,7 +50,7 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
                 return (
                   <li key={`${bi.product_id}-${idx}`} className="flex items-center justify-between gap-1">
                     <span className="flex items-center gap-1">
-                      <span className="h-1 w-1 rounded-full bg-amber-500 flex-shrink-0"></span>
+                      <span className="h-1 w-1 rounded-full bg-[#c67a46] flex-shrink-0"></span>
                       <span className="truncate">{bi.name || `Product #${bi.product_id}`}</span>
                       <span className="text-gray-400 flex-shrink-0">x{displayQty}</span>
                     </span>
@@ -73,7 +73,7 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
         {addonItems.length > 0 && (
           <>
             <div className="mt-1 pt-1 border-t border-gray-100">
-              <span className="font-medium text-amber-600">{isRTL ? "الإضافات:" : "Add-ons:"}</span>
+              <span className="font-medium text-[#c67a46]">{isRTL ? "الإضافات:" : "Add-ons:"}</span>
             </div>
             <ul className="mt-0.5 space-y-0.5">
               {addonItems.map((bi, idx) => {
@@ -84,21 +84,21 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
                 return (
                   <li key={`addon-${bi.product_id}-${idx}`} className="flex items-center justify-between gap-1">
                     <span className="flex items-center gap-1">
-                      <span className="h-1 w-1 rounded-full bg-amber-600 flex-shrink-0"></span>
+                      <span className="h-1 w-1 rounded-full bg-[#c67a46] flex-shrink-0"></span>
                       <span className="truncate">{bi.name || `Product #${bi.product_id}`}</span>
-                      <span className="text-amber-400 flex-shrink-0">x{displayQty}</span>
+                      <span className="text-[#c67a46] flex-shrink-0">x{displayQty}</span>
                     </span>
                     {showPrices && displayPrice !== undefined && displayPrice > 0 && (
-                      <FormattedPrice price={displayPrice} className="text-xs text-amber-500 flex-shrink-0" iconSize="xs" />
+                      <FormattedPrice price={displayPrice} className="text-xs text-[#c67a46] flex-shrink-0" iconSize="xs" />
                     )}
                   </li>
                 );
               })}
             </ul>
             {showPrices && addonItemsTotal > 0 && (
-              <div className="mt-0.5 flex items-center justify-between text-amber-600">
+              <div className="mt-0.5 flex items-center justify-between text-[#c67a46]">
                 <span className="text-[10px]">{isRTL ? "مجموع الإضافات:" : "Add-ons Total:"}</span>
-                <FormattedPrice price={addonItemsTotal} className="text-xs text-amber-600 flex-shrink-0" iconSize="xs" />
+                <FormattedPrice price={addonItemsTotal} className="text-xs text-[#c67a46] flex-shrink-0" iconSize="xs" />
               </div>
             )}
           </>
@@ -131,7 +131,7 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
         {showPrices && isFixedPricing && (
           <div className="mt-1 flex items-center justify-between border-t border-gray-200 pt-1">
             <span className="font-medium">{isRTL ? "سعر الباقة:" : "Bundle Price:"}</span>
-            <FormattedPrice price={totalPrice} className="text-xs font-medium text-amber-600" iconSize="xs" />
+            <FormattedPrice price={totalPrice} className="text-xs font-medium text-[#c67a46]" iconSize="xs" />
           </div>
         )}
       </div>
@@ -152,7 +152,7 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
               return (
                 <li key={`${bi.product_id}-${idx}`} className="flex items-center justify-between gap-2 text-xs">
                   <span className="flex items-center gap-1.5 text-gray-600">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500 flex-shrink-0"></span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#c67a46] flex-shrink-0"></span>
                     <span>{bi.name || `Product #${bi.product_id}`}</span>
                     <span className="text-gray-400">x{displayQty}</span>
                   </span>
@@ -175,7 +175,7 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
       {addonItems.length > 0 && (
         <>
           <div className="mt-3 pt-2 border-t border-gray-200">
-            <p className="mb-2 text-xs font-medium text-amber-600">{isRTL ? "الإضافات:" : "Add-ons:"}</p>
+            <p className="mb-2 text-xs font-medium text-[#c67a46]">{isRTL ? "الإضافات:" : "Add-ons:"}</p>
           </div>
           <ul className="space-y-1.5">
             {addonItems.map((bi, idx) => {
@@ -185,22 +185,22 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
               const displayPrice = basePrice !== undefined ? basePrice * cartQuantity : undefined;
               return (
                 <li key={`addon-${bi.product_id}-${idx}`} className="flex items-center justify-between gap-2 text-xs">
-                  <span className="flex items-center gap-1.5 text-amber-700">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-600 flex-shrink-0"></span>
+                  <span className="flex items-center gap-1.5 text-[#b2a896]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#c67a46] flex-shrink-0"></span>
                     <span>{bi.name || `Product #${bi.product_id}`}</span>
-                    <span className="text-amber-400">x{displayQty}</span>
+                    <span className="text-[#c67a46]">x{displayQty}</span>
                   </span>
                   {showPrices && displayPrice !== undefined && displayPrice > 0 && (
-                    <FormattedPrice price={displayPrice} className="text-xs text-amber-500 flex-shrink-0" iconSize="xs" />
+                    <FormattedPrice price={displayPrice} className="text-xs text-[#c67a46] flex-shrink-0" iconSize="xs" />
                   )}
                 </li>
               );
             })}
           </ul>
           {showPrices && addonItemsTotal > 0 && (
-            <div className="mt-1.5 flex items-center justify-between text-amber-600">
+            <div className="mt-1.5 flex items-center justify-between text-[#c67a46]">
               <span className="text-xs">{isRTL ? "مجموع الإضافات:" : "Add-ons Total:"}</span>
-              <FormattedPrice price={addonItemsTotal} className="text-xs text-amber-600 flex-shrink-0" iconSize="xs" />
+              <FormattedPrice price={addonItemsTotal} className="text-xs text-[#c67a46] flex-shrink-0" iconSize="xs" />
             </div>
           )}
         </>
@@ -233,7 +233,7 @@ export function BundleItemsList({ item, locale, compact = false, showPrices = tr
       {showPrices && isFixedPricing && (
         <div className="mt-2 flex items-center justify-between border-t border-gray-200 pt-2">
           <span className="text-xs font-medium text-gray-600">{isRTL ? "سعر الباقة:" : "Bundle Price:"}</span>
-          <FormattedPrice price={totalPrice} className="text-sm font-semibold text-amber-600" iconSize="xs" />
+          <FormattedPrice price={totalPrice} className="text-sm font-semibold text-[#c67a46]" iconSize="xs" />
         </div>
       )}
     </div>
