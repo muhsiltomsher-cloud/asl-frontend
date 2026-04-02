@@ -1399,7 +1399,7 @@ export default function CheckoutClient() {
         {/* Modern User Status Card */}
         <div className="mb-6 flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full text-white text-sm font-semibold ${isAuthenticated ? 'bg-gradient-to-br from-emerald-400 to-emerald-600' : 'bg-gradient-to-br from-amber-400 to-amber-600'}`}>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full text-white text-sm font-semibold ${isAuthenticated ? 'bg-gradient-to-br from-emerald-400 to-emerald-600' : 'bg-gradient-to-br from-[#c67a46] to-[#c67a46]'}`}>
               {isAuthenticated ? (user?.user_email?.charAt(0).toUpperCase() || 'U') : 'G'}
             </div>
             <div>
@@ -1480,9 +1480,9 @@ export default function CheckoutClient() {
 
               {/* Empty Cart Message with Auto-Redirect */}
               {isEmptyCart && emptyCartCountdown !== null && (
-                <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
+                <div className="mb-6 rounded-lg border border-[#b2a896] bg-[#f7f6f2] p-6 text-center">
                   <div className="mb-4">
-                    <svg className="mx-auto h-16 w-16 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="mx-auto h-16 w-16 text-[#c67a46]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                   </div>
@@ -1494,7 +1494,7 @@ export default function CheckoutClient() {
                       ? "لا يمكنك المتابعة للدفع بدون منتجات في السلة." 
                       : "You cannot proceed to checkout without any products in your cart."}
                   </p>
-                  <p className="text-sm text-amber-700">
+                  <p className="text-sm text-[#b2a896]">
                     {isRTL 
                       ? `سيتم توجيهك إلى الصفحة الرئيسية خلال ${emptyCartCountdown} ثانية...` 
                       : `Redirecting to home page in ${emptyCartCountdown} seconds...`}
@@ -1545,18 +1545,18 @@ export default function CheckoutClient() {
               
               {/* Login Prompt for Registered Email */}
               {showLoginPrompt && !isAuthenticated && (
-                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <div className="mt-4 rounded-lg border border-[#b2a896] bg-[#f7f6f2] p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="h-5 w-5 text-[#c67a46]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-sm font-medium text-amber-800">
+                      <h3 className="text-sm font-medium text-[#633d1f]">
                         {isRTL ? "هذا البريد الإلكتروني مسجل بالفعل" : "This email is already registered"}
                       </h3>
-                      <p className="mt-1 text-sm text-amber-700">
+                      <p className="mt-1 text-sm text-[#b2a896]">
                         {isRTL 
                           ? "يرجى تسجيل الدخول لربط هذا الطلب بحسابك وتتبع طلباتك بسهولة."
                           : "Please log in to link this order to your account and easily track your orders."}
@@ -1811,8 +1811,8 @@ export default function CheckoutClient() {
                   <span className="ml-2 text-gray-600">{isRTL ? "جاري تحميل طرق الشحن..." : "Loading shipping methods..."}</span>
                 </div>
               ) : shippingPackages.length === 0 || shippingPackages.every(pkg => !pkg.shipping_rates || pkg.shipping_rates.length === 0) ? (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-sm text-amber-800">
+                <div className="rounded-lg border border-[#b2a896] bg-[#f7f6f2] p-4">
+                  <p className="text-sm text-[#633d1f]">
                     {isRTL 
                       ? "يرجى إدخال عنوان الشحن لعرض طرق الشحن المتاحة" 
                       : "Please enter your shipping address to see available shipping methods"}
@@ -1860,7 +1860,7 @@ export default function CheckoutClient() {
                                 />
                                 {rate.method_id === "free_shipping" && rate.free_shipping_min_amount && rate.free_shipping_min_amount > 0 && (
                                   <p className={`mt-1 text-xs ${
-                                    rate.free_shipping_eligible === false ? "text-amber-600" : "text-green-600"
+                                    rate.free_shipping_eligible === false ? "text-[#c67a46]" : "text-green-600"
                                   }`}>
                                     {rate.free_shipping_eligible === false
                                       ? (isRTL
@@ -2005,12 +2005,12 @@ export default function CheckoutClient() {
                           
                           {/* MyFatoorah Test Mode Banner */}
                           {isMyFatoorahTestMode && (
-                            <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3">
+                            <div className="mb-4 rounded-lg border border-[#b2a896] bg-[#f7f6f2] p-3">
                               <div className="flex items-center gap-2">
-                                <svg className="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="h-5 w-5 text-[#c67a46]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
-                                <span className="text-sm font-medium text-amber-800">
+                                <span className="text-sm font-medium text-[#633d1f]">
                                   {isRTL ? "وضع الاختبار - لن يتم خصم أي مبالغ حقيقية" : "Test Mode - No real charges will be made"}
                                 </span>
                               </div>
@@ -2208,7 +2208,7 @@ export default function CheckoutClient() {
                                   <div className="flex-1 min-w-0">
                                     <p className="truncate text-sm font-medium text-gray-900">{item.name}</p>
                                     {productCategories[item.id] && (
-                                      <p className="font-medium uppercase tracking-wider text-amber-600 mt-0.5" style={{ fontSize: '9px' }}>
+                                      <p className="font-medium uppercase tracking-wider text-[#c67a46] mt-0.5" style={{ fontSize: '9px' }}>
                                         {productCategories[item.id]}
                                       </p>
                                     )}
@@ -2298,12 +2298,12 @@ export default function CheckoutClient() {
                                         key={coupon.code}
                                         type="button"
                                         onClick={() => handleSelectCoupon(coupon.code)}
-                                        className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-100"
+                                        className="inline-flex items-center gap-1 rounded-full border border-[#b2a896] bg-[#f7f6f2] px-3 py-1 text-xs font-medium text-[#633d1f] transition-colors hover:bg-[#f7f6f2]"
                                         title={coupon.description || `${formatCouponDiscount(coupon)} off`}
                                       >
                                         <Tag className="h-3 w-3" />
                                         {coupon.code}
-                                        <span className="text-amber-600">({formatCouponDiscount(coupon)})</span>
+                                        <span className="text-[#c67a46]">({formatCouponDiscount(coupon)})</span>
                                       </button>
                                     ))}
                                   </div>

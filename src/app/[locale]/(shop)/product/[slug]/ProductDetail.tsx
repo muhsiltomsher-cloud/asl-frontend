@@ -451,7 +451,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
           onClick={() => setViewMode("grid")}
           className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
             viewMode === "grid"
-              ? "bg-amber-800 text-white"
+              ? "bg-[#633d1f] text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
           aria-label={isRTL ? "عرض الشبكة" : "Grid view"}
@@ -464,7 +464,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
           onClick={() => setViewMode("slider")}
           className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
             viewMode === "slider"
-              ? "bg-amber-800 text-white"
+              ? "bg-[#633d1f] text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
           aria-label={isRTL ? "عرض الشرائح" : "Slider view"}
@@ -771,7 +771,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                     type="button"
                     className={`relative aspect-square w-full overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
                       selectedImage === index 
-                        ? "border-amber-800 ring-2 ring-amber-800/30 shadow-md" 
+                        ? "border-[#633d1f] ring-2 ring-[#633d1f]/30 shadow-md" 
                         : "border-gray-200 hover:border-gray-400"
                     }`}
                   >
@@ -851,7 +851,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               <>
                                 <FormattedPrice
                                   price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                                  className="text-base font-bold text-amber-800 md:text-xl"
+                                  className="text-base font-bold text-[#633d1f] md:text-xl"
                                   iconSize="md"
                                 />
                 <FormattedPrice
@@ -865,7 +865,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                         ) : (
                           <FormattedPrice
                             price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                            className="text-base font-bold text-amber-800 md:text-xl"
+                            className="text-base font-bold text-[#633d1f] md:text-xl"
                             iconSize="md"
                           />
                         )}
@@ -940,7 +940,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={isOutOfStock || quantity <= 1}
-                  className="flex h-10 w-10 items-center justify-center bg-[#C4885B] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                  className="flex h-10 w-10 items-center justify-center bg-[#c67a46] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                   aria-label={isRTL ? "تقليل الكمية" : "Decrease quantity"}
                 >
                   <Minus className="h-4 w-4" />
@@ -962,7 +962,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                   type="button"
                   onClick={() => setQuantity(Math.min(quantity + 1, product.add_to_cart.maximum || 99))}
                   disabled={isOutOfStock || quantity >= (product.add_to_cart.maximum || 99)}
-                  className="flex h-10 w-10 items-center justify-center bg-[#C4885B] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                  className="flex h-10 w-10 items-center justify-center bg-[#c67a46] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                   aria-label={isRTL ? "زيادة الكمية" : "Increase quantity"}
                 >
                   <Plus className="h-4 w-4" />
@@ -977,7 +977,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 className={`flex items-center justify-center gap-2 px-8 py-3 text-sm font-medium uppercase tracking-wide transition-all duration-300 border-2 rounded-full disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 cursor-pointer ${
                   isAddedToCart
                     ? "bg-green-500 border-green-500 text-white scale-95"
-                    : "bg-[#C4885B] border-[#C4885B] text-white hover:bg-transparent hover:text-[#C4885B]"
+                    : "bg-[#c67a46] border-[#c67a46] text-white hover:bg-transparent hover:text-[#c67a46]"
                 }`}
               >
                 {isAddedToCart ? (
@@ -1042,7 +1042,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                       {product.tags.map(t => (
                         <span
                           key={t.slug}
-                          className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200"
+                          className="inline-flex items-center rounded-full bg-[#f7f6f2] px-2.5 py-0.5 text-xs font-medium text-[#633d1f] ring-1 ring-inset ring-[#b2a896]"
                         >
                           {t.name}
                         </span>
@@ -1133,7 +1133,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               <p className="truncate text-sm font-medium text-gray-900">{product.name}</p>
               <FormattedPrice
                 price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                className="text-sm font-bold text-amber-800"
+                className="text-sm font-bold text-[#633d1f]"
                 iconSize="sm"
               />
             </div>
@@ -1144,7 +1144,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 type="button"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={quantity <= 1}
-                className="flex h-9 w-9 items-center justify-center bg-[#C4885B] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-9 items-center justify-center bg-[#c67a46] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={isRTL ? "تقليل الكمية" : "Decrease quantity"}
               >
                 <Minus className="h-3.5 w-3.5" />
@@ -1154,7 +1154,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
                 type="button"
                 onClick={() => setQuantity(Math.min(quantity + 1, product.add_to_cart.maximum || 99))}
                 disabled={quantity >= (product.add_to_cart.maximum || 99)}
-                className="flex h-9 w-9 items-center justify-center bg-[#C4885B] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-9 items-center justify-center bg-[#c67a46] text-white rounded-full transition-all duration-300 hover:bg-[#b07a4f] disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={isRTL ? "زيادة الكمية" : "Increase quantity"}
               >
                 <Plus className="h-3.5 w-3.5" />
@@ -1167,7 +1167,7 @@ export function ProductDetail({ product, locale, relatedProducts = [], upsellPro
               className={`flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-medium uppercase tracking-wide transition-all duration-300 border-2 rounded-full disabled:cursor-not-allowed disabled:bg-gray-400 disabled:border-gray-400 ${
                 isAddedToCart
                   ? "bg-green-500 border-green-500 text-white scale-95"
-                  : "bg-[#C4885B] border-[#C4885B] text-white hover:bg-transparent hover:text-[#C4885B]"
+                  : "bg-[#c67a46] border-[#c67a46] text-white hover:bg-transparent hover:text-[#c67a46]"
               }`}
             >
               {isAddedToCart ? (

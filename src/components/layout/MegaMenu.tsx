@@ -241,8 +241,8 @@ export function MegaMenu({
                             />
                           </div>
                         ) : (
-                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-amber-50">
-                            <Grid3X3 className="h-4 w-4 text-amber-400" />
+                          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-[#f7f6f2]">
+                            <Grid3X3 className="h-4 w-4 text-[#c67a46]" />
                           </div>
                         )}
                         <span className="text-sm font-bold text-gray-900 uppercase tracking-wide group-hover:text-[#7a3205] transition-colors">

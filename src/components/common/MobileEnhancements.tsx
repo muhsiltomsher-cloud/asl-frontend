@@ -33,10 +33,10 @@ export function MobileEnhancements({ children }: MobileEnhancementsProps) {
         >
           <div className="rounded-full bg-white p-2 shadow-lg">
             {isRefreshing ? (
-              <Loader2 className="h-6 w-6 animate-spin text-amber-600" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#c67a46]" />
             ) : (
               <svg
-                className="h-6 w-6 text-amber-600 transition-transform duration-200"
+                className="h-6 w-6 text-[#c67a46] transition-transform duration-200"
                 style={{ transform: `rotate(${progress * 180}deg)` }}
                 viewBox="0 0 24 24"
                 fill="none"

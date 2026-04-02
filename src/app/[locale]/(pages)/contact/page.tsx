@@ -103,28 +103,28 @@ export default async function ContactPage({ params }: ContactPageProps) {
   const infoConfig: Record<string, { icon: typeof MapPin; gradient: string; hoverGradient: string }> = {
     address: { 
       icon: MapPin, 
-      gradient: "from-amber-600 to-amber-700",
-      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
+      gradient: "from-[#c67a46] to-[#633d1f]",
+      hoverGradient: "group-hover:from-[#633d1f] group-hover:to-[#4a2d17]"
     },
     phone: { 
       icon: Phone, 
-      gradient: "from-amber-600 to-amber-700",
-      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
+      gradient: "from-[#c67a46] to-[#633d1f]",
+      hoverGradient: "group-hover:from-[#633d1f] group-hover:to-[#4a2d17]"
     },
     callPhone: { 
       icon: Phone, 
-      gradient: "from-amber-600 to-amber-700",
-      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
+      gradient: "from-[#c67a46] to-[#633d1f]",
+      hoverGradient: "group-hover:from-[#633d1f] group-hover:to-[#4a2d17]"
     },
     email: { 
       icon: Mail, 
-      gradient: "from-amber-600 to-amber-700",
-      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
+      gradient: "from-[#c67a46] to-[#633d1f]",
+      hoverGradient: "group-hover:from-[#633d1f] group-hover:to-[#4a2d17]"
     },
     hours: { 
       icon: Clock, 
-      gradient: "from-amber-600 to-amber-700",
-      hoverGradient: "group-hover:from-amber-700 group-hover:to-amber-800"
+      gradient: "from-[#c67a46] to-[#633d1f]",
+      hoverGradient: "group-hover:from-[#633d1f] group-hover:to-[#4a2d17]"
     },
   };
 
@@ -146,8 +146,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
   const contactInfoItems = infoItems.map((item) => ({
     ...item,
     icon: infoConfig[item.key]?.icon || MapPin,
-    gradient: infoConfig[item.key]?.gradient || "from-amber-500 to-amber-600",
-    hoverGradient: infoConfig[item.key]?.hoverGradient || "group-hover:from-amber-600 group-hover:to-amber-700",
+    gradient: infoConfig[item.key]?.gradient || "from-[#c67a46] to-[#c67a46]",
+    hoverGradient: infoConfig[item.key]?.hoverGradient || "group-hover:from-[#c67a46] group-hover:to-[#633d1f]",
   }));
 
   return (
@@ -169,14 +169,14 @@ export default async function ContactPage({ params }: ContactPageProps) {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-950/90 via-amber-900/80 to-stone-900/70" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2a1a0e]/90 via-[#633d1f]/80 to-stone-900/70" />
         </div>
 
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-amber-600/10 blur-3xl" />
+          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl" />
           <div
-            className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-amber-400/10 blur-3xl"
+            className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl"
             style={{ animationDelay: "1s" }}
           />
         </div>
@@ -197,12 +197,12 @@ export default async function ContactPage({ params }: ContactPageProps) {
           <div className="mx-auto max-w-4xl text-center">
             {/* Decorative Line */}
             <div className="mb-6 flex items-center justify-center gap-4">
-              <div className="h-px w-20 bg-gradient-to-r from-transparent to-amber-400" />
-              <MessageCircle className="h-6 w-6 text-amber-400" />
-              <div className="h-px w-20 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <MessageCircle className="h-6 w-6 text-[#c67a46]" />
+              <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
 
-            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
+            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-[#b2a896]">
               {content.heroSubtitle}
             </span>
 
@@ -210,7 +210,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               {content.heroTitle}
             </h1>
 
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-amber-100/90">
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#f7f6f2]/90">
               {content.heroDescription}
             </p>
           </div>
@@ -218,8 +218,8 @@ export default async function ContactPage({ params }: ContactPageProps) {
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2">
-          <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-amber-400/50 p-1">
-            <div className="h-2 w-1 animate-bounce rounded-full bg-amber-400" />
+          <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-[#c67a46]/50 p-1">
+            <div className="h-2 w-1 animate-bounce rounded-full bg-[#c67a46]" />
           </div>
         </div>
       </section>
@@ -230,10 +230,10 @@ export default async function ContactPage({ params }: ContactPageProps) {
       </div>
 
       {/* Quick Contact Buttons */}
-      <section className="bg-gradient-to-r from-amber-50 to-stone-50">
+      <section className="bg-gradient-to-r from-[#f7f6f2] to-stone-50">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6 text-center">
-            <h2 className="text-xl font-semibold text-amber-900">{content.quickContact}</h2>
+            <h2 className="text-xl font-semibold text-[#633d1f]">{content.quickContact}</h2>
           </div>
           <QuickContactButtons
             whatsappLabel={content.whatsapp}
@@ -246,28 +246,28 @@ export default async function ContactPage({ params }: ContactPageProps) {
       {/* Main Content Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#f7f6f2] to-white py-16 md:py-24">
         {/* Decorative Elements */}
-        <div className="absolute -left-40 top-20 h-80 w-80 rounded-full bg-amber-100/40 blur-3xl" />
+        <div className="absolute -left-40 top-20 h-80 w-80 rounded-full bg-[#f7f6f2] blur-3xl" />
         <div className="absolute -right-40 bottom-20 h-80 w-80 rounded-full bg-stone-100/60 blur-3xl" />
 
         <div className="container relative mx-auto px-4">
           <div className="grid gap-12 lg:grid-cols-2">
             {/* Contact Form */}
             <div className="relative">
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-200/30 to-stone-200/30 blur-xl" />
-              <div className="relative overflow-hidden bg-white p-8 shadow-xl shadow-amber-900/5">
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-[#b2a896]/30 to-stone-200/30 blur-xl" />
+              <div className="relative overflow-hidden bg-white p-8 shadow-xl shadow-[#633d1f]/5">
                 {/* Decorative Corner */}
-                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-100/50" />
+                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#f7f6f2]/50" />
                 
                 <div className="relative">
                   <div className="mb-6 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 shadow-lg shadow-amber-500/20">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#c67a46] to-[#c67a46] shadow-lg shadow-[#c67a46]/20">
                       <Send className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-amber-900">
+                      <h2 className="text-2xl font-bold text-[#633d1f]">
                         {sendMessage}
                       </h2>
-                      <p className="text-sm text-amber-600">
+                      <p className="text-sm text-[#c67a46]">
                         {sendMessageSub}
                       </p>
                     </div>
@@ -281,12 +281,12 @@ export default async function ContactPage({ params }: ContactPageProps) {
             <div className="space-y-6">
               <div className="mb-8">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="h-1 w-12 rounded-full bg-gradient-to-r from-amber-600 to-amber-400" />
-                  <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                  <div className="h-1 w-12 rounded-full bg-gradient-to-r from-[#c67a46] to-[#c67a46]" />
+                  <span className="text-sm font-medium uppercase tracking-widest text-[#c67a46]">
                     {contactInfoLabel}
                   </span>
                 </div>
-                <h2 className="text-3xl font-bold text-amber-900">
+                <h2 className="text-3xl font-bold text-[#633d1f]">
                   {contactInfoTitle}
                 </h2>
               </div>
@@ -295,30 +295,30 @@ export default async function ContactPage({ params }: ContactPageProps) {
                 {contactInfoItems.map((item, index) => (
                   <div
                     key={index}
-                    className="group relative overflow-hidden bg-white p-6 shadow-lg transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-900/10"
+                    className="group relative overflow-hidden bg-white p-6 shadow-lg transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#633d1f]/10"
                   >
                     {/* Decorative Corner */}
-                    <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-amber-50 transition-transform duration-500 group-hover:scale-150" />
+                    <div className="absolute -right-4 -top-4 h-12 w-12 rounded-full bg-[#f7f6f2] transition-transform duration-500 group-hover:scale-150" />
                     
                     <div className="relative">
                       <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} ${item.hoverGradient} shadow-lg transition-all duration-300`}>
                         <item.icon className="h-7 w-7 text-white" />
                       </div>
-                      <h3 className="mb-1 text-lg font-bold text-amber-900">{item.title}</h3>
+                      <h3 className="mb-1 text-lg font-bold text-[#633d1f]">{item.title}</h3>
                       {item.key === "phone" || item.key === "callPhone" ? (
-                        <a href={`tel:${item.content.replace(/\s/g, "")}`} className="text-amber-700 transition-colors hover:text-amber-900">
+                        <a href={`tel:${item.content.replace(/\s/g, "")}`} className="text-[#b2a896] transition-colors hover:text-[#633d1f]">
                           {item.content}
                         </a>
                       ) : item.key === "email" ? (
-                        <a href={`mailto:${item.content}`} className="text-sm text-amber-700 transition-colors hover:text-amber-900" style={{ wordBreak: "break-all" }}>
+                        <a href={`mailto:${item.content}`} className="text-sm text-[#b2a896] transition-colors hover:text-[#633d1f]" style={{ wordBreak: "break-all" }}>
                           {item.content}
                         </a>
                       ) : item.key === "address" ? (
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.content)}`} target="_blank" rel="noopener noreferrer" className="text-amber-700 transition-colors hover:text-amber-900">
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.content)}`} target="_blank" rel="noopener noreferrer" className="text-[#b2a896] transition-colors hover:text-[#633d1f]">
                           {item.content}
                         </a>
                       ) : (
-                        <p className="text-amber-700">{item.content}</p>
+                        <p className="text-[#b2a896]">{item.content}</p>
                       )}
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default async function ContactPage({ params }: ContactPageProps) {
               </div>
 
               {/* Social Links */}
-              <div className="mt-8 bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 p-6">
+              <div className="mt-8 bg-gradient-to-r from-[#633d1f] via-[#633d1f] to-stone-900 p-6">
                 <h3 className="mb-4 text-lg font-semibold text-white">
                   {followUs}
                 </h3>
@@ -369,30 +369,30 @@ export default async function ContactPage({ params }: ContactPageProps) {
       </section>
 
       {/* CTA Section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 py-16 md:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#633d1f] via-[#633d1f] to-stone-900 py-16 md:py-20">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-amber-400/20 to-transparent" />
-          <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-amber-400/20 to-transparent" />
-          <div className="absolute left-3/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-amber-400/20 to-transparent" />
+          <div className="absolute left-1/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#c67a46]/20 to-transparent" />
+          <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#c67a46]/20 to-transparent" />
+          <div className="absolute left-3/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#c67a46]/20 to-transparent" />
         </div>
 
         <div className="container relative mx-auto px-4 text-center">
           <div className="mb-6 flex items-center justify-center gap-4">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-amber-400" />
-            <Sparkles className="h-5 w-5 text-amber-400" />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-amber-400" />
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#c67a46]" />
+            <Sparkles className="h-5 w-5 text-[#c67a46]" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#c67a46]" />
           </div>
 
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
             {content.ctaTitle}
           </h2>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-amber-100/80">
+          <p className="mx-auto mb-10 max-w-2xl text-lg text-[#f7f6f2]">
             {content.ctaSubtitle}
           </p>
           <Link
             href={`/${locale}/store-locator`}
-            className="group inline-flex items-center gap-3 rounded-full bg-white px-10 py-5 text-lg font-semibold text-amber-900 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-2xl hover:shadow-amber-900/20"
+            className="group inline-flex items-center gap-3 rounded-full bg-white px-10 py-5 text-lg font-semibold text-[#633d1f] shadow-lg transition-all duration-300 hover:bg-[#f7f6f2] hover:shadow-2xl hover:shadow-[#633d1f]/20"
           >
             <MapPin className="h-5 w-5" />
             <span>{content.ctaButton}</span>

@@ -107,11 +107,11 @@ export function CategorySection({
       <div className="container mx-auto px-4">
         <div className="mb-8 flex items-center justify-between md:mb-10">
           <div className="text-center w-full md:text-left md:w-auto">
-            <h2 className="mb-2 text-2xl font-bold text-amber-900 md:text-3xl">
+            <h2 className="mb-2 text-2xl font-bold text-[#633d1f] md:text-3xl">
               {settings.section_title}
             </h2>
             {settings.section_subtitle && (
-              <p className="text-amber-700/70">
+              <p className="text-[#b2a896]">
                 {settings.section_subtitle}
               </p>
             )}
@@ -119,7 +119,7 @@ export function CategorySection({
           {settings.show_view_all && (
             <Link
               href={`/${locale}/shop`}
-              className="hidden items-center text-sm font-medium text-amber-900 hover:text-amber-700 hover:underline md:flex"
+              className="hidden items-center text-sm font-medium text-[#633d1f] hover:text-[#b2a896] hover:underline md:flex"
             >
               {viewAllText}
               <ArrowRight className={`ml-1 h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
@@ -159,7 +159,7 @@ export function CategorySection({
                     )}
                   </div>
                   <div className="mt-3 text-center">
-                    <h3 className="text-base font-semibold text-amber-900 transition-colors group-hover:text-amber-700 md:text-lg">
+                    <h3 className="text-base font-semibold text-[#633d1f] transition-colors group-hover:text-[#b2a896] md:text-lg">
                       {decodeHtmlEntities(category.name)}
                     </h3>
                   </div>
@@ -191,7 +191,7 @@ export function CategorySection({
                 )}
               </div>
               <div className="mt-3 text-center">
-                <h3 className="text-base font-semibold text-amber-900 transition-colors group-hover:text-amber-700 md:text-lg">
+                <h3 className="text-base font-semibold text-[#633d1f] transition-colors group-hover:text-[#b2a896] md:text-lg">
                   {item.name[locale]}
                 </h3>
               </div>
@@ -201,7 +201,7 @@ export function CategorySection({
 
         {settings.show_view_all && (
           <div className="mt-8 text-center md:hidden">
-            <Button variant="outline" className="border-amber-900 text-amber-900 hover:bg-amber-900 hover:text-white" asChild>
+            <Button variant="outline" className="border-[#633d1f] text-[#633d1f] hover:bg-[#633d1f] hover:text-white" asChild>
               <Link href={`/${locale}/shop`}>{viewAllText}</Link>
             </Button>
           </div>

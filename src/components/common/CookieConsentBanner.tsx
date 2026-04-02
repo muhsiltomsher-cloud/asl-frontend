@@ -102,8 +102,8 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
         </button>
 
         <div className="flex items-start gap-3 pr-8">
-          <div className="flex-shrink-0 rounded-full bg-[#C4885B]/10 p-2">
-            <Cookie className="h-5 w-5 text-[#C4885B]" />
+          <div className="flex-shrink-0 rounded-full bg-[#c67a46]/10 p-2">
+            <Cookie className="h-5 w-5 text-[#c67a46]" />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -112,7 +112,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
             <div className="flex flex-wrap items-center gap-2 mt-3">
               <button
                 onClick={handleAccept}
-                className="px-4 py-2 text-xs font-medium text-white bg-[#C4885B] rounded-full hover:bg-[#B37A4F] transition-colors uppercase tracking-wide"
+                className="px-4 py-2 text-xs font-medium text-white bg-[#c67a46] rounded-full hover:bg-[#B37A4F] transition-colors uppercase tracking-wide"
               >
                 {t.accept}
               </button>
@@ -124,7 +124,7 @@ export function CookieConsentBanner({ locale = "en" }: CookieConsentBannerProps)
               </button>
               <a
                 href={`/${locale}/privacy`}
-                className="text-xs text-[#C4885B] hover:underline"
+                className="text-xs text-[#c67a46] hover:underline"
               >
                 {t.learnMore}
               </a>

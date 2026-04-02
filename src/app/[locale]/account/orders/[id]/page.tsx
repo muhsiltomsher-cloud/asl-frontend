@@ -435,7 +435,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
                           {isFreeGift ? (
-                            <Gift className="h-8 w-8 text-amber-500" />
+                            <Gift className="h-8 w-8 text-[#c67a46]" />
                           ) : (
                             <Package className="h-8 w-8 text-gray-400" />
                           )}
@@ -450,7 +450,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                       <div className="flex items-center gap-2">
                         <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
                         {isFreeGift && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#f7f6f2] px-2 py-0.5 text-xs font-medium text-[#b2a896]">
                             <Gift className="h-3 w-3" />
                             {t.freeGift}
                           </span>
@@ -472,7 +472,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageProps) {
                         price={isFreeGift ? 0 : item.total}
                         orderCurrency={order.currency}
                         orderCurrencySymbol={order.currency_symbol}
-                        className={`font-medium ${isFreeGift ? "text-amber-600" : "text-gray-900"}`}
+                        className={`font-medium ${isFreeGift ? "text-[#c67a46]" : "text-gray-900"}`}
                         iconSize="xs"
                       />
                     </div>

@@ -19,7 +19,7 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
       {field.label}
       {field.required && <span className="text-red-500 ml-1">*</span>}
       {field.price && field.price > 0 && (
-        <span className="ml-2 text-xs text-amber-600">
+        <span className="ml-2 text-xs text-[#c67a46]">
           (+<FormattedPrice price={field.price} iconSize="xs" />)
         </span>
       )}
@@ -35,7 +35,7 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
   );
 
   const baseInputClasses =
-    "w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500";
+    "w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-[#c67a46] focus:outline-none focus:ring-1 focus:ring-[#c67a46]";
 
   switch (field.type) {
     case "text":
@@ -149,13 +149,13 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
               name={field.name}
               checked={Boolean(value)}
               onChange={(e) => onChange(e.target.checked)}
-              className="h-5 w-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              className="h-5 w-5 rounded border-gray-300 text-[#c67a46] focus:ring-[#c67a46]"
             />
             <span className="text-sm text-gray-700">
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
               {field.price && field.price > 0 && (
-                <span className="ml-2 text-xs text-amber-600">
+                <span className="ml-2 text-xs text-[#c67a46]">
                   (+<FormattedPrice price={field.price} iconSize="xs" />)
                 </span>
               )}
@@ -189,12 +189,12 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                       onChange(selectedValues.filter((v) => v !== option.value));
                     }
                   }}
-                  className="h-5 w-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="h-5 w-5 rounded border-gray-300 text-[#c67a46] focus:ring-[#c67a46]"
                 />
                 <span className="text-sm text-gray-700">
                   {option.label}
                   {option.price && option.price > 0 && (
-                    <span className="ml-2 text-xs text-amber-600">
+                    <span className="ml-2 text-xs text-[#c67a46]">
                       (+<FormattedPrice price={option.price} iconSize="xs" />)
                     </span>
                   )}
@@ -225,12 +225,12 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                   value={option.value}
                   checked={value === option.value}
                   onChange={(e) => onChange(e.target.value)}
-                  className="h-5 w-5 border-gray-300 text-amber-600 focus:ring-amber-500"
+                  className="h-5 w-5 border-gray-300 text-[#c67a46] focus:ring-[#c67a46]"
                 />
                 <span className="text-sm text-gray-700">
                   {option.label}
                   {option.price && option.price > 0 && (
-                    <span className="ml-2 text-xs text-amber-600">
+                    <span className="ml-2 text-xs text-[#c67a46]">
                       (+<FormattedPrice price={option.price} iconSize="xs" />)
                     </span>
                   )}
@@ -273,8 +273,8 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                   }}
                   className={`relative aspect-square rounded-lg border-2 overflow-hidden transition-all ${
                     isSelected
-                      ? "border-amber-500 ring-2 ring-amber-500/50"
-                      : "border-gray-200 hover:border-amber-300"
+                      ? "border-[#c67a46] ring-2 ring-[#c67a46]/50"
+                      : "border-gray-200 hover:border-[#b2a896]"
                   }`}
                 >
                   {option.image && (
@@ -288,11 +288,11 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                   <div className="absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1">
                     <p className="text-xs text-white truncate">{option.label}</p>
                     {option.price && option.price > 0 && (
-                      <p className="text-xs text-amber-300">+{option.price}</p>
+                      <p className="text-xs text-[#b2a896]">+{option.price}</p>
                     )}
                   </div>
                   {isSelected && (
-                    <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-amber-500 flex items-center justify-center">
+                    <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#c67a46] flex items-center justify-center">
                       <svg
                         className="h-3 w-3 text-white"
                         fill="none"
@@ -347,8 +347,8 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                   }}
                   className={`relative h-10 w-10 rounded-full border-2 transition-all ${
                     isSelected
-                      ? "border-amber-500 ring-2 ring-amber-500/50 scale-110"
-                      : "border-gray-200 hover:border-amber-300"
+                      ? "border-[#c67a46] ring-2 ring-[#c67a46]/50 scale-110"
+                      : "border-gray-200 hover:border-[#b2a896]"
                   }`}
                   style={{ backgroundColor: option.color || option.value }}
                   title={option.label}
@@ -414,8 +414,8 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                   }}
                   className={`relative rounded-lg border-2 p-3 text-left transition-all ${
                     isSelected
-                      ? "border-amber-500 bg-amber-50"
-                      : "border-gray-200 hover:border-amber-300"
+                      ? "border-[#c67a46] bg-[#f7f6f2]"
+                      : "border-gray-200 hover:border-[#b2a896]"
                   }`}
                 >
                   {productGroupField.show_image !== false && option.image && (
@@ -432,12 +432,12 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
                     {option.label}
                   </p>
                   {productGroupField.show_price !== false && option.price !== undefined && (
-                    <p className="text-xs text-amber-600 mt-1">
+                    <p className="text-xs text-[#c67a46] mt-1">
                       +<FormattedPrice price={option.price} iconSize="xs" />
                     </p>
                   )}
                   {isSelected && (
-                    <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-amber-500 flex items-center justify-center">
+                    <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-[#c67a46] flex items-center justify-center">
                       <svg
                         className="h-3 w-3 text-white"
                         fill="none"
@@ -549,7 +549,7 @@ export function FieldRenderer({ field, value, error, onChange, locale, t }: Fiel
           <div className="mt-1">
             <label
               htmlFor={field.id}
-              className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-4 transition-colors hover:border-amber-400"
+              className="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-4 transition-colors hover:border-[#c67a46]"
             >
               <div className="text-center">
                 <svg

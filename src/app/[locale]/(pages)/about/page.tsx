@@ -129,18 +129,18 @@ export default async function AboutPage({ params }: AboutPageProps) {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-950/90 via-amber-900/80 to-stone-900/70" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2a1a0e]/90 via-[#633d1f]/80 to-stone-900/70" />
         </div>
 
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-amber-600/10 blur-3xl" />
+          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl" />
           <div
-            className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-amber-400/10 blur-3xl"
+            className="absolute -bottom-32 -right-32 h-[500px] w-[500px] animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl"
             style={{ animationDelay: "1s" }}
           />
           <div
-            className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-amber-500/5 blur-3xl"
+            className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-[#c67a46]/5 blur-3xl"
             style={{ animationDelay: "2s" }}
           />
         </div>
@@ -161,12 +161,12 @@ export default async function AboutPage({ params }: AboutPageProps) {
           <div className="mx-auto max-w-4xl text-center">
             {/* Decorative Line */}
             <div className="mb-8 flex items-center justify-center gap-4">
-              <div className="h-px w-20 bg-gradient-to-r from-transparent to-amber-400" />
-              <Sparkles className="h-6 w-6 text-amber-400" />
-              <div className="h-px w-20 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <Sparkles className="h-6 w-6 text-[#c67a46]" />
+              <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
 
-            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-amber-300">
+            <span className="mb-4 inline-block text-sm font-medium uppercase tracking-[0.3em] text-[#b2a896]">
               {heroSubtitle}
             </span>
 
@@ -174,27 +174,27 @@ export default async function AboutPage({ params }: AboutPageProps) {
               {title}
             </h1>
 
-            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-amber-100/90 md:text-xl">
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-[#f7f6f2]/90 md:text-xl">
               {heroDescription}
             </p>
 
             {/* Stats Row */}
             <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
-              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
-                <Calendar className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{statSince}</div>
+              <div className="border border-[#c67a46]/20 bg-white/5 p-4 backdrop-blur-sm">
+                <Calendar className="mx-auto mb-2 h-6 w-6 text-[#c67a46]" />
+                <div className="text-sm font-medium text-[#f7f6f2]">{statSince}</div>
               </div>
-              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
-                <MapPin className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{statLocation}</div>
+              <div className="border border-[#c67a46]/20 bg-white/5 p-4 backdrop-blur-sm">
+                <MapPin className="mx-auto mb-2 h-6 w-6 text-[#c67a46]" />
+                <div className="text-sm font-medium text-[#f7f6f2]">{statLocation}</div>
               </div>
-              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
-                <Sparkles className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{statHandcrafted}</div>
+              <div className="border border-[#c67a46]/20 bg-white/5 p-4 backdrop-blur-sm">
+                <Sparkles className="mx-auto mb-2 h-6 w-6 text-[#c67a46]" />
+                <div className="text-sm font-medium text-[#f7f6f2]">{statHandcrafted}</div>
               </div>
-              <div className="border border-amber-400/20 bg-white/5 p-4 backdrop-blur-sm">
-                <Leaf className="mx-auto mb-2 h-6 w-6 text-amber-400" />
-                <div className="text-sm font-medium text-amber-100">{statSustainable}</div>
+              <div className="border border-[#c67a46]/20 bg-white/5 p-4 backdrop-blur-sm">
+                <Leaf className="mx-auto mb-2 h-6 w-6 text-[#c67a46]" />
+                <div className="text-sm font-medium text-[#f7f6f2]">{statSustainable}</div>
               </div>
             </div>
           </div>
@@ -202,8 +202,8 @@ export default async function AboutPage({ params }: AboutPageProps) {
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-amber-400/50 p-1">
-            <div className="h-2 w-1 animate-bounce rounded-full bg-amber-400" />
+          <div className="flex h-10 w-6 items-start justify-center rounded-full border-2 border-[#c67a46]/50 p-1">
+            <div className="h-2 w-1 animate-bounce rounded-full bg-[#c67a46]" />
           </div>
         </div>
       </section>
@@ -216,14 +216,14 @@ export default async function AboutPage({ params }: AboutPageProps) {
       {/* Main Story Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-[#f7f6f2] to-white py-16 md:py-24">
         {/* Decorative Elements */}
-        <div className="absolute -left-40 top-20 h-80 w-80 rounded-full bg-amber-100/40 blur-3xl" />
+        <div className="absolute -left-40 top-20 h-80 w-80 rounded-full bg-[#f7f6f2] blur-3xl" />
         <div className="absolute -right-40 bottom-20 h-80 w-80 rounded-full bg-stone-100/60 blur-3xl" />
 
         <div className="container relative mx-auto px-4">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
             {/* Image Column */}
             <div className={`relative ${isRTL ? "lg:order-2" : ""}`}>
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-amber-200/30 to-stone-200/30 blur-xl" />
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-[#b2a896]/30 to-stone-200/30 blur-xl" />
               <div className="relative">
                 {/* Main Image */}
                 <div className="relative aspect-[4/5] overflow-hidden shadow-2xl">
@@ -237,31 +237,31 @@ export default async function AboutPage({ params }: AboutPageProps) {
                   />
                 </div>
                 {/* Decorative Circle */}
-                <div className="absolute -left-4 -top-4 h-20 w-20 rounded-full border-4 border-amber-200/50 bg-gradient-to-br from-amber-100 to-white" />
+                <div className="absolute -left-4 -top-4 h-20 w-20 rounded-full border-4 border-[#b2a896]/50 bg-gradient-to-br from-[#f7f6f2] to-white" />
               </div>
             </div>
 
             {/* Content Column */}
             <div className={`${isRTL ? "lg:order-1" : ""}`}>
               <div className="mb-6 flex items-center gap-3">
-                <div className="h-1 w-12 rounded-full bg-gradient-to-r from-amber-600 to-amber-400" />
-                <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+                <div className="h-1 w-12 rounded-full bg-gradient-to-r from-[#c67a46] to-[#c67a46]" />
+                <span className="text-sm font-medium uppercase tracking-widest text-[#c67a46]">
                   {mainTitle}
                 </span>
               </div>
 
-              <h2 className="mb-8 text-3xl font-bold text-amber-900 md:text-4xl lg:text-5xl">
+              <h2 className="mb-8 text-3xl font-bold text-[#633d1f] md:text-4xl lg:text-5xl">
                 {isRTL ? "رحلتنا العطرية" : "Our Fragrance Journey"}
               </h2>
 
               <div className="space-y-6">
-                <p className="text-lg leading-relaxed text-amber-800/80">
+                <p className="text-lg leading-relaxed text-[#633d1f]/80">
                   {mainP1}
                 </p>
-                <p className="leading-relaxed text-amber-700/70">
+                <p className="leading-relaxed text-[#b2a896]">
                   {mainP2}
                 </p>
-                <p className="leading-relaxed text-amber-700/70">
+                <p className="leading-relaxed text-[#b2a896]">
                   {mainP3}
                 </p>
               </div>
@@ -271,29 +271,29 @@ export default async function AboutPage({ params }: AboutPageProps) {
       </section>
 
       {/* Uniqueness Section - Full Width Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-amber-900 via-amber-800 to-stone-900 py-16 md:py-24">
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#633d1f] via-[#633d1f] to-stone-900 py-16 md:py-24">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-amber-400/20 to-transparent" />
-          <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-amber-400/20 to-transparent" />
-          <div className="absolute left-3/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-amber-400/20 to-transparent" />
+          <div className="absolute left-1/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#c67a46]/20 to-transparent" />
+          <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#c67a46]/20 to-transparent" />
+          <div className="absolute left-3/4 top-0 h-full w-px bg-gradient-to-b from-transparent via-[#c67a46]/20 to-transparent" />
         </div>
 
         <div className="container relative mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-6 flex items-center justify-center gap-4">
-              <div className="h-px w-16 bg-gradient-to-r from-transparent to-amber-400" />
-              <Sparkles className="h-5 w-5 text-amber-400" />
-              <div className="h-px w-16 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <Sparkles className="h-5 w-5 text-[#c67a46]" />
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
 
             <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
               {uniqueTitle}
             </h2>
-            <p className="mb-8 text-lg text-amber-300">
+            <p className="mb-8 text-lg text-[#b2a896]">
               {uniqueSubtitle}
             </p>
-            <p className="mx-auto max-w-3xl text-lg leading-relaxed text-amber-100/80">
+            <p className="mx-auto max-w-3xl text-lg leading-relaxed text-[#f7f6f2]">
               {uniqueContent}
             </p>
           </div>
@@ -315,44 +315,44 @@ export default async function AboutPage({ params }: AboutPageProps) {
 
         <div className="container relative mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-8 text-6xl text-amber-300">&ldquo;</div>
-            <h3 className="mb-4 text-2xl font-bold text-amber-900 md:text-3xl">
+            <div className="mb-8 text-6xl text-[#b2a896]">&ldquo;</div>
+            <h3 className="mb-4 text-2xl font-bold text-[#633d1f] md:text-3xl">
               {journeyTitle}
             </h3>
-            <p className="text-xl italic leading-relaxed text-amber-700/80 md:text-2xl">
+            <p className="text-xl italic leading-relaxed text-[#b2a896] md:text-2xl">
               {journeyContent}
             </p>
-            <div className="mt-8 text-6xl text-amber-300">&rdquo;</div>
+            <div className="mt-8 text-6xl text-[#b2a896]">&rdquo;</div>
           </div>
         </div>
       </section>
 
       {/* Ingredients Section */}
       <section className="relative overflow-hidden bg-white py-16 md:py-24">
-        <div className="absolute -left-20 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-amber-50 blur-3xl" />
+        <div className="absolute -left-20 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[#f7f6f2] blur-3xl" />
         <div className="absolute -right-20 top-1/3 h-64 w-64 rounded-full bg-stone-50 blur-3xl" />
 
         <div className="container relative mx-auto px-4">
           {/* Section Header */}
           <div className="mb-12 text-center md:mb-16">
             <div className="mb-4 flex items-center justify-center gap-4">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <span className="text-sm font-medium uppercase tracking-widest text-[#c67a46]">
                 {isRTL ? "استكشف" : "Explore"}
               </span>
-              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
-            <h2 className="mb-4 text-3xl font-bold text-amber-900 md:text-4xl lg:text-5xl">
+            <h2 className="mb-4 text-3xl font-bold text-[#633d1f] md:text-4xl lg:text-5xl">
               {ingredientsTitle}
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-amber-700/70">
+            <p className="mx-auto max-w-2xl text-lg text-[#b2a896]">
               {ingredientsSubtitle}
             </p>
           </div>
 
           {/* Description */}
           <div className="mx-auto mb-12 max-w-4xl">
-            <p className="text-center leading-relaxed text-amber-700/80">
+            <p className="text-center leading-relaxed text-[#b2a896]">
               {ingredientsDesc}
             </p>
           </div>
@@ -370,29 +370,29 @@ export default async function AboutPage({ params }: AboutPageProps) {
         <div className="container relative mx-auto px-4">
           <div className="mb-12 text-center md:mb-16">
             <div className="mb-4 flex items-center justify-center gap-4">
-              <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-              <span className="text-sm font-medium uppercase tracking-widest text-amber-600">
+              <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
+              <span className="text-sm font-medium uppercase tracking-widest text-[#c67a46]">
                 {isRTL ? "أسئلة شائعة" : "FAQ"}
               </span>
-              <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+              <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
             </div>
-            <h2 className="mb-4 text-3xl font-bold text-amber-900 md:text-4xl">
+            <h2 className="mb-4 text-3xl font-bold text-[#633d1f] md:text-4xl">
               {isRTL ? "أسئلة شائعة عن العلامة التجارية" : "Frequently Asked Questions"}
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-amber-700/70">
+            <p className="mx-auto max-w-2xl text-lg text-[#b2a896]">
               {isRTL ? "كل ما تحتاج معرفته عن أروماتيك سينتس لاب" : "Everything you need to know about Aromatic Scents Lab"}
             </p>
           </div>
           <div className="mx-auto max-w-3xl space-y-4">
             {brandFaqItems.map((item, idx) => (
-              <details key={idx} className="group border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
+              <details key={idx} className="group border border-[#e8e0d5] bg-gradient-to-b from-[#f7f6f2] to-white shadow-sm">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-[#633d1f] transition-colors hover:text-[#b2a896]">
                   <span>{item.question}</span>
-                  <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 shrink-0 text-[#c67a46] transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="px-5 pb-5 leading-relaxed text-amber-700/80">
+                <div className="px-5 pb-5 leading-relaxed text-[#b2a896]">
                   {item.answer}
                 </div>
               </details>
@@ -402,10 +402,10 @@ export default async function AboutPage({ params }: AboutPageProps) {
       </section>
 
       {/* Call to Action Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-900 via-amber-800 to-stone-900 py-16 md:py-24">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#633d1f] via-[#633d1f] to-stone-900 py-16 md:py-24">
         {/* Animated Background */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-amber-600/10 blur-3xl" />
+          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-[#c67a46]/10 blur-3xl" />
           <div
             className="absolute -bottom-20 -right-20 h-80 w-80 animate-pulse rounded-full bg-stone-600/10 blur-3xl"
             style={{ animationDelay: "1s" }}
@@ -414,20 +414,20 @@ export default async function AboutPage({ params }: AboutPageProps) {
 
         <div className="container relative mx-auto px-4 text-center">
           <div className="mb-6 flex items-center justify-center gap-4">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-amber-400" />
-            <Sparkles className="h-5 w-5 text-amber-400" />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-amber-400" />
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#c67a46]" />
+            <Sparkles className="h-5 w-5 text-[#c67a46]" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#c67a46]" />
           </div>
 
           <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
             {ctaTitle}
           </h2>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-amber-100/80">
+          <p className="mx-auto mb-10 max-w-2xl text-lg text-[#f7f6f2]">
             {ctaSubtitle}
           </p>
           <Link
             href={`/${locale}/shop`}
-            className="group inline-flex items-center gap-3 rounded-full bg-white px-10 py-5 text-lg font-semibold text-amber-900 shadow-lg transition-all duration-300 hover:bg-amber-50 hover:shadow-2xl hover:shadow-amber-900/20"
+            className="group inline-flex items-center gap-3 rounded-full bg-white px-10 py-5 text-lg font-semibold text-[#633d1f] shadow-lg transition-all duration-300 hover:bg-[#f7f6f2] hover:shadow-2xl hover:shadow-[#633d1f]/20"
           >
             <span>{ctaButton}</span>
             <ChevronRight

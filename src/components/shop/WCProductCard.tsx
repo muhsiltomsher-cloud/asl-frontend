@@ -198,7 +198,7 @@ export function WCProductCard({
             <div className="absolute bottom-0 left-0 right-0 p-3 opacity-0 translate-y-full transition-all duration-500 ease-out group-hover:opacity-100 group-hover:translate-y-0">
               {isBundleProduct ? (
                 <span
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium uppercase tracking-wide text-white bg-[#C4885B] rounded-full shadow-lg transition-all duration-300 hover:text-[#C4885B] hover:bg-white/70 hover:backdrop-blur-md hover:border hover:border-[#C4885B]/30"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium uppercase tracking-wide text-white bg-[#c67a46] rounded-full shadow-lg transition-all duration-300 hover:text-[#c67a46] hover:bg-white/70 hover:backdrop-blur-md hover:border hover:border-[#c67a46]/30"
                 >
                   <Eye className="h-4 w-4" />
                   {isRTL ? "تخصيص" : "Customize"}
@@ -211,7 +211,7 @@ export function WCProductCard({
                     "w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium uppercase tracking-wide rounded-full shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
                     isAddedToCart
                       ? "bg-green-500 text-white scale-95"
-                      : "text-white bg-[#C4885B] hover:text-[#C4885B] hover:bg-white/70 hover:backdrop-blur-md hover:border hover:border-[#C4885B]/30"
+                      : "text-white bg-[#c67a46] hover:text-[#c67a46] hover:bg-white/70 hover:backdrop-blur-md hover:border hover:border-[#c67a46]/30"
                   )}
                 >
                   {isAddedToCart ? (
@@ -226,12 +226,12 @@ export function WCProductCard({
         </div>
 
         <div className="mt-4 space-y-1">
-                              <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-amber-800 transition-colors uppercase">
+                              <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 group-hover:text-[#633d1f] transition-colors uppercase">
                                 {product.name}
                               </h3>
 
                                         {product.categories?.[0] && (
-                                <p className="font-medium uppercase tracking-wider text-amber-600" style={{ fontSize: '10px' }}>
+                                <p className="font-medium uppercase tracking-wider text-[#c67a46]" style={{ fontSize: '10px' }}>
                                   {decodeHtmlEntities(product.categories[0].name)}
                                 </p>
                               )}
@@ -241,7 +241,7 @@ export function WCProductCard({
               <>
                 <FormattedPrice
                   price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                  className="text-sm font-bold text-amber-900"
+                  className="text-sm font-bold text-[#633d1f]"
                   iconSize="xs"
                 />
                 <FormattedPrice
@@ -254,7 +254,7 @@ export function WCProductCard({
             ) : (
               <FormattedPrice
                 price={parseInt(product.prices.price) / Math.pow(10, product.prices.currency_minor_unit)}
-                className="text-sm font-bold text-amber-900"
+                className="text-sm font-bold text-[#633d1f]"
                 iconSize="xs"
               />
             )}

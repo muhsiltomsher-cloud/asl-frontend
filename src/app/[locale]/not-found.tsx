@@ -65,9 +65,9 @@ export default function NotFound() {
     <div className="flex min-h-[80vh] flex-col" dir={isRTL ? "rtl" : "ltr"}>
       <section className="relative overflow-hidden bg-gradient-to-b from-[#F5F0E8] to-white px-4 py-16 md:py-24">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-amber-200/20 blur-3xl" />
+          <div className="absolute -left-20 -top-20 h-96 w-96 animate-pulse rounded-full bg-[#b2a896]/20 blur-3xl" />
           <div
-            className="absolute -bottom-32 -right-32 h-[400px] w-[400px] animate-pulse rounded-full bg-amber-100/30 blur-3xl"
+            className="absolute -bottom-32 -right-32 h-[400px] w-[400px] animate-pulse rounded-full bg-[#f7f6f2]/30 blur-3xl"
             style={{ animationDelay: "1s" }}
           />
         </div>
@@ -84,10 +84,10 @@ export default function NotFound() {
             />
           </div>
 
-          <h1 className="mb-4 text-2xl font-bold text-amber-900 md:text-4xl">
+          <h1 className="mb-4 text-2xl font-bold text-[#633d1f] md:text-4xl">
             {texts.heading}
           </h1>
-          <p className="mx-auto mb-10 max-w-xl text-base text-amber-700/80 md:text-lg">
+          <p className="mx-auto mb-10 max-w-xl text-base text-[#b2a896] md:text-lg">
             {texts.description}
           </p>
 
@@ -111,11 +111,11 @@ export default function NotFound() {
       <section className="bg-white px-4 py-12 md:py-16">
         <div className="container mx-auto max-w-4xl">
           <div className="mb-8 flex items-center justify-center gap-3">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-amber-400" />
-            <h2 className="text-lg font-semibold uppercase tracking-widest text-amber-600 md:text-xl">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
+            <h2 className="text-lg font-semibold uppercase tracking-widest text-[#c67a46] md:text-xl">
               {texts.popularTitle}
             </h2>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-amber-400" />
+            <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4">
@@ -123,12 +123,12 @@ export default function NotFound() {
               <Link
                 key={cat.name}
                 href={cat.href}
-                className="group flex items-center gap-3 rounded-xl border border-amber-100 bg-[#F5F0E8]/50 p-4 transition-all duration-300 hover:border-amber-300 hover:bg-[#F5F0E8] hover:shadow-md"
+                className="group flex items-center gap-3 rounded-xl border border-[#e8e0d5] bg-[#F5F0E8]/50 p-4 transition-all duration-300 hover:border-[#b2a896] hover:bg-[#F5F0E8] hover:shadow-md"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 transition-colors group-hover:bg-amber-200">
-                  <cat.icon className="h-5 w-5 text-amber-700" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f7f6f2] transition-colors group-hover:bg-[#b2a896]">
+                  <cat.icon className="h-5 w-5 text-[#b2a896]" />
                 </div>
-                <span className="text-sm font-medium text-amber-900 md:text-base">
+                <span className="text-sm font-medium text-[#633d1f] md:text-base">
                   {cat.name}
                 </span>
               </Link>
@@ -139,11 +139,11 @@ export default function NotFound() {
 
       <section className="bg-gradient-to-b from-white to-[#F5F0E8] px-4 py-12">
         <div className="container mx-auto max-w-2xl text-center">
-          <Search className="mx-auto mb-4 h-8 w-8 text-amber-400" />
-          <h3 className="mb-2 text-lg font-semibold text-amber-900">
+          <Search className="mx-auto mb-4 h-8 w-8 text-[#c67a46]" />
+          <h3 className="mb-2 text-lg font-semibold text-[#633d1f]">
             {texts.helpTitle}
           </h3>
-          <p className="mb-6 text-amber-700/70">{texts.helpDescription}</p>
+          <p className="mb-6 text-[#b2a896]">{texts.helpDescription}</p>
           <Button variant="outline" asChild size="sm">
             <Link
               href={`/${locale}/contact`}

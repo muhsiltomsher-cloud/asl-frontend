@@ -192,7 +192,7 @@ export default async function LocaleLayout({
                 speed={200}
                 shadow="0 0 10px #92400e,0 0 5px #92400e"
               />
-              <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-lg focus:bg-amber-900 focus:px-6 focus:py-3 focus:text-white focus:shadow-lg focus:outline-none">
+              <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-lg focus:bg-[#633d1f] focus:px-6 focus:py-3 focus:text-white focus:shadow-lg focus:outline-none">
                 {validLocale === "ar" ? "انتقل إلى المحتوى الرئيسي" : "Skip to main content"}
               </a>
               <div dir={dir} lang={validLocale} className="flex min-h-screen flex-col bg-[#f7f6f2] overflow-x-clip max-w-full">

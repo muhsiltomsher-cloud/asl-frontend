@@ -21,7 +21,7 @@ export function CartItem({
 }: CartItemProps) {
   return (
     <li 
-      className={`p-4 transition-all duration-500 ${isGiftItem ? "bg-gradient-to-r from-amber-50 to-orange-50" : ""} ${isNewlyAddedGift ? "animate-pulse ring-2 ring-amber-400 ring-inset" : ""}`}
+      className={`p-4 transition-all duration-500 ${isGiftItem ? "bg-gradient-to-r from-[#f7f6f2] to-orange-50" : ""} ${isNewlyAddedGift ? "animate-pulse ring-2 ring-[#c67a46] ring-inset" : ""}`}
     >
       <div className="flex gap-4">
         <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden bg-gray-100">
@@ -40,7 +40,7 @@ export function CartItem({
             </div>
           )}
           {isGiftItem && (
-            <div className="absolute top-0 left-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg flex items-center gap-0.5">
+            <div className="absolute top-0 left-0 bg-gradient-to-r from-[#c67a46] to-orange-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br-lg flex items-center gap-0.5">
               <Gift className="h-3 w-3" />
               FREE
             </div>
@@ -54,7 +54,7 @@ export function CartItem({
                 {item.name}
               </h3>
               {categoryName && (
-                <p className="font-medium uppercase tracking-wider text-amber-600 mt-0.5" style={{ fontSize: '9px' }}>
+                <p className="font-medium uppercase tracking-wider text-[#c67a46] mt-0.5" style={{ fontSize: '9px' }}>
                   {categoryName}
                 </p>
               )}
@@ -72,7 +72,7 @@ export function CartItem({
           </div>
 
           {isGiftItem ? (
-            <p className="mt-1 text-sm font-medium text-amber-600 inline-flex items-center gap-1">
+            <p className="mt-1 text-sm font-medium text-[#c67a46] inline-flex items-center gap-1">
               <Gift className="h-3 w-3" />
               {locale === "ar" ? "هدية مجانية" : "Free Gift"}
             </p>

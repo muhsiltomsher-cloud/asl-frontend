@@ -102,7 +102,7 @@ export default async function DynamicPage({ params }: DynamicPageProps) {
 
       <div className="mx-auto max-w-4xl">
         <div
-          className="prose prose-amber max-w-none prose-headings:text-amber-900 prose-p:text-gray-700 prose-strong:text-amber-800 prose-li:text-gray-700 prose-a:text-amber-700 prose-a:underline hover:prose-a:text-amber-900"
+          className="prose prose-stone max-w-none prose-headings:text-[#633d1f] prose-p:text-gray-700 prose-strong:text-[#633d1f] prose-li:text-gray-700 prose-a:text-[#b2a896] prose-a:underline hover:prose-a:text-[#633d1f]"
           dangerouslySetInnerHTML={{ __html: page.content.rendered }}
         />
       </div>

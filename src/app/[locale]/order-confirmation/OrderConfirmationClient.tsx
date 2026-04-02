@@ -614,7 +614,7 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
                         <span className="text-gray-600">
                           {item.name} x {item.quantity}
                           {isFreeGift && (
-                            <span className="ml-2 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                            <span className="ml-2 inline-flex items-center rounded-full bg-[#f7f6f2] px-2 py-0.5 text-xs font-medium text-[#b2a896]">
                               {isRTL ? "هدية مجانية" : "Free Gift"}
                             </span>
                           )}
@@ -622,7 +622,7 @@ export default function OrderConfirmationClient({ locale }: OrderConfirmationCli
                         <OrderPrice 
                           price={isFreeGift ? 0 : item.total} 
                           orderCurrency={order.currency} 
-                          className={`font-medium ${isFreeGift ? "text-amber-600" : ""}`} 
+                          className={`font-medium ${isFreeGift ? "text-[#c67a46]" : ""}`} 
                           iconSize="xs" 
                         />
                       </div>

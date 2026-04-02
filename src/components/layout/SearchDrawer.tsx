@@ -206,7 +206,7 @@ export function SearchDrawer({
                     )}
                     <div className="flex-1 min-w-0">
                       {product.categories?.[0] && (
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-amber-600 truncate">
+                        <p className="text-[10px] font-medium uppercase tracking-wider text-[#c67a46] truncate">
                           {decodeHtmlEntities(product.categories[0].name)}
                         </p>
                       )}

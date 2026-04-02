@@ -123,7 +123,7 @@ export function ProductViewToggle({
             className={cn(
               "flex items-center justify-center rounded-md p-2 transition-all",
               viewMode === "grid"
-                ? "bg-white text-amber-700 shadow-sm"
+                ? "bg-white text-[#b2a896] shadow-sm"
                 : "text-gray-500 hover:text-gray-700"
             )}
             aria-label={t.grid}
@@ -137,7 +137,7 @@ export function ProductViewToggle({
             className={cn(
               "flex items-center justify-center rounded-md p-2 transition-all",
               viewMode === "list"
-                ? "bg-white text-amber-700 shadow-sm"
+                ? "bg-white text-[#b2a896] shadow-sm"
                 : "text-gray-500 hover:text-gray-700"
             )}
             aria-label={t.list}
@@ -158,7 +158,7 @@ export function ProductViewToggle({
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-md transition-all",
                   gridColumns === option.columns
-                    ? "bg-white text-amber-700 shadow-sm"
+                    ? "bg-white text-[#b2a896] shadow-sm"
                     : "text-gray-500 hover:text-gray-700",
                   option.columns === 5 && "hidden lg:flex"
                 )}
@@ -201,7 +201,7 @@ export function ProductViewToggle({
                   "w-full px-4 py-2 text-sm transition-colors",
                   isRTL ? "text-right" : "text-left",
                   sortBy === option.value
-                    ? "bg-amber-50 text-amber-800"
+                    ? "bg-[#f7f6f2] text-[#633d1f]"
                     : "text-gray-700 hover:bg-gray-50"
                 )}
               >

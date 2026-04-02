@@ -72,8 +72,8 @@ export function MobileCategoryMenu({
                     />
                   </div>
                 ) : (
-                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-amber-50">
-                    <Grid3X3 className="h-4 w-4 text-amber-400" />
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-[#f7f6f2]">
+                    <Grid3X3 className="h-4 w-4 text-[#c67a46]" />
                   </div>
                 )}
                 <span className="flex-1">{category.name}</span>
@@ -114,11 +114,11 @@ export function MobileCategoryMenu({
                     className={cn(
                       "flex items-center gap-2 rounded-md px-3 py-2",
                       "text-sm text-gray-600",
-                      "hover:bg-amber-50 hover:text-amber-700",
+                      "hover:bg-[#f7f6f2] hover:text-[#b2a896]",
                       "transition-colors"
                     )}
                   >
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#b2a896]" />
                     <span className="flex-1">{child.name}</span>
                   </Link>
                 ))}

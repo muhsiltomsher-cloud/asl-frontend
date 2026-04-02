@@ -71,11 +71,11 @@ export function CollectionsSection({
     <section className={`bg-white py-6 md:py-8 ${className} ${getVisibilityClass()}`}>
       <div className="container mx-auto px-4">
         <div className="mb-8 text-center md:mb-10">
-          <h2 className="mb-2 text-2xl font-bold text-amber-900 md:text-3xl">
+          <h2 className="mb-2 text-2xl font-bold text-[#633d1f] md:text-3xl">
             {settings.section_title}
           </h2>
           {settings.section_subtitle && (
-            <p className="text-amber-700/70">
+            <p className="text-[#b2a896]">
               {settings.section_subtitle}
             </p>
           )}

@@ -195,7 +195,7 @@ export default function LoginPage({ params }: LoginPageProps) {
             <div className={`mb-6 ${isRTL ? "text-right" : "text-left"}`}>
               <div className="inline-block">
                 <h1 className="text-sm font-bold tracking-widest text-[#92400e] uppercase">{texts.login}</h1>
-                <div className="mt-2 h-0.5 bg-gradient-to-r from-[#92400e] to-[#d4a574]"></div>
+                <div className="mt-2 h-0.5 bg-gradient-to-r from-[#92400e] to-[#d4956b]"></div>
               </div>
             </div>
 
@@ -237,7 +237,7 @@ export default function LoginPage({ params }: LoginPageProps) {
               </div>
             )}
 
-            <div className={`mb-6 rounded-md bg-amber-50 border border-amber-200 p-4 text-sm text-amber-800 ${isRTL ? "text-right" : "text-left"}`}>
+            <div className={`mb-6 rounded-md bg-[#f7f6f2] border border-[#b2a896] p-4 text-sm text-[#633d1f] ${isRTL ? "text-right" : "text-left"}`}>
               <p>
                 {texts.returningUserMessage}{" "}
                 <Link

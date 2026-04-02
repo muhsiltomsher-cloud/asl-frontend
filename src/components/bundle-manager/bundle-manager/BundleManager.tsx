@@ -169,13 +169,13 @@ export function BundleManager({
             </select>
           </div>
 
-          <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="flex items-center gap-3 rounded-lg border border-[#b2a896] bg-[#f7f6f2] p-4">
             <input
               type="checkbox"
               id="enableBundle"
               checked={config.isEnabled}
               onChange={(e) => updateConfig("isEnabled", e.target.checked)}
-              className="h-5 w-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              className="h-5 w-5 rounded border-gray-300 text-[#c67a46] focus:ring-[#c67a46]"
             />
             <div>
               <label htmlFor="enableBundle" className="font-medium text-gray-900">
@@ -202,7 +202,7 @@ export function BundleManager({
                   key={option.value}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors ${
                     config.pricing.mode === option.value
-                      ? "border-amber-500 bg-amber-50"
+                      ? "border-[#c67a46] bg-[#f7f6f2]"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
@@ -212,7 +212,7 @@ export function BundleManager({
                     value={option.value}
                     checked={config.pricing.mode === option.value}
                     onChange={(e) => updatePricing("mode", e.target.value as PricingMode)}
-                    className="mt-1 h-4 w-4 border-gray-300 text-amber-600 focus:ring-amber-500"
+                    className="mt-1 h-4 w-4 border-gray-300 text-[#c67a46] focus:ring-[#c67a46]"
                   />
                   <div className="flex-1">
                     <span className="font-medium text-gray-900">
@@ -316,7 +316,7 @@ export function BundleManager({
               id="showProductPrices"
               checked={config.pricing.showProductPrices}
               onChange={(e) => updatePricing("showProductPrices", e.target.checked)}
-              className="h-5 w-5 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              className="h-5 w-5 rounded border-gray-300 text-[#c67a46] focus:ring-[#c67a46]"
             />
             <div>
               <label htmlFor="showProductPrices" className="font-medium text-gray-900">
@@ -360,7 +360,7 @@ export function BundleManager({
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-2 rounded-md bg-amber-600 px-6 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center gap-2 rounded-md bg-[#c67a46] px-6 py-2 text-sm font-medium text-white hover:bg-[#633d1f] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             {isSaving ? t.saving : t.save}
