@@ -148,3 +148,6 @@ require_once ASL_SETTINGS_PATH . 'includes/class-asl-page-fields.php';
 
 // Include Notes CPT module (fragrance notes as individual posts, like Guides)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-notes-cpt.php';
+
+// Include Product Meta module (dynamic SEO meta descriptions for products)
+require_once ASL_SETTINGS_PATH . 'includes/class-asl-product-meta.php';
