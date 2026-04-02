@@ -180,6 +180,23 @@ input::-webkit-credentials-auto-fill-button {
   opacity: 1;
 }
 
+/* Swiper pagination bullet colors - using plain CSS classes instead of Tailwind arbitrary values
+   because Swiper uses bulletClass as CSS selectors and # in hex colors breaks querySelectorAll */
+.swiper-bullet-brown {
+  background-color: rgba(99, 61, 31, 0.3) !important;
+}
+.swiper-bullet-brown-active {
+  background-color: #633d1f !important;
+}
+.swiper-bullet-beige {
+  background-color: #b2a896 !important;
+  opacity: 0.5 !important;
+}
+.swiper-bullet-orange-active {
+  background-color: #c67a46 !important;
+  opacity: 1 !important;
+}
+
 /* Hero slider - force Swiper to auto-size on mobile so banner images are not cropped */
 @media (max-width: 767px) {
   .hero-slider.swiper {

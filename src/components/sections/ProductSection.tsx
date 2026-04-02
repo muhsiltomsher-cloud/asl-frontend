@@ -129,8 +129,8 @@ export function ProductSection({
             }}
             pagination={{
               clickable: true,
-              bulletClass: "swiper-pagination-bullet !bg-[#633d1f]/30",
-              bulletActiveClass: "swiper-pagination-bullet-active !bg-[#633d1f]",
+              bulletClass: "swiper-pagination-bullet swiper-bullet-brown",
+              bulletActiveClass: "swiper-pagination-bullet-active swiper-bullet-brown-active",
             }}
             breakpoints={{
               640: {
