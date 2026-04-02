@@ -42,8 +42,8 @@ export function IngredientsCarousel({
         }}
         pagination={{
           clickable: true,
-          bulletClass: "swiper-pagination-bullet !bg-[#b2a896] !opacity-50",
-          bulletActiveClass: "!bg-[#c67a46] !opacity-100",
+          bulletClass: "swiper-pagination-bullet swiper-bullet-beige",
+          bulletActiveClass: "swiper-bullet-orange-active",
         }}
         navigation={{
           prevEl: ".ingredients-slider-prev",
