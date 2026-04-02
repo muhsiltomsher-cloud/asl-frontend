@@ -199,6 +199,19 @@ function asl_render_products_tab($key,$label) {
  * Render Categories tab
  */
 function asl_render_categories_tab() {
+    // Fetch all WooCommerce product categories (parent=0, exclude uncategorized)
+    $all_cats = get_terms(array(
+        'taxonomy'   => 'product_cat',
+        'hide_empty' => false,
+        'parent'     => 0,
+        'exclude'    => array(get_option('default_product_cat', 0)),
+    ));
+    if (is_wp_error($all_cats)) $all_cats = array();
+
+    $selected_ids = get_theme_mod('asl_categories_selected', array());
+    if (!is_array($selected_ids)) $selected_ids = array();
+    // Cast to int
+    $selected_ids = array_map('intval', $selected_ids);
     ?>
     <h2>Categories Section</h2>
     <table class="form-table">
@@ -207,11 +220,70 @@ function asl_render_categories_tab() {
         <tr><th>Hide on Desktop</th><td><label><input type="checkbox" name="asl_categories_hide_desktop" value="1" <?php checked(get_theme_mod('asl_categories_hide_desktop',false)); ?>> Hide on desktop</label></td></tr>
         <tr><th>Title (EN)</th><td><input type="text" name="asl_categories_title" value="<?php echo esc_attr(get_theme_mod('asl_categories_title','Shop by Category')); ?>" class="regular-text"></td></tr>
         <tr><th>Title (AR)</th><td><input type="text" name="asl_categories_title_ar" value="<?php echo esc_attr(get_theme_mod('asl_categories_title_ar','')); ?>" class="regular-text" dir="rtl"></td></tr>
-        <tr><th>Count</th><td><input type="number" name="asl_categories_count" value="<?php echo esc_attr(get_theme_mod('asl_categories_count',6)); ?>" min="3" max="12" class="small-text"></td></tr>
         <tr><th>Desktop Cols</th><td><input type="number" name="asl_categories_cols_desktop" value="<?php echo esc_attr(get_theme_mod('asl_categories_cols_desktop',6)); ?>" min="3" max="8" class="small-text"></td></tr>
         <tr><th>Tablet Cols</th><td><input type="number" name="asl_categories_cols_tablet" value="<?php echo esc_attr(get_theme_mod('asl_categories_cols_tablet',4)); ?>" min="2" max="6" class="small-text"></td></tr>
         <tr><th>Mobile Cols</th><td><input type="number" name="asl_categories_cols_mobile" value="<?php echo esc_attr(get_theme_mod('asl_categories_cols_mobile',3)); ?>" min="2" max="4" class="small-text"></td></tr>
     </table>
+
+    <h3>Select Categories to Display</h3>
+    <p class="description" style="margin-bottom:12px;">Check the categories you want to show on the homepage. Drag to reorder. The number of selected categories determines how many are shown (the old Count field is no longer needed). If 4 categories are selected and Desktop Cols is 3, the 4th category wraps to the next row.</p>
+
+    <!-- Selected categories (ordered) -->
+    <div id="asl-cat-selected" style="margin-bottom:20px;">
+        <h4 style="margin-bottom:8px;">Selected Categories (drag to reorder)</h4>
+        <div id="asl-cat-selected-list" style="min-height:40px;padding:8px;background:#f0f7ff;border:2px dashed #c5d9ed;border-radius:6px;">
+            <?php
+            // Render selected categories in saved order
+            foreach ($selected_ids as $cat_id) {
+                $term = get_term($cat_id, 'product_cat');
+                if (!$term || is_wp_error($term)) continue;
+                $thumb_id = get_term_meta($cat_id, 'thumbnail_id', true);
+                $thumb_url = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'thumbnail') : '';
+                $count = $term->count;
+                ?>
+                <div class="asl-cat-item asl-cat-selected-item" data-id="<?php echo esc_attr($cat_id); ?>" style="display:flex;align-items:center;padding:10px;margin-bottom:6px;background:#fff;border:1px solid #c5d9ed;border-radius:4px;cursor:grab;">
+                    <span class="dashicons dashicons-menu" style="margin-right:10px;color:#999;cursor:grab;"></span>
+                    <?php if ($thumb_url): ?>
+                        <img src="<?php echo esc_url($thumb_url); ?>" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:10px;">
+                    <?php endif; ?>
+                    <div style="flex:1;">
+                        <strong><?php echo esc_html($term->name); ?></strong>
+                        <small style="color:#666;"> (<?php echo $count; ?> products) &middot; slug: <?php echo esc_html($term->slug); ?></small>
+                    </div>
+                    <input type="hidden" name="asl_categories_selected[]" value="<?php echo esc_attr($cat_id); ?>">
+                    <button type="button" class="button asl-cat-deselect" style="color:red;" title="Remove">&times;</button>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+        <p id="asl-cat-empty-msg" style="color:#999;text-align:center;padding:10px;<?php echo !empty($selected_ids) ? 'display:none;' : ''; ?>">No categories selected. Check categories below to add them.</p>
+    </div>
+
+    <!-- Available categories -->
+    <div id="asl-cat-available">
+        <h4 style="margin-bottom:8px;">Available Categories</h4>
+        <div style="max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:6px;padding:8px;background:#fafafa;">
+            <?php foreach ($all_cats as $cat):
+                $is_selected = in_array($cat->term_id, $selected_ids);
+                $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
+                $thumb_url = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'thumbnail') : '';
+            ?>
+                <div class="asl-cat-available-item" data-id="<?php echo esc_attr($cat->term_id); ?>" data-name="<?php echo esc_attr($cat->name); ?>" data-slug="<?php echo esc_attr($cat->slug); ?>" data-count="<?php echo esc_attr($cat->count); ?>" data-thumb="<?php echo esc_url($thumb_url); ?>" style="display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;<?php echo $is_selected ? 'opacity:0.4;' : ''; ?>">
+                    <label style="display:flex;align-items:center;flex:1;cursor:pointer;">
+                        <input type="checkbox" class="asl-cat-checkbox" value="<?php echo esc_attr($cat->term_id); ?>" <?php checked($is_selected); ?> style="margin-right:10px;">
+                        <?php if ($thumb_url): ?>
+                            <img src="<?php echo esc_url($thumb_url); ?>" style="width:36px;height:36px;object-fit:cover;border-radius:4px;margin-right:10px;">
+                        <?php endif; ?>
+                        <div>
+                            <strong><?php echo esc_html($cat->name); ?></strong>
+                            <small style="color:#666;"> (<?php echo $cat->count; ?> products) &middot; slug: <?php echo esc_html($cat->slug); ?></small>
+                        </div>
+                    </label>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
     <?php
 }
 
@@ -542,10 +614,19 @@ function asl_save_home_settings() {
             set_theme_mod('asl_categories_hide_desktop', isset($_POST['asl_categories_hide_desktop']));
             set_theme_mod('asl_categories_title', sanitize_text_field($_POST['asl_categories_title']??''));
             set_theme_mod('asl_categories_title_ar', sanitize_text_field($_POST['asl_categories_title_ar']??''));
-            set_theme_mod('asl_categories_count', absint($_POST['asl_categories_count']??6));
             set_theme_mod('asl_categories_cols_desktop', absint($_POST['asl_categories_cols_desktop']??6));
             set_theme_mod('asl_categories_cols_tablet', absint($_POST['asl_categories_cols_tablet']??4));
             set_theme_mod('asl_categories_cols_mobile', absint($_POST['asl_categories_cols_mobile']??3));
+            // Save selected category IDs (ordered)
+            $selected = array();
+            if (isset($_POST['asl_categories_selected']) && is_array($_POST['asl_categories_selected'])) {
+                $selected = array_map('absint', $_POST['asl_categories_selected']);
+                $selected = array_filter($selected); // remove zeros
+                $selected = array_values($selected); // reindex
+            }
+            set_theme_mod('asl_categories_selected', $selected);
+            // Keep count in sync for backward compat
+            set_theme_mod('asl_categories_count', count($selected) > 0 ? count($selected) : 6);
             break;
             
         case 'collections':
@@ -835,7 +916,27 @@ function asl_get_products_settings($key) {
  * Get categories settings
  */
 function asl_get_categories_settings() {
-    return array('enabled'=>get_theme_mod('asl_categories_enabled',true),'hideOnMobile'=>get_theme_mod('asl_categories_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_categories_hide_desktop',false),'title'=>get_theme_mod('asl_categories_title','Shop by Category'),'titleAr'=>get_theme_mod('asl_categories_title_ar',''),'subtitle'=>get_theme_mod('asl_categories_subtitle',''),'subtitleAr'=>get_theme_mod('asl_categories_subtitle_ar',''),'count'=>get_theme_mod('asl_categories_count',6),'responsive'=>array('desktop'=>get_theme_mod('asl_categories_cols_desktop',6),'tablet'=>get_theme_mod('asl_categories_cols_tablet',4),'mobile'=>get_theme_mod('asl_categories_cols_mobile',3)));
+    $selected = get_theme_mod('asl_categories_selected', array());
+    if (!is_array($selected)) $selected = array();
+    $selected = array_map('intval', $selected);
+    $selected = array_filter($selected);
+    $selected = array_values($selected);
+    return array(
+        'enabled'      => get_theme_mod('asl_categories_enabled', true),
+        'hideOnMobile'  => get_theme_mod('asl_categories_hide_mobile', false),
+        'hideOnDesktop' => get_theme_mod('asl_categories_hide_desktop', false),
+        'title'         => get_theme_mod('asl_categories_title', 'Shop by Category'),
+        'titleAr'       => get_theme_mod('asl_categories_title_ar', ''),
+        'subtitle'      => get_theme_mod('asl_categories_subtitle', ''),
+        'subtitleAr'    => get_theme_mod('asl_categories_subtitle_ar', ''),
+        'count'         => count($selected) > 0 ? count($selected) : (int)get_theme_mod('asl_categories_count', 6),
+        'selectedIds'   => $selected,
+        'responsive'    => array(
+            'desktop' => get_theme_mod('asl_categories_cols_desktop', 6),
+            'tablet'  => get_theme_mod('asl_categories_cols_tablet', 4),
+            'mobile'  => get_theme_mod('asl_categories_cols_mobile', 3),
+        ),
+    );
 }
 
 /**

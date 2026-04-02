@@ -89,6 +89,7 @@ export interface CategorySectionSettings {
   section_title: string;
   section_subtitle?: string;
   categories_count: number;
+  selected_category_ids?: number[];
   show_view_all: boolean;
   hide_on_mobile?: boolean;
   hide_on_desktop?: boolean;
