@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getProductBySlug, getRelatedProducts, getProducts, getEnglishSlugForProduct, getBundleConfig, getFreeGiftProductIds, getHiddenProductIds, getCategoryBySlug, getEnglishSlugForCategory, getProductUpsellIds, getProductsByIds } from "@/lib/api/woocommerce";
 import { getProductAddons } from "@/lib/api/wcpa";
 import { generateMetadata as generateSeoMetadata, generateProductJsonLd, generateBreadcrumbJsonLd } from "@/lib/utils/seo";
-import { getTopbarSettings } from "@/lib/api/wordpress";
+import { getTopbarSettings, getProductMetaDescription } from "@/lib/api/wordpress";
 import { ProductDetail } from "./ProductDetail";
 import { BuildYourOwnSetClient } from "../../build-your-own-set/BuildYourOwnSetClient";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
@@ -74,7 +74,12 @@ export async function generateMetadata({
   params,
 }: ProductPageProps): Promise<Metadata> {
   const { locale, slug } = await params;
-  const product = await getProductBySlug(slug, locale as Locale);
+
+  // Fetch product and backend-generated meta description in parallel
+  const [product, backendMetaDesc] = await Promise.all([
+    getProductBySlug(slug, locale as Locale),
+    getProductMetaDescription(slug, locale as Locale),
+  ]);
 
   if (!product) {
     return generateSeoMetadata({
@@ -125,36 +130,41 @@ export async function generateMetadata({
     seoTitle = `${productName} | ${seoSuffix}`;
   }
 
-  // Build a richer product description for SEO
-  // Truncate raw description at word boundary to avoid mid-word cuts
-  const fullRawDescription = decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, ""));
-  const rawDescription = fullRawDescription.length > 100
-    ? fullRawDescription.slice(0, 100).replace(/\s+\S*$/, "")
-    : fullRawDescription;
-  const minorUnit = product.prices?.currency_minor_unit || 2;
-  const divisor = Math.pow(10, minorUnit);
-  const priceValue = product.prices?.price ? (parseInt(product.prices.price, 10) / divisor).toFixed(0) : null;
+  // Use backend-generated meta description if available (from WordPress REST API).
+  // Falls back to frontend-generated description if backend returns empty.
+  let trimmedDescription: string;
 
-  // Include fragrance notes in the description for richer SEO snippets
-  const notesSnippet = fragranceNotes.length > 0
-    ? (locale === "ar"
-      ? ` المكونات: ${fragranceNotes.slice(0, 3).join("، ")}.`
-      : ` Notes: ${fragranceNotes.slice(0, 3).join(", ")}.`)
-    : "";
-  const olfactorySnippet = olfactoryFamily
-    ? (locale === "ar"
-      ? ` عائلة العطر: ${olfactoryFamily}.`
-      : ` Fragrance family: ${olfactoryFamily}.`)
-    : "";
+  if (backendMetaDesc) {
+    trimmedDescription = backendMetaDesc;
+  } else {
+    // Fallback: Build description on the frontend from product data
+    const fullRawDescription = decodeHtmlEntities(product.short_description.replace(/<[^>]*>/g, ""));
+    const rawDescription = fullRawDescription.length > 100
+      ? fullRawDescription.slice(0, 100).replace(/\s+\S*$/, "")
+      : fullRawDescription;
+    const minorUnit = product.prices?.currency_minor_unit || 2;
+    const divisor = Math.pow(10, minorUnit);
+    const priceValue = product.prices?.price ? (parseInt(product.prices.price, 10) / divisor).toFixed(0) : null;
 
-  const productDescription = locale === "ar"
-    ? `${rawDescription ? rawDescription + ". " : ""}${productName} من ${siteConfig.name}.${olfactorySnippet}${notesSnippet}${priceValue ? " السعر: " + priceValue + " درهم." : ""} توصيل مجاني للطلبات فوق 500 درهم.`
-    : `${rawDescription ? rawDescription + ". " : ""}${productName} by ${siteConfig.name}.${olfactorySnippet}${notesSnippet}${priceValue ? " Price: " + priceValue + " AED." : ""} Free delivery on orders over 500 AED.`;
+    const notesSnippet = fragranceNotes.length > 0
+      ? (locale === "ar"
+        ? ` المكونات: ${fragranceNotes.slice(0, 3).join("، ")}.`
+        : ` Notes: ${fragranceNotes.slice(0, 3).join(", ")}.`)
+      : "";
+    const olfactorySnippet = olfactoryFamily
+      ? (locale === "ar"
+        ? ` عائلة العطر: ${olfactoryFamily}.`
+        : ` Fragrance family: ${olfactoryFamily}.`)
+      : "";
 
-  // Truncate final description at word boundary (max 160 chars for SEO)
-  const trimmedDescription = productDescription.length > 160
-    ? productDescription.slice(0, 160).replace(/\s+\S*$/, "") + "..."
-    : productDescription;
+    const productDescription = locale === "ar"
+      ? `${rawDescription ? rawDescription + ". " : ""}${productName} من ${siteConfig.name}.${olfactorySnippet}${notesSnippet}${priceValue ? " السعر: " + priceValue + " درهم." : ""} توصيل مجاني للطلبات فوق 500 درهم.`
+      : `${rawDescription ? rawDescription + ". " : ""}${productName} by ${siteConfig.name}.${olfactorySnippet}${notesSnippet}${priceValue ? " Price: " + priceValue + " AED." : ""} Free delivery on orders over 500 AED.`;
+
+    trimmedDescription = productDescription.length > 160
+      ? productDescription.slice(0, 160).replace(/\s+\S*$/, "") + "..."
+      : productDescription;
+  }
 
   // Build enriched keywords from product attributes
   const olfactoryKeywords = olfactoryFamily ? [olfactoryFamily, `${olfactoryFamily} perfume`] : [];

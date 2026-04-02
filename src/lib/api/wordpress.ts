@@ -1379,6 +1379,39 @@ export function mapRepeater<T>(items: BilingualField | any[] | undefined, locale
   return items.map(item => mapper(item, locale));
 }
 
+// ─── Product Meta Descriptions ────────────────────────────────────
+
+interface ProductMetaResponse {
+  meta_description: string;
+  source: "yoast" | "auto" | "none";
+}
+
+/**
+ * Fetch dynamically generated meta description for a product from the backend.
+ * The backend auto-generates 150-160 char descriptions from product data
+ * (name, short_description, category, olfactory family, notes, price).
+ * If a Yoast SEO meta description has been manually set, it takes priority.
+ */
+export async function getProductMetaDescription(
+  slug: string,
+  locale?: Locale
+): Promise<string | null> {
+  const data = await fetchWPAPI<ProductMetaResponse>(
+    `/asl/v1/product-meta/${encodeURIComponent(slug)}`,
+    {
+      tags: ["products", `product-meta-${slug}`],
+      locale,
+      revalidate: 300,
+    }
+  );
+
+  if (!data || !data.meta_description) {
+    return null;
+  }
+
+  return data.meta_description;
+}
+
 // ─── Notes SEO ────────────────────────────────────────────────────
 
 interface NoteSeoResponse {
