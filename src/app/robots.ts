@@ -34,14 +34,24 @@ export default function robots(): MetadataRoute.Robots {
           "/*?replytocom=",
         ],
       },
+      // Allow AI crawlers explicitly for AI search visibility
       {
-        userAgent: "AhrefsBot",
-        disallow: "/",
+        userAgent: "GPTBot",
+        allow: "/",
       },
       {
-        userAgent: "SemrushBot",
-        disallow: "/",
+        userAgent: "Google-Extended",
+        allow: "/",
       },
+      {
+        userAgent: "Applebot-Extended",
+        allow: "/",
+      },
+      {
+        userAgent: "OAI-SearchBot",
+        allow: "/",
+      },
+      // Block known spam/scraper bots
       {
         userAgent: "MJ12bot",
         disallow: "/",

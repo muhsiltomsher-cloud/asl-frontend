@@ -721,6 +721,43 @@
         }
       ]
     },
+    "guides": {
+      "breadcrumb": "Guides",
+      "relatedGuides": "Related Guides",
+      "readGuide": "Read {title} guide",
+      "ourPicks": "Our Picks",
+      "topPicks": "Top Picks",
+      "buyingGuide": "Buying Guide",
+      "faqTitle": "Frequently Asked Questions",
+      "faqSubtitle": "Answers to your most common questions",
+      "updated": "Updated: ",
+      "location": "UAE",
+      "expertPicks": "Expert Picks",
+      "ctaTitle": "Ready to Find Your Perfect Scent?",
+      "ctaDescription": "Browse our full collection of premium, handcrafted fragrances made in the UAE. Free delivery on orders over 500 AED.",
+      "ctaShopButton": "Shop Aromatic Scents Lab Fragrances",
+      "ctaBrowseButton": "Browse Perfumes",
+      "contactUs": "Contact Us"
+    },
+    "storeLocator": {
+      "heroTitle": "Discover Our Stores",
+      "heroSubtitle": "Store Locator",
+      "heroDescription": "Visit us at one of our locations and enjoy a unique aromatic experience. Our specialized team is waiting to help you choose the perfect fragrance.",
+      "stores": "Stores",
+      "countries": "Countries",
+      "getDirections": "Get Directions",
+      "openingHours": "Opening Hours",
+      "openingHoursValue": "10:00 AM - 10:00 PM",
+      "ctaTitle": "Can't Visit Us?",
+      "ctaSubtitle": "Shop our full collection online and get free delivery on orders over 500 AED",
+      "ctaButton": "Shop Fragrances Online",
+      "contactUs": "Contact Us",
+      "storesIn": "Stores in",
+      "region": "Region",
+      "regions": "Regions",
+      "waitingTitle": "We're Waiting for You",
+      "waitingSubtitle": "Visit us at the nearest branch and enjoy a unique shopping experience"
+    },
     "about": {
       "title": "Aromatic Scents Lab",
       "heroSubtitle": "Experience the Art of Fragrance",

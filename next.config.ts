@@ -75,6 +75,10 @@ const nextConfig: NextConfig = {
   async headers() {
     const securityHeaders = [
       {
+        key: "X-Robots-Tag",
+        value: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
+      {
         key: "X-Frame-Options",
         value: "DENY",
       },

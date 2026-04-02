@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { ProductGridSkeleton } from "@/components/common/Skeleton";
 import { Breadcrumbs } from "@/components/seo/Breadcrumbs";
 import { getDictionary } from "@/i18n";
-import { generateMetadata as generateSeoMetadata } from "@/lib/utils/seo";
+import { generateMetadata as generateSeoMetadata, generateCollectionPageJsonLd, generateItemListJsonLd, generateBreadcrumbJsonLd } from "@/lib/utils/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getCategoryBySlug, getProductsByCategory, getCategories, getFreeGiftProductInfo, getBundleEnabledProductSlugs, getEnglishSlugFromLocalizedSlug, BESTSELLER_PRODUCT_SLUGS } from "@/lib/api/woocommerce";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
@@ -171,12 +172,44 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       { name: decodeHtmlEntities(category.name), href: `/${locale}/category/${slug}` },
     ];
 
+  const categoryUrl = `${siteConfig.url}/${locale}/category/${slug}`;
+  const categoryName = decodeHtmlEntities(category.name);
+
+  const collectionJsonLd = generateCollectionPageJsonLd({
+    name: categoryName,
+    description: category.description
+      ? decodeHtmlEntities(category.description.replace(/<[^>]*>/g, "")).slice(0, 200)
+      : `Shop ${categoryName} at ${siteConfig.name}`,
+    url: categoryUrl,
+  });
+
+  const itemListJsonLd = generateItemListJsonLd({
+    name: categoryName,
+    description: `${categoryName} products from ${siteConfig.name}`,
+    url: categoryUrl,
+    items: products.slice(0, 20).map((product, index) => ({
+      name: decodeHtmlEntities(product.name),
+      url: `${siteConfig.url}/${locale}/product/${product.slug}`,
+      image: product.images[0]?.src || "",
+      position: index + 1,
+    })),
+  });
+
+  const breadcrumbJsonLd = generateBreadcrumbJsonLd([
+    { name: dictionary.common.home, url: `${siteConfig.url}/${locale}` },
+    { name: dictionary.common.shop, url: `${siteConfig.url}/${locale}/shop` },
+    { name: categoryName, url: categoryUrl },
+  ]);
+
   return (
     <div className="container mx-auto px-4 py-3">
+      <JsonLd data={collectionJsonLd} />
+      <JsonLd data={itemListJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <Breadcrumbs items={breadcrumbItems} locale={locale as Locale} />
 
       <div className="mb-3">
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">{decodeHtmlEntities(category.name)}</h1>
+        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">{categoryName}</h1>
       </div>
 
       <Suspense fallback={<ProductGridSkeleton count={12} />}>
