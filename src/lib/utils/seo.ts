@@ -99,8 +99,10 @@ export function generateProductJsonLd(product: {
   image: string;
   images?: string[];
   price: string;
+  salePrice?: string;
   currency: string;
   sku?: string;
+  gtin?: string;
   availability: "InStock" | "OutOfStock";
   url: string;
   brandName?: string;
@@ -141,16 +143,19 @@ export function generateProductJsonLd(product: {
           },
         }
       : {}),
+    ...(product.gtin ? { gtin: product.gtin } : {}),
     offers: {
       "@type": "Offer",
       price: product.price,
       priceCurrency: product.currency,
+      priceValidUntil: new Date(new Date().getFullYear() + 1, 11, 31).toISOString().split("T")[0],
       availability: `https://schema.org/${product.availability}`,
       url: product.url,
       itemCondition: "https://schema.org/NewCondition",
       seller: {
         "@type": "Organization",
         name: siteConfig.name,
+        url: siteConfig.url,
       },
       shippingDetails: {
         "@type": "OfferShippingDetails",
@@ -186,6 +191,7 @@ export function generateProductJsonLd(product: {
         merchantReturnDays: 14,
         returnMethod: "https://schema.org/ReturnByMail",
         returnFees: "https://schema.org/FreeReturn",
+        url: `${siteConfig.url}/en/returns`,
       },
     },
   };

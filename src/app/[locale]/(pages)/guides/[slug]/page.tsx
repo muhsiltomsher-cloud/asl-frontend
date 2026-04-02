@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { generateMetadata as generateSeoMetadata, generateItemListJsonLd, generateFAQJsonLd } from "@/lib/utils/seo";
 import { getProductBySlug } from "@/lib/api/woocommerce";
 import { getGuidePages, getGuidePageBySlug } from "@/lib/api/wordpress";
+import { getDictionary } from "@/i18n";
 import { siteConfig, type Locale } from "@/config/site";
 import type { Metadata } from "next";
 import type { WCProduct } from "@/types/woocommerce";
@@ -153,6 +154,8 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   const validLocale = locale as Locale;
   const isRTL = locale === "ar";
+  const dictionary = await getDictionary(validLocale);
+  const dict = dictionary.pages.guides;
 
   // Fetch all products in parallel
   const productPromises = guide.products.map((gp) =>
@@ -224,7 +227,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
 
   const breadcrumbItems = [
     {
-      name: isRTL ? "الأدلة" : "Guides",
+      name: dict.breadcrumb,
       href: `/${locale}/guides`,
     },
     {
@@ -292,7 +295,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 <span>
-                  {isRTL ? "آخر تحديث: " : "Updated: "}
+                  {dict.updated}
                   {new Date(guide.updatedAt).toLocaleDateString(
                     isRTL ? "ar-SA" : "en-US",
                     { year: "numeric", month: "long", day: "numeric" }
@@ -301,13 +304,13 @@ export default async function GuidePage({ params }: GuidePageProps) {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span>{isRTL ? "الإمارات العربية المتحدة" : "UAE"}</span>
+                <span>{dict.location}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4" />
                 <span>
                   {productPairs.length}{" "}
-                  {isRTL ? "منتجات مختارة" : "Expert Picks"}
+                  {dict.expertPicks}
                 </span>
               </div>
             </div>
@@ -329,12 +332,12 @@ export default async function GuidePage({ params }: GuidePageProps) {
               <div className="mb-4 flex items-center justify-center gap-4">
                 <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#c67a46]" />
                 <span className="text-sm font-medium uppercase tracking-widest text-[#c67a46]">
-                  {isRTL ? "اختياراتنا" : "Our Picks"}
+                  {dict.ourPicks}
                 </span>
                 <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
               </div>
               <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">
-                {isRTL ? "المنتجات المختارة" : "Top Picks"}
+                {dict.topPicks}
               </h2>
             </div>
 
@@ -368,7 +371,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
                   <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#c67a46]" />
                 </div>
                 <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">
-                  {isRTL ? "دليل الشراء" : "Buying Guide"}
+                  {dict.buyingGuide}
                 </h2>
               </div>
 
@@ -399,14 +402,10 @@ export default async function GuidePage({ params }: GuidePageProps) {
             <div className="mx-auto max-w-4xl">
               <div className="mb-6 text-center sm:mb-10">
                 <h2 className="text-2xl font-bold text-[#633d1f] md:text-3xl">
-                  {isRTL
-                    ? "الأسئلة الشائعة"
-                    : "Frequently Asked Questions"}
+                  {dict.faqTitle}
                 </h2>
                 <p className="mt-2 text-[#b2a896]">
-                  {isRTL
-                    ? "إجابات على أسئلتك الأكثر شيوعاً"
-                    : "Answers to your most common questions"}
+                  {dict.faqSubtitle}
                 </p>
               </div>
 
@@ -437,7 +436,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-4xl">
               <h2 className="mb-8 text-center text-2xl font-bold text-[#633d1f] md:text-3xl">
-                {isRTL ? "أدلة ذات صلة" : "Related Guides"}
+                {dict.relatedGuides}
               </h2>
               <div className="grid gap-4 md:grid-cols-2">
                 {relatedGuides.map((related) => (
@@ -453,7 +452,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
                       {related.metaDescription[validLocale]}
                     </p>
                                   <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#c67a46]">
-                                    {isRTL ? "اقرأ المزيد" : "Read More"}
+                                    {dict.readGuide.replace("{title}", related.title[validLocale])}
                                     <ChevronRight className={`h-4 w-4 ${isRTL ? "rotate-180" : ""}`} />
                                   </span>
                                 </Link>
@@ -468,27 +467,23 @@ export default async function GuidePage({ params }: GuidePageProps) {
       <section className="bg-gradient-to-r from-[#633d1f] via-[#633d1f] to-stone-900 py-8 sm:py-12 md:py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="mb-3 text-xl font-bold text-white sm:mb-4 sm:text-2xl md:text-3xl">
-            {isRTL
-              ? "مستعد لاكتشاف عطرك المثالي؟"
-              : "Ready to Find Your Perfect Scent?"}
+            {dict.ctaTitle}
           </h2>
           <p className="mx-auto mb-6 max-w-xl text-sm text-[#f7f6f2] sm:mb-8 sm:text-base">
-            {isRTL
-              ? "تصفح مجموعتنا الكاملة من العطور الفاخرة المصنوعة يدوياً في الإمارات. توصيل مجاني للطلبات فوق 500 درهم."
-              : "Browse our full collection of premium, handcrafted fragrances made in the UAE. Free delivery on orders over 500 AED."}
+            {dict.ctaDescription}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               href={`/${locale}/shop`}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#c67a46] px-8 py-3 text-sm font-medium uppercase tracking-wide text-white transition-all hover:bg-[#d4956b] hover:shadow-lg"
             >
-              {isRTL ? "تسوق الآن" : "Shop Now"}
+              {dict.ctaShopButton}
             </Link>
             <Link
               href={`/${locale}/category/perfumes`}
               className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#c67a46]/50 px-8 py-3 text-sm font-medium uppercase tracking-wide text-[#b2a896] transition-all hover:border-[#b2a896] hover:text-white"
             >
-              {isRTL ? "تصفح العطور" : "Browse Perfumes"}
+              {dict.ctaBrowseButton}
             </Link>
           </div>
         </div>
