@@ -175,6 +175,8 @@ function asl_render_hero_tab() {
  * Render Products tab (New Products, Bestsellers, Featured)
  */
 function asl_render_products_tab($key,$label) {
+    $selected_slugs = get_theme_mod("asl_{$key}_selected_products", array());
+    if (!is_array($selected_slugs)) $selected_slugs = array();
     ?>
     <h2><?php echo $label; ?> Section</h2>
     <table class="form-table">
@@ -185,13 +187,32 @@ function asl_render_products_tab($key,$label) {
         <tr><th>Title (AR)</th><td><input type="text" name="asl_<?php echo $key; ?>_title_ar" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_title_ar",'')); ?>" class="regular-text" dir="rtl"></td></tr>
         <tr><th>Subtitle (EN)</th><td><input type="text" name="asl_<?php echo $key; ?>_subtitle" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_subtitle",'')); ?>" class="regular-text"></td></tr>
         <tr><th>Subtitle (AR)</th><td><input type="text" name="asl_<?php echo $key; ?>_subtitle_ar" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_subtitle_ar",'')); ?>" class="regular-text" dir="rtl"></td></tr>
-        <tr><th>Count</th><td><input type="number" name="asl_<?php echo $key; ?>_count" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_count",8)); ?>" min="4" max="24" class="small-text"></td></tr>
+        <tr><th>Count</th><td><input type="number" name="asl_<?php echo $key; ?>_count" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_count",8)); ?>" min="4" max="24" class="small-text"><p class="description">Max products to display. If selected products exceed this, only the first N are shown.</p></td></tr>
         <tr><th>Display</th><td><select name="asl_<?php echo $key; ?>_display"><option value="slider" <?php selected(get_theme_mod("asl_{$key}_display",'slider'),'slider'); ?>>Slider</option><option value="grid" <?php selected(get_theme_mod("asl_{$key}_display",'slider'),'grid'); ?>>Grid</option></select></td></tr>
         <tr><th>Autoplay</th><td><label><input type="checkbox" name="asl_<?php echo $key; ?>_autoplay" value="1" <?php checked(get_theme_mod("asl_{$key}_autoplay",true)); ?>> Enable</label></td></tr>
         <tr><th>Desktop Cols</th><td><input type="number" name="asl_<?php echo $key; ?>_cols_desktop" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_cols_desktop",4)); ?>" min="2" max="6" class="small-text"></td></tr>
         <tr><th>Tablet Cols</th><td><input type="number" name="asl_<?php echo $key; ?>_cols_tablet" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_cols_tablet",3)); ?>" min="2" max="4" class="small-text"></td></tr>
         <tr><th>Mobile Cols</th><td><input type="number" name="asl_<?php echo $key; ?>_cols_mobile" value="<?php echo esc_attr(get_theme_mod("asl_{$key}_cols_mobile",2)); ?>" min="1" max="3" class="small-text"></td></tr>
     </table>
+
+    <h3>Selected Products <small style="color:#666;font-weight:normal;">(drag to reorder, products load automatically if none selected)</small></h3>
+    <div class="asl-product-selector-section" data-section="<?php echo $key; ?>">
+        <div class="asl-prod-selected-list" id="asl-prod-selected-<?php echo $key; ?>" style="min-height:40px;padding:10px;background:#f9f9f9;border:1px solid #ddd;border-radius:4px;margin-bottom:15px;">
+            <p class="asl-prod-empty-msg" style="color:#999;margin:0;<?php echo !empty($selected_slugs) ? 'display:none;' : ''; ?>">No products selected. Products will load automatically based on section type.</p>
+            <?php foreach ($selected_slugs as $slug): ?>
+            <div class="asl-prod-selected-item" data-slug="<?php echo esc_attr($slug); ?>" style="display:flex;align-items:center;padding:10px;margin-bottom:6px;background:#fff;border:1px solid #c5d9ed;border-radius:4px;cursor:grab;">
+                <span class="dashicons dashicons-menu" style="margin-right:10px;color:#999;cursor:grab;"></span>
+                <div style="flex:1;" class="asl-prod-item-info"><strong><?php echo esc_html($slug); ?></strong> <small style="color:#666;">(loading...)</small></div>
+                <input type="hidden" name="asl_<?php echo $key; ?>_selected_products[]" value="<?php echo esc_attr($slug); ?>">
+                <button type="button" class="button asl-prod-deselect" style="color:red;" title="Remove">&times;</button>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <div style="margin-bottom:15px;">
+            <input type="text" class="asl-prod-search regular-text" placeholder="Search products by name, slug, or SKU..." autocomplete="off">
+            <div class="asl-prod-results" style="display:none;max-height:300px;overflow-y:auto;border:1px solid #ddd;border-top:none;background:#fff;"></div>
+        </div>
+    </div>
     <?php
 }
 
@@ -342,7 +363,7 @@ function asl_render_banners_tab() {
             $img = get_theme_mod("asl_banner_{$i}_image",'');
             if (!empty($img)) $items[] = array('image'=>$img,'mobile'=>get_theme_mod("asl_banner_{$i}_mobile",''),'title'=>get_theme_mod("asl_banner_{$i}_title",''),'title_ar'=>get_theme_mod("asl_banner_{$i}_title_ar",''),'subtitle'=>get_theme_mod("asl_banner_{$i}_subtitle",''),'subtitle_ar'=>get_theme_mod("asl_banner_{$i}_subtitle_ar",''),'link'=>get_theme_mod("asl_banner_{$i}_link",''));
         }
-        if (empty($items)) $items[] = array('image'=>'','mobile'=>'','title'=>'','title_ar'=>'','subtitle'=>'','subtitle_ar'=>'','link'=>'');
+        if (empty($items)) $items[] = array('image'=>'','mobile'=>'','image_ar'=>'','mobile_ar'=>'','title'=>'','title_ar'=>'','subtitle'=>'','subtitle_ar'=>'','link'=>'');
     }
     ?>
     <h2>Banners Section</h2>
@@ -361,8 +382,10 @@ function asl_render_banners_tab() {
         <div class="asl-banner-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">
             <h4>Banner <?php echo $i+1; ?> <button type="button" class="button asl-remove-banner" style="float:right;color:red;">Remove</button></h4>
             <table class="form-table">
-                <tr><th>Desktop Image</th><td><?php asl_image_field("asl_banners_items[{$i}][image]",$item['image']??''); ?></td></tr>
-                <tr><th>Mobile Image</th><td><?php asl_image_field("asl_banners_items[{$i}][mobile]",$item['mobile']??''); ?></td></tr>
+                <tr><th>Desktop Image (EN)</th><td><?php asl_image_field("asl_banners_items[{$i}][image]",$item['image']??''); ?></td></tr>
+                <tr><th>Mobile Image (EN)</th><td><?php asl_image_field("asl_banners_items[{$i}][mobile]",$item['mobile']??''); ?></td></tr>
+                <tr><th>Desktop Image (AR)</th><td><?php asl_image_field("asl_banners_items[{$i}][image_ar]",$item['image_ar']??''); ?><p class="description">Arabic version. Falls back to EN image if empty.</p></td></tr>
+                <tr><th>Mobile Image (AR)</th><td><?php asl_image_field("asl_banners_items[{$i}][mobile_ar]",$item['mobile_ar']??''); ?><p class="description">Arabic version. Falls back to EN mobile image if empty.</p></td></tr>
                 <tr><th>Title (EN)</th><td><input type="text" name="asl_banners_items[<?php echo $i; ?>][title]" value="<?php echo esc_attr($item['title']??''); ?>" class="regular-text"></td></tr>
                 <tr><th>Title (AR)</th><td><input type="text" name="asl_banners_items[<?php echo $i; ?>][title_ar]" value="<?php echo esc_attr($item['title_ar']??''); ?>" class="regular-text" dir="rtl"></td></tr>
                 <tr><th>Subtitle (EN)</th><td><input type="text" name="asl_banners_items[<?php echo $i; ?>][subtitle]" value="<?php echo esc_attr($item['subtitle']??''); ?>" class="regular-text"></td></tr>
@@ -659,7 +682,7 @@ function asl_save_home_settings() {
             $banners = array();
             if (isset($_POST['asl_banners_items']) && is_array($_POST['asl_banners_items'])) {
                 foreach ($_POST['asl_banners_items'] as $item) {
-                    $banners[] = array('image'=>esc_url_raw($item['image']??''),'mobile'=>esc_url_raw($item['mobile']??''),'title'=>sanitize_text_field($item['title']??''),'title_ar'=>sanitize_text_field($item['title_ar']??''),'subtitle'=>sanitize_text_field($item['subtitle']??''),'subtitle_ar'=>sanitize_text_field($item['subtitle_ar']??''),'link'=>asl_sanitize_link($item['link']??''));
+                    $banners[] = array('image'=>esc_url_raw($item['image']??''),'mobile'=>esc_url_raw($item['mobile']??''),'image_ar'=>esc_url_raw($item['image_ar']??''),'mobile_ar'=>esc_url_raw($item['mobile_ar']??''),'title'=>sanitize_text_field($item['title']??''),'title_ar'=>sanitize_text_field($item['title_ar']??''),'subtitle'=>sanitize_text_field($item['subtitle']??''),'subtitle_ar'=>sanitize_text_field($item['subtitle_ar']??''),'link'=>asl_sanitize_link($item['link']??''));
                 }
             }
             set_theme_mod('asl_banners_items', $banners);
@@ -685,6 +708,15 @@ function asl_save_products_section($key) {
     set_theme_mod("asl_{$key}_cols_desktop", absint($_POST["asl_{$key}_cols_desktop"]??4));
     set_theme_mod("asl_{$key}_cols_tablet", absint($_POST["asl_{$key}_cols_tablet"]??3));
     set_theme_mod("asl_{$key}_cols_mobile", absint($_POST["asl_{$key}_cols_mobile"]??2));
+    // Save selected product slugs (ordered)
+    $selected = array();
+    if (isset($_POST["asl_{$key}_selected_products"]) && is_array($_POST["asl_{$key}_selected_products"])) {
+        foreach ($_POST["asl_{$key}_selected_products"] as $slug) {
+            $slug = sanitize_title($slug);
+            if (!empty($slug)) $selected[] = $slug;
+        }
+    }
+    set_theme_mod("asl_{$key}_selected_products", $selected);
 }
 
 /**
@@ -909,7 +941,10 @@ function asl_get_hero_settings() {
  * Get products settings
  */
 function asl_get_products_settings($key) {
-    return array('enabled'=>get_theme_mod("asl_{$key}_enabled",true),'hideOnMobile'=>get_theme_mod("asl_{$key}_hide_mobile",false),'hideOnDesktop'=>get_theme_mod("asl_{$key}_hide_desktop",false),'title'=>get_theme_mod("asl_{$key}_title",''),'titleAr'=>get_theme_mod("asl_{$key}_title_ar",''),'subtitle'=>get_theme_mod("asl_{$key}_subtitle",''),'subtitleAr'=>get_theme_mod("asl_{$key}_subtitle_ar",''),'count'=>get_theme_mod("asl_{$key}_count",8),'display'=>get_theme_mod("asl_{$key}_display",'slider'),'autoplay'=>get_theme_mod("asl_{$key}_autoplay",true),'responsive'=>array('desktop'=>get_theme_mod("asl_{$key}_cols_desktop",4),'tablet'=>get_theme_mod("asl_{$key}_cols_tablet",3),'mobile'=>get_theme_mod("asl_{$key}_cols_mobile",2)));
+    $selected = get_theme_mod("asl_{$key}_selected_products", array());
+    if (!is_array($selected)) $selected = array();
+    $selected = array_values(array_filter($selected));
+    return array('enabled'=>get_theme_mod("asl_{$key}_enabled",true),'hideOnMobile'=>get_theme_mod("asl_{$key}_hide_mobile",false),'hideOnDesktop'=>get_theme_mod("asl_{$key}_hide_desktop",false),'title'=>get_theme_mod("asl_{$key}_title",''),'titleAr'=>get_theme_mod("asl_{$key}_title_ar",''),'subtitle'=>get_theme_mod("asl_{$key}_subtitle",''),'subtitleAr'=>get_theme_mod("asl_{$key}_subtitle_ar",''),'count'=>get_theme_mod("asl_{$key}_count",8),'display'=>get_theme_mod("asl_{$key}_display",'slider'),'autoplay'=>get_theme_mod("asl_{$key}_autoplay",true),'selectedProductSlugs'=>$selected,'responsive'=>array('desktop'=>get_theme_mod("asl_{$key}_cols_desktop",4),'tablet'=>get_theme_mod("asl_{$key}_cols_tablet",3),'mobile'=>get_theme_mod("asl_{$key}_cols_mobile",2)));
 }
 
 /**
@@ -967,7 +1002,7 @@ function asl_get_banners_settings() {
             if (!empty($img)) $items[] = array('image'=>$img,'mobileImage'=>get_theme_mod("asl_banner_{$i}_mobile",$img),'title'=>get_theme_mod("asl_banner_{$i}_title",''),'titleAr'=>get_theme_mod("asl_banner_{$i}_title_ar",''),'subtitle'=>get_theme_mod("asl_banner_{$i}_subtitle",''),'subtitleAr'=>get_theme_mod("asl_banner_{$i}_subtitle_ar",''),'link'=>get_theme_mod("asl_banner_{$i}_link",''));
         }
     } else {
-        $items = array_map(function($item) { return array('image'=>$item['image']??'','mobileImage'=>$item['mobile']??$item['image']??'','title'=>$item['title']??'','titleAr'=>$item['title_ar']??'','subtitle'=>$item['subtitle']??'','subtitleAr'=>$item['subtitle_ar']??'','link'=>$item['link']??''); }, $items);
+        $items = array_map(function($item) { return array('image'=>$item['image']??'','mobileImage'=>$item['mobile']??$item['image']??'','imageAr'=>$item['image_ar']??'','mobileImageAr'=>$item['mobile_ar']??'','title'=>$item['title']??'','titleAr'=>$item['title_ar']??'','subtitle'=>$item['subtitle']??'','subtitleAr'=>$item['subtitle_ar']??'','link'=>$item['link']??''); }, $items);
     }
     return array('enabled'=>get_theme_mod('asl_banners_enabled',true),'hideOnMobile'=>get_theme_mod('asl_banners_hide_mobile',false),'hideOnDesktop'=>get_theme_mod('asl_banners_hide_desktop',false),'layout'=>get_theme_mod('asl_banners_layout','grid'),'responsive'=>array('desktop'=>get_theme_mod('asl_banners_cols_desktop',2),'tablet'=>get_theme_mod('asl_banners_cols_tablet',2),'mobile'=>get_theme_mod('asl_banners_cols_mobile',1)),'items'=>$items);
 }

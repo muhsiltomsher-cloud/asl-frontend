@@ -75,7 +75,22 @@ export function FeaturedProductsSlider({
     return null;
   }
 
-  const displayProducts = products.slice(0, settings.products_count);
+  // Reorder products based on selected slugs, then enforce count limit
+  const selectedSlugs = settings.selected_product_slugs ?? [];
+  let orderedProducts = products;
+  if (selectedSlugs.length > 0) {
+    const productsBySlug = new Map(products.map(p => [p.slug, p]));
+    const ordered: WCProduct[] = [];
+    for (const slug of selectedSlugs) {
+      const product = productsBySlug.get(slug);
+      if (product) ordered.push(product);
+    }
+    for (const product of products) {
+      if (!selectedSlugs.includes(product.slug)) ordered.push(product);
+    }
+    orderedProducts = ordered;
+  }
+  const displayProducts = orderedProducts.slice(0, settings.products_count);
 
   // Handle visibility based on hide_on_mobile and hide_on_desktop settings
   const getVisibilityClass = () => {
