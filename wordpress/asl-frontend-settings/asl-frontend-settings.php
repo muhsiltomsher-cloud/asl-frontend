@@ -41,7 +41,8 @@ add_action('admin_enqueue_scripts', function($hook) {
     $is_cpt = in_array(get_post_type(), ['asl_guide','asl_product_page','asl_note','page']);
     if (!$is_asl && !$is_cpt) return;
     wp_enqueue_media();
-    wp_enqueue_script('asl-admin', plugins_url('admin.js', __FILE__), array('jquery'), ASL_SETTINGS_VERSION, true);
+    wp_enqueue_script('jquery-ui-sortable');
+    wp_enqueue_script('asl-admin', plugins_url('admin.js', __FILE__), array('jquery', 'jquery-ui-sortable'), ASL_SETTINGS_VERSION, true);
     wp_localize_script('asl-admin', 'aslAdmin', [
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce'   => wp_create_nonce('asl_product_search'),

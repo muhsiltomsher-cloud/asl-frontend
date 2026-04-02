@@ -94,6 +94,7 @@ interface WPPluginProductSectionSettings {
   autoplay?: boolean;
   hideOnMobile?: boolean;
   hideOnDesktop?: boolean;
+  selectedIds?: number[];
   responsive?: {
     desktop: number;
     tablet: number;
@@ -390,6 +391,7 @@ function transformCategorySectionSettings(pluginSection: WPPluginProductSectionS
     section_title: locale === "ar" ? (pluginSection.titleAr || "") : pluginSection.title,
     section_subtitle: locale === "ar" ? (pluginSection.subtitleAr || "") : pluginSection.subtitle,
     categories_count: pluginSection.count,
+    selected_category_ids: pluginSection.selectedIds ?? [],
     show_view_all: true,
     hide_on_mobile: pluginSection.hideOnMobile,
     hide_on_desktop: pluginSection.hideOnDesktop,
