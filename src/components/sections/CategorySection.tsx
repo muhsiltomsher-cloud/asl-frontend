@@ -80,9 +80,23 @@ export function CategorySection({
     return null;
   }
 
-  const displayCategories = categories
-    .filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized")
-    .slice(0, settings.categories_count);
+  // If selected_category_ids is provided and non-empty, use them to filter and order categories
+  const selectedIds = settings.selected_category_ids;
+  let displayCategories: WCCategory[];
+  if (selectedIds && selectedIds.length > 0) {
+    // Build a map of categories by ID for quick lookup
+    const categoryById = new Map<number, WCCategory>();
+    categories.forEach((cat) => categoryById.set(cat.id, cat));
+    // Return categories in the order specified by selectedIds
+    displayCategories = selectedIds
+      .map((id) => categoryById.get(id))
+      .filter((cat): cat is WCCategory => cat !== undefined);
+  } else {
+    // Fallback: use count-based slicing (backward compat)
+    displayCategories = categories
+      .filter((cat) => cat.parent === 0 && cat.slug !== "uncategorized")
+      .slice(0, settings.categories_count);
+  }
 
   if (displayCategories.length === 0) {
     return null;

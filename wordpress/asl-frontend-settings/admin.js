@@ -289,4 +289,67 @@ jQuery(document).ready(function($) {
         $(this).closest('.asl-banner-item').remove();
         reindexRepeater($('#asl-banners-items'), 'asl-banner-item', 'Banner');
     });
+
+    /* ================================================================
+       CATEGORY SELECTOR - Check/uncheck + drag-and-drop reorder
+       ================================================================ */
+
+    function updateCatEmptyMsg() {
+        var count = $('#asl-cat-selected-list .asl-cat-selected-item').length;
+        $('#asl-cat-empty-msg').toggle(count === 0);
+    }
+
+    /** Build a selected-category card from data attributes */
+    function buildSelectedCatItem(id, name, slug, count, thumb) {
+        var html = '<div class="asl-cat-item asl-cat-selected-item" data-id="' + id + '" style="display:flex;align-items:center;padding:10px;margin-bottom:6px;background:#fff;border:1px solid #c5d9ed;border-radius:4px;cursor:grab;">';
+        html += '<span class="dashicons dashicons-menu" style="margin-right:10px;color:#999;cursor:grab;"></span>';
+        if (thumb) html += '<img src="' + thumb + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:10px;">';
+        html += '<div style="flex:1;"><strong>' + name + '</strong>';
+        html += '<small style="color:#666;"> (' + count + ' products) &middot; slug: ' + slug + '</small></div>';
+        html += '<input type="hidden" name="asl_categories_selected[]" value="' + id + '">';
+        html += '<button type="button" class="button asl-cat-deselect" style="color:red;" title="Remove">&times;</button>';
+        html += '</div>';
+        return html;
+    }
+
+    // Checkbox toggle: add/remove from selected list
+    $(document).on('change', '.asl-cat-checkbox', function() {
+        var cb = $(this), id = cb.val();
+        var availItem = cb.closest('.asl-cat-available-item');
+        if (cb.is(':checked')) {
+            // Add to selected list
+            var name = availItem.data('name'), slug = availItem.data('slug');
+            var count = availItem.data('count'), thumb = availItem.data('thumb');
+            $('#asl-cat-selected-list').append(buildSelectedCatItem(id, name, slug, count, thumb));
+            availItem.css('opacity', '0.4');
+        } else {
+            // Remove from selected list
+            $('#asl-cat-selected-list .asl-cat-selected-item[data-id="' + id + '"]').remove();
+            availItem.css('opacity', '1');
+        }
+        updateCatEmptyMsg();
+    });
+
+    // Deselect button in selected list
+    $(document).on('click', '.asl-cat-deselect', function(e) {
+        e.preventDefault();
+        var item = $(this).closest('.asl-cat-selected-item');
+        var id = item.data('id');
+        // Uncheck the checkbox in available list
+        $('.asl-cat-available-item[data-id="' + id + '"]').css('opacity', '1')
+            .find('.asl-cat-checkbox').prop('checked', false);
+        item.remove();
+        updateCatEmptyMsg();
+    });
+
+    // jQuery UI Sortable for drag-and-drop reordering
+    if ($('#asl-cat-selected-list').length && $.fn.sortable) {
+        $('#asl-cat-selected-list').sortable({
+            items: '.asl-cat-selected-item',
+            handle: '.dashicons-menu',
+            placeholder: 'asl-cat-sortable-placeholder',
+            tolerance: 'pointer',
+            cursor: 'grabbing'
+        });
+    }
 });
