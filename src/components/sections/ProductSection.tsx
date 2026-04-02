@@ -76,6 +76,24 @@ export function ProductSection({
     return null;
   }
 
+  // Reorder products based on selected slugs, then enforce count limit
+  const selectedSlugs = settings.selected_product_slugs ?? [];
+  let orderedProducts = products;
+  if (selectedSlugs.length > 0) {
+    const productsBySlug = new Map(products.map(p => [p.slug, p]));
+    const ordered: WCProduct[] = [];
+    for (const slug of selectedSlugs) {
+      const product = productsBySlug.get(slug);
+      if (product) ordered.push(product);
+    }
+    // Append remaining products not in selected list
+    for (const product of products) {
+      if (!selectedSlugs.includes(product.slug)) ordered.push(product);
+    }
+    orderedProducts = ordered;
+  }
+  const displayProducts = orderedProducts.slice(0, settings.products_count);
+
   const viewAllLink = settings.view_all_link || `/${locale}/shop`;
 
   // Handle visibility based on hide_on_mobile and hide_on_desktop settings
@@ -153,7 +171,7 @@ export function ProductSection({
             className="!pb-12"
             dir={isRTL ? "rtl" : "ltr"}
           >
-            {products.slice(0, settings.products_count).map((product) => (
+            {displayProducts.map((product) => (
               <SwiperSlide key={product.id}>
                 <WCProductCard product={product} locale={locale} bundleProductSlugs={bundleProductSlugs} englishSlug={englishProductSlugs[product.id]} />
               </SwiperSlide>

@@ -77,6 +77,7 @@ export interface ProductSectionSettings {
   section_title: string;
   section_subtitle?: string;
   products_count: number;
+  selected_product_slugs?: string[];
   show_view_all: boolean;
   view_all_link?: string;
   hide_on_mobile?: boolean;
@@ -101,6 +102,7 @@ export interface FeaturedProductsSettings {
   section_title: string;
   section_subtitle?: string;
   products_count: number;
+  selected_product_slugs?: string[];
   autoplay: boolean;
   autoplay_delay: number;
   hide_on_mobile?: boolean;

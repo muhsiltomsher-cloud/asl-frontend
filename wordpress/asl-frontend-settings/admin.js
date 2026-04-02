@@ -180,7 +180,7 @@ jQuery(document).ready(function($) {
             '<button type="button" class="button asl-upload-btn" data-target="#' + id + '_mobile" data-preview="#' + id + '_mobile_preview">Upload Image</button>' +
             '<button type="button" class="button asl-remove-btn" data-target="#' + id + '_mobile" data-preview="#' + id + '_mobile_preview" style="display:none;">Remove</button>' +
             '<div id="' + id + '_mobile_preview" class="asl-preview"></div></div></td></tr>' +
-            '<tr><th>Link URL</th><td><input type="url" name="' + p + '[link]" value="" class="large-text"></td></tr>' +
+            '<tr><th>Link URL</th><td><input type="text" name="' + p + '[link]" value="" class="large-text" placeholder="/shop or https://example.com"></td></tr>' +
             '</table></div>';
     }
 
@@ -209,7 +209,7 @@ jQuery(document).ready(function($) {
             '<tr><th>Title (AR)</th><td><input type="text" name="' + p + '[title_ar]" value="" class="regular-text" dir="rtl"></td></tr>' +
             '<tr><th>Description (EN)</th><td><textarea name="' + p + '[description]" class="large-text" rows="2"></textarea></td></tr>' +
             '<tr><th>Description (AR)</th><td><textarea name="' + p + '[description_ar]" class="large-text" rows="2" dir="rtl"></textarea></td></tr>' +
-            '<tr><th>Link</th><td><input type="url" name="' + p + '[link]" value="" class="large-text"></td></tr>' +
+            '<tr><th>Link</th><td><input type="text" name="' + p + '[link]" value="" class="large-text" placeholder="/shop or https://example.com"></td></tr>' +
             '</table></div>';
     }
 
@@ -264,21 +264,33 @@ jQuery(document).ready(function($) {
         return '<div class="asl-banner-item" style="background:#f9f9f9;padding:15px;margin-bottom:15px;border:1px solid #ddd;">' +
             '<h4>Banner ' + (i+1) + ' <button type="button" class="button asl-remove-banner" style="float:right;color:red;">Remove</button></h4>' +
             '<table class="form-table">' +
-            '<tr><th>Desktop Image</th><td><div class="asl-image-field">' +
+            '<tr><th>Desktop Image (EN)</th><td><div class="asl-image-field">' +
             '<input type="hidden" name="' + p + '[image]" id="' + id + '_image" value="">' +
             '<button type="button" class="button asl-upload-btn" data-target="#' + id + '_image" data-preview="#' + id + '_image_preview">Upload Image</button>' +
             '<button type="button" class="button asl-remove-btn" data-target="#' + id + '_image" data-preview="#' + id + '_image_preview" style="display:none;">Remove</button>' +
             '<div id="' + id + '_image_preview" class="asl-preview"></div></div></td></tr>' +
-            '<tr><th>Mobile Image</th><td><div class="asl-image-field">' +
+            '<tr><th>Mobile Image (EN)</th><td><div class="asl-image-field">' +
             '<input type="hidden" name="' + p + '[mobile]" id="' + id + '_mobile" value="">' +
             '<button type="button" class="button asl-upload-btn" data-target="#' + id + '_mobile" data-preview="#' + id + '_mobile_preview">Upload Image</button>' +
             '<button type="button" class="button asl-remove-btn" data-target="#' + id + '_mobile" data-preview="#' + id + '_mobile_preview" style="display:none;">Remove</button>' +
             '<div id="' + id + '_mobile_preview" class="asl-preview"></div></div></td></tr>' +
+            '<tr><th>Desktop Image (AR)</th><td><div class="asl-image-field">' +
+            '<input type="hidden" name="' + p + '[image_ar]" id="' + id + '_image_ar" value="">' +
+            '<button type="button" class="button asl-upload-btn" data-target="#' + id + '_image_ar" data-preview="#' + id + '_image_ar_preview">Upload Image</button>' +
+            '<button type="button" class="button asl-remove-btn" data-target="#' + id + '_image_ar" data-preview="#' + id + '_image_ar_preview" style="display:none;">Remove</button>' +
+            '<div id="' + id + '_image_ar_preview" class="asl-preview"></div></div>' +
+            '<p class="description">Arabic version. Falls back to EN image if empty.</p></td></tr>' +
+            '<tr><th>Mobile Image (AR)</th><td><div class="asl-image-field">' +
+            '<input type="hidden" name="' + p + '[mobile_ar]" id="' + id + '_mobile_ar" value="">' +
+            '<button type="button" class="button asl-upload-btn" data-target="#' + id + '_mobile_ar" data-preview="#' + id + '_mobile_ar_preview">Upload Image</button>' +
+            '<button type="button" class="button asl-remove-btn" data-target="#' + id + '_mobile_ar" data-preview="#' + id + '_mobile_ar_preview" style="display:none;">Remove</button>' +
+            '<div id="' + id + '_mobile_ar_preview" class="asl-preview"></div></div>' +
+            '<p class="description">Arabic version. Falls back to EN mobile image if empty.</p></td></tr>' +
             '<tr><th>Title (EN)</th><td><input type="text" name="' + p + '[title]" value="" class="regular-text"></td></tr>' +
             '<tr><th>Title (AR)</th><td><input type="text" name="' + p + '[title_ar]" value="" class="regular-text" dir="rtl"></td></tr>' +
             '<tr><th>Subtitle (EN)</th><td><input type="text" name="' + p + '[subtitle]" value="" class="regular-text"></td></tr>' +
             '<tr><th>Subtitle (AR)</th><td><input type="text" name="' + p + '[subtitle_ar]" value="" class="regular-text" dir="rtl"></td></tr>' +
-            '<tr><th>Link</th><td><input type="url" name="' + p + '[link]" value="" class="large-text"></td></tr>' +
+            '<tr><th>Link</th><td><input type="text" name="' + p + '[link]" value="" class="large-text" placeholder="/shop or https://example.com"></td></tr>' +
             '</table></div>';
     }
 
@@ -352,4 +364,135 @@ jQuery(document).ready(function($) {
             cursor: 'grabbing'
         });
     }
+
+    /* ================================================================
+       PRODUCT SELECTOR (for Featured / Bestsellers / New Products)
+       Search, select, deselect, drag-and-drop reorder
+       ================================================================ */
+
+    var prodSearchTimer = null;
+
+    function updateProdEmptyMsg(section) {
+        var list = section.find('.asl-prod-selected-list');
+        var count = list.find('.asl-prod-selected-item').length;
+        list.find('.asl-prod-empty-msg').toggle(count === 0);
+    }
+
+    /** Build a selected-product card */
+    function buildProdSelectedItem(sectionKey, p) {
+        var safe = $('<span>').text(p.name).html();
+        var cat = p.category || '';
+        var html = '<div class="asl-prod-selected-item" data-slug="' + p.slug + '" style="display:flex;align-items:center;padding:10px;margin-bottom:6px;background:#fff;border:1px solid #c5d9ed;border-radius:4px;cursor:grab;">';
+        html += '<span class="dashicons dashicons-menu" style="margin-right:10px;color:#999;cursor:grab;"></span>';
+        if (p.image) html += '<img src="' + p.image + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:10px;">';
+        html += '<div style="flex:1;"><strong>' + safe + '</strong>';
+        if (cat) html += '<br><small style="color:#0073aa;">Category: ' + cat + '</small>';
+        html += '<br><small style="color:#666;">Slug: ' + p.slug + ' &middot; ' + p.price;
+        if (p.sku) html += ' &middot; SKU: ' + p.sku;
+        html += '</small></div>';
+        html += '<input type="hidden" name="asl_' + sectionKey + '_selected_products[]" value="' + p.slug + '">';
+        html += '<button type="button" class="button asl-prod-deselect" style="color:red;" title="Remove">&times;</button>';
+        html += '</div>';
+        return html;
+    }
+
+    // Search input for product selector
+    $(document).on('input', '.asl-prod-search', function() {
+        var input = $(this), section = input.closest('.asl-product-selector-section');
+        var results = section.find('.asl-prod-results'), q = input.val().trim();
+        clearTimeout(prodSearchTimer);
+        if (q.length < 2) { results.hide().empty(); return; }
+        prodSearchTimer = setTimeout(function() {
+            $.get(aslAdmin.ajaxurl, { action: 'asl_search_products', nonce: aslAdmin.nonce, q: q }, function(res) {
+                if (!res.success || !res.data.length) {
+                    results.html('<div style="padding:8px;color:#999;">No products found</div>').show();
+                    return;
+                }
+                // Filter out already-selected slugs
+                var selectedSlugs = [];
+                section.find('.asl-prod-selected-item').each(function() {
+                    selectedSlugs.push($(this).data('slug'));
+                });
+                var filtered = $.grep(res.data, function(p) {
+                    return $.inArray(p.slug, selectedSlugs) === -1;
+                });
+                if (!filtered.length) {
+                    results.html('<div style="padding:8px;color:#999;">All matching products already selected</div>').show();
+                    return;
+                }
+                results.html($.map(filtered, function(p) {
+                    return productRow(p);
+                }).join('')).show();
+            });
+        }, 300);
+    });
+
+    // Select product from search results
+    $(document).on('click', '.asl-product-selector-section .asl-product-result', function() {
+        var el = $(this), section = el.closest('.asl-product-selector-section');
+        var sectionKey = section.data('section');
+        var p = {
+            slug: el.data('slug'), name: el.data('name'), price: el.data('price'),
+            sku: el.data('sku'), image: el.data('image'), category: el.data('category')
+        };
+        section.find('.asl-prod-selected-list').append(buildProdSelectedItem(sectionKey, p));
+        section.find('.asl-prod-search').val('');
+        section.find('.asl-prod-results').hide().empty();
+        updateProdEmptyMsg(section);
+    });
+
+    // Deselect product
+    $(document).on('click', '.asl-prod-deselect', function(e) {
+        e.preventDefault();
+        var item = $(this).closest('.asl-prod-selected-item');
+        var section = item.closest('.asl-product-selector-section');
+        item.remove();
+        updateProdEmptyMsg(section);
+    });
+
+    // Hide product search results on outside click
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.asl-product-selector-section').length) {
+            $('.asl-prod-results').hide();
+        }
+    });
+
+    // jQuery UI Sortable for product selector drag-and-drop
+    $('.asl-prod-selected-list').each(function() {
+        if ($.fn.sortable) {
+            $(this).sortable({
+                items: '.asl-prod-selected-item',
+                handle: '.dashicons-menu',
+                placeholder: 'asl-prod-sortable-placeholder',
+                tolerance: 'pointer',
+                cursor: 'grabbing'
+            });
+        }
+    });
+
+    // Page load: fetch product details for pre-filled slugs
+    $('.asl-product-selector-section').each(function() {
+        var section = $(this), sectionKey = section.data('section');
+        section.find('.asl-prod-selected-item').each(function() {
+            var item = $(this), slug = item.data('slug');
+            if (!slug) return;
+            $.get(aslAdmin.ajaxurl, { action: 'asl_search_products', nonce: aslAdmin.nonce, q: slug }, function(res) {
+                if (!res.success) return;
+                var match = null;
+                $.each(res.data, function(i, p) { if (p.slug === slug) { match = p; return false; } });
+                if (match) {
+                    var safe = $('<span>').text(match.name).html();
+                    var info = '<strong>' + safe + '</strong>';
+                    if (match.category) info += '<br><small style="color:#0073aa;">Category: ' + match.category + '</small>';
+                    info += '<br><small style="color:#666;">Slug: ' + match.slug + ' &middot; ' + match.price;
+                    if (match.sku) info += ' &middot; SKU: ' + match.sku;
+                    info += '</small>';
+                    item.find('.asl-prod-item-info').html(info);
+                    if (match.image && !item.find('img').length) {
+                        item.find('.dashicons-menu').after('<img src="' + match.image + '" style="width:40px;height:40px;object-fit:cover;border-radius:4px;margin-right:10px;">');
+                    }
+                }
+            });
+        });
+    });
 });

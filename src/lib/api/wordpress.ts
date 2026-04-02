@@ -49,6 +49,8 @@ interface WPPluginHeroSettings {
 interface WPPluginBannerItem {
   image: string;
   mobileImage: string;
+  imageAr?: string;
+  mobileImageAr?: string;
   title: string;
   titleAr: string;
   subtitle: string;
@@ -95,6 +97,7 @@ interface WPPluginProductSectionSettings {
   hideOnMobile?: boolean;
   hideOnDesktop?: boolean;
   selectedIds?: number[];
+  selectedProductSlugs?: string[];
   responsive?: {
     desktop: number;
     tablet: number;
@@ -331,13 +334,18 @@ function transformHeroSettings(pluginHero: WPPluginHeroSettings, locale?: Locale
 function transformBannersSettings(pluginBanners: WPPluginBannersSettings, locale?: Locale): BannersSettings {
   const banners: Banner[] = pluginBanners.items
     .filter(item => item.image)
-    .map((item, index) => ({
-      image: createWPImage(item.image, item.title || `Banner ${index + 1}`) as WPImage,
-      mobile_image: createWPImage(item.mobileImage, item.title || `Banner ${index + 1} Mobile`) || undefined,
-      link: createWPLink(item.link, item.title),
-      title: locale === "ar" ? (item.titleAr || "") : item.title,
-      subtitle: locale === "ar" ? (item.subtitleAr || "") : item.subtitle,
-    }));
+    .map((item, index) => {
+      const isAr = locale === "ar";
+      const desktopImg = (isAr && item.imageAr) ? item.imageAr : item.image;
+      const mobileImg = (isAr && item.mobileImageAr) ? item.mobileImageAr : item.mobileImage;
+      return {
+        image: createWPImage(desktopImg, item.title || `Banner ${index + 1}`) as WPImage,
+        mobile_image: createWPImage(mobileImg, item.title || `Banner ${index + 1} Mobile`) || undefined,
+        link: createWPLink(item.link, item.title),
+        title: isAr ? (item.titleAr || "") : item.title,
+        subtitle: isAr ? (item.subtitleAr || "") : item.subtitle,
+      };
+    });
 
   return {
     enabled: pluginBanners.enabled,
@@ -377,6 +385,7 @@ function transformProductSectionSettings(pluginSection: WPPluginProductSectionSe
     section_title: locale === "ar" ? (pluginSection.titleAr || "") : pluginSection.title,
     section_subtitle: locale === "ar" ? (pluginSection.subtitleAr || "") : pluginSection.subtitle,
     products_count: pluginSection.count,
+    selected_product_slugs: pluginSection.selectedProductSlugs ?? [],
     show_view_all: true,
     view_all_link: "/shop",
     hide_on_mobile: pluginSection.hideOnMobile,
@@ -405,6 +414,7 @@ function transformFeaturedProductsSettings(pluginSection: WPPluginProductSection
     section_title: locale === "ar" ? (pluginSection.titleAr || "") : pluginSection.title,
     section_subtitle: locale === "ar" ? (pluginSection.subtitleAr || "") : pluginSection.subtitle,
     products_count: pluginSection.count,
+    selected_product_slugs: pluginSection.selectedProductSlugs ?? [],
     autoplay: pluginSection.autoplay ?? true,
     autoplay_delay: 4000,
     hide_on_mobile: pluginSection.hideOnMobile,
