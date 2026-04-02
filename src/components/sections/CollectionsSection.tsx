@@ -13,7 +13,7 @@ interface CollectionsSectionProps {
 function CollectionCardSkeleton() {
   return (
     <div className="flex flex-col">
-      <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+      <Skeleton className="aspect-[4/3] w-full" />
       <div className="mt-4 space-y-2">
         <Skeleton className="h-6 w-3/4" />
         <Skeleton className="h-4 w-full" />
@@ -87,7 +87,7 @@ export function CollectionsSection({
               key={index}
               href={collection.link?.url || "#"}
               target={collection.link?.target || "_self"}
-              className="group relative aspect-[4/3] overflow-hidden rounded-xl"
+              className="group relative aspect-[4/3] overflow-hidden"
             >
               {collection.image?.url ? (
                 <Image

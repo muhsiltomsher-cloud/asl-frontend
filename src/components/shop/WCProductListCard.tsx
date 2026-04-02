@@ -93,10 +93,10 @@ export function WCProductListCard({
     <article className={cn("group relative", className)}>
       <Link 
         href={`/${locale}/product/${productSlug}`} 
-        className="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-amber-200 hover:shadow-md md:gap-6"
+        className="flex gap-4 border border-gray-100 bg-white p-4 shadow-sm transition-all duration-300 hover:border-amber-200 hover:shadow-md md:gap-6"
       >
         {/* Product Image */}
-        <div className="relative h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 md:h-40 md:w-40">
+        <div className="relative h-32 w-32 flex-shrink-0 overflow-hidden bg-gray-100 md:h-40 md:w-40">
           {mainImage ? (
             <Image
               src={mainImage.src}
@@ -219,7 +219,7 @@ export function WCProductListCard({
               onClick={handleWishlistToggle}
               disabled={isAddingToWishlist}
               className={cn(
-                "rounded-lg border p-2 transition-all",
+                "border p-2 transition-all",
                 isWishlisted
                   ? "border-red-200 bg-red-50 text-red-500 hover:bg-red-100"
                   : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:text-gray-700",

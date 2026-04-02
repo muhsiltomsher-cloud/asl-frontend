@@ -381,11 +381,11 @@ export default async function HomePage({ params }: HomePageProps) {
                 ? homeSections.whyChooseUs.items.map((item, idx) => ({ title: t(item.title), description: t(item.description), idx }))
                 : dictionary.sections.whyChooseUs.items.map((item: { title: string; description: string }, idx: number) => ({ ...item, idx }))
               ).map(({ title, description, idx }) => (
-                <div key={idx} className="group rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
-                    <span className="text-xl font-bold">{idx + 1}</span>
-                  </div>
-                  <h3 className="mb-2 text-lg font-bold text-amber-900">{title}</h3>
+                <div key={idx} className="group border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
+                                      <span className="text-xl font-bold">{idx + 1}</span>
+                                    </div>
+                                    <h3 className="mb-2 text-lg font-bold text-amber-900">{title}</h3>
                   <p className="text-sm leading-relaxed text-amber-700/70">{description}</p>
                 </div>
               ))}
@@ -415,8 +415,8 @@ export default async function HomePage({ params }: HomePageProps) {
             </div>
             <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
               <div className="relative">
-                <div className="absolute -inset-4 rounded-2xl bg-gradient-to-br from-amber-200/20 to-stone-200/20 blur-sm" />
-                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl shadow-xl lg:aspect-square">
+                <div className="absolute -inset-4 bg-gradient-to-br from-amber-200/20 to-stone-200/20 blur-sm" />
+                <div className="relative aspect-[4/5] overflow-hidden shadow-xl lg:aspect-square">
                   <Image
                     src={homeSections.ourStory.image || "https://cms.aromaticscentslab.com/wp-content/uploads/2025/12/ASL-Website-Images-Patchouli-Glow-06.webp"}
                     alt={isRTL ? "قصتنا" : "Our Story"}
@@ -441,7 +441,7 @@ export default async function HomePage({ params }: HomePageProps) {
                       ? homeSections.ourStory.stats
                       : [{ value: '100%', label: { en: 'Natural Ingredients', ar: 'مكونات طبيعية' } }, { value: '10+', label: { en: 'Years of Excellence', ar: 'سنوات من الخبرة' } }]
                     ).map((stat, idx) => (
-                      <div key={idx} className="rounded-xl bg-white/60 p-4 shadow-sm backdrop-blur-sm">
+                      <div key={idx} className="bg-white/60 p-4 shadow-sm backdrop-blur-sm">
                         <div className="mb-2 text-2xl font-bold text-amber-900">{stat.value}</div>
                         <div className="text-sm text-amber-700/70">{t(stat.label)}</div>
                       </div>
@@ -490,7 +490,7 @@ export default async function HomePage({ params }: HomePageProps) {
               </div>
               <div className="mx-auto max-w-3xl space-y-4">
                 {faqItems.map((item: { question: string; answer: string }, idx: number) => (
-                  <details key={idx} className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
+                  <details key={idx} className="group border border-amber-100 bg-gradient-to-b from-amber-50/30 to-white shadow-sm">
                     <summary className="flex cursor-pointer items-center justify-between gap-4 p-5 text-left font-semibold text-amber-900 transition-colors hover:text-amber-700">
                       <span>{item.question}</span>
                       <svg className="h-5 w-5 shrink-0 text-amber-400 transition-transform duration-200 group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">

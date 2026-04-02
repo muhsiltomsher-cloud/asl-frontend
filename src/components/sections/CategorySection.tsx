@@ -33,7 +33,7 @@ interface CategorySectionProps {
 function CategoryCardSkeleton() {
   return (
     <div className="flex flex-col">
-      <Skeleton className="aspect-[3/2] w-full rounded-xl" />
+      <Skeleton className="aspect-[3/2] w-full" />
       <div className="mt-3 space-y-2 text-center">
         <Skeleton className="mx-auto h-5 w-3/4" />
         <Skeleton className="mx-auto h-4 w-1/2" />
@@ -140,7 +140,7 @@ export function CategorySection({
                   href={`/${locale}/category/${categorySlugForUrl}`}
                   className="group flex flex-col"
                 >
-                  <div className="relative aspect-[3/2] overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-lg">
+                  <div className="relative aspect-[3/2] overflow-hidden bg-white transition-shadow duration-300 hover:shadow-lg">
                     {categoryImage?.src ? (
                       <Image
                         src={categoryImage.src}
@@ -172,7 +172,7 @@ export function CategorySection({
               href={item.href}
               className="group flex flex-col"
             >
-              <div className="relative aspect-[3/2] overflow-hidden rounded-xl bg-white transition-shadow duration-300 hover:shadow-lg">
+              <div className="relative aspect-[3/2] overflow-hidden bg-white transition-shadow duration-300 hover:shadow-lg">
                 {item.image ? (
                   <Image
                     src={item.image}

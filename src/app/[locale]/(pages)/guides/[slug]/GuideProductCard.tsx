@@ -95,7 +95,7 @@ export function GuideProductCard({
     product.tags?.some((tag) => tag.slug === "bestseller");
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
+    <article className="group overflow-hidden border border-amber-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
       {/* Mobile: Compact horizontal layout */}
       <div className="flex flex-col md:flex-row">
         {/* Rank Badge + Image */}

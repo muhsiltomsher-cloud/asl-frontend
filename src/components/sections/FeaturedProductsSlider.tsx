@@ -29,7 +29,7 @@ interface FeaturedProductsSliderProps {
 function FeaturedProductCardSkeleton() {
   return (
     <div className="flex flex-col">
-      <Skeleton className="aspect-square w-full rounded-lg" />
+      <Skeleton className="aspect-square w-full" />
       <div className="mt-3 space-y-2">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/2" />

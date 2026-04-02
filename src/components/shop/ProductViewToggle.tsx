@@ -99,7 +99,7 @@ export function ProductViewToggle({
   return (
     <div 
       className={cn(
-        "flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm",
+        "flex flex-wrap items-center justify-between gap-4 border border-gray-100 bg-white px-4 py-3 shadow-sm",
         className
       )} 
       dir={isRTL ? "rtl" : "ltr"}
@@ -116,7 +116,7 @@ export function ProductViewToggle({
       {/* Center: View Mode + Grid Columns */}
       <div className="flex items-center gap-3">
         {/* View Mode Toggle */}
-        <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-1">
+        <div className="flex items-center border border-gray-200 bg-gray-50 p-1">
           <button
             type="button"
             onClick={() => onViewModeChange("grid")}
@@ -149,7 +149,7 @@ export function ProductViewToggle({
 
         {/* Grid Columns Toggle (only show when in grid mode, hidden on mobile) */}
         {viewMode === "grid" && (
-          <div className="hidden items-center rounded-lg border border-gray-200 bg-gray-50 p-1 md:flex">
+          <div className="hidden items-center border border-gray-200 bg-gray-50 p-1 md:flex">
             {gridOptions.map((option) => (
               <button
                 key={option.columns}
@@ -177,7 +177,7 @@ export function ProductViewToggle({
         <button
           type="button"
           onClick={() => setIsSortOpen(!isSortOpen)}
-          className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100"
+          className="flex items-center gap-2 border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100"
         >
           <span className="hidden sm:inline">{t.sortBy}:</span>
           <span className="text-gray-900">{currentSortLabel}</span>
@@ -186,7 +186,7 @@ export function ProductViewToggle({
 
         {isSortOpen && (
           <div className={cn(
-            "absolute top-full z-50 mt-1 min-w-[180px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg",
+            "absolute top-full z-50 mt-1 min-w-[180px] border border-gray-200 bg-white py-1 shadow-lg",
             isRTL ? "left-0" : "right-0"
           )}>
             {sortOptions.map((option) => (

@@ -376,7 +376,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
                 {guide.contentBlocks.map((block, index) => (
                   <div
                     key={index}
-                    className="rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-4 shadow-sm sm:rounded-2xl sm:p-6 md:p-8"
+                    className="border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-4 shadow-sm sm:p-6 md:p-8"
                   >
                     <h3 className="mb-3 text-lg font-bold text-amber-900 sm:mb-4 sm:text-xl md:text-2xl">
                       {block.heading[validLocale]}
@@ -414,7 +414,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
                 {guide.faqs.map((faq, index) => (
                   <details
                     key={index}
-                    className="group rounded-lg border border-amber-100 bg-white shadow-sm sm:rounded-xl"
+                    className="group border border-amber-100 bg-white shadow-sm"
                   >
                     <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-amber-900 transition-colors hover:text-amber-700 sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
                       <span>{faq.question[validLocale]}</span>
@@ -444,7 +444,7 @@ export default async function GuidePage({ params }: GuidePageProps) {
                   <Link
                     key={related.slug}
                     href={`/${locale}/guides/${related.slug}`}
-                    className="group rounded-xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+                    className="group border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
                   >
                     <h3 className="font-bold text-amber-900 transition-colors group-hover:text-amber-700">
                       {related.title[validLocale]}

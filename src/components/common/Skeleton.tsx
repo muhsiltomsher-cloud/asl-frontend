@@ -11,7 +11,7 @@ export function ProductCardSkeleton({ placeholderLogo }: { placeholderLogo?: str
   const logoSrc = placeholderLogo || "/images/asl-placeholder.png";
   return (
     <div className="space-y-4">
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden">
+      <div className="relative aspect-square w-full overflow-hidden">
         <Skeleton className="absolute inset-0" />
         <div className="absolute inset-0 flex items-center justify-center">
           <Image
@@ -45,7 +45,7 @@ export function ProductGridSkeleton({ count = 8, placeholderLogo }: { count?: nu
 export function CartItemSkeleton() {
   return (
     <div className="flex gap-4 p-4">
-      <Skeleton className="h-20 w-20 flex-shrink-0 rounded-lg" />
+      <Skeleton className="h-20 w-20 flex-shrink-0" />
       <div className="flex flex-1 flex-col gap-2">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-4 w-1/3" />
@@ -99,7 +99,7 @@ export function CategoriesGridSkeleton({ count = 4 }: { count?: number }) {
 export function MiniProductCardSkeleton() {
   return (
     <div className="block">
-      <Skeleton className="aspect-square w-full rounded-lg" />
+      <Skeleton className="aspect-square w-full" />
       <div className="mt-2 space-y-1">
         <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-1/2" />

@@ -251,7 +251,7 @@ function BannersBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
             const bannerSubtitle = isRTL ? (banner.subtitleAr || banner.subtitle) : banner.subtitle;
 
             const content = (
-              <div className="group relative overflow-hidden rounded-2xl">
+              <div className="group relative overflow-hidden">
                 {banner.image && (
                   <div className="relative aspect-[16/9]">
                     <Image
@@ -318,8 +318,8 @@ function FeaturesBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
             const featureDesc = isRTL ? (feature.descriptionAr || feature.description) : feature.description;
 
             return (
-              <div key={idx} className="group rounded-2xl border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
+              <div key={idx} className="group border border-amber-100 bg-gradient-to-b from-amber-50/50 to-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md">
                   <span className="text-xl font-bold">{idx + 1}</span>
                 </div>
                 {featureTitle && <h3 className="mb-2 text-lg font-bold text-amber-900">{featureTitle}</h3>}
@@ -355,7 +355,7 @@ function FAQBlock({ page, isRTL }: { page: ProductPage; isRTL: boolean }) {
               if (!question) return null;
 
               return (
-                <details key={idx} className="group rounded-lg border border-amber-100 bg-white shadow-sm sm:rounded-xl">
+                <details key={idx} className="group border border-amber-100 bg-white shadow-sm">
                   <summary className="flex cursor-pointer items-center justify-between px-4 py-4 text-left text-sm font-semibold text-amber-900 transition-colors hover:text-amber-700 sm:px-6 sm:py-5 sm:text-base [&::-webkit-details-marker]:hidden">
                     <span>{question}</span>
                     <ChevronRight className="h-5 w-5 shrink-0 text-amber-400 transition-transform group-open:rotate-90" />
