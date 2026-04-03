@@ -276,20 +276,24 @@ function asl_render_footer_links_tab() {
                 });
             });
         }
-        $('#asl-add-quick-link').on('click', function() {
-            var c = $('#asl-footer-quick-links');
-            c.append(footerLinkHtml('asl_footer_quick_links', c.find('.asl-footer-link-item').length));
-        });
-        $('#asl-add-cs-link').on('click', function() {
-            var c = $('#asl-footer-cs-links');
-            c.append(footerLinkHtml('asl_footer_cs_links', c.find('.asl-footer-link-item').length));
-        });
-        $(document).on('click', '.asl-remove-footer-link', function() {
-            var item = $(this).closest('.asl-footer-link-item');
-            var container = item.parent();
-            item.remove();
-            reindexLinks(container);
-        });
+        // Use setTimeout(0) to run AFTER admin.js ready handler,
+        // then unbind any duplicate handlers before rebinding (prevents double-fire)
+        setTimeout(function() {
+            $('#asl-add-quick-link').off('click').on('click', function() {
+                var c = $('#asl-footer-quick-links');
+                c.append(footerLinkHtml('asl_footer_quick_links', c.find('.asl-footer-link-item').length));
+            });
+            $('#asl-add-cs-link').off('click').on('click', function() {
+                var c = $('#asl-footer-cs-links');
+                c.append(footerLinkHtml('asl_footer_cs_links', c.find('.asl-footer-link-item').length));
+            });
+            $(document).off('click', '.asl-remove-footer-link').on('click', '.asl-remove-footer-link', function() {
+                var item = $(this).closest('.asl-footer-link-item');
+                var container = item.parent();
+                item.remove();
+                reindexLinks(container);
+            });
+        }, 0);
     });
     </script>
     <?php
