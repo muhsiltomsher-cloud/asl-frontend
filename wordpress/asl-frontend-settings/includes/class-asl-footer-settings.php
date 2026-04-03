@@ -180,9 +180,11 @@ function asl_render_footer_general_tab() {
  * Render Footer Links tab - Quick Links and Customer Service repeaters
  */
 function asl_render_footer_links_tab() {
-    // Quick Links
+    // Quick Links - use 'asl_footer_quick_links_saved' flag to distinguish
+    // "never configured" (show defaults) from "intentionally empty" (show nothing)
+    $quick_links_saved = get_theme_mod('asl_footer_quick_links_saved', false);
     $quick_links = get_theme_mod('asl_footer_quick_links', array());
-    if (empty($quick_links)) {
+    if (!$quick_links_saved && empty($quick_links)) {
         $quick_links = array(
             array('label_en' => 'Home', 'label_ar' => 'الرئيسية', 'url' => '/'),
             array('label_en' => 'Shop', 'label_ar' => 'المتجر', 'url' => '/shop'),
@@ -193,8 +195,9 @@ function asl_render_footer_links_tab() {
     }
 
     // Customer Service
+    $cs_links_saved = get_theme_mod('asl_footer_cs_links_saved', false);
     $cs_links = get_theme_mod('asl_footer_cs_links', array());
-    if (empty($cs_links)) {
+    if (!$cs_links_saved && empty($cs_links)) {
         $cs_links = array(
             array('label_en' => 'FAQ', 'label_ar' => 'الأسئلة الشائعة', 'url' => '/faq'),
             array('label_en' => 'Shipping Information', 'label_ar' => 'معلومات الشحن', 'url' => '/shipping'),
@@ -251,6 +254,48 @@ function asl_render_footer_links_tab() {
         </div>
         <?php endforeach; ?>
     </div>
+
+    <script type="text/javascript">
+    jQuery(function($) {
+        function footerLinkHtml(prefix, i) {
+            return '<div class="asl-footer-link-item" style="background:#f9f9f9;padding:15px;margin-bottom:10px;border:1px solid #ddd;">' +
+                '<h4>Link ' + (i+1) + ' <button type="button" class="button asl-remove-footer-link" style="float:right;color:red;">Remove</button></h4>' +
+                '<table class="form-table">' +
+                '<tr><th>Label (EN)</th><td><input type="text" name="' + prefix + '[' + i + '][label_en]" value="" class="regular-text"></td></tr>' +
+                '<tr><th>Label (AR)</th><td><input type="text" name="' + prefix + '[' + i + '][label_ar]" value="" class="regular-text" dir="rtl"></td></tr>' +
+                '<tr><th>URL</th><td><input type="text" name="' + prefix + '[' + i + '][url]" value="" class="large-text" placeholder="/shop or https://example.com"></td></tr>' +
+                '</table></div>';
+        }
+        function reindexLinks(container) {
+            var prefix = container.attr('id') === 'asl-footer-quick-links' ? 'asl_footer_quick_links' : 'asl_footer_cs_links';
+            container.find('.asl-footer-link-item').each(function(i) {
+                $(this).find('h4').contents().first().replaceWith('Link ' + (i + 1) + ' ');
+                $(this).find('input').each(function() {
+                    var n = $(this).attr('name');
+                    if (n) $(this).attr('name', n.replace(/\[\d+\]/, '[' + i + ']'));
+                });
+            });
+        }
+        // Use setTimeout(0) to run AFTER admin.js ready handler,
+        // then unbind any duplicate handlers before rebinding (prevents double-fire)
+        setTimeout(function() {
+            $('#asl-add-quick-link').off('click').on('click', function() {
+                var c = $('#asl-footer-quick-links');
+                c.append(footerLinkHtml('asl_footer_quick_links', c.find('.asl-footer-link-item').length));
+            });
+            $('#asl-add-cs-link').off('click').on('click', function() {
+                var c = $('#asl-footer-cs-links');
+                c.append(footerLinkHtml('asl_footer_cs_links', c.find('.asl-footer-link-item').length));
+            });
+            $(document).off('click', '.asl-remove-footer-link').on('click', '.asl-remove-footer-link', function() {
+                var item = $(this).closest('.asl-footer-link-item');
+                var container = item.parent();
+                item.remove();
+                reindexLinks(container);
+            });
+        }, 0);
+    });
+    </script>
     <?php
 }
 
@@ -346,6 +391,7 @@ function asl_save_footer_settings() {
                 }
             }
             set_theme_mod('asl_footer_quick_links', $quick_links);
+            set_theme_mod('asl_footer_quick_links_saved', true);
 
             // Customer Service Links
             $cs_links = array();
@@ -360,6 +406,7 @@ function asl_save_footer_settings() {
                 }
             }
             set_theme_mod('asl_footer_cs_links', $cs_links);
+            set_theme_mod('asl_footer_cs_links_saved', true);
             break;
 
         case 'social':

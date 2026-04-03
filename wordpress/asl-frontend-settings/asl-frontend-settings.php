@@ -18,7 +18,7 @@ if (defined('ASL_FRONTEND_SETTINGS_LOADED')) {
     return;
 }
 define('ASL_FRONTEND_SETTINGS_LOADED', true);
-define('ASL_SETTINGS_VERSION', '6.3.0');
+define('ASL_SETTINGS_VERSION', '6.5.0');
 define('ASL_SETTINGS_PATH', plugin_dir_path(__FILE__));
 
 /**
