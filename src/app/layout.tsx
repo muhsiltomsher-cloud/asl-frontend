@@ -77,14 +77,23 @@ export default async function RootLayout({
   var reloadCount = 0;
   try { reloadCount = parseInt(sessionStorage.getItem(KEY) || '0', 10) || 0; } catch(e) {}
 
+  // Cache-busting reload: navigate to same URL with a timestamp param
+  // to bypass Cloudflare/CDN cached HTML that references old chunks
+  function cacheBustReload() {
+    if (reloadCount >= MAX_RELOADS) return;
+    try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
+    var url = window.location.href.replace(/[?&]_cr=\\d+/, '');
+    var sep = url.indexOf('?') !== -1 ? '&' : '?';
+    window.location.replace(url + sep + '_cr=' + Date.now());
+  }
+
   // Listen for script/link load errors (fires before React mounts)
   window.addEventListener('error', function(e) {
     var target = e.target || e.srcElement;
     if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
       var src = target.src || target.href || '';
-      if (src.indexOf('/_next/static/') !== -1 && reloadCount < MAX_RELOADS) {
-        try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
-        window.location.reload();
+      if (src.indexOf('/_next/static/') !== -1) {
+        cacheBustReload();
       }
     }
   }, true);
@@ -92,6 +101,11 @@ export default async function RootLayout({
   // Clear the reload counter on successful page load
   window.addEventListener('load', function() {
     try { sessionStorage.removeItem(KEY); } catch(e) {}
+    // Clean up the _cr query param from URL without reload
+    if (window.history && window.history.replaceState && window.location.search.indexOf('_cr=') !== -1) {
+      var clean = window.location.href.replace(/[?&]_cr=\\d+/, '').replace(/\\?$/, '');
+      window.history.replaceState(null, '', clean);
+    }
   });
 
   // Handle dynamic import / chunk load failures after React mounts
@@ -101,11 +115,8 @@ export default async function RootLayout({
         (msg.indexOf('ChunkLoadError') !== -1 ||
          msg.indexOf('Loading chunk') !== -1 ||
          msg.indexOf('Failed to fetch dynamically imported module') !== -1)) {
-      if (reloadCount < MAX_RELOADS) {
-        try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
-        window.location.reload();
-        return true;
-      }
+      cacheBustReload();
+      return true;
     }
     if (origError) return origError.apply(this, arguments);
   };
@@ -119,10 +130,7 @@ export default async function RootLayout({
           reason.message.indexOf('Loading chunk') !== -1 ||
           reason.message.indexOf('Failed to load chunk') !== -1
         )))) {
-      if (reloadCount < MAX_RELOADS) {
-        try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
-        window.location.reload();
-      }
+      cacheBustReload();
     }
   });
 })();
