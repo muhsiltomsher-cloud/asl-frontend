@@ -1033,7 +1033,7 @@ function asl_get_menu($request) {
  * Theme support
  */
 function asl_settings_theme_support() {
-    register_nav_menus(array('primary'=>'Primary Menu','footer'=>'Footer Menu'));
+    register_nav_menus(array('primary'=>'Primary Menu','primary_ar'=>'Primary Menu (Arabic)','footer'=>'Footer Menu','footer_ar'=>'Footer Menu (Arabic)'));
     add_theme_support('custom-logo',array('height'=>100,'width'=>400,'flex-height'=>true,'flex-width'=>true));
 }
 

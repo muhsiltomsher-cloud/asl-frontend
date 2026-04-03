@@ -151,3 +151,6 @@ require_once ASL_SETTINGS_PATH . 'includes/class-asl-notes-cpt.php';
 
 // Include Product Meta module (dynamic SEO meta descriptions for products)
 require_once ASL_SETTINGS_PATH . 'includes/class-asl-product-meta.php';
+
+// Include Footer Settings module (dynamic footer content with EN/AR support)
+require_once ASL_SETTINGS_PATH . 'includes/class-asl-footer-settings.php';

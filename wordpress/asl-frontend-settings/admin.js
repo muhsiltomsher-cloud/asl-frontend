@@ -470,6 +470,48 @@ jQuery(document).ready(function($) {
         }
     });
 
+    /* ================================================================
+       FOOTER LINKS - Add / Remove / Reindex
+       ================================================================ */
+    function footerLinkTemplate(container, i) {
+        var prefix = container.attr('id') === 'asl-footer-quick-links' ? 'asl_footer_quick_links' : 'asl_footer_cs_links';
+        return '<div class="asl-footer-link-item" style="background:#f9f9f9;padding:15px;margin-bottom:10px;border:1px solid #ddd;">' +
+            '<h4>Link ' + (i+1) + ' <button type="button" class="button asl-remove-footer-link" style="float:right;color:red;">Remove</button></h4>' +
+            '<table class="form-table">' +
+            '<tr><th>Label (EN)</th><td><input type="text" name="' + prefix + '[' + i + '][label_en]" value="" class="regular-text"></td></tr>' +
+            '<tr><th>Label (AR)</th><td><input type="text" name="' + prefix + '[' + i + '][label_ar]" value="" class="regular-text" dir="rtl"></td></tr>' +
+            '<tr><th>URL</th><td><input type="text" name="' + prefix + '[' + i + '][url]" value="" class="large-text" placeholder="/shop or https://example.com"></td></tr>' +
+            '</table></div>';
+    }
+
+    function reindexFooterLinks(container) {
+        var prefix = container.attr('id') === 'asl-footer-quick-links' ? 'asl_footer_quick_links' : 'asl_footer_cs_links';
+        container.find('.asl-footer-link-item').each(function(i) {
+            $(this).find('h4').contents().first().replaceWith('Link ' + (i + 1) + ' ');
+            $(this).find('input').each(function() {
+                var n = $(this).attr('name');
+                if (n) $(this).attr('name', n.replace(/\[\d+\]/, '[' + i + ']'));
+            });
+        });
+    }
+
+    $('#asl-add-quick-link').on('click', function() {
+        var c = $('#asl-footer-quick-links');
+        c.append(footerLinkTemplate(c, c.find('.asl-footer-link-item').length));
+    });
+
+    $('#asl-add-cs-link').on('click', function() {
+        var c = $('#asl-footer-cs-links');
+        c.append(footerLinkTemplate(c, c.find('.asl-footer-link-item').length));
+    });
+
+    $(document).on('click', '.asl-remove-footer-link', function() {
+        var item = $(this).closest('.asl-footer-link-item');
+        var container = item.parent();
+        item.remove();
+        reindexFooterLinks(container);
+    });
+
     // Page load: fetch product details for pre-filled slugs
     $('.asl-product-selector-section').each(function() {
         var section = $(this), sectionKey = section.data('section');
