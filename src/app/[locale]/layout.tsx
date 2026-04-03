@@ -15,7 +15,7 @@ import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd, generateWebSiteJsonLd, generateLocalBusinessJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings } from "@/lib/api/wordpress";
+import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getTopbarSettings, getSeoSettings, getFooterSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
 import { Suspense } from "react";
 
@@ -147,13 +147,14 @@ export default async function LocaleLayout({
   const { dir } = localeConfig[validLocale];
 
   // Fetch site settings, header settings, mobile bar settings, topbar settings, menu, and SEO settings in parallel
-  const [siteSettings, headerSettings, mobileBarSettings, topbarSettings, menuItems, seoSettings] = await Promise.all([
+  const [siteSettings, headerSettings, mobileBarSettings, topbarSettings, menuItems, seoSettings, footerSettings] = await Promise.all([
     getSiteSettings(validLocale),
     getHeaderSettings(),
     getMobileBarSettings(validLocale),
     getTopbarSettings(validLocale),
     getPrimaryMenu(validLocale),
     getSeoSettings(validLocale),
+    getFooterSettings(),
   ]);
 
   return (
@@ -210,7 +211,7 @@ export default async function LocaleLayout({
                   <MobileEnhancements>{children}</MobileEnhancements>
                 </main>
                 <footer className="print:hidden" role="contentinfo">
-                  <Footer locale={validLocale} dictionary={dictionary} siteSettings={siteSettings} />
+                  <Footer locale={validLocale} dictionary={dictionary} siteSettings={siteSettings} footerSettings={footerSettings} />
                 </footer>
                 <div className="print:hidden">
                   <MobileBottomBar

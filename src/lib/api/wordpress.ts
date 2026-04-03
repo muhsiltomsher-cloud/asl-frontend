@@ -22,6 +22,7 @@ import type {
   CategorySeoContent,
   HomeSections,
   GuidePage,
+  FooterSettings,
 } from "@/types/wordpress";
 
 const WP_API_BASE = `${siteConfig.apiUrl}/wp-json`;
@@ -939,6 +940,82 @@ export async function getTopbarSettings(locale?: Locale): Promise<TopbarSettings
     dismissible: data.dismissible,
     freeShippingThreshold: data.freeShippingThreshold ?? defaultTopbarSettings.freeShippingThreshold,
     freeShippingThresholds: data.freeShippingThresholds ?? null,
+  };
+}
+
+// ─── Footer Settings ───
+const defaultFooterSettings: FooterSettings = {
+  description: {
+    en: "Aromatic Scents Lab is a luxury fragrance house dedicated to crafting unique, high-quality perfumes that captivate the senses.",
+    ar: "معمل العطور الفاخرة مكرس لصناعة عطور فريدة وعالية الجودة تأسر الحواس.",
+  },
+  copyright: {
+    en: "© 2025 Aromatic Scents Lab. All rights reserved.",
+    ar: "© 2025 معمل العطور. جميع الحقوق محفوظة.",
+  },
+  newsletter: {
+    title: { en: "Stay in the Scent Loop", ar: "ابقَ في عالم العطور" },
+    subtitle: {
+      en: "Subscribe to receive updates, access to exclusive deals, and more.",
+      ar: "اشترك لتلقي التحديثات والوصول إلى العروض الحصرية والمزيد.",
+    },
+    buttonText: { en: "Subscribe", ar: "اشترك" },
+    placeholder: {
+      en: "Enter your email address",
+      ar: "أدخل بريدك الإلكتروني",
+    },
+  },
+  quickLinks: {
+    heading: { en: "Quick Links", ar: "روابط سريعة" },
+    items: [
+      { label: { en: "Shop All", ar: "تسوق الكل" }, url: "/shop" },
+      { label: { en: "New Arrivals", ar: "وصل حديثاً" }, url: "/new-arrivals" },
+      { label: { en: "Best Sellers", ar: "الأكثر مبيعاً" }, url: "/best-sellers" },
+      { label: { en: "About Us", ar: "من نحن" }, url: "/about" },
+    ],
+  },
+  customerService: {
+    heading: { en: "Customer Service", ar: "خدمة العملاء" },
+    items: [
+      { label: { en: "Contact Us", ar: "اتصل بنا" }, url: "/contact" },
+      { label: { en: "Shipping Policy", ar: "سياسة الشحن" }, url: "/shipping-policy" },
+      { label: { en: "Return & Exchange", ar: "الإرجاع والاستبدال" }, url: "/return-exchange" },
+      { label: { en: "FAQs", ar: "الأسئلة الشائعة" }, url: "/faqs" },
+    ],
+  },
+  social: {
+    facebook: "",
+    instagram: "",
+    twitter: "",
+    tiktok: "",
+    snapchat: "",
+    whatsapp: "",
+  },
+  poweredBy: {
+    text: { en: "Powered by", ar: "مدعوم من" },
+    name: { en: "Cadvil", ar: "كادفل" },
+    url: "https://cadvil.ae",
+  },
+};
+
+export async function getFooterSettings(): Promise<FooterSettings> {
+  const data = await fetchWPAPI<FooterSettings>("/asl/v1/footer-settings", {
+    tags: ["footer-settings"],
+    revalidate: 600,
+  });
+
+  if (!data) {
+    return defaultFooterSettings;
+  }
+
+  return {
+    description: data.description || defaultFooterSettings.description,
+    copyright: data.copyright || defaultFooterSettings.copyright,
+    newsletter: data.newsletter || defaultFooterSettings.newsletter,
+    quickLinks: data.quickLinks || defaultFooterSettings.quickLinks,
+    customerService: data.customerService || defaultFooterSettings.customerService,
+    social: data.social || defaultFooterSettings.social,
+    poweredBy: data.poweredBy || defaultFooterSettings.poweredBy,
   };
 }
 

@@ -402,6 +402,49 @@ export interface GuidePage {
   updatedAt: string;
 }
 
+// ─── Footer Settings (from /asl/v1/footer-settings) ───
+export interface FooterLinkItem {
+  label: BilingualText;
+  url: string;
+}
+
+export interface FooterLinkSection {
+  heading: BilingualText;
+  items: FooterLinkItem[];
+}
+
+export interface FooterNewsletterSettings {
+  title: BilingualText;
+  subtitle: BilingualText;
+  buttonText: BilingualText;
+  placeholder: BilingualText;
+}
+
+export interface FooterSocialLinks {
+  facebook: string;
+  instagram: string;
+  twitter: string;
+  tiktok: string;
+  snapchat: string;
+  whatsapp: string;
+}
+
+export interface FooterPoweredBy {
+  text: BilingualText;
+  name: BilingualText;
+  url: string;
+}
+
+export interface FooterSettings {
+  description: BilingualText;
+  copyright: BilingualText;
+  newsletter: FooterNewsletterSettings;
+  quickLinks: FooterLinkSection;
+  customerService: FooterLinkSection;
+  social: FooterSocialLinks;
+  poweredBy: FooterPoweredBy;
+}
+
 // WordPress Site Info from /wp-json (root endpoint)
 export interface WPSiteInfo {
   name: string;
