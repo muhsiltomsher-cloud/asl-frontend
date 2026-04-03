@@ -68,6 +68,67 @@ export default async function RootLayout({
     <html lang={locale} dir={dir} suppressHydrationWarning className="overflow-x-clip">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  var KEY = '__chunk_reload';
+  var MAX_RELOADS = 2;
+  var reloadCount = 0;
+  try { reloadCount = parseInt(sessionStorage.getItem(KEY) || '0', 10) || 0; } catch(e) {}
+
+  // Listen for script/link load errors (fires before React mounts)
+  window.addEventListener('error', function(e) {
+    var target = e.target || e.srcElement;
+    if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) {
+      var src = target.src || target.href || '';
+      if (src.indexOf('/_next/static/') !== -1 && reloadCount < MAX_RELOADS) {
+        try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
+        window.location.reload();
+      }
+    }
+  }, true);
+
+  // Clear the reload counter on successful page load
+  window.addEventListener('load', function() {
+    try { sessionStorage.removeItem(KEY); } catch(e) {}
+  });
+
+  // Handle dynamic import / chunk load failures after React mounts
+  var origError = window.onerror;
+  window.onerror = function(msg) {
+    if (typeof msg === 'string' &&
+        (msg.indexOf('ChunkLoadError') !== -1 ||
+         msg.indexOf('Loading chunk') !== -1 ||
+         msg.indexOf('Failed to fetch dynamically imported module') !== -1)) {
+      if (reloadCount < MAX_RELOADS) {
+        try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
+        window.location.reload();
+        return true;
+      }
+    }
+    if (origError) return origError.apply(this, arguments);
+  };
+
+  // Handle unhandled promise rejections (dynamic imports throw these)
+  window.addEventListener('unhandledrejection', function(e) {
+    var reason = e.reason;
+    if (reason && (reason.name === 'ChunkLoadError' ||
+        (reason.message && (
+          reason.message.indexOf('Failed to fetch dynamically imported module') !== -1 ||
+          reason.message.indexOf('Loading chunk') !== -1 ||
+          reason.message.indexOf('Failed to load chunk') !== -1
+        )))) {
+      if (reloadCount < MAX_RELOADS) {
+        try { sessionStorage.setItem(KEY, String(reloadCount + 1)); } catch(ex) {}
+        window.location.reload();
+      }
+    }
+  });
+})();
+`,
+          }}
+        />
         <link rel="dns-prefetch" href="https://cms.aromaticscentslab.com" />
         <link rel="preconnect" href="https://cms.aromaticscentslab.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
