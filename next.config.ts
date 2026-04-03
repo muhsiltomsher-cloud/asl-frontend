@@ -117,6 +117,26 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: securityHeaders,
       },
+      // Prevent Cloudflare/CDN from caching HTML pages so users always get fresh
+      // HTML with correct chunk references after a new deployment
+      {
+        source: "/:locale(en|ar)/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, s-maxage=0, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/:locale(en|ar)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=0, s-maxage=0, must-revalidate",
+          },
+        ],
+      },
       {
         source: "/wp-content/uploads/:path*",
         headers: [
