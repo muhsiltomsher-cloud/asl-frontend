@@ -28,10 +28,11 @@ interface HeaderProps {
   headerSettings?: HeaderSettings | null;
   menuItems?: WPMenuItem[] | null;
   mobileMenuItems?: WPMenuItem[] | null;
+  categoriesDrawerMenuItems?: WPMenuItem[] | null;
   topbarSettings?: TopbarSettings | null;
 }
 
-export function Header({ locale, dictionary, siteSettings, headerSettings, menuItems, mobileMenuItems, topbarSettings }: HeaderProps) {
+export function Header({ locale, dictionary, siteSettings, headerSettings, menuItems, mobileMenuItems, categoriesDrawerMenuItems, topbarSettings }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
         const megaMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -320,6 +321,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
         onClose={() => setIsCategoriesDrawerOpen(false)}
         locale={locale}
         dictionary={dictionary}
+        menuItems={categoriesDrawerMenuItems}
       />
     </>
   );

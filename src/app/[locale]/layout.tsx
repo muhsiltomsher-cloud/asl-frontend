@@ -15,7 +15,7 @@ import { getDictionary } from "@/i18n";
 import { siteConfig, localeConfig, type Locale } from "@/config/site";
 import { generateOrganizationJsonLd, generateWebSiteJsonLd, generateLocalBusinessJsonLd } from "@/lib/utils/seo";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getMobileHeaderMenu, getMobileBottomBarMenu, getTopbarSettings, getSeoSettings, getFooterSettings } from "@/lib/api/wordpress";
+import { getSiteSettings, getHeaderSettings, getMobileBarSettings, getPrimaryMenu, getMobileHeaderMenu, getMobileBottomBarMenu, getCategoriesDrawerMenu, getTopbarSettings, getSeoSettings, getFooterSettings } from "@/lib/api/wordpress";
 import { TrackingScripts } from "@/components/tracking";
 import { Suspense } from "react";
 
@@ -147,7 +147,7 @@ export default async function LocaleLayout({
   const { dir } = localeConfig[validLocale];
 
   // Fetch site settings, header settings, mobile bar settings, topbar settings, menu, and SEO settings in parallel
-  const [siteSettings, headerSettings, mobileBarSettings, topbarSettings, menuItems, mobileMenuItems, mobileBottomBarMenu, seoSettings, footerSettings] = await Promise.all([
+  const [siteSettings, headerSettings, mobileBarSettings, topbarSettings, menuItems, mobileMenuItems, mobileBottomBarMenu, categoriesDrawerMenu, seoSettings, footerSettings] = await Promise.all([
     getSiteSettings(validLocale),
     getHeaderSettings(),
     getMobileBarSettings(validLocale),
@@ -155,6 +155,7 @@ export default async function LocaleLayout({
     getPrimaryMenu(validLocale),
     getMobileHeaderMenu(validLocale),
     getMobileBottomBarMenu(validLocale),
+    getCategoriesDrawerMenu(validLocale),
     getSeoSettings(validLocale),
     getFooterSettings(),
   ]);
@@ -207,6 +208,7 @@ export default async function LocaleLayout({
                     headerSettings={headerSettings}
                     menuItems={menuItems?.items}
                     mobileMenuItems={mobileMenuItems?.items}
+                    categoriesDrawerMenuItems={categoriesDrawerMenu?.items}
                     topbarSettings={topbarSettings}
                   />
                 </nav>
@@ -224,6 +226,7 @@ export default async function LocaleLayout({
                     menuItems={menuItems?.items}
                     mobileMenuItems={mobileMenuItems?.items}
                     mobileBottomBarMenuItems={mobileBottomBarMenu?.items}
+                    categoriesDrawerMenuItems={categoriesDrawerMenu?.items}
                   />
                 </div>
               </div>

@@ -22,6 +22,7 @@ interface MobileBottomBarProps {
   menuItems?: WPMenuItem[] | null;
   mobileMenuItems?: WPMenuItem[] | null;
   mobileBottomBarMenuItems?: WPMenuItem[] | null;
+  categoriesDrawerMenuItems?: WPMenuItem[] | null;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -64,7 +65,7 @@ function wpMenuToBarItems(wpItems: WPMenuItem[], locale: Locale): MobileBarSetti
     });
 }
 
-export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobileMenuItems, mobileBottomBarMenuItems }: MobileBottomBarProps) {
+export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobileMenuItems, mobileBottomBarMenuItems, categoriesDrawerMenuItems }: MobileBottomBarProps) {
   const { wishlistItemsCount } = useWishlist();
   const { setIsAccountDrawerOpen } = useAuth();
   const isKeyboardVisible = useKeyboardVisible();
@@ -198,7 +199,7 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobil
         }}
         locale={locale}
         dictionary={dictionary}
-        menuItems={mobileMenuItems || menuItems}
+        menuItems={categoriesDrawerMenuItems || mobileMenuItems || menuItems}
       />
       <SearchDrawer
         isOpen={isSearchDrawerOpen}

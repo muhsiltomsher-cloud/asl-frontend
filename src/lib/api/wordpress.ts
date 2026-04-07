@@ -772,6 +772,30 @@ export async function getMobileBottomBarMenu(locale?: Locale): Promise<WPMenu | 
   return getMenu("mobile-bottom", locale);
 }
 
+// Fetch WordPress menu by slug (uses /menus/v1/menus/{slug} endpoint)
+// For Arabic locale, appends "-ar" suffix to fetch the translated menu
+export async function getMenuBySlug(slug: string, locale?: Locale): Promise<WPMenu | null> {
+  const menuSlug = locale === "ar" ? `${slug}-ar` : slug;
+  const data = await fetchWPAPI<RawWPMenu>(
+    `/menus/v1/menus/${menuSlug}`,
+    {
+      tags: ["menus", `menu-slug-${menuSlug}`],
+      revalidate: 600,
+    }
+  );
+
+  if (!data) {
+    return null;
+  }
+
+  return transformMenu(data);
+}
+
+// Fetch categories drawer menu (independent from mobile hamburger and desktop header)
+export async function getCategoriesDrawerMenu(locale?: Locale): Promise<WPMenu | null> {
+  return getMenuBySlug("categories-drawer", locale);
+}
+
 // Fetch footer menu
 export async function getFooterMenu(locale?: Locale): Promise<WPMenu | null> {
   return getMenu("footer", locale);
