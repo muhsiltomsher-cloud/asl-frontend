@@ -762,6 +762,16 @@ export async function getPrimaryMenu(locale?: Locale): Promise<WPMenu | null> {
   return getMenu("primary", locale);
 }
 
+// Fetch mobile header menu (used for Categories drawer - separate from primary/desktop menu)
+export async function getMobileHeaderMenu(locale?: Locale): Promise<WPMenu | null> {
+  return getMenu("mobile-header", locale);
+}
+
+// Fetch mobile bottom bar menu (used for bottom navigation icons - separate from other menus)
+export async function getMobileBottomBarMenu(locale?: Locale): Promise<WPMenu | null> {
+  return getMenu("mobile-bottom", locale);
+}
+
 // Fetch footer menu
 export async function getFooterMenu(locale?: Locale): Promise<WPMenu | null> {
   return getMenu("footer", locale);

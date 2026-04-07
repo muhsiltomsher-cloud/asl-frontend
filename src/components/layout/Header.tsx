@@ -27,10 +27,11 @@ interface HeaderProps {
   siteSettings?: SiteSettings | null;
   headerSettings?: HeaderSettings | null;
   menuItems?: WPMenuItem[] | null;
+  mobileMenuItems?: WPMenuItem[] | null;
   topbarSettings?: TopbarSettings | null;
 }
 
-export function Header({ locale, dictionary, siteSettings, headerSettings, menuItems, topbarSettings }: HeaderProps) {
+export function Header({ locale, dictionary, siteSettings, headerSettings, menuItems, mobileMenuItems, topbarSettings }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
         const megaMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -110,6 +111,11 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
   const navigation = menuItems && menuItems.length > 0
     ? getDynamicNavigationItems(menuItems, locale)
     : getHeaderCategoryLinks(locale);
+
+  // Mobile hamburger menu: use mobile-header menu if available, fallback to primary menu
+  const mobileNavigation = mobileMenuItems && mobileMenuItems.length > 0
+    ? getDynamicNavigationItems(mobileMenuItems, locale)
+    : navigation;
 
   return (
     <>
@@ -280,7 +286,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu - reads from Mobile Header Menu (independent from desktop) */}
                 <div
                   className={cn(
                     "xl:hidden",
@@ -288,7 +294,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
                   )}
                 >
           <div className="space-y-1 px-4 pb-3 pt-2">
-            {navigation.map((item) => {
+            {mobileNavigation.map((item) => {
               // Skip items with mega menu - they are handled separately
               if (item.hasMegaMenu) {
                 return null;
