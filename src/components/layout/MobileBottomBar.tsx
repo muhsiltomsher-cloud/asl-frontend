@@ -21,6 +21,7 @@ interface MobileBottomBarProps {
   dictionary: Dictionary;
   menuItems?: WPMenuItem[] | null;
   mobileMenuItems?: WPMenuItem[] | null;
+  mobileBottomBarMenuItems?: WPMenuItem[] | null;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -31,7 +32,39 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   user: User,
 };
 
-export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobileMenuItems }: MobileBottomBarProps) {
+// Infer icon from WordPress menu item CSS classes or title
+function inferIconFromMenuItem(item: WPMenuItem): string {
+  const title = item.title.toLowerCase().trim();
+  const url = item.url.toLowerCase();
+
+  // Map common titles/URLs to icons
+  if (title === "home" || url === "/" || url === "") return "home";
+  if (title === "menu" || title === "categories" || url.includes("categories")) return "grid";
+  if (title === "search" || url.includes("search")) return "search";
+  if (title === "account" || url.includes("account")) return "user";
+  if (title === "wishlist" || url.includes("wishlist")) return "heart";
+
+  // Default to home icon for unrecognized items
+  return "home";
+}
+
+// Convert WordPress menu items to MobileBarSettings items
+function wpMenuToBarItems(wpItems: WPMenuItem[], locale: Locale): MobileBarSettings["items"] {
+  return wpItems
+    .filter(item => item.parent === 0) // Only top-level items
+    .map(item => {
+      const icon = inferIconFromMenuItem(item);
+      const isCategoriesItem = icon === "grid";
+      return {
+        icon,
+        label: isCategoriesItem ? "Menu" : item.title,
+        labelAr: isCategoriesItem ? "القائمة" : (locale === "ar" ? item.title : ""),
+        url: item.url || "/",
+      };
+    });
+}
+
+export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobileMenuItems, mobileBottomBarMenuItems }: MobileBottomBarProps) {
   const { wishlistItemsCount } = useWishlist();
   const { setIsAccountDrawerOpen } = useAuth();
   const isKeyboardVisible = useKeyboardVisible();
@@ -40,7 +73,12 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobil
   const [activeDrawer, setActiveDrawer] = useState<string | null>(null);
   const pathname = usePathname();
 
-  if (!settings.enabled || settings.items.length === 0) {
+  // Use WordPress Mobile Bottom Bar menu if available, otherwise fall back to plugin API settings
+  const effectiveSettings: MobileBarSettings = mobileBottomBarMenuItems && mobileBottomBarMenuItems.length > 0
+    ? { enabled: true, items: wpMenuToBarItems(mobileBottomBarMenuItems, locale) }
+    : settings;
+
+  if (!effectiveSettings.enabled || effectiveSettings.items.length === 0) {
     return null;
   }
 
@@ -88,7 +126,7 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobil
     <>
       <nav className={`fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-gray-100 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.08)] xl:hidden transition-transform duration-200 ${isKeyboardVisible ? "translate-y-full" : "translate-y-0"}`}>
         <div className="flex items-center justify-around px-3 py-2 pb-safe">
-          {settings.items.map((item, index) => {
+          {effectiveSettings.items.map((item, index) => {
             const IconComponent = iconMap[item.icon] || Home;
             // Override "Categories" label with "Menu" / "القائمة"
             // Also handled server-side in getMobileBarSettings for SSR consistency

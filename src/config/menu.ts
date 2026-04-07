@@ -135,6 +135,8 @@ const menuArabicTranslations: Record<string, string> = {
   "women's perfumes": "عطور نسائية",
   "unisex perfumes": "عطور للجنسين",
   "oud perfumes": "عطور العود",
+  "all over spray": "سبراي للجسم",
+  "air fresheners": "معطرات الجو",
   "home": "الرئيسية",
   "about": "من نحن",
   "contact": "اتصل بنا",
