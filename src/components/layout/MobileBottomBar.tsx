@@ -20,6 +20,7 @@ interface MobileBottomBarProps {
   settings: MobileBarSettings;
   dictionary: Dictionary;
   menuItems?: WPMenuItem[] | null;
+  mobileMenuItems?: WPMenuItem[] | null;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -30,7 +31,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   user: User,
 };
 
-export function MobileBottomBar({ locale, settings, dictionary, menuItems }: MobileBottomBarProps) {
+export function MobileBottomBar({ locale, settings, dictionary, menuItems, mobileMenuItems }: MobileBottomBarProps) {
   const { wishlistItemsCount } = useWishlist();
   const { setIsAccountDrawerOpen } = useAuth();
   const isKeyboardVisible = useKeyboardVisible();
@@ -159,7 +160,7 @@ export function MobileBottomBar({ locale, settings, dictionary, menuItems }: Mob
         }}
         locale={locale}
         dictionary={dictionary}
-        menuItems={menuItems}
+        menuItems={mobileMenuItems || menuItems}
       />
       <SearchDrawer
         isOpen={isSearchDrawerOpen}
