@@ -172,7 +172,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
                   alt={siteSettings.logo.alt || siteSettings.site_name || "Logo"}
                   width={140}
                   height={90}
-                  className="h-16 md:h-20 w-auto"
+                  className="h-10 md:h-12 w-auto"
                   style={{ width: "auto" }}
                   priority
                 />
@@ -184,7 +184,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
             </Link>
 
             {/* Desktop navigation */}
-            <nav className="hidden xl:flex xl:gap-x-8">
+            <nav className="hidden xl:flex xl:gap-x-4">
               {navigation.map((item) => {
                 if (item.hasMegaMenu) {
                   return (
