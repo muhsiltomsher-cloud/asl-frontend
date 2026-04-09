@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
         revalidatedPaths.push("/en", "/ar");
         break;
 
-      case "menus":
+      case "menus": {
         // Revalidate all menu caches (primary, mobile-header, mobile-bottom, categories-drawer)
         revalidateTag(CACHE_TAGS.menus, revalidateOptions);
         revalidatedTags.push(CACHE_TAGS.menus);
@@ -197,6 +197,7 @@ export async function POST(request: NextRequest) {
         revalidatePath("/ar");
         revalidatedPaths.push("/en", "/ar");
         break;
+      }
 
       case "all":
         // Revalidate everything
