@@ -184,7 +184,7 @@ export function Header({ locale, dictionary, siteSettings, headerSettings, menuI
             </Link>
 
             {/* Desktop navigation */}
-            <nav className="hidden xl:flex xl:gap-x-4">
+            <nav className="hidden xl:flex xl:gap-x-8">
               {navigation.map((item) => {
                 if (item.hasMegaMenu) {
                   return (
