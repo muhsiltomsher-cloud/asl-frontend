@@ -13,7 +13,7 @@ import { revalidateTag, revalidatePath } from "next/cache";
  *   x-revalidate-token: <REVALIDATE_SECRET_TOKEN>
  * Body (JSON):
  *   {
- *     "type": "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "all",
+ *     "type": "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "site-settings" | "menus" | "all",
  *     "slug": "optional-product-slug",
  *     "id": "optional-product-id",
  *     "path": "optional-path-to-revalidate"
@@ -31,6 +31,8 @@ const CACHE_TAGS = {
   pageSeo: "page-seo",
   bundleConfig: "bundle-config",
   freeGifts: "free-gifts",
+  siteSettings: "site-settings",
+  menus: "menus",
 } as const;
 
 export async function POST(request: NextRequest) {
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
     // Parse the request body
     const body = await request.json().catch(() => ({}));
     const { type, slug, id, path } = body as {
-      type?: "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "all";
+      type?: "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "site-settings" | "menus" | "all";
       slug?: string;
       id?: string | number;
       path?: string;
@@ -165,6 +167,37 @@ export async function POST(request: NextRequest) {
         revalidatedPaths.push("/en/cart", "/ar/cart");
         break;
 
+      case "site-settings":
+        // Revalidate site settings (logo, site name, favicon, header, footer, etc.)
+        revalidateTag(CACHE_TAGS.siteSettings, revalidateOptions);
+        revalidateTag("logo", revalidateOptions);
+        revalidatedTags.push(CACHE_TAGS.siteSettings, "logo");
+
+        // Revalidate all pages since site settings affect the entire layout
+        revalidatePath("/en");
+        revalidatePath("/ar");
+        revalidatedPaths.push("/en", "/ar");
+        break;
+
+      case "menus":
+        // Revalidate all menu caches (primary, mobile-header, mobile-bottom, categories-drawer)
+        revalidateTag(CACHE_TAGS.menus, revalidateOptions);
+        revalidatedTags.push(CACHE_TAGS.menus);
+
+        // Also revalidate specific menu tags
+        const menuSlugs = ["primary", "mobile-header", "mobile-bottom", "categories-drawer", "categories-drawer-ar"];
+        menuSlugs.forEach((menuSlug) => {
+          revalidateTag(`menu-${menuSlug}`, revalidateOptions);
+          revalidateTag(`menu-slug-${menuSlug}`, revalidateOptions);
+          revalidatedTags.push(`menu-${menuSlug}`, `menu-slug-${menuSlug}`);
+        });
+
+        // Revalidate all pages since menus appear on every page
+        revalidatePath("/en");
+        revalidatePath("/ar");
+        revalidatedPaths.push("/en", "/ar");
+        break;
+
       case "all":
         // Revalidate everything
         Object.values(CACHE_TAGS).forEach((tag) => {
@@ -187,7 +220,7 @@ export async function POST(request: NextRequest) {
           revalidatedPaths.push(path);
         } else {
           return NextResponse.json(
-            { error: "Invalid revalidation type. Use: products, categories, pages, page-seo, free-gifts, all, or provide a path" },
+            { error: "Invalid revalidation type. Use: products, categories, pages, page-seo, free-gifts, site-settings, menus, all, or provide a path" },
             { status: 400 }
           );
         }
@@ -216,7 +249,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const token = searchParams.get("token");
-  const type = searchParams.get("type") as "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "all" | undefined;
+  const type = searchParams.get("type") as "products" | "categories" | "pages" | "page-seo" | "free-gifts" | "site-settings" | "menus" | "all" | undefined;
   const slug = searchParams.get("slug") || undefined;
   const id = searchParams.get("id") || undefined;
   const path = searchParams.get("path") || undefined;
